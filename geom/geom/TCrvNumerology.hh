@@ -6,6 +6,7 @@
 
 #include "TObject.h"
 #include "TString.h"
+#include "TVector3.h"
 
 class TCrvNumerology : public TObject {
 public:
@@ -24,33 +25,21 @@ public:
     int     fBarIndex;
     int     fSector;
     int     fSectorType;
-    float   fBarX;
-    float   fBarY;
-    float   fBarZ;
-    float   fWidthDir;
-    bool    localXY(float&X, float&Y){
-      if((fSector >= 0) && (fSector <= 6)){
-    	//right side sectors: 0-4, left side sectors: 5-6; dx/dz gives particle direction wrt beam
-    	X = fBarX;
-    	Y = fBarZ;
-	if((fSector >= 0) && (fSector <= 4)){
-	  X = -X; // flip right side to make slopes match left and top
-	}
-	return true;
-      }
-      else if((fSector >= 7) && (fSector <= 10)){
-    	//top side sectors: 7-10; dy/dz gives particle direction wrt beam
-    	X = fBarY;
-    	Y = fBarZ;
-	return true;
-      }
-      else{
-    	//nothing is needed if particle goes through U,D sectors
-        X = 0;
-	Y = 0;
-	return false;
-      }
+    TVector3 fBarPos;
+    int     fBarU;
+    int     fBarV;
+    int     fBarK;
+    // float   fBarX;
+    // float   fBarY;
+    // float   fBarZ;
+    // float   fWidthDir;
+    float   localX() {
+      float dir(1);
+      if((fSector >= 0) && (fSector <= 4))
+	dir = -1.;
+      return dir*fBarPos[fBarU];
     }
+    float   localY() { return fBarPos[fBarV];}
   };
 
   enum { kNSectors = 22, kNBars = 5504 } ;
@@ -80,7 +69,8 @@ public:
   int         NBarsPerLayer(int I) { return fSector[I].fNBarsPerLayer; }
   int         FirstIndex   (int I) { return fSector[I].fFirstIndex;    }
   float       BarLength    (int I) { return fSector[I].fBarLength;     }
-  bool        LocalBarXY   (int I, float&X, float&Y) { return fBar[I].localXY(X,Y); }
+  float       LocalBarX    (int I) { return fBar[I].localX(); }
+  float       LocalBarY    (int I) { return fBar[I].localY(); }
 //-----------------------------------------------------------------------------
 // other methods
 //-----------------------------------------------------------------------------
