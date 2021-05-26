@@ -18,17 +18,17 @@ git clone https://www.github.com/Mu2e/Stntuple.git
     for this release to choose the build option (prof or debug), 
     run "buildopts -h" for help.
 
-#+begin_code 
+#+begin_quote
 source /cvmfs/mu2e.opensciencegrid.org/setupmu2e-art.sh
 ./buildopts --build=debug 
-#+end_code 
+#+end_quote
 
 - run local setup script, then run scons to build libraries :
 
-#+begin_code
+#+begin_quote
 source ./setup.sh 
 scons -j2
-#+end_code
+#+end_quote
 * ------------------------------------------------------------------------------
 * back to [[file:Stntuple.org][Stntuple.org]]
 * ------------------------------------------------------------------------------
