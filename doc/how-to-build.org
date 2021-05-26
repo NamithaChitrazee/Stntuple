@@ -3,32 +3,32 @@
 
 - check out Mu2e Offline into dev directory
 
-#+begin_quote
+#+begin_src
 git clone https://www.github.com/Mu2e/Offline.git dev 
-#+end_quote
+#+end_src
 
 - change directory to dev and clone Stntuple:
 
-#+begin_quote 
+#+begin_src  
 cd dev 
 git clone https://www.github.com/Mu2e/Stntuple.git 
-#+end_quote
+#+end_src 
 
 - setup Mu2e environment and run local ./buildopts script to set configuration options 
     for this release to choose the build option (prof or debug), 
     run "buildopts -h" for help.
 
-#+begin_quote
+#+begin_src
 source /cvmfs/mu2e.opensciencegrid.org/setupmu2e-art.sh
 ./buildopts --build=debug 
-#+end_quote
+#+end_src
 
 - run local setup script, then run scons to build libraries :
 
-#+begin_quote
+#+begin_src
 source ./setup.sh 
 scons -j2
-#+end_quote
+#+end_src
 * ------------------------------------------------------------------------------
 * back to [[file:Stntuple.org][Stntuple.org]]
 * ------------------------------------------------------------------------------

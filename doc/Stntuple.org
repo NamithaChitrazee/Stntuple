@@ -2,7 +2,7 @@
 * ------------------------------------------------------------------------------
 * organization                                                               
   Stntuple includes several subpackages, each subpackage builds a separate library
-#+begin_code                                            
+#+begin_src                                           
   [[file:../ana][ana]]     : examples of analysis modules
   alg     : algorithm classes 
   base    : base infrastructure classes
@@ -17,7 +17,7 @@
             these functions are Framework-aware
   scripts : 
   val     : validation utility, more infrastructure code
-#+end_code 
+#+end_src
 * [[file:./how-to-build.org][how to build Stntuple libraries]]
 * fcl files                                                                  
   the table below lists status of validation of various FCL files
