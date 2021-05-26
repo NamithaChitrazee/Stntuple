@@ -2,12 +2,12 @@
 * ------------------------------------------------------------------------------
 * organization                                                               
   Stntuple includes several subpackages, each subpackage builds a separate library
-#+begin_src                                           
-  [[file:../ana][ana]]     : examples of analysis modules
-  alg     : algorithm classes 
-  base    : base infrastructure classes
-  doc     : documentation
-  geom    : light-weight geometry definitions for event display and analysis
+  - [[file:../ana][ana]]     : examples of analysis modules
+  - [[file:../alg][alg]]     : algorithm classes 
+  - [[file:../base][base]]    : base infrastructure classes
+  - [[file:./][doc]]     : documentation
+  -[[file:../geom][ geom]]    : light-weight geometry definitions for event display and analysis
+
   gui     : prototype of the event display, so far - 2D
             EVE-based prototype - see file:../ana/TStnEventDisplayModule.cc
   loop    : interactive event loop utility for analysis jobs 
@@ -17,7 +17,6 @@
             these functions are Framework-aware
   scripts : 
   val     : validation utility, more infrastructure code
-#+end_src
 * [[file:./how-to-build.org][how to build Stntuple libraries]]
 * fcl files                                                                  
   the table below lists status of validation of various FCL files
