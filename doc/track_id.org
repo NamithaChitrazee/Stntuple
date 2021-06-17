@@ -1,5 +1,7 @@
 #
 
+* [[file:../alg/alg/TStnTrackID.hh][TStnTrackID]] : a track selection utility
+
 * TStnTrackID histograms
 
   For each parameter used for track ID, TStnTrackID::FillHistograms fills 5 histograms:
@@ -9,4 +11,7 @@
   - [2] : cuts applied in sequence, before the cut
   - [3] : cuts applied in sequence, after  the cut
   - [4] : distribution in a given parameter for tracks passing all ID cuts
+* ------------------------------------------------------------------------------
+* back to [[file:Stntuple.org][Stntuple.org]]
+* ------------------------------------------------------------------------------
 
