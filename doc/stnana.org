@@ -4,7 +4,7 @@
 
 ** _running interactively_:                                               
 
-- checks:
+- initial checks:
 
 1) your working area is that of the test release, 
 2) [[file:../scripts/rootlogon.C]] and [[file:../scripts/.rootrc][.rootrc]] files have been copied from the [[file:../scripts][Stntuple/scripts]] area
@@ -18,7 +18,7 @@ root [0] .L stnana.C
 root [1] stnana("file","","","nts._USER_.cele0s81b2.su2020.001000_00000000.stn","stn_val(11,28)/save=eminus_gun_stnmaker.hist",100)
 #+end_src
 
-stnana provides an interface to STNTUPLE event loop utility. Meaning of the call parameters:
+stnana provides an interactive interface to the STNTUPLE event loop utility. Meaning of the call parameters:
 
 - parameters 1-4 : define the dataset to run on, see the explanation below
 - parameter 5    : defines the configuration of the analysis job
@@ -146,17 +146,21 @@ root [4] stntuple::m_val->fTrackBlock->NTracks()
 
 Each STNTUPLE data block has ::Print(..) function which could be called from the compiled code as well as interactively. 
 One can process an event and print is data directly from the ROOT prompt.
-Here is an example of how to print a track block:
+For example, if a track block fTrackBlock is defined in your analysis module (m_ele), this is how to print 
+it from the ROOT prompt:
 
 #+begin_src
 root[10] g.x->Continue(1);
 root[11] m_ele->fTrackBlock->Print() 
 #+end_src
 
-* User analysis packages                                                     
+* analysis packages                                                     
 
  - User analysis code is organized in packages, similar to Offline packages. 
-   STNTUPLE analysis packages are specified in a .rootrc file , their list 
+
+ - [[file:../ana][Stntuple/ana]] gives an example of an analysis package
+
+ - STNTUPLE analysis packages are specified in a .rootrc file , their list 
    can be extended with '+' lines as shown below
 #+begin_src org
 #------------------------------------------------------------------------------ 
@@ -180,8 +184,9 @@ root[11] m_ele->fTrackBlock->Print()
    in [[file:../ana/scripts/load_stnana_scripts_Stntuple.C][Stntuple/ana/scripts/load_stnana_scripts_Stntuple.C]], make your own loader script, 
    following the template
 
- - each loaded script defines one or multiple job configurations - see example in 
-   [[file:../ana/scripts/validation.C][Stntuple/ana/scripts/validation.C]]
+ - each loaded script defines one or multiple job configurations:
+   - [[file:../ana/scripts/validation.C][Stntuple/ana/scripts/validation.C]] defines one job (stn_val)
+   - file:../ana/scripts/trk.C         also defines one
 
  - file $pkg/ana/scripts/modules.hh declares user analysis modules - see example in 
    [[file:../ana/scripts/modules.hh][Stntuple/ana/scripts/modules.hh]] (the namespace there doesn't have to be replicated)
@@ -189,6 +194,8 @@ root[11] m_ele->fTrackBlock->Print()
  - [[file:../ana/scripts][Stntuple/ana/scripts]] directory contains examples of the analysis job configuration scripts
 
  - [[file:../scripts/.rootrc][Stntuple/scripts/.rootrc]] file shows how to configure Unix.*.Root.MacroPath - path for loading ROOT macros
+
+- each name used by *def_name* has to be unique 
 
 * Internal structure of a user analysis package - an example                 
 
