@@ -1,0 +1,38 @@
+# hit <TAB> to expand and collapse the menues
+* ------------------------------------------------------------------------------
+* _STNTUPLE datasets_                                                        
+
+  - Mu2e STNTUPLE dataset are kept on BLUEARC disks and in dCache. The datasets are cataloged and could be accessed 
+  via the catalog. The top level catalog page is here: https://mu2e.fnal.gov/public/hep/computing/Stntuple/cafdfc/
+
+  - Logically, all datasets are split into books (think - cataloged folders), 
+  such that two users using two different books, could have two datasets with the same name. 
+  The books could be public and private. Datasets in public books are centrally maintained by the collaboration,
+  private books are the books maintained by individual users and serve their own needs.
+  The only difference between them is that one can't complain if a dataset, cataloged in the private book 
+  of another user, disappears - public datasets belong to public books. 
+
+  - If you want to create your own book, send email to murat@fnal.gov to use cataloged datasets, 
+  describe the catalog location in your .rootrc file:
+
+#+begin_quote
+  Stntuple.Catalog   https://mu2e.fnal.gov/public/hep/computing/Stntuple/cafdfc 
+#+end_quote
+
+** Public books:                                 
+
+   - [[http://mu2e.fnal.gov/public/hep/computing/Stntuple/cafdfc/su2020/index.shtml][su2020]]  : stntuples of SU2020 datasets ￼
+   - [[https://mu2e.fnal.gov/public/hep/computing/Stntuple/cafdfc/mdc2018/index.shtml][mdc2018]]  : stntuples of MDC2018 datasets (by Giani and Pasha)
+   - [[https://mu2e.fnal.gov/public/hep/computing/Stntuple/cafdfc/su2020/index.shtml][bluearc]]  : general purpose STNTUPLE datasets (CD3 era, mostly obsolete)
+
+** Private books                                 
+
+   - murat    : stntuples of MDC2018 datasets with tuned DAR version (*721z datasets, so far, test version)
+   - gianipez : general purpose STNTUPLE datasets by Giani
+   - mhedges  : signal and background datasets for pi+ --> e+ nu studies by Michael H.
+   - mmackenz : general purpose STNTUPLE datasets by Michael M.
+   - rdonghia : general purpose STNTUPLE datasets by Raffaella
+   - ediociat : general purpose STNTUPLE datasets by Eleonora
+* ------------------------------------------------------------------------------
+* back to [[file:Stntuple.org][Stntuple.org]]
+* ------------------------------------------------------------------------------

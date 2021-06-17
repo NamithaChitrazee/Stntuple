@@ -1,0 +1,31 @@
+#
+* _How to make first stntuple_
+
+it is assumed that the working area is that of the test release 
+
+1) Setup the Mu2e offline environment, buid STNTUPLE libraries 
+2) run a job to generate 100 events with single conversion electrons:
+
+#+begin_src
+mu2e -c Stntuple/fcl/gen_sim_digi_cele0.fcl -n 100
+#+end_src
+
+3) run a job to stntuple produced events :
+
+#+begin_src
+mu2e -c Stntuple/fcl/reco_stn_cele0.fcl -s dig._USER_.cele0s41b0.su2020.001000_00000000.art
+#+end_src
+
+4) check the job printout, make sure the ntuple (.stn file) has been produced:
+
+#+begin_src
+>ls -altr | grep cele0s8
+.. snip.. 
+-rw-r--r--   1 murat mu2e    29227 Jun 17 10:41 nts._USER_.cele0s81b2.su2020.001000_00000000.stn
+-rw-r--r--   1 murat mu2e      519 Jun 17 10:41 nts._USER_.cele0s81b0.su2020.001000_00000000.root
+#+end_src
+
+* next: _how to run analyse produced stntuple_ : [[file:stnana.org][stnana.org]] 
+* ------------------------------------------------------------------------------
+* back to [[file:Stntuple.org][Stntuple.org]]
+* ------------------------------------------------------------------------------
