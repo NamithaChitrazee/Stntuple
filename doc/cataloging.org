@@ -68,3 +68,6 @@ be present, currently no software tools rely on the metadata presence.
 catalog_dir=/web/sites/mu2e.fnal.gov/htdocs/atwork/computing/Stntuple/cafdfc
 Stntuple/scripts/catalog_stntuples --access=xrootd -b su2020 -d $dsid -D $dir -p $dsid --install $catalog_dir
 #+end_src
+* ------------------------------------------------------------------------------
+* back to: [[file:stntuple-datasets.org][Stntuple datasets]]  [[file:Stntuple.org][Stntuple.org]]
+* ------------------------------------------------------------------------------

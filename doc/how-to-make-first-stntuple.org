@@ -1,5 +1,6 @@
-#
-* _How to make first stntuple_
+# use <TAB> to expand and collpse the menues
+* ------------------------------------------------------------------------------
+* _How to make yuor first stntuple_
 
 it is assumed that the working area is that of the test release 
 

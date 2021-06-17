@@ -33,6 +33,8 @@
    - mmackenz : general purpose STNTUPLE datasets by Michael M.
    - rdonghia : general purpose STNTUPLE datasets by Raffaella
    - ediociat : general purpose STNTUPLE datasets by Eleonora
+** [[file:cataloging.org][How to create a cataloged STNUPLE dataset]]
+** [[file:concatenation.org][How to concatenate]] 
 * ------------------------------------------------------------------------------
-* back to [[file:Stntuple.org][Stntuple.org]]
+* back to <[[file:Stntuple.org][Stntuple.org]]>
 * ------------------------------------------------------------------------------
