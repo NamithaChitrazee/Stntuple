@@ -1,5 +1,5 @@
 # 
-* Building Stntuple libraries in a full test release  
+* _Building Stntuple libraries in a full test release_                       
 
 - check out Mu2e Offline into dev directory
 
@@ -26,7 +26,8 @@ source /cvmfs/mu2e.opensciencegrid.org/setupmu2e-art.sh
 - run local setup script, then run scons to build libraries :
 
 #+begin_src
-source ./setup.sh 
+source ./setup.sh
+scons Stntuple
 scons -j2
 #+end_src
 * ------------------------------------------------------------------------------

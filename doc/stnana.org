@@ -1,8 +1,17 @@
-* STNANA: Stntuple interactive analysis framework     
+# use <TAB> to expand and collapse the menus
+* ------------------------------------------------------------------------------
+* STNANA: Stntuple interactive analysis framework                            
 
-** running interactively:                
+** _running interactively_:                                               
 
-to run an interactive STNTUPLE analysis job, open a ROOT session, load and run [[file:../scripts/stnana.C][Stntuple/scripts/stnana.C]] :
+- checks:
+
+1) your working area is that of the test release, 
+2) [[file:../scripts/rootlogon.C]] and [[file:../scripts/.rootrc][.rootrc]] files have been copied from the [[file:../scripts][Stntuple/scripts]] area
+
+- run an interactive STNTUPLE analysis job: 
+
+1) open a ROOT session, load and run [[file:../scripts/stnana.C][Stntuple/scripts/stnana.C]] :
 
 #+begin_src C
 root [0] .L stnana.C 
@@ -28,7 +37,7 @@ runs the track_ana() function on first 10000 events of the dataset defined by th
 
 WARNING: track_ana() function is not defined by default, don't try to call it.
 
-** stnana call format                    
+** stnana call format                                                   
 
 #+begin_src C
 void stnana (TString Book, TString Dataset, TString Fileset = "", TString File = "",TString JobName="lumi()",int NEvents = 0) ; 
@@ -67,7 +76,7 @@ First 4 parameters in a call to *stnana* describe the input dataset: (read more 
   - /grl : name of the good run list (Mu2e doesn't have such yet)
 
 - NEvents : number of events to be processed. If NEvents<=0 (default): process all events ​
-** interactive capabilities of *stnana*  
+** interactive capabilities of *stnana*                                 
 
 When stnana.C is loaded, an object of StnAnaGlobals_t type is created. This object is accessible under 
 the name ‘g’ and is defined in [[file:../scripts/global_vars.h][Stntuple/scripts/global_vars.h]]. The most used element of this structure, 
@@ -132,7 +141,7 @@ root [4] stntuple::m_val->fTrackBlock->NTracks()
 (int) 0
 #+end_src
 
-** Printing STNTUPLE data blocks         
+** Printing STNTUPLE data blocks                                        
 
 Each STNTUPLE data block has ::Print(..) function which could be called from the compiled code as well as interactively. 
 One can process an event and print is data directly from the ROOT prompt.
@@ -143,11 +152,10 @@ root[10] g.x->Continue(1);
 root[11] m_ele->fTrackBlock->Print() 
 #+end_src
 
-
-* STNTUPLE user analysis packages                     
+* User analysis packages                                                     
 
  - User analysis code is organized in packages, similar to Offline packages. 
-   STNTUPLE analysis packages are specified in the .rootrc file , their list 
+   STNTUPLE analysis packages are specified in a .rootrc file , their list 
    can be extended with '+' lines as shown below
 #+begin_src org
 #------------------------------------------------------------------------------ 
@@ -181,7 +189,7 @@ root[11] m_ele->fTrackBlock->Print()
 
  - [[file:../scripts/.rootrc][Stntuple/scripts/.rootrc]] file shows how to configure Unix.*.Root.MacroPath - path for loading ROOT macros
 
-** Internal structure of a user analysis package         
+* Internal structure of a user analysis package - an example                 
 
 #+begin_src org  
   /mu2e/app/users/murat/mdc2018_prof/MyAna/ana:
@@ -215,7 +223,7 @@ root[11] m_ele->fTrackBlock->Print()
   -rw-r--r-- 1 murat mu2e  674 Jun 22 18:32 trk.C
 #+end_src
 
-** how to clone Stntuple/ana into an analysis package    
+* how to clone Stntuple/ana and create a user analysis package               
 
    - run [[file:../scripts/make_analysis_package][Stntuple/scripts/make_analysis_package]] script:
 
@@ -227,4 +235,5 @@ root[11] m_ele->fTrackBlock->Print()
    2) in the created package, the module names are placed into a *package_name* namespace
    3) not all modules are cloned
 
-      
+* ------------------------------------------------------------------------------
+* back to [[file:./Stntuple.org]]
