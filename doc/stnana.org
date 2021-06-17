@@ -11,21 +11,22 @@
 
 - run an interactive STNTUPLE analysis job: 
 
-1) open a ROOT session, load and run [[file:../scripts/stnana.C][Stntuple/scripts/stnana.C]] :
+1) open a ROOT session, load and run [[file:../scripts/stnana.C][Stntuple/scripts/stnana.C]] (make sure the input file name is correct) :
 
 #+begin_src C
 root [0] .L stnana.C 
-root [1] stnana("file","","","nts.user.eminus_gun_stnmaker.xxx.000001.stn","val_stn(11,28)/save=eminus_gun_stnmaker.hist",100)
+root [1] stnana("file","","","nts._USER_.cele0s81b2.su2020.001000_00000000.stn","stn_val(11,28)/save=eminus_gun_stnmaker.hist",100)
 #+end_src
 
-stnana provides an interface to STNTUPLE event loop utility. The call parameters specify
+stnana provides an interface to STNTUPLE event loop utility. Meaning of the call parameters:
 
-- dataset to run on: first 4 parameters, see explanation below
-- configuration of the analysis job: which analysis code should be executed within the event loop
-- number of events to run on
+- parameters 1-4 : define the dataset to run on, see the explanation below
+- parameter 5    : defines the configuration of the analysis job
+- parameter 6    : number of events to run on
 
-The example above runs the analysis job configured by ROOT function val_stn(11,28) on first 100 events 
-of the file nts.user.eminus_gun_stnmaker.xxx.000001.stn. '11' and '28' are the call parameters passed to val_stn().
+The example above runs the analysis job configured by the call to ROOT function stn_val(11,28) on first 100 events 
+of the file nts._USER_.cele0s81b2.su2020.001000_00000000.stn '11' and '28' are the call parameters of stn_val(...).
+stn_val is defined in [[file:../ana/scripts/validation.C][Stntuple/ana/scripts/validation.C]]
 
 The following example
 
