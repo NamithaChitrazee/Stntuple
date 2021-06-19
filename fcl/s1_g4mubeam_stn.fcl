@@ -6,6 +6,7 @@ BEGIN_PROLOG
   TIME_MAPS        @protect_ignore: [ ]
   TIME_OFFSET_MAPS @protect_ignore: { inputs : @local::TIME_MAPS }
   TRIGGER_PATHS    @protect_ignore: [ stntuple_p0 ]
+  GEN_ID           @protect_ignore: "unknown"                            # ignore GEN_ID check
 END_PROLOG
 
 #include "Stntuple/fcl/stnmaker.fcl"

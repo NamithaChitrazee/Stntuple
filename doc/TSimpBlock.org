@@ -20,6 +20,8 @@
     when a generator module is used, need to be the same as defined in the generator module
 
   - pdgId : particle PDG ID, defined in [[file:../fcl/prolog.fcl::@local::PDG_ID][Stntuple/fcl/prolog.fcl]]
+* Details on variables 
+-  TSimParticle time is the time w/o timing offsets explicitly applied   
 * ------------------------------------------------------------------------------
 * *common problems*
 * ------------------------------------------------------------------------------

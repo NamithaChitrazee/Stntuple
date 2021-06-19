@@ -1,0 +1,17 @@
+#
+* FCL files to configure sample jobs 
+
+  the table below lists status of validation of various FCL files
+
+|-----------------------------------------+----------------------+----------|
+| job configuration                       | last validation date | comments |
+|-----------------------------------------+----------------------+----------|
+| [[../test/eminus_gun_stnmaker.fcl][Stntuple/test/eminus_gun_stnmaker.fcl]]   | <2020-05-30 Sat>     |          |
+|-----------------------------------------+----------------------+----------|
+| Stntuple/fcl/primary/flateminus_stn.fcl | <2020-05-31 Sun>     |          |
+
+
+* ------------------------------------------------------------------------------
+* back to [[file:Stntuple.org][Stntuple.org]] 
+* ------------------------------------------------------------------------------
+

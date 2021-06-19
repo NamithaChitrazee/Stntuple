@@ -1,0 +1,23 @@
+# -*- mode: tcl -*-
+
+BEGIN_PROLOG
+  PROCESS_NAME  @protect_ignore: S4GenSimDigi
+  INPUT_MODULE  @protect_ignore: EmptyEvent         # choices: EmptyEvent / RootInput
+  TRIGGER_PATHS @protect_ignore: [ su2020_p1 ]      # defined in su2020/common/su2020.fcl
+  GEN_ID        @protect_ignore: CeLeadingLog
+END_PROLOG
+
+#include "Stntuple/fcl/stnmaker.fcl"
+
+source                                 : { module_type: @local::INPUT_MODULE }
+physics                                : { @table::Stntuple.physics }
+outputs                                : { @table::Stntuple.outputs }
+physics.producers.generate             : { @table::Stntuple.physics.producers.CeMLeadingLog }
+
+physics.output_path                    : [ defaultOutput ]
+outputs.defaultOutput.SelectEvents     : [ @sequence::TRIGGER_PATHS ]
+outputs.defaultOutput.outputCommands   : [ @sequence::su2020.gen_sim_digi_output ]
+#------------------------------------------------------------------------------
+services.GeometryService.inputFile     : "su2020/common/geom_baseline.txt"
+services.TFileService.fileName         : "nts._USER_.cele0s41b0.su2020.001000_00000000.root"
+outputs.defaultOutput.fileName         : "dig._USER_.cele0s41b0.su2020.001000_00000000.art"

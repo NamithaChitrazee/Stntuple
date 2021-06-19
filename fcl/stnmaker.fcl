@@ -10,6 +10,9 @@
 #
 # variables defined in the following PROLOG can be redefined in the top-level
 # job configuration file using "@protect_ignore:" FCL construct
+#
+# GEN_ID needs to be redefined once again in the job top-level FCL file, as it 
+#        is set to "CeEndpoint" in EventGenerator/fcl/prolog.fcl
 #------------------------------------------------------------------------------
 BEGIN_PROLOG
   bgHitFiles          : @nil
@@ -19,7 +22,7 @@ BEGIN_PROLOG
   BLIND_TIME          : 500                                  # default
   STN_VDHITS_COLL_TAG : "compressDigiMCs:virtualdetector"
   PDG_ID              : 0                                    # 0: ignore PDG_ID
-  GEN_ID              : "unknown"                            # 0: ignore GEN_ID check
+  GEN_ID              : "unknown"                            #    ignore GEN_ID check
 END_PROLOG
 
 #include "fcl/minimalMessageService.fcl"
