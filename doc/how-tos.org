@@ -1,8 +1,13 @@
 #
-* _Stntuple How-To's_ 
+_Stntuple How-To's_ 
 
-* [[file:how-to-print-branch-sizes.org][how to print sizes of different STNTUPLE branches]]
-* [[file:how-to-debug.org][how to debug an Stntuple job with GDB]]
+1) how to report a problem                                                   
+
+   don't to that. If you happened to be the first one to hit a problem, analyse it, 
+   find a solution, and report a solution
+
+2) [[file:how-to-print-branch-sizes.org][how to print sizes of different STNTUPLE branches]]
+3) [[file:how-to-debug.org][how to debug an Stntuple job with GDB]]
 * ------------------------------------------------------------------------------
 * back to the top: [[file:Stntuple.org][Stntuple.org]]
 * ------------------------------------------------------------------------------

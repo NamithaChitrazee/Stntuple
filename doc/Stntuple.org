@@ -1,5 +1,25 @@
 # hit <TAB> to expand and collapse the menues
 * ------------------------------------------------------------------------------
+* what is STNTUPLE 
+
+  STNTUPLE is two things:
+
+  - an ntuple data format
+  - a light-weight ntuple analysis framework, used for many years by the CDF experiment at Fermilab and ported to Mu2e.
+
+  Assumptions which lead to development of STNTUPLE are as follows:
+
+  - in any experiment, over time, ntuples become large. De-facto, they become mini-DST's.
+  - Ntuple datasets also become large, one needs a way to share them and store them in the data handling system
+  - "Click-on-TNtuple"-based mode doesn't work for publication-level analysis. 
+     To be able to efficiently re-submit a job and to deal with multiple jobs 
+     one needs a framework. 
+     For reproducibility, analysis jobs should be configured and driven by scripts
+  - analysis code quickly becomes rather sophisticated. 
+    It can't be used in interpreted mode - has to be compiled
+  - HEP uses C++ for compiled code. Using one language is better (simpler) than two - 
+    all scripting is done using ROOT C++ interpreting capabilities
+
 * [[file:./how-to-build.org][how to build Stntuple libraries]]
 * [[file:how-to-make-first-stntuple.org][how to make first Stntuple]] 
 * [[file:stnana.org][stnana]] - STNTUPLE analysis framework                                       
