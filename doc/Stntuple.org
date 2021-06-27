@@ -1,13 +1,16 @@
 # hit <TAB> to expand and collapse the menues
 * ------------------------------------------------------------------------------
-* what is STNTUPLE 
+* what is STNTUPLE                                                           
 
   STNTUPLE is two things:
 
   - an ntuple data format
-  - a light-weight ntuple analysis framework, used for many years by the CDF experiment at Fermilab and ported to Mu2e.
+  - a light-weight interactive ntuple analysis framework, used for many years by the CDF experiment at Fermilab 
+    and ported to Mu2e.
+    The framework supprots multiple job configurations, it is interfaced to the data handling system and allows to run 
+    analysis jobs of any complexity, interactively and on the GRID.
 
-  Assumptions which lead to development of STNTUPLE are as follows:
+  STNTUPLE development is based on the following assumptions:
 
   - in any experiment, over time, ntuples become large. De-facto, they become mini-DST's.
   - Ntuple datasets also become large, one needs a way to share them and store them in the data handling system
@@ -17,8 +20,14 @@
      For reproducibility, analysis jobs should be configured and driven by scripts
   - analysis code quickly becomes rather sophisticated. 
     It can't be used in interpreted mode - has to be compiled
-  - HEP uses C++ for compiled code. Using one language is better (simpler) than two - 
-    all scripting is done using ROOT C++ interpreting capabilities
+  - HEP uses C++ for compiled code. Using one language is less expensive than two.
+    Thus all scripting, and the needed level of scripting is rather simple, is done using ROOT C++ 
+    interpreting capabilities
+  - an HEP analysis can be competed and publish using ~5% of C++ functionality, without any disadvantages.
+    Therefore STNTUPLE C++ is, by design, a "simple" , C-style, C++, which doesn't require any knowledge 
+    of advanced features of the language.
+
+  - lets keep it simple :) 
 
 * [[file:./how-to-build.org][how to build Stntuple libraries]]
 * [[file:how-to-make-first-stntuple.org][how to make first Stntuple]] 
