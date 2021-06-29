@@ -23,7 +23,7 @@
   - HEP uses C++ for compiled code. Using one language is less expensive than two.
     Thus all scripting, and the needed level of scripting is rather simple, is done using ROOT C++ 
     interpreting capabilities
-  - an HEP analysis can be competed and publish using ~5% of C++ functionality, without any disadvantages.
+  - an HEP analysis can be competed and published using ~5% of C++ functionality, without any disadvantages.
     Therefore STNTUPLE C++ is, by design, a "simple" , C-style, C++, which doesn't require any knowledge 
     of advanced features of the language.
 

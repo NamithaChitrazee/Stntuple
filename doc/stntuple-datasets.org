@@ -1,6 +1,6 @@
 # hit <TAB> to expand and collapse the menues
 * ------------------------------------------------------------------------------
-* _STNTUPLE datasets_                                                        
+  _STNTUPLE datasets_                                                        
 
   - Mu2e STNTUPLE dataset are kept on BLUEARC disks and in dCache. The datasets are cataloged and could be accessed 
   via the catalog. The top level catalog page is here: https://mu2e.fnal.gov/public/hep/computing/Stntuple/cafdfc/
