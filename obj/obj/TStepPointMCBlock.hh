@@ -76,7 +76,7 @@ public:
 				int ParentSimID, int ParentPDGCode, 
 				int CreationCode, int EndProcessCode,
 				float EDepTot, float EDepNio, 
-				float Time, float StepLength,
+				float Time, float ProperTime, float StepLength,
 				float    X, float      Y, float          Z, 
 				float   Px, float     Py, float         Pz);
 

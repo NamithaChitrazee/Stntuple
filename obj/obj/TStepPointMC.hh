@@ -25,6 +25,7 @@ public:
   float           fEDepNio;
   float           fTime;
   float           fStepLength;
+  float           fProperTime;          // added in V2;
 
   TVector3        fPos;			// starting point of the step
   TVector3        fMom;
@@ -41,7 +42,8 @@ public:
 	       int ParentSimID , int ParentPDGCode , 
 	       int CreationCode, int EndProcessCode,
 	       float EDepTot   , float EDepNio     , 
-	       float Time      , float StepLength  ,
+	       float Time      , float ProperTime  , 
+	       float StepLength,
 	       float X, float Y, float Z, float Px, float Py, float Pz   );
 
   virtual ~TStepPointMC();
@@ -62,6 +64,7 @@ public:
   float  EDepTot       () const { return fEDepTot;       }
   float  EDepNio       () const { return fEDepNio;       }
   float  Time          () const { return fTime;          }
+  float  ProperTime    () const { return fProperTime;    }
   float  StepLength    () const { return fStepLength;    }
 
   const TVector3*  Pos       () const { return &fPos; }
@@ -73,9 +76,9 @@ public:
 //-----------------------------------------------------------------------------
 // schema evolution
 //-----------------------------------------------------------------------------
-//  void     ReadV1(TBuffer &R__b);
+  void     ReadV1(TBuffer &R__b);
 
-  ClassDef(TStepPointMC,1)
+  ClassDef(TStepPointMC,2)
 };
 
 #endif

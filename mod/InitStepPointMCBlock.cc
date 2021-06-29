@@ -55,7 +55,7 @@ int StntupleInitStepPointMCBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* 
       spmc_block->fG4RealTime       = sg4->realTime();
     }
   }
-  
+
   AnEvent->getByLabel(fSpmcCollTag,spmcch);
   
   if (spmcch.isValid()) {
@@ -119,6 +119,7 @@ int StntupleInitStepPointMCBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* 
       }
       else time =  spmc->time();
 
+      float proper_time = spmc->properTime();
       step_length = spmc->stepLength();
 
       spmc_block->NewStepPointMC(volume_id, gen_index, 
@@ -126,7 +127,9 @@ int StntupleInitStepPointMCBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* 
 				 parent_id, parent_pdg_code, 
 				 creation_code, end_process_code,
 				 edep_tot,edep_nio,
-				 time, step_length,
+				 time, 
+				 proper_time,
+				 step_length,
 				 spmc->position().x(),
 				 spmc->position().y(),
 				 spmc->position().z(),

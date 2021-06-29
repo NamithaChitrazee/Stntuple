@@ -113,7 +113,7 @@ TStepPointMCBlock::NewStepPointMC(int VolumeID, int GenIndex,
 				  int ParentSimID, int ParentPDGCode,
 				  int CreationCode, int EndProcessCode, 
 				  float EDepTot, float EDepNio,
-				  float Time, float StepLength,
+				  float Time, float ProperTime, float StepLength,
 				  float  X, Float_t  Y, Float_t  Z,
 				  float Px, Float_t Py, Float_t Pz
 				  )
@@ -129,7 +129,7 @@ TStepPointMCBlock::NewStepPointMC(int VolumeID, int GenIndex,
 							     ParentSimID, ParentPDGCode,
 							     CreationCode, EndProcessCode,
 							     EDepTot,EDepNio,
-							     Time,StepLength,
+							     Time,ProperTime,StepLength,
 							     X,Y,Z,Px,Py,Pz);
   fNStepPoints += 1;
 

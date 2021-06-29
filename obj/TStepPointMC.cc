@@ -9,48 +9,56 @@
 ClassImp(TStepPointMC)
 
 //-----------------------------------------------------------------------------
-// void TStepPointMC::ReadV1(TBuffer &R__b) {
+void TStepPointMC::ReadV1(TBuffer &R__b) {
 
-//   struct TStepPointMCV01_t {
-//     int             fParentID;
-//     int             fPdgCode;
-//     int             fCreationCode;
-//     int             fStartVolumeIndex;
-//     int             fTerminationCode;
-//     int             fEndVolumeIndex;
-//     int             fNStrawHits;
+  struct TStepPointMC_v01_t {
+    int             fVolumeID;
+    int             fGenIndex;
+    int             fSimID;
+    int             fPDGCode;
+    int             fCreationCode;
+    int             fParentSimID;
+    int             fParentPDGCode;
+    int             fEndProcessCode;
+
+    float           fEDepTot;
+    float           fEDepNio;
+    float           fTime;
+    float           fStepLength;
     
-//     float           fMomTargetEnd;
-//     float           fMomTrackerFront;		// entrance to ST
+    TVector3        fPos;			// starting point of the step
+    TVector3        fMom;
+  };
 
-//     TLorentzVector  fStartPos;
-//     TLorentzVector  fStartMom;
-//   };
+  TStepPointMC_v01_t data;
 
-//   TStepPointMCV01_t data;
+  int nwi = ((int*  ) &data.fEDepTot) - &data.fVolumeID;
+  int nwf = ((float*) &data.fPos    ) - &data.fEDepTot ;
 
-//   int nwi = ((int*  ) &data.fMomTargetEnd) - &data.fParentID;
-//   int nwf = ((float*) &data.fStartPos    ) - &data.fMomTargetEnd ;
+  TObject::Streamer(R__b);
 
-//   TObject::Streamer(R__b);
+  R__b.ReadFastArray(&data.fVolumeID,nwi);
+  R__b.ReadFastArray(&data.fEDepTot ,nwf);
 
-//   R__b.ReadFastArray(&data.fParentID   ,nwi);
-//   R__b.ReadFastArray(&data.fMomTargetEnd,nwf);
-
-//   fParentID         = data.fParentID;
-//   fPdgCode          = data.fPdgCode;
-//   fCreationCode     = data.fCreationCode;
-//   fStartVolumeIndex = data.fStartVolumeIndex;
-//   fTerminationCode  = data.fTerminationCode;
-//   fEndVolumeIndex   = data.fEndVolumeIndex;
-//   fNStrawHits       = data.fNStrawHits;
-
-//   fGenpID           = -1;         // ** added in V2 **
-
-//   fStartPos.Streamer(R__b);
-//   fStartMom.Streamer(R__b);
+  fVolumeID         = data.fVolumeID;
+  fGenIndex         = data.fGenIndex;
+  fSimID            = data.fSimID;
+  fPDGCode          = data.fPDGCode;
+  fCreationCode     = data.fCreationCode;
+  fParentSimID      = data.fParentSimID;
+  fParentPDGCode    = data.fParentPDGCode;
+  fEndProcessCode   = data.fEndProcessCode;
   
-// }
+  fEDepTot          = data.fEDepTot;
+  fEDepNio          = data.fEDepNio;
+  fTime             = data.fTime;
+  fStepLength       = data.fStepLength;
+  
+  fProperTime       = -1;         // ** added in V2 **
+
+  fPos.Streamer(R__b);
+  fMom.Streamer(R__b);
+}
 
 //-----------------------------------------------------------------------------
 // we don't really need to write out TObject part - so far it is not used
@@ -62,18 +70,17 @@ void TStepPointMC::Streamer(TBuffer& R__b) {
   nwf = ((float*) &fPos    ) - &fEDepTot ;
 
   if (R__b.IsReading()) {
-    //    Version_t R__v = R__b.ReadVersion(); 
-    R__b.ReadVersion(); 
-    // if (R__v == 1) ReadV1(R__b);
-    // else {
+    Version_t R__v = R__b.ReadVersion(); 
+    if (R__v == 1) ReadV1(R__b);
+    else {
+					// current vsrion V2
+      TObject::Streamer(R__b);
+      R__b.ReadFastArray(&fVolumeID,nwi);
+      R__b.ReadFastArray(&fEDepTot ,nwf);
 
-    TObject::Streamer(R__b);
-    R__b.ReadFastArray(&fVolumeID,nwi);
-    R__b.ReadFastArray(&fEDepTot ,nwf);
-    
-    fPos.Streamer(R__b);
-    fMom.Streamer(R__b);
-    //    }
+      fPos.Streamer(R__b);
+      fMom.Streamer(R__b);
+    }
   }
   else {
     R__b.WriteVersion(TStepPointMC::IsA());
@@ -97,7 +104,8 @@ TStepPointMC::TStepPointMC(int VolumeID    , int GenIndex      ,
 			   int ParentSimID , int ParentPDGCode , 
 			   int CreationCode, int EndProcessCode, 
 			   float EDepTot   , float EDepNio     , 
-			   float Time      , float StepLength  ,
+			   float Time      , float ProperTime  ,
+			   float StepLength,
 			   float X, float Y, float Z, float Px, float Py, float Pz):
   fPos( X, Y, Z),
   fMom(Px,Py,Pz)
@@ -115,6 +123,7 @@ TStepPointMC::TStepPointMC(int VolumeID    , int GenIndex      ,
   fEDepTot        = EDepTot;
   fEDepNio        = EDepNio;
   fTime           = Time;
+  fProperTime     = ProperTime;
   fStepLength     = StepLength;
 }
 
@@ -130,7 +139,7 @@ void TStepPointMC::Print(Option_t* Opt) const {
     printf("---------------------------------------------------------------------------------------------------------------");
     printf("-------------------------------------------------------------------------\n");
     printf("   Vol   Gen     PDG Particle          Creation   SimID   PPdg  PSimID  StopProc     X          Y          Z   ");
-    printf("  Edep(Tot) Edep(NIO)  Step    Time      Px        Py        Pz     Ptot\n");
+    printf("  Edep(Tot) Edep(NIO)  Step    Time     PTime     Px        Py        Pz     Ptot\n");
     printf("---------------------------------------------------------------------------------------------------------------");
     printf("------------------------------------------------------------------------\n");
   }
@@ -161,6 +170,7 @@ void TStepPointMC::Print(Option_t* Opt) const {
 
      printf("%9.3f" ,fStepLength);
      printf("%9.3f" ,fTime);
+     printf("%9.3f" ,fProperTime);
      
      printf("%9.3f" ,fMom.Px());
      printf("%9.3f" ,fMom.Py());

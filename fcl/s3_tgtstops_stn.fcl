@@ -1,0 +1,51 @@
+# -*- mode:tcl -*-
+#------------------------------------------------------------------------------
+# make STNTUPLE from the output of the stage 3 simulation - stopped muons (tgtStopFilter)
+#------------------------------------------------------------------------------
+BEGIN_PROLOG
+  TIME_MAPS        @protect_ignore: [ ]
+  TRIGGER_PATHS    @protect_ignore: [ stntuple_p0 ]
+END_PROLOG
+
+#include "Stntuple/fcl/stnmaker.fcl"
+
+process_name : S3TgtstopsStn
+
+source       : { module_type : RootInput fileNames : ["undefined", "undefined"] }
+
+outputs      : { @table::Stntuple.outputs   }
+filters      : { @table::Stntuple.filters   }
+
+physics : { @table::Stntuple.physics 
+
+    filters  : { @table::filters 
+	StntupleMaker: { @table::filters.StntupleMaker
+#------------------------------------------------------------------------------
+# disable everything, enable StepPointMC
+#------------------------------------------------------------------------------
+	    makeClusters    : 0
+	    makeCrvClusters : 0  # default: 1
+	    makePid         : 0
+	    makeSimp        : 1
+	    makeTracks      : 0
+	    makeStepPointMC : 1
+
+	    simpCollTag     : "tgtStopFilter"
+
+	    spmcBlockName   : [ "SpmcBlock"                    , "VDetBlock"                     ]
+	    spmcCollTag     : [ "tgtStopFilter:DetectorMother" , "tgtStopFilter:virtualdetector" ]
+	    statusG4Tag     : [ "g4run"                        , "g4run"                         ]
+	}
+    }
+
+    out           : []             # []/[defaultOutput] - defined in Stntuple/fcl/templates.fcl
+    end_paths     : [ gcl, out ]   # gcl defined in paths
+}
+#------------------------------------------------------------------------------
+# uncomment the next 3 lines if you want the DST file to be written out
+#-----------------------------------------------------------------------------
+# physics.out                              : [ detectorOutput ]
+# outputs.defaultOutput.SelectEvents       : [ path_gen_digi_reco_stn_dem_dmm ]
+
+services.TFileService.fileName             : "nts.user.s3_tgtstops_stn.project.sequencer.root"
+physics.filters.InitStntuple.histFileName  : "nts.user.s3_tgtstops_stn.project.sequencer.stn"
