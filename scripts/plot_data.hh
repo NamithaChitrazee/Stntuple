@@ -19,21 +19,22 @@ public:
   float         fLabelYMin;
   float         fLabelFontSize;
   float         fLabelFont;
-
+					// --- limits, scales, rebinning
   float         fXMin;
   float         fXMax;
+  int           fXLogScale;
   float         fYMin;
   float         fYMax;
   int           fYLogScale;
   int           fRebin;
-
+					// --- statistics 
   int           fStats;
   int           fOptStat;		// default for all histograms on the plot
   float         fStatBoxXMin;
   float         fStatBoxYMin;
   float         fStatBoxXMax;
   float         fStatBoxYMax;
-
+					// --- titles
   TString       fXAxisTitle;
   TString       fYAxisTitle;
   TString       fYTitFormat;		// if "", Y axis title is not printed
@@ -42,11 +43,15 @@ public:
   float         fLegendYMin;
   float         fLegendXMax;
   float         fLegendYMax;
+
   TString       fCanvasName;
   int           fCanvasSizeX;
   int           fCanvasSizeY;
   TCanvas*      fCanvas;
+
   TString       fOutputFn;
+
+  static TString fgFiguresDir;       
 
   plot_data_t(int NHist = -1) {
     nhist = NHist;
@@ -78,6 +83,7 @@ public:
     fStatBoxYMax   = 0.90;
 
     fRebin         = -1;
+    fXLogScale     =  0;
     fYLogScale     =  0;
 
     fXAxisTitle    = "";
@@ -115,5 +121,7 @@ public:
     return 0;
   }
 };
+
+TString plot_data_t::fgFiguresDir = "plot_data::undefined";
 
 #endif

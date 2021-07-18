@@ -1,8 +1,12 @@
 //-----------------------------------------------------------------------------
 // a 'dataset' here is a histogram file plus data fields for plotting attributes
+// hist_data_t::fHist is supposed to be defined on exit
+// need libStntuple_val.so
 //-----------------------------------------------------------------------------
 #ifndef __Stntuple_scripts_hist_data_hh__
 #define __Stntuple_scripts_hist_data_hh__
+
+#include "Stntuple/val/stntuple_val_functions.hh"
 
 #include "stn_book.hh"
 #include "hist_file.hh"
@@ -66,36 +70,48 @@ public:
     fBook        = nullptr;
     fName        = HistName;
     fModule      = Module;
-    init();
+    if (fFile != nullptr) {
+      fHist        = gh1(fFile->fName,fModule,HistName);
+      if (fHist != nullptr) init();
+    }
   }
   
   hist_data_t(const stn_book* Book, const char* DsID = "", const char* JobName = "", const char* Module = "", const char* HistName = "") {
     fHist        = nullptr;
     fBook        = Book;
-    fFile        = Book->FindHistFile(DsID,"",JobName);
     fName        = HistName;
     fModule      = Module;
-    init();
+    fFile        = Book->FindHistFile(DsID,"",JobName);
+    if (fFile != nullptr) {
+      fHist        = gh1(fFile->fName,fModule,HistName);
+      if (fHist != nullptr) init();
+    }
   }
   
   hist_data_t(const stn_catalog* Catalog, const char* BookName, const char* DsID = "",
 	      const char* JobName = "",   const char* Module = "", const char* HistName = "") {
-
     fHist        = nullptr;
     fBook        = Catalog->FindBook(BookName);
     fFile        = fBook->FindHistFile(DsID,"",JobName);
     fName        = HistName;
     fModule      = Module;
-    init();
+    if (fFile != nullptr) {
+      fHist        = gh1(fFile->fName,fModule,HistName);
+      if (fHist != nullptr) init();
+    }
   }
   
   hist_data_t(TH1* Hist, const char* JobName = "", const char* Module = "") {
+    // Hist is supposed not to be a null pointer, still check
     fHist        = Hist;
     fFile        = nullptr;            // don't need it, fHist is already defined
     fBook        = nullptr;            // same reason
-    fName        = Hist->GetName();
     fModule      = Module;
-    init();
+    fName        = "";
+    if (Hist != nullptr) {
+      fName        = Hist->GetName();
+      init();
+    }
   }
 
   void  init() {
