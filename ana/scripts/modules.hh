@@ -8,6 +8,8 @@ class TStnGeneratorModule;		// event generator base class
 class TStnLumiMonModule;
 
 #include "Stntuple/ana/TClusterAnaModule.hh"
+#include "Stntuple/ana/TGenAnaModule.hh"
+#include "Stntuple/ana/TSpmcAnaModule.hh"
 
 namespace stntuple {
 
@@ -16,7 +18,6 @@ namespace stntuple {
   class TGenAnaModule;
   class THelixAnaModule;
   class TPhotosAnaModule;
-  class TSpmcAnaModule;
   class TTrackAnaModule;
   class TTrackSeedAnaModule;
   class TTriggerAnaModule;

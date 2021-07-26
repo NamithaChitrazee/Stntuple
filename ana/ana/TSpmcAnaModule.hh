@@ -1,8 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
 ///////////////////////////////////////////////////////////////////////////////
-#ifndef Stntuple_ana_TStnSpmcAnaModule_hh
-#define Stntuple_ana_TStnSpmcAnaModule_hh
+#ifndef Stntuple_ana_TSpmcAnaModule_hh
+#define Stntuple_ana_TSpmcAnaModule_hh
 
 #include "TH1.h"
 #include "TH2.h"
@@ -20,26 +20,30 @@
 
 #include "Stntuple/alg/TStntuple.hh"
 
-// #include "murat/ana/HistBase_t.h"
-// #include "murat/ana/SimPar_t.hh"
-#include "Stntuple/geom/StnVDetData_t.hh"
+#include "Stntuple/ana/HistBase_t.h"
+#include "Stntuple/ana/SimPar_t.hh"
+#include "Stntuple/ana/VDetData_t.hh"
+
+#include "Stntuple/ana/AnaDefs.hh"
 
 namespace stntuple {
+
 class TSpmcAnaModule: public TStnModule {
 public:
   enum { kMaxNSimp = 1000 };
 //-----------------------------------------------------------------------------
 //  histograms
 //-----------------------------------------------------------------------------
-  struct EventHist_t { // : public HistBase_t {
+  struct EventHist_t : public HistBase_t {
     TH1F*      fRunNumber;
     TH1F*      fEventNumber;
     TH1F*      fNSimp;
-    TH1F*      fNSpmc;
-    TH1F*      fNSpmc150;
+    TH1F*      fTMaxSimp[2];
+    TH1F*      fTMaxSpmc;
+    TH1F*      fLogWeight;
   };
 
-  struct SimpHist_t { // : public HistBase_t {
+  struct SimpHist_t : public HistBase_t {
     TH1F*      fVolumeID;		       //
     TH1F*      fStage;
     TH1F*      fGeneratorID;
@@ -56,7 +60,7 @@ public:
     TH2F*      fCosThVsMomPV;		// for antiprotons
   };
 
-  struct SpmcHist_t { // : public HistBase_t {
+  struct StepPointMCHist_t : public HistBase_t {
     TH1F*      fVolumeID;		       //
     TH1F*      fGenIndex;		       //
     TH1F*      fSimID;
@@ -68,7 +72,8 @@ public:
 
     TH1F*      fEDepTot;
     TH1F*      fEDepNio;
-    TH1F*      fTime;
+    TH1F*      fTime;			// in ns
+    TH1F*      fTimeSec;		// in seconds, for R/A decays
     TH1F*      fStepLength;
 
     TH1F*      fMom[2];
@@ -80,12 +85,13 @@ public:
     TH2F*      fCosThVsMomPV;		// for antiprotons
   };
 
-  struct VDetHist_t { // : public HistBase_t {
+  struct VDetHist_t : public HistBase_t {
     TH1F*      fIndex   ;
     TH1F*      fPDGCode ;		       //
     TH1F*      fGenCode ;		       // generator code
     TH1F*      fMom[2]  ;
     TH1F*      fTime    ;
+    TH1F*      fPTime   ;                // proper time
     TH2F*      fYVsX    ;                // different VD's have different orientation
     TH2F*      fYVsZ    ;                // fill both hist's
     TH1F*      fPt      ;                // transverse mom
@@ -94,6 +100,9 @@ public:
     TH1F*      fEKin    ;
     TH2F*      fCosThVsMom ;	       // cos (pitch angle) vs Mom
     TH2F*      fCosThVsMomPV;		// for antiprotons
+    TH2F*      fTimeVsMom;
+    TH2F*      fTimeVsMomW;
+    TH2F*      fPTimeVsMom;
   };
 
   struct SimpData_t {
@@ -114,18 +123,19 @@ public:
   enum { kNVDetHistSets         = 10000 };
 
   struct Hist_t {
-    EventHist_t*  fEvent      [kNEventHistSets      ];
-    SimpHist_t*   fSimp       [kNSimpHistSets       ];
-    VDetHist_t*   fVDet       [kNVDetHistSets       ];
-    SpmcHist_t*   fStepPointMC[kNStepPointMCHistSets];
+    EventHist_t*        fEvent      [kNEventHistSets      ];
+    SimpHist_t*         fSimp       [kNSimpHistSets       ];
+    VDetHist_t*         fVDet       [kNVDetHistSets       ];
+    StepPointMCHist_t*  fStepPointMC[kNStepPointMCHistSets];
   };
 //-----------------------------------------------------------------------------
 //  data members
 //-----------------------------------------------------------------------------
 public:
 					// pointers to the data blocks used
+  TGenpBlock*           fGenpBlock;  
   TSimpBlock*           fSimpBlock;  
-  TStepPointMCBlock*    fSpmcBlock;
+  TStepPointMCBlock*    fStepPointMCBlock;
   TStepPointMCBlock*    fVDetBlock;
 					// histograms filled
   Hist_t                fHist;
@@ -143,28 +153,25 @@ public:
 
   int                   fNVDetHits  ;
   int                   fNVDet;
-  StnVDetData_t         fVDet[200];
+  stntuple::VDetData_t  fVDet[200];
   int                   fStageID;
   int                   fNSimp;
   int                   fStage;
 
-  int                   fNSpmc;
-  int                   fNSpmc150;
-
   SimpData_t            fSimData[kMaxNSimp];
 
   TStntuple*            fStnt;
-  double                fWeight; // event weight, determined by the production cross section
-
-					// antiproton-specific : in the production vertex
+  double                fWeight;         // event weight, determined by the production cross section
+  double                fTMaxSimp;	 // in seconds
+  double                fTMaxSpmc;	 // in ns
+					 // antiproton-specific : in the production vertex
   double                fPbarCosThPV;
   double                fPbarMomPV;
-
 //-----------------------------------------------------------------------------
 //  functions
 //-----------------------------------------------------------------------------
 public:
-  TSpmcAnaModule(const char* name="StntupleSpmcAna", const char* title="Stntuple SpmcAna");
+  TSpmcAnaModule(const char* name="Stntuple_SpmcAna", const char* title="Stntuple SpmcAna");
   ~TSpmcAnaModule();
 //-----------------------------------------------------------------------------
 // accessors
@@ -189,15 +196,15 @@ public:
 //-----------------------------------------------------------------------------
 // other methods
 //-----------------------------------------------------------------------------
-  void    BookEventHistograms        (EventHist_t* Hist, const char* Folder);
-  void    BookSimpHistograms         (SimpHist_t*  Hist, const char* Folder);
-  void    BookStepPointMCHistograms  (SpmcHist_t*  Hist, const char* Folder);
-  void    BookVDetHistograms         (VDetHist_t*  Hist, const char* Folder);
+  void    BookEventHistograms        (HistBase_t* Hist, const char* Folder);
+  void    BookSimpHistograms         (HistBase_t* Hist, const char* Folder);
+  void    BookStepPointMCHistograms  (HistBase_t* Hist, const char* Folder);
+  void    BookVDetHistograms         (HistBase_t* Hist, const char* Folder);
 
-  void    FillEventHistograms        (EventHist_t* Hist);
-  void    FillSimpHistograms         (SimpHist_t*  Hist, TSimParticle* Simp, SimpData_t* SimpData, double Weight = 1.);
-  void    FillStepPointMCHistograms  (SpmcHist_t*  Hist, TStepPointMC* Step, SpmcData_t* SpmcData, double Weight = 1.);
-  void    FillVDetHistograms         (VDetHist_t*  Hist, TStepPointMC* Step,                       double Weight = 1.);
+  void    FillEventHistograms        (HistBase_t* Hist);
+  void    FillSimpHistograms         (HistBase_t* Hist, TSimParticle* Simp, SimpData_t* SimpData, double Weight = 1.);
+  void    FillStepPointMCHistograms  (HistBase_t* Hist, TStepPointMC* Step, SpmcData_t* SpmcData, double Weight = 1.);
+  void    FillVDetHistograms         (HistBase_t* Hist, TStepPointMC* Step,                       double Weight = 1.);
 
   void    BookHistograms();
   void    FillHistograms();
@@ -211,5 +218,6 @@ public:
 
   ClassDef(TSpmcAnaModule,0)
 };
+
 }
 #endif

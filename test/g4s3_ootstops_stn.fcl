@@ -25,7 +25,7 @@ filters      : { @table::Stntuple.filters   }
 analyzers    : { @table::Stntuple.analyzers }
 paths        : { @table::Stntuple.paths     }
 
-physics : {
+physics      : {
     producers: { @table::producers 
 	generate                 : { @table::producers.egun }
 # for CE, not old background mixing - default: 'compressPVDetector'

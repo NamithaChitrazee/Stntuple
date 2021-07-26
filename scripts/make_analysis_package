@@ -74,7 +74,7 @@ done
 #------------------------------------------------------------------------------
 # step 2.5 : copy additional data structures, to decouple the clone from Stntuple/ana
 #------------------------------------------------------------------------------
-list_of_includes="AnaDefs.hh HistBase_t.h TrackPar_t.hh ParBase_t.hh"
+list_of_includes="AnaDefs.hh HistBase_t.h TrackPar_t.hh SimPar_t.hh ParBase_t.hh VDetData_t.hh"
 if [ $debug_level != 0 ] ; then echo "----->"  step 2.5 ; fi
 for f in $list_of_includes; do
     cat Stntuple/ana/ana/$f | sed "s/Stntuple_ana/${pkg}_ana/" | sed "s/stntuple::/$pkg::/g" |   \
@@ -83,6 +83,26 @@ for f in $list_of_includes; do
 	>| $pkg/ana/ana/${f}_tmp
 
     mv $pkg/ana/ana/${f}_tmp $pkg/ana/ana/$f
+done
+#------------------------------------------------------------------------------
+# step 2.6 : copy additional non-module source files
+#------------------------------------------------------------------------------
+list_of_additional_files="InitVirtualDetectors"
+if [ $debug_level != 0 ] ; then echo "----->"  step 2.6 ; fi
+for f in $list_of_additional_files; do
+
+    cat Stntuple/ana/$f.cc | sed "s/stntuple::/$pkg::/g" | \
+	sed "s#Stntuple/ana#${pkg}/ana#"                      | \
+	awk -v pkg=$pkg '{if ($1 == "namespace") {print $1 " " pkg " {" } else { print $0}}' \
+	>| $pkg/ana/$f.cc
+
+    cat Stntuple/ana/ana/$f.hh | sed "s/Stntuple_ana/${pkg}_ana/" | sed "s/stntuple::/$pkg::/g" | \
+	sed "s#Stntuple/ana#$pkg/ana#"  | \
+	awk -v pkg=$pkg '{if ($1 == "namespace") {print $1 " " pkg " {" } else { print $0}}' \
+	>| $pkg/ana/ana/$f.hh
+
+#    cat Stntuple/ana/ana/dict/${f}_linkdef.h | sed "s/stntuple::/$pkg::/g" \
+#	>| $pkg/ana/ana/dict/${f}_linkdef.h
 done
 
 if [ $debug_level != 0 ] ; then echo "----->"  step 3 ; fi
@@ -94,15 +114,20 @@ if [ $debug_level != 0 ] ; then echo "----->"  step 4 ; fi
 echo "#ifndef ${pkg}_ana_scripts_modules_hh"                                >| $pkg/ana/scripts/modules.hh
 echo "#define ${pkg}_ana_scripts_modules_hh"                                >> $pkg/ana/scripts/modules.hh
 echo ""                                                                     >> $pkg/ana/scripts/modules.hh
-echo "namespace $pkg {"                                                     >> $pkg/ana/scripts/modules.hh
 for i in ${!modules[@]}; do
-    module=$pkg::${modules[$i]}Module
-    echo  "class $module;"                                                  >> $pkg/ana/scripts/modules.hh
+    module=${modules[$i]}Module
+    echo  "#include \"$pkg/ana/$module.hh\""                                   >> $pkg/ana/scripts/modules.hh
 done
 echo ""                                                                     >> $pkg/ana/scripts/modules.hh
+echo "namespace $pkg {"                                                     >> $pkg/ana/scripts/modules.hh
+# for i in ${!modules[@]}; do
+#     module=$pkg::${modules[$i]}Module
+#     echo  "class $module;"                                                  >> $pkg/ana/scripts/modules.hh
+# done
+# echo ""                                                                     >> $pkg/ana/scripts/modules.hh
 for i in ${!modules[@]}; do
     module=$pkg::${modules[$i]}Module
-    printf "%-30s %-8s %-10s\n" "${module}*" "${m_names[$i]}" " = nullptr;" >> $pkg/ana/scripts/modules.hh
+    printf "  %-30s %-8s %-10s\n" "${module}*" "${m_names[$i]}" " = nullptr;" >> $pkg/ana/scripts/modules.hh
 done
 echo "}"                                                                    >> $pkg/ana/scripts/modules.hh
 echo "#endif"                                                               >> $pkg/ana/scripts/modules.hh
@@ -126,6 +151,7 @@ cat << "EOF"                                      >> $pkg/ana/scripts/load_stnan
     "calorimeter.C", "PWD",
     "crv.C"        , "PWD",
     "genp.C"       , "PWD",
+    "spmc.C"       , "PWD",
     "trk.C"        , "PWD",
     "trs.C"        , "PWD",
     "trigger.C"    , "PWD",
