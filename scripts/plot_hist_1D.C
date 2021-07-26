@@ -5,6 +5,7 @@
 // overlay two histograms with the same ModuleName/HistName from two files
 // defined by Ds1 and Ds2, HistName like "spmc_1/mom"
 // Print = -1: don't print, store the file name in the hist record instead
+// if printing is requested, the destination directory is defined by gEnv->GetValue("FiguresDir",".");
 ///////////////////////////////////////////////////////////////////////////////
 #ifndef __plot_hist_1D__
 #define __plot_hist_1D__
@@ -26,6 +27,11 @@ void plot_hist_1D(hist_data_t* Hist1,  hist_data_t*  Hist2, int Print = 0) {
 //-----------------------------------------------------------------------------
 // figure out clone histogram names
 //-----------------------------------------------------------------------------
+  if ((Hist1->fHist == nullptr) or (Hist2->fHist == nullptr)) {
+    printf("plot_hist_1D ERROR: one of the two histograms is a NULL pointer\n");
+    return;
+  }
+  
   TString h1name(Hist1->fName), h2name(Hist2->fName);
 
   if (Hist1->fNewName == "") h1name.ReplaceAll("/","_");
@@ -37,29 +43,14 @@ void plot_hist_1D(hist_data_t* Hist1,  hist_data_t*  Hist2, int Print = 0) {
   hist_file_t* hf1 = Hist1->fFile;
   hist_file_t* hf2 = Hist2->fFile;
   
-  TH1F* hpx1;
+  TH1F* hpx1 = (TH1F*) Hist1->fHist->Clone(h1name);
 
-  if  (hf1) {
-    hpx1 = (TH1F*) gh1(hf1->fName,Hist1->fModule,Hist1->fName)->Clone(h1name);
-    Hist1->fHist = hpx1;
-  }
-  else      hpx1 = (TH1F*) Hist1->fHist->Clone(h1name);
-
-  if (Hist1->fRebin > 0) hpx1->Rebin(Hist1->fRebin);
-//-----------------------------------------------------------------------------
-// scale, if requested
-//-----------------------------------------------------------------------------
-  if (Hist1->fScale > 0) hpx1->Scale(Hist1->fScale);
+  if (Hist1->fRebin > 0) hpx1->Rebin(Hist1->fRebin);  // rebin, if requested
+  if (Hist1->fScale > 0) hpx1->Scale(Hist1->fScale);  // scale, if requested
   
-  TH1F* hpx2;
+  TH1F* hpx2 = (TH1F*) Hist2->fHist->Clone(h2name);
 
-  if  (hf2) {
-    hpx2 = (TH1F*) gh1(hf2->fName,Hist2->fModule,Hist2->fName)->Clone(h2name);
-    Hist2->fHist = hpx2;
-  }
-  else      hpx2 = (TH1F*) Hist2->fHist->Clone(h2name);
-
-  if (Hist2->fRebin > 0) hpx2->Rebin(Hist2->fRebin);
+  if (Hist2->fRebin > 0) hpx2->Rebin(Hist2->fRebin);  // rebin, if requested
 
   stn_dataset_t* ds1(nullptr);
   stn_dataset_t* ds2(nullptr);
@@ -215,7 +206,7 @@ void plot_hist_1D(hist_data_t* Hist1,  hist_data_t*  Hist2, int Print = 0) {
     }
   }
   
-  Hist1->fOutputFn = Form("%s/eps/%s.eps",FiguresDir,Hist1->fPlotName.Data());
+  Hist1->fOutputFn = Form("%s/eps/%s.eps",gEnv->GetValue("FiguresDir","./"),Hist1->fPlotName.Data());
   if (Print == 1) {
     c->Print(Form("%s",Hist1->fOutputFn.Data())) ;
   }
@@ -236,6 +227,11 @@ int plot_hist_1d(hist_data_t* Hist, int NHist, int Print = 0) {
 // figure out clone histogram names
 //-----------------------------------------------------------------------------
   hist_data_t* Hist1 = &Hist[0];
+
+  if (Hist1->fHist == nullptr) {
+    printf("plot_hist_1d error: Hist1->fHist == NULL, BAIL OUT\n");
+    return -1; 
+  }
   
   TString h1name(Hist1->fName);
 
@@ -244,30 +240,10 @@ int plot_hist_1d(hist_data_t* Hist, int NHist, int Print = 0) {
 
   hist_file_t* hf1 = Hist1->fFile;
   
-  TH1F* hpx1;
+  TH1F* hpx1 = (TH1F*) Hist1->fHist->Clone(h1name);
 
   //  printf("1:%s  2:%s    3:%s\n",hf1->fName.Data(),Hist1->fModule.Data(),Hist1->fName.Data());
   
-  if  (hf1) {
-    TH1F* h1 = (TH1F*) gh1(hf1->fName,Hist1->fModule,Hist1->fName);
-    
-    if (h1 == nullptr) {
-      printf("plot_hist_1D::plot_hist_1d ERROR: histogram %s/%s/%s not found, bail out\n",
-	     hf1->fName.Data(),Hist1->fModule.Data(),Hist1->fName.Data());
-      return -1;
-    }
-    
-    hpx1 = (TH1F*) h1->Clone(h1name);
-    Hist1->fHist = hpx1;
-  }
-  else {
-    if (Hist1->fHist == nullptr) {
-      printf("plot_hist_1D::plot_hist_1d ERROR: Hist1->fHist == nullptr, bail out\n");
-      return -1;
-    }
-    hpx1 = (TH1F*) Hist1->fHist->Clone(h1name);
-  }
-
   if (Hist1->fRebin > 0) hpx1->Rebin(Hist1->fRebin);
 //-----------------------------------------------------------------------------
 // scale, if requested
@@ -368,23 +344,18 @@ int plot_hist_1d(hist_data_t* Hist, int NHist, int Print = 0) {
   for (int ihist=1; ihist<NHist; ihist++) {
     hist_data_t* Hist2 = &Hist[ihist];
 
+    if (Hist2->fHist == nullptr) {
+      printf("plot_hist_1d ERROR: ihist = %i Hist2->fHist == NULL, BAIL OUT\n",ihist);
+      return -1;
+    }
+
     TString h2name(Hist2->fName);
     if (Hist2->fNewName == "") h2name.ReplaceAll("/","_");
     else                       h2name = Hist2->fNewName;
 
     hist_file_t* hf2 = Hist2->fFile;
     
-    TH1F* hpx2;
-    if  (hf2) {
-      TH1F* h2 = gh1(hf2->fName,Hist2->fModule,Hist2->fName);
-      if ( h2 == nullptr) {
-	printf("histogram %s/%s/%s not found, bail out\n",hf2->fName.Data(),Hist2->fModule.Data(),Hist2->fName.Data());
-	return -1;
-      }
-      hpx2 = (TH1F*) h2->Clone(h2name);
-      Hist2->fHist = hpx2;
-    }
-    else      hpx2 = (TH1F*) Hist2->fHist->Clone(h2name);
+    TH1F* hpx2 = (TH1F*) Hist2->fHist->Clone(h2name);
 //-----------------------------------------------------------------------------
 //  by default, use the same rebinning as for Hist1
 //-----------------------------------------------------------------------------
@@ -517,7 +488,7 @@ int plot_hist_1d(hist_data_t* Hist, int NHist, int Print = 0) {
     }
   }
   
-  Hist1->fOutputFn = Form("%s/eps/%s.eps",FiguresDir,Hist1->fPlotName.Data());
+  Hist1->fOutputFn = Form("%s/eps/%s.eps",gEnv->GetValue("FiguresDir","./"),Hist1->fPlotName.Data());
   if (Print == 1) {
     c->Print(Form("%s",Hist1->fOutputFn.Data())) ;
   }
@@ -525,7 +496,6 @@ int plot_hist_1d(hist_data_t* Hist, int NHist, int Print = 0) {
 
   return 0;
 }
-
 
 //-----------------------------------------------------------------------------
 // overlay N histograms , the first one is assumed to be always present, the
@@ -540,6 +510,11 @@ int plot_hist_1d(plot_data_t* Plot, int Print = 0) {
 //-----------------------------------------------------------------------------
   hist_data_t* Hist1 = &Plot->hd[0];
   
+  if (Hist1->fHist == nullptr) {
+    printf("plot_hist_1d error: Hist1->fHist == NULL, BAIL OUT\n");
+    return -1;
+  }
+  
   TString h1name(Hist1->fName);
 
   if (Hist1->fNewName == "") h1name.ReplaceAll("/","_");
@@ -547,31 +522,9 @@ int plot_hist_1d(plot_data_t* Plot, int Print = 0) {
 
   hist_file_t* hf1 = Hist1->fFile;
   
-  TH1F* hpx1;
-
-  //  printf("1:%s  2:%s    3:%s\n",hf1->fName.Data(),Hist1->fModule.Data(),Hist1->fName.Data());
-  
-  if  (hf1) {
-    TH1F* h1 = (TH1F*) gh1(hf1->fName,Hist1->fModule,Hist1->fName);
-    
-    if (h1 == nullptr) {
-      printf("plot_hist_1D::plot_hist_1d ERROR: histogram %s/%s/%s not found, bail out\n",
-	     hf1->fName.Data(),Hist1->fModule.Data(),Hist1->fName.Data());
-      return -1;
-    }
-    
-    hpx1 = (TH1F*) h1->Clone(h1name);
-    Hist1->fHist = hpx1;
-  }
-  else {
-    if (Hist1->fHist == nullptr) {
-      printf("plot_hist_1D::plot_hist_1d ERROR: Hist1->fHist == nullptr, bail out\n");
-      return -1;
-    }
-    hpx1 = (TH1F*) Hist1->fHist->Clone(h1name);
-  }
+  TH1F* hpx1 = (TH1F*) Hist1->fHist->Clone(h1name);
 //-----------------------------------------------------------------------------
-// rebinning: first check hte histogram, then - default for the plot
+// rebinning: first check the histogram, then - default for the plot
 //-----------------------------------------------------------------------------
   int rebin = Hist1->fRebin;
   if (rebin <= 0) rebin = Plot->fRebin;
@@ -605,9 +558,10 @@ int plot_hist_1d(plot_data_t* Plot, int Print = 0) {
   int cx = Plot->fCanvasSizeX;
   int cy = Plot->fCanvasSizeY;
 //-----------------------------------------------------------------------------
-// initially, create canvas with an empty name
+// initially, create canvas with an empty name, set scales
 //-----------------------------------------------------------------------------
   TCanvas* c = new TCanvas(canvas_name,canvas_name,cx,cy);
+  c->SetLogx(Plot->fXLogScale);
   c->SetLogy(Plot->fYLogScale);
 //-----------------------------------------------------------------------------
 // the two histograms may correspond to slightly different NPOT
@@ -675,23 +629,18 @@ int plot_hist_1d(plot_data_t* Plot, int Print = 0) {
   for (int ihist=1; ihist<Plot->nhist; ihist++) {
     hist_data_t* Hist2 = &Plot->hd[ihist];
 
+    if (Hist2->fHist == nullptr) {
+      printf("plot_hist_1d ERROR: ihist = %i Hist2->fHist == NULL, BAIL OUT\n",ihist);
+      return -1;
+    }
+    
     TString h2name(Hist2->fName);
     if (Hist2->fNewName == "") h2name.ReplaceAll("/","_");
     else                       h2name = Hist2->fNewName;
 
     hist_file_t* hf2 = Hist2->fFile;
     
-    TH1F* hpx2;
-    if  (hf2) {
-      TH1F* h2 = gh1(hf2->fName,Hist2->fModule,Hist2->fName);
-      if ( h2 == nullptr) {
-	printf("histogram %s/%s/%s not found, bail out\n",hf2->fName.Data(),Hist2->fModule.Data(),Hist2->fName.Data());
-	return -1;
-      }
-      hpx2 = (TH1F*) h2->Clone(h2name);
-      Hist2->fHist = hpx2;
-    }
-    else      hpx2 = (TH1F*) Hist2->fHist->Clone(h2name);
+    TH1F* hpx2 = (TH1F*) Hist2->fHist->Clone(h2name);
 //-----------------------------------------------------------------------------
 //  by default, use the same rebinning as for Hist1
 //-----------------------------------------------------------------------------
@@ -825,7 +774,7 @@ int plot_hist_1d(plot_data_t* Plot, int Print = 0) {
 // determine the output file name. always print in '.eps'
 //-----------------------------------------------------------------------------
 //  printf (" debug 003\n");
-  Plot->fOutputFn = Form("%s/eps/%s.eps",FiguresDir,Plot->fName.Data());
+  Plot->fOutputFn = Form("%s/eps/%s.eps",gEnv->GetValue("FiguresDir","./"),Plot->fName.Data());
   if (Print == 1) {
     c->Print(Form("%s",Plot->fOutputFn.Data())) ;
   }
@@ -914,7 +863,7 @@ void fit_gaus_hist_1D(hist_data_t* Hist, const char* FOpt, const char* GOpt, dou
     if (Hist->fPlotName == "") {
       Hist->fPlotName = Form("%s_fit_gaus",Hist->fName.Data());
     }
-    c->Print(Form("%s/eps/%s.eps",FiguresDir,Hist->fPlotName.Data())) ;
+    c->Print(Form("%s/eps/%s.eps",gEnv->GetValue("FiguresDir","./"),Hist->fPlotName.Data())) ;
   }
 
   Hist->fCanvas   = c;

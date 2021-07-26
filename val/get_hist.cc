@@ -16,9 +16,9 @@
 TH1F* get_hist(TString FName, TString ModuleName, TString HistName)
 {
 
-  TFile   *file(NULL);
-  TFolder *fol;
-  TH1F    *h; 
+  TFile   *file(nullptr);
+  TFolder *fol (nullptr);
+  TH1F    *h   (nullptr); 
 
   char folder_name[200];
 

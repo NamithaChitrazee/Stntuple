@@ -4,6 +4,7 @@
 //
 // overlay two histograms with the same ModuleName/HistName from two files
 // defined by Ds1 and Ds2, HistName like "spmc_1/mom"
+// if printing is requested, the destination directory is defined by gEnv->GetValue("FiguresDir",".");
 ///////////////////////////////////////////////////////////////////////////////
 #ifndef __plot_hist_2D__
 #define __plot_hist_2D__
@@ -128,14 +129,14 @@ void plot_hist_2D(hist_data_t* Hd, int Print = 0) {
   
   if (Print == -1) {
     Hd->fHist     = hpx1;
-    Hd->fOutputFn = Form("%s/eps/%s.eps",FiguresDir,Hd->fPlotName.Data());
+    Hd->fOutputFn = Form("%s/eps/%s.eps",gEnv->GetValue("FiguresDir","./"),Hd->fPlotName.Data());
   }
   else { 
 //-----------------------------------------------------------------------------
 // .png files are written into /png/ subdirectory
 //-----------------------------------------------------------------------------
     if (Print == 1) {
-      c->Print(Form("%s/eps/%s.eps",FiguresDir,Hd->fPlotName.Data())) ;
+      c->Print(Form("%s/eps/%s.eps",gEnv->GetValue("FiguresDir","./"),Hd->fPlotName.Data())) ;
     }
   } 
 
@@ -296,14 +297,14 @@ void plot_hist_2D(hist_data_t* Hist1,  hist_data_t*  Hist2, int Print = 0) {
   if (Print == -1) {
     Hist1->fCanvas   = c;
     Hist1->fHist     = hpx1;
-    Hist1->fOutputFn = Form("%s/eps/%s.eps",FiguresDir,Hist1->fPlotName.Data());
+    Hist1->fOutputFn = Form("%s/eps/%s.eps",gEnv->GetValue("FiguresDir","./"),Hist1->fPlotName.Data());
   }
   else { 
 //-----------------------------------------------------------------------------
 // .png files are written into /png/ subdirectory
 //-----------------------------------------------------------------------------
     if (Print == 1) {
-      c->Print(Form("%s/eps/%s.eps",FiguresDir,Hist1->fPlotName.Data())) ;
+      c->Print(Form("%s/eps/%s.eps",gEnv->GetValue("FiguresDir","./"),Hist1->fPlotName.Data())) ;
     }
   }
   
