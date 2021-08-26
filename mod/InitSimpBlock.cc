@@ -90,6 +90,10 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
     AnEvent->getByLabel(fSimpCollTag,simp_handle);
   }
 //-----------------------------------------------------------------------------
+// load simulation time offsets for this event: timeOffsets may not be defined yet (stages 1, 2, 3)
+//-----------------------------------------------------------------------------
+  if (fTimeOffsets) fTimeOffsets->updateMap(*AnEvent);
+//-----------------------------------------------------------------------------
 // figure out how many straw hits each particle has produced
 //-----------------------------------------------------------------------------
   std::vector<int> vid, vin;
@@ -203,18 +207,21 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
 	if ((nhits == 0) and (energy < fMinSimpEnergy))       continue;
       }
 
+      double time_offsets = 0;
+      if (fTimeOffsets) time_offsets = fTimeOffsets->totalTimeOffset(sim);
+
       simp   = simp_block->NewParticle(id, parent_id, pdg_code, 
 				       creation_code, termination_code,
 				       start_vol_id, end_vol_id,
 				       generator_id);
       simp->SetStartMom(px, py, pz, energy);
-      simp->SetStartPos(sp->x(),sp->y(),sp->z(),sim->startGlobalTime());
+      simp->SetStartPos(sp->x(),sp->y(),sp->z(),sim->startGlobalTime()+time_offsets);
       simp->SetEndMom  (sim->endMomentum().x(),
 			sim->endMomentum().y(),
 			sim->endMomentum().z(),
 			sim->endMomentum().e());
       const CLHEP::Hep3Vector* ep = &sim->endPosition();
-      simp->SetEndPos(ep->x(),ep->y(),ep->z(),sim->endGlobalTime());
+      simp->SetEndPos(ep->x(),ep->y(),ep->z(),sim->endGlobalTime()+time_offsets);
       simp->SetNStrawHits(nhits);
 //-----------------------------------------------------------------------------
 // particle parameters at virtual detectors

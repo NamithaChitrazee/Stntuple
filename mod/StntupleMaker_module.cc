@@ -173,6 +173,7 @@ protected:
   double                   fMinECrystal  ;  // 
   double                   fSimpMinEnergy; // min energy of a particle to be stored in SIMP block
   double                   fSimpMaxZ     ; // max Z of a particle to be stored in SIMP block
+  int                      fSimpUseTimeOffsets; // default=0
 
   string                   fCutHelixSeedCollTag; // helix collection to cut on
   int                      fMinNHelices    ; // min number of helices (for cosmics)
@@ -286,6 +287,7 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
   , fMinECrystal             (PSet.get<double>        ("minECrystal"         ))
   , fSimpMinEnergy           (PSet.get<double>        ("simpMinEnergy"       ))
   , fSimpMaxZ                (PSet.get<double>        ("simpMaxZ"            ))
+  , fSimpUseTimeOffsets      (PSet.get<int>           ("simpUseTimeOffsets"  ))
   , fCutHelixSeedCollTag     (PSet.get<string>        ("cutHelixSeedCollTag" ))
   , fMinNHelices             (PSet.get<int>           ("minNHelices"         ))
 {
@@ -359,16 +361,20 @@ bool StntupleMaker::beginRun(art::Run& aRun) {
 //-----------------------------------------------------------------------------
 // StepPointMC collections - set mbtime - have to do that at beginRun()
 //-----------------------------------------------------------------------------
+  mu2e::ConditionsHandle<mu2e::AcceleratorParams> accPar("ignored");
+  float mbtime = accPar->deBuncherPeriod;
+
   if (fMakeStepPointMC) {
     int nblocks = fSpmcBlockName.size();
-
-    mu2e::ConditionsHandle<mu2e::AcceleratorParams> accPar("ignored");
-    float mbtime = accPar->deBuncherPeriod;
 
     for (int i=0; i<nblocks; i++) {
       StntupleInitStepPointMCBlock* init_block = static_cast<StntupleInitStepPointMCBlock*> (fInitStepPointMCBlock->At(i));
       init_block->SetMbTime(mbtime);
     }
+  }
+
+  if (fMakeSimp and fSimpUseTimeOffsets) {
+    fInitSimpBlock->SetMbTime(mbtime);
   }
 
   THistModule::afterBeginRun(aRun);
@@ -568,6 +574,9 @@ void StntupleMaker::beginJob() {
     fInitSimpBlock->SetMaxZ         (fSimpMaxZ);
     fInitSimpBlock->SetGenProcessID (fGenId.id());
     fInitSimpBlock->SetPdgID        (fPdgId);
+
+    if (fSimpUseTimeOffsets != 0) fInitSimpBlock->SetTimeOffsets(fTimeOffsets);
+    else                          fInitSimpBlock->SetTimeOffsets(NULL);
 
     AddDataBlock("SimpBlock","TSimpBlock",fInitSimpBlock,buffer_size,split_mode,compression_level);
   }
