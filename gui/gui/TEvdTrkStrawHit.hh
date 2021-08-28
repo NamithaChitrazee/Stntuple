@@ -13,7 +13,7 @@
 #include "TLine.h"
 
 #ifndef __CINT__
-#include "BTrkData/inc/TrkStrawHit.hh"
+#include "Offline/BTrkData/inc/TrkStrawHit.hh"
 #else
 namespace mu2e {
   class TrkStrawHit;

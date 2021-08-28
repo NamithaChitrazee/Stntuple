@@ -9,14 +9,12 @@
 // print all StepPointMCCollection's in the event
 //-----------------------------------------------------------------------------
 void print_spmc_colls() {
-  std::vector<art::Handle<mu2e::StepPointMCCollection>> vcoll;
-
   printf("Available StepPointMCCollections: \n");
 
   const art::Event* event = TAnaDump::Instance()->Event();
 
   art::Selector  selector(art::ProductInstanceNameSelector(""));
-  event->getMany(selector,vcoll);
+  auto vcoll = event->getMany<mu2e::StepPointMCCollection>(selector);
 
   for (auto handle = vcoll.begin(); handle != vcoll.end(); handle++) {
     if (handle->isValid()) {

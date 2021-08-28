@@ -2,6 +2,8 @@
 // 2014-01-26 P.Murat
 ///////////////////////////////////////////////////////////////////////////////
 
+#include "messagefacility/MessageLogger/MessageLogger.h"
+
 // conditions
 #include "ConditionsService/inc/ConditionsHandle.hh"
 #include "ConditionsService/inc/AcceleratorParams.hh"

@@ -8,13 +8,11 @@
 // this clause is necessary
 //-----------------------------------------------------------------------------
 #ifndef __CINT__
-#include "RecoDataProducts/inc/KalRepPtrCollection.hh"
-#include "TrackerGeom/inc/Tracker.hh"
-#include "RecoDataProducts/inc/ComboHit.hh"
-//#include "RecoDataProducts/inc/StrawHitCollection.hh"
-#include "RecoDataProducts/inc/TimeCluster.hh"
-#include "MCDataProducts/inc/StrawDigiMCCollection.hh"
-// #include "RecoDataProducts/inc/StrawHitFlagCollection.hh"
+#include "Offline/RecoDataProducts/inc/KalRepPtrCollection.hh"
+#include "Offline/TrackerGeom/inc/Tracker.hh"
+#include "Offline/RecoDataProducts/inc/ComboHit.hh"
+#include "Offline/RecoDataProducts/inc/TimeCluster.hh"
+#include "Offline/MCDataProducts/inc/StrawDigiMCCollection.hh"
 
 #else
 namespace mu2e {

@@ -17,21 +17,20 @@
 
 #ifndef __CINT__
 
-#include "CosmicRayShieldGeom/inc/CRSScintillatorBar.hh"
-#include "DataProducts/inc/CRSScintillatorBarIndex.hh"
+#include "Offline/CosmicRayShieldGeom/inc/CRSScintillatorBar.hh"
+#include "Offline/DataProducts/inc/CRSScintillatorBarIndex.hh"
 //#include "CosmicRayShieldGeom/inc/CRSScintillatorShield.hh"
 //#include "RecoDataProducts/inc/CrvRecoPulse.hh"
 
-#include "RecoDataProducts/inc/CrvRecoPulseCollection.hh" //
+#include "Offline/RecoDataProducts/inc/CrvRecoPulse.hh" //
 
 
 #else
-namespace mu2e 
-{
-	class CRSScintillatorBar;
-	class CRSScintillatorBarIndex;
-	class CrvRecoPulse;
-    struct CrvRecoPulse::CrvSingleRecoPulse;
+namespace mu2e {
+  class CRSScintillatorBar;
+  class CRSScintillatorBarIndex;
+  class CrvRecoPulse;
+  struct CrvRecoPulse::CrvSingleRecoPulse;
 };
 #endif
 

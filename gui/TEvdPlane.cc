@@ -40,7 +40,7 @@ TEvdPlane::TEvdPlane(): TObject() {
 }
 
 //_____________________________________________________________________________
-TEvdPlane::TEvdPlane(int ID, const mu2e::Plane* Plane, TEvdStation* Station): TObject() {
+  TEvdPlane::TEvdPlane(int ID, const mu2e::Plane* Plane, TEvdStation* Station, const mu2e::Tracker* Tracker): TObject() {
 
   int        id;
   TEvdPanel*  evd_panel;
@@ -56,7 +56,7 @@ TEvdPlane::TEvdPlane(int ID, const mu2e::Plane* Plane, TEvdStation* Station): TO
     const mu2e::Panel* panel = &fPlane->getPanel(i);
 
     id       = -1; // fNPanels*Plane->id()+i;
-    evd_panel = new TEvdPanel(id,panel,this);
+    evd_panel = new TEvdPanel(id,panel,this,Tracker);
 
     fListOfPanels->Add(evd_panel);
   }

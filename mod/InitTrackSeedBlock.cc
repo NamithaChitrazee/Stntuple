@@ -301,11 +301,10 @@ int  StntupleInitMu2eTrackSeedBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mod
   return 0;
 }
 
-//_____________________________________________________________________________
-Int_t StntupleInitMu2eTrackSeedBlockLinks(TStnDataBlock* Block, AbsEvent* AnEvent, int Mode) {
-  // Mu2e version, do nothing
+//-----------------------------------------------------------------------------
+int StntupleInitMu2eTrackSeedBlockLinks(TStnDataBlock* Block, AbsEvent* AnEvent, int Mode) {
 
-  // Int_t  ev_number, rn_number;
+  // int  ev_number, rn_number;
 
   // ev_number = AnEvent->event();
   // rn_number = AnEvent->run();
@@ -314,13 +313,11 @@ Int_t StntupleInitMu2eTrackSeedBlockLinks(TStnDataBlock* Block, AbsEvent* AnEven
   if (Block->LinksInitialized()) return 0;
 
   TStnTrackSeedBlock* tsb;
-  TStnTrackSeed*      trkseed;
   TStnHelixBlock*     hb;
   TStnHelix          *helix;
   TStnEvent*          ev;
 
   const mu2e::HelixSeed* khelix, *fkhelix;
-  const mu2e::KalSeed*   kseed; 
 
   tsb    = (TStnTrackSeedBlock*) Block;
 
@@ -337,10 +334,11 @@ Int_t StntupleInitMu2eTrackSeedBlockLinks(TStnDataBlock* Block, AbsEvent* AnEven
   if (hb) nhelix = hb->NHelices();
   
   for (int i=0; i<ntrkseed; i++) {
-    trkseed = tsb->TrackSeed(i);
-    kseed   = trkseed->fTrackSeed;
+    TStnTrackSeed* trkseed = tsb->TrackSeed(i);
+    // const mu2e::KalSeed*   kseed   = trkseed->fTrackSeed;
 
-    fkhelix  = kseed->helix().get();
+    printf("StntupleInitMu2eTrackSeedBlockLinks ERROR: kseed->helix() is gone. FIXIT\n");
+    fkhelix  = nullptr; // kseed->helix().get();
     int  helixIndex(-1);
     for (int j=0; j<nhelix; ++j){
       helix  = hb->Helix(j);
@@ -364,4 +362,3 @@ Int_t StntupleInitMu2eTrackSeedBlockLinks(TStnDataBlock* Block, AbsEvent* AnEven
 
   return 0;
 }
-

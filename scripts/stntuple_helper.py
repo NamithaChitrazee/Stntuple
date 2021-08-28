@@ -9,18 +9,21 @@ class stntuple_helper:
     sourceroot =  os.path.abspath('.')
 
     def __init__(self, env, debug=False):
+        self._debug  = debug
         self._env    = env;
         self._list_of_object_files = [];
 
-        self.dd      = re.search('[^/]*/[^/]*$',self._env.Dir('.').abspath).group(0)
-        self.dirname = os.path.dirname(self.dd);   # THIS
-        self.subdir  = os.path.basename(self.dd);
+        if (debug) : print("[stntuple_helper::__init__] Dir:"+self._env.Dir('.').abspath)
+
+        self.dd      = re.search('[^/]*/[^/]*/[^/]*$',self._env.Dir('.').abspath).group(0)
+        self.dirname = self.dd.split('/')[0];   # THIS
+        self.subdir  = self.dd.split('/')[2];
         self.libname = self.dirname+'_'+self.subdir
-        self.d1      = self.libname+'-shared';
         self.suffix  = ".hh" ;
-        self.tmp_dir = "tmp/src/"+self.d1;
+        self.tmp_dir = os.getenv("MUSE_BUILD_DIR")+'/'+self.dirname+'/tmp/'+self.subdir;
         self._debug  = debug
-        if (debug) : print ("-------------- building directory: "+self.dirname+'/'+self.subdir)
+        if (debug) : 
+            print("[stntuple_helper::__init__] -------------- building directory: "+self.dirname+'/'+self.subdir)
 #
 #   Accesors
 #
@@ -46,7 +49,7 @@ class stntuple_helper:
 #------------------------------------------------------------------------------
         list_of_linkdef_files = self._env.Glob(self.subdir+'/dict/*_linkdef.h', strings=True)
         if (self._debug):
-            print ("["+self.dirname+"/"+self.subdir+"] handle_dictionaries: list_of_linkdef_files = ",list_of_linkdef_files)
+            print ("[stntuple_helper::handle_dictionaries] ["+self.dirname+"/"+self.subdir+"] handle_dictionaries: list_of_linkdef_files = ",list_of_linkdef_files)
             
         list_of_dict_files    = []
 
@@ -55,18 +58,18 @@ class stntuple_helper:
             linkdef_fn    = linkdef[len(linkdef)-1];
 
             if (self._debug): 
-                print ("linkdef_fn = ",linkdef_fn)
+                print ("[stntuple_helper::handle_dictionaries] linkdef_fn = ",linkdef_fn)
 
             if (not linkdef_fn in skip_list):
                 clname        = linkdef_fn.replace("_linkdef.h","");
                 include       = self.subdir+'/'+clname+self.suffix;
             
-                dict          = '#/tmp/src/'+self.d1+'/'+clname+'_dict.cxx';
+                dict          = os.getenv("MUSE_BUILD_DIR")+'/'+self.dirname+'/tmp/'+self.subdir+'/'+clname+'_dict.cxx';
                 list_of_dict_files.append(dict);
 
                 if (self._debug):
-                    print ("linkdef = ",linkdef)
-                    print ("include = ",include)
+                    print ("[stntuple_helper::handle_dictionaries] linkdef = ",linkdef)
+                    print ("[stntuple_helper::handle_dictionaries] include = ",include)
 
                 self._env.StntupleRootCint(dict,[f,include])
 #------------------------------------------------------------------------------
@@ -89,7 +92,7 @@ class stntuple_helper:
 
         for f in list_of_f_files:
             if (not f in skip_list):
-                o = '#tmp/src/'+self.d1+'/'+f.split('.')[0]+'.o'
+                o = os.getenv("MUSE_BUILD_DIR")+'/'+self.dirname+'/tmp/'+self.subdir+'/'+f.split('.')[0]+'.o'
                 self._list_of_object_files.append(o);
                 self._env.SharedObject(o,f)
 
@@ -101,16 +104,15 @@ class stntuple_helper:
         for cc in list_of_cc_files:
             if (not cc in skip_list):
                 if (self._debug):
-                    print (".cc file: "+cc)
+                    print ("stntuple_helper::build_libs: .cc file: "+cc)
                     
-                o = '#/tmp/src/'+self.d1+'/'+cc.split('.')[0]+'.o'
+                o = os.getenv("MUSE_BUILD_DIR")+'/'+self.dirname+'/tmp/'+self.subdir+'/'+cc.split('.')[0]+'.o'
                 self._list_of_object_files.append(o);
                 self._env.SharedObject(o,cc)
         #------------------------------------------------------------------------------
         # need to keep MU2E_SATELLITE_RELEASE for a while for building in a satellite release
         #------------------------------------------------------------------------------
-        dir = os.environ.get('MU2E_SATELLITE_RELEASE');
-        if (dir == None): dir = os.environ.get('BUILD_BASE');
+        dir = os.environ.get('MUSE_BUILD_DIR')+'/'+self.dirname;
         lib_name = dir+'/lib/'+self.libname+'.so';
 
         if (self._debug):
@@ -128,13 +130,16 @@ class stntuple_helper:
                 if (self._debug):
                     print ("module file: "+module)
                     
-                o = '#/tmp/src/'+self.d1+'/'+module.split('.')[0]+'.o'
+                o = os.getenv("MUSE_BUILD_DIR")+'/'+self.dirname+'/tmp/'+self.subdir+'/'+module.split('.')[0]+'.o'
                 self._env.SharedObject(o,module)
 
                 mname = os.path.basename(module).split('.')[0];
-                lib   = '#/lib/libmu2e_'+self.dirname+'_'+mname+'.so';
+                lib   = os.getenv("MUSE_BUILD_DIR")+'/'+self.dirname+'/lib/libmu2e_'+self.dirname+'_'+mname+'.so';
                 if (self._debug):
                     print ("o: "+o, "lib:"+lib)
                     
                 self._env.SharedLibrary(lib,o,LIBS =  ['libStntuple_mod.so',libs]);
+
+    def print():
+        print("stntuple_helper::print :  emoe");
 #------------------------------------------------------------------------------ END

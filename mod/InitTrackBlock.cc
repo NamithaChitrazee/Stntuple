@@ -18,47 +18,46 @@
 #include "Stntuple/obj/TStnTrackSeed.hh"
 #include "Stntuple/obj/TStnTrackSeedBlock.hh"
 
+#include "messagefacility/MessageLogger/MessageLogger.h"
+
 #include "art/Framework/Principal/Selector.h"
 #include "art/Framework/Principal/Handle.h"
 
-#include "GeometryService/inc/GeometryService.hh"
-#include "GeometryService/inc/GeomHandle.hh"
-#include "GeometryService/inc/VirtualDetector.hh"
-#include "GeometryService/inc/DetectorSystem.hh"
+#include "Offline/GeometryService/inc/GeometryService.hh"
+#include "Offline/GeometryService/inc/GeomHandle.hh"
+#include "Offline/GeometryService/inc/VirtualDetector.hh"
+#include "Offline/GeometryService/inc/DetectorSystem.hh"
 
-//#include "TrackerConditions/inc/Types.hh"
-#include "TrackerGeom/inc/Tracker.hh"
-#include "CalorimeterGeom/inc/Calorimeter.hh"
-#include "CalorimeterGeom/inc/DiskCalorimeter.hh"
-// #include "CalorimeterGeom/inc/VaneCalorimeter.hh"
+#include "Offline/TrackerGeom/inc/Tracker.hh"
+#include "Offline/CalorimeterGeom/inc/Calorimeter.hh"
+#include "Offline/CalorimeterGeom/inc/DiskCalorimeter.hh"
 
-#include "RecoDataProducts/inc/HelixSeed.hh"
-#include "RecoDataProducts/inc/KalSeed.hh"
-#include "RecoDataProducts/inc/KalRepPtrCollection.hh"
-#include "RecoDataProducts/inc/KalRepCollection.hh"
-#include "BTrkData/inc/TrkStrawHit.hh"
-#include "BTrkData/inc/TrkCaloHit.hh"
-#include "BTrkData/inc/Doublet.hh"
-#include "RecoDataProducts/inc/TrkQual.hh"
-#include "TrkReco/inc/DoubletAmbigResolver.hh"
+#include "Offline/RecoDataProducts/inc/HelixSeed.hh"
+#include "Offline/RecoDataProducts/inc/KalSeed.hh"
+#include "Offline/RecoDataProducts/inc/KalRepPtrCollection.hh"
+#include "Offline/RecoDataProducts/inc/KalRepCollection.hh"
+#include "Offline/BTrkData/inc/TrkStrawHit.hh"
+#include "Offline/BTrkData/inc/TrkCaloHit.hh"
+#include "Offline/BTrkData/inc/Doublet.hh"
+#include "Offline/RecoDataProducts/inc/TrkQual.hh"
+#include "Offline/TrkReco/inc/DoubletAmbigResolver.hh"
 
-#include "RecoDataProducts/inc/TrkCaloIntersectCollection.hh"
-#include "RecoDataProducts/inc/TrackClusterMatch.hh"
+#include "Offline/RecoDataProducts/inc/TrkCaloIntersectCollection.hh"
+#include "Offline/RecoDataProducts/inc/TrackClusterMatch.hh"
 
-#include "MCDataProducts/inc/GenParticleCollection.hh"
-#include "MCDataProducts/inc/SimParticleCollection.hh"
-#include "MCDataProducts/inc/StepPointMCCollection.hh"
-#include "MCDataProducts/inc/StrawDigiMCCollection.hh"
-#include "MCDataProducts/inc/StrawGasStep.hh"
-#include "DataProducts/inc/VirtualDetectorId.hh"
+#include "Offline/MCDataProducts/inc/GenParticle.hh"
+#include "Offline/MCDataProducts/inc/SimParticle.hh"
+#include "Offline/MCDataProducts/inc/StepPointMC.hh"
+#include "Offline/MCDataProducts/inc/StrawDigiMCCollection.hh"
+#include "Offline/MCDataProducts/inc/StrawGasStep.hh"
+#include "Offline/DataProducts/inc/VirtualDetectorId.hh"
 
-#include "RecoDataProducts/inc/StrawDigi.hh"
-#include "RecoDataProducts/inc/StrawHitCollection.hh"
-#include "RecoDataProducts/inc/CaloCrystalHitCollection.hh"
-#include "RecoDataProducts/inc/CaloHitCollection.hh"
-#include "RecoDataProducts/inc/CaloClusterCollection.hh"
-#include "RecoDataProducts/inc/PIDProductCollection.hh"
-#include "RecoDataProducts/inc/AlgorithmIDCollection.hh"
+#include "Offline/RecoDataProducts/inc/StrawDigi.hh"
+#include "Offline/RecoDataProducts/inc/StrawHitCollection.hh"
+#include "Offline/RecoDataProducts/inc/CaloHit.hh"
+#include "Offline/RecoDataProducts/inc/CaloCluster.hh"
+#include "Offline/RecoDataProducts/inc/PIDProductCollection.hh"
+#include "Offline/RecoDataProducts/inc/AlgorithmIDCollection.hh"
 
 					          // BaBar 
 #include "BTrk/ProbTools/ChisqConsistency.hh"
@@ -70,7 +69,7 @@
 #include "Stntuple/mod/THistModule.hh"
 #include "Stntuple/base/TNamedHandle.hh"
 
-#include "TrkDiag/inc/KalDiag.hh"
+// #include "TrkDiag/inc/KalDiag.hh"
 
 namespace {
 
@@ -139,7 +138,6 @@ namespace {
     *Offset  = iface % 2;
   }
 
-
 //-----------------------------------------------------------------------------
 // extrapolate track to a given Z
 //-----------------------------------------------------------------------------
@@ -204,7 +202,7 @@ Int_t StntupleInitMu2eTrackBlock  (TStnDataBlock* Block, AbsEvent* AnEvent, Int_
 //-----------------------------------------------------------------------------
   static int                          initialized(0);
   static mu2e::DoubletAmbigResolver* _dar;
-  static mu2e::KalDiag*              _kalDiag;
+  //  static mu2e::KalDiag*              _kalDiag;
   
   int                       ntrk(0), ev_number, rn_number;
   TStnTrack*                track;
@@ -236,7 +234,7 @@ Int_t StntupleInitMu2eTrackBlock  (TStnDataBlock* Block, AbsEvent* AnEvent, Int_
   char   pidp_module_label[100], pidp_description[100];
   char   spmc_module_label[100], spmc_description[100];
 
-  char   module_name      [100], dar_name        [100], kaldiag_name[100];
+  char   module_name      [100], dar_name        [100]; // kaldiag_name[100];
 
   ev_number = AnEvent->event();
   rn_number = AnEvent->run();
@@ -264,12 +262,12 @@ Int_t StntupleInitMu2eTrackBlock  (TStnDataBlock* Block, AbsEvent* AnEvent, Int_
     nh   = static_cast<TNamedHandle*> (m->GetFolder()->FindObject(dar_name));
     _dar = static_cast<mu2e::DoubletAmbigResolver*> (nh->Object());
 
-    data->GetModuleLabel("KalDiagHandle",module_name );
-    data->GetDescription("KalDiagHandle",kaldiag_name);
+    // data->GetModuleLabel("KalDiagHandle",module_name );
+    // data->GetDescription("KalDiagHandle",kaldiag_name);
 
-    m        = static_cast<THistModule*>  (THistModule::GetListOfModules()->FindObject(module_name));
-    nh       = static_cast<TNamedHandle*> (m->GetFolder()->FindObject(kaldiag_name));
-    _kalDiag = static_cast<mu2e::KalDiag*> (nh->Object());
+    // m        = static_cast<THistModule*>  (THistModule::GetListOfModules()->FindObject(module_name));
+    // nh       = static_cast<TNamedHandle*> (m->GetFolder()->FindObject(kaldiag_name));
+    // _kalDiag = static_cast<mu2e::KalDiag*> (nh->Object());
   }
 
   data->GetModuleLabel("mu2e::AlgorithmIDCollection",algs_module_label);
@@ -618,14 +616,15 @@ Int_t StntupleInitMu2eTrackBlock  (TStnDataBlock* Block, AbsEvent* AnEvent, Int_
 //-----------------------------------------------------------------------------
 // Dave's variables calculated by KalDiag
 //-----------------------------------------------------------------------------
-    _kalDiag->kalDiag(krep,false);
+    printf("InitTrackBlock: ERROR: kalDiag is gone, FIXIT\n");
+    // _kalDiag->kalDiag(krep,false);
 //-----------------------------------------------------------------------------
 // total number of hits associated with the trackand the number of bend sites
 //-----------------------------------------------------------------------------
-    track->fNHits     = ntrkhits | (_kalDiag->_trkinfo._nbend << 16);
-    track->fNMatSites = _kalDiag->_trkinfo._nmat | (_kalDiag->_trkinfo._nmatactive << 16);
+    track->fNHits     = ntrkhits; // ntrkhits | (_kalDiag->_trkinfo._nbend << 16);
+    track->fNMatSites = 0; // _kalDiag->_trkinfo._nmat | (_kalDiag->_trkinfo._nmatactive << 16);
 
-    if (list_of_trkqual) track->fTrkQual = list_of_trkqual->at(itrk).MVAOutput();//_kalDiag->_trkinfo._trkqual;
+    if (list_of_trkqual) track->fTrkQual = list_of_trkqual->at(itrk).MVAOutput();
     else                 track->fTrkQual = -1.e6;
 //-----------------------------------------------------------------------------
 // defined bit-packed fNActive word
@@ -924,7 +923,7 @@ Int_t StntupleInitMu2eTrackBlock  (TStnDataBlock* Block, AbsEvent* AnEvent, Int_
       krep  = extrk->trk().get();
       if (krep == track->fKalRep[0]) {
 	const mu2e::CaloCluster* cl = tcm->caloCluster();
-	iv   = cl->diskId();
+	iv   = cl->diskID();
 	vint = &track->fDisk[iv];
 	if (bc == 0) {
 	  printf(">>> ERROR: %s VANE calorimeter is not defined \n",oname);
@@ -1051,12 +1050,12 @@ Int_t StntupleInitMu2eTrackBlock  (TStnDataBlock* Block, AbsEvent* AnEvent, Int_
       if (! tch) continue;
       vtch = &(track->fTrkCaloHit);
       const mu2e::CaloCluster*cl = &(tch->caloCluster());
-      XYZVec cpos = Geom::toXYZVec(bc->geomUtil().mu2eToTracker(bc->geomUtil().diskFFToMu2e( cl->diskId(), cl->cog3Vector())));
+      XYZVec cpos = Geom::toXYZVec(bc->geomUtil().mu2eToTracker(bc->geomUtil().diskFFToMu2e( cl->diskID(), cl->cog3Vector())));
     
       CLHEP::Hep3Vector pos;
       tch->hitPosition(pos);
 
-      vtch->fID           = cl->diskId();		// 
+      vtch->fID           = cl->diskID();		// 
       vtch->fClusterIndex = -1;         // cluster index in the list of clusters
 
       // the following includes the (Calibrated) light-propagation time delay.  It should eventually be put in the reconstruction FIXME!

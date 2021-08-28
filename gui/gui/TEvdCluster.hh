@@ -14,8 +14,8 @@
 #include "Stntuple/gui/TEvdCrystal.hh"
 
 #ifndef __CINT__
-#include "RecoDataProducts/inc/CaloCluster.hh"
-#include "CalorimeterGeom/inc/Disk.hh"
+#include "Offline/RecoDataProducts/inc/CaloCluster.hh"
+#include "Offline/CalorimeterGeom/inc/Disk.hh"
 #else
 namespace mu2e {
   class CaloCluster;

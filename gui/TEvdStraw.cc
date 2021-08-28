@@ -22,6 +22,7 @@
 #include "GeometryService/inc/GeomHandle.hh"
 
 #include "TrackerGeom/inc/Straw.hh"
+#include "TrackerGeom/inc/Tracker.hh"
 #include "RecoDataProducts/inc/StrawDigi.hh"
 
 #include "Stntuple/gui/TEvdPanel.hh"
@@ -41,7 +42,7 @@ TEvdStraw::TEvdStraw(): TObject() {
 // drawing straws makes sense only on RZ view, in any other view it is just 
 // a waste of time ... and screen space
 //-----------------------------------------------------------------------------
-TEvdStraw::TEvdStraw(int Index, const mu2e::Straw* Straw, TEvdPanel* Panel): TObject() {
+  TEvdStraw::TEvdStraw(int Index, const mu2e::Straw* Straw, TEvdPanel* Panel, const mu2e::Tracker* Tracker): TObject() {
 
   fIndex     = Index;
   fStraw     = Straw;
@@ -55,7 +56,7 @@ TEvdStraw::TEvdStraw(int Index, const mu2e::Straw* Straw, TEvdPanel* Panel): TOb
 
   z        = pos->z();
   rwire    = pos->perp();                      // radial position of the wire
-  r        = fStraw->getRadius();
+  r        = Tracker->strawProperties()._strawOuterRadius;
 
   fArc = new TArc(z,rwire,r);
 

@@ -127,7 +127,7 @@ int  StntupleInitMu2eHelixBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mode) {
       
       helix->fClusterTime    = cluster->time();
       helix->fClusterEnergy  = cluster->energyDep();
-      CLHEP::Hep3Vector gpos = _calorimeter->geomUtil().diskToMu2e(cluster->diskId(),cluster->cog3Vector());
+      CLHEP::Hep3Vector gpos = _calorimeter->geomUtil().diskToMu2e(cluster->diskID(),cluster->cog3Vector());
       CLHEP::Hep3Vector tpos = _calorimeter->geomUtil().mu2eToTracker(gpos);
       helix->fClusterX       = tpos.x();
       helix->fClusterY       = tpos.y();
@@ -385,12 +385,12 @@ Int_t StntupleInitMu2eHelixBlockLinks(TStnDataBlock* Block, AbsEvent* AnEvent, i
   TStnHelixBlock*          hb;
   TStnHelix*               helix;
   TStnTrackSeedBlock*      tsb;
-  TStnTrackSeed*           trkseed;
+  // TStnTrackSeed*           trkseed;
   TStnTimeClusterBlock*    tcb;
   TStnTimeCluster*         tp;
 
   const mu2e::HelixSeed*   khelix, *fkhelix;
-  const mu2e::KalSeed*     kseed;
+  // const mu2e::KalSeed*     kseed;
   const mu2e::TimeCluster* ktimepeak, *fktimepeak;
 
   char                     ts_block_name[100], tc_block_name[100];
@@ -417,9 +417,10 @@ Int_t StntupleInitMu2eHelixBlockLinks(TStnDataBlock* Block, AbsEvent* AnEvent, i
     khelix = helix->fHelix;
     int      trackseedIndex(-1);
     for (int j=0; j<ntseeds; ++j){
-      trkseed = tsb->TrackSeed(j);
-      kseed   = trkseed->fTrackSeed;
-      fkhelix = kseed->helix().get();
+      // trkseed = tsb->TrackSeed(j);
+      // kseed   = trkseed->fTrackSeed;
+      printf("StntupleInitMu2eHelixBlockLinks ERROR:  kseed->helix() undefined, FIXIT\n");
+      fkhelix = nullptr; // kseed->helix().get();
       if (fkhelix == khelix) {
 	trackseedIndex = j;
 	break;

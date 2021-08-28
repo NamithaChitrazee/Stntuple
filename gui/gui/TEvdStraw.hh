@@ -12,6 +12,7 @@
 
 namespace mu2e {
   class Straw;
+  class Tracker;
 };
 
 
@@ -42,7 +43,7 @@ public:
 // constructors and destructor
 //-----------------------------------------------------------------------------
   TEvdStraw();
-  TEvdStraw(int Index, const mu2e::Straw* Straw, TEvdPanel* Panel); 
+  TEvdStraw(int Index, const mu2e::Straw* Straw, TEvdPanel* Panel, const mu2e::Tracker* Tracker); 
 
   virtual ~TEvdStraw();
 //-----------------------------------------------------------------------------

@@ -14,12 +14,10 @@ void print_sh_colls() {
 
   printf("Available StrawHitCollections: \n");
 
-  std::vector<art::Handle<mu2e::StrawHitCollection>> vcoll;
-
   const art::Event* event = TAnaDump::Instance()->Event();
 
   art::Selector  selector(art::ProductInstanceNameSelector(""));
-  event->getMany(selector,vcoll);
+  auto vcoll = event->getMany<mu2e::StrawHitCollection>(selector);
 
   for (auto handle = vcoll.begin(); handle != vcoll.end(); handle++) {
     if (handle->isValid()) {

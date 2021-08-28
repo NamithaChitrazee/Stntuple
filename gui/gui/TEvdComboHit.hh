@@ -15,8 +15,8 @@
 #include "TEllipse.h"
 #include "TMarker.h"
 
-#include "RecoDataProducts/inc/ComboHit.hh"
-#include "MCDataProducts/inc/StrawDigiMC.hh"
+#include "Offline/RecoDataProducts/inc/ComboHit.hh"
+#include "Offline/MCDataProducts/inc/StrawDigiMC.hh"
 
 namespace mu2e {
   class ComboHit;

@@ -111,7 +111,7 @@ int  StntupleInitTimeClusterBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent*
       
       tc->fClusterTime    = cluster->time();
       tc->fClusterEnergy  = cluster->energyDep();
-      CLHEP::Hep3Vector         gpos = _calorimeter->geomUtil().diskToMu2e(cluster->diskId(),cluster->cog3Vector());
+      CLHEP::Hep3Vector         gpos = _calorimeter->geomUtil().diskToMu2e(cluster->diskID(),cluster->cog3Vector());
       CLHEP::Hep3Vector         tpos = _calorimeter->geomUtil().mu2eToTracker(gpos);
       tc->fClusterX       = tpos.x();
       tc->fClusterY       = tpos.y();

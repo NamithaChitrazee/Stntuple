@@ -11,17 +11,13 @@
 #include "TArc.h"
 
 #ifndef __CINT__
-#include "RecoDataProducts/inc/StrawHitCollection.hh"
-#include "RecoDataProducts/inc/StrawHitPositionCollection.hh"
-#include "RecoDataProducts/inc/StrawHitFlagCollection.hh"
-#include "MCDataProducts/inc/PtrStepPointMCVectorCollection.hh"
-#include "TrackerGeom/inc/Tracker.hh"
+#include "Offline/RecoDataProducts/inc/StrawHit.hh"
+#include "Offline/RecoDataProducts/inc/StrawHitFlag.hh"
+#include "Offline/TrackerGeom/inc/Tracker.hh"
 #else
 namespace mu2e {
   class StrawHitCollection;
-  class StrawHitPositionCollection;
   class StrawHitFlagCollection;
-  class PtrStepPointMCVectorCollection;
   class TTracker;
 };
 #endif

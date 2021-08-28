@@ -12,7 +12,7 @@
 
 #ifndef __CINT__
 
-#include "CalorimeterGeom/inc/Disk.hh"
+#include "Offline/CalorimeterGeom/inc/Disk.hh"
 
 #else
 

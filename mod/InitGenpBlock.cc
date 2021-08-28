@@ -77,7 +77,7 @@ int StntupleInitGenpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
 //-----------------------------------------------------------------------------
 // loop over existing GENP collections, there could be many of them
 //-----------------------------------------------------------------------------
-  AnEvent->getMany(selector,list_of_gp);
+  list_of_gp = AnEvent->getMany<mu2e::GenParticleCollection>(selector);
 
   TDatabasePDG* pdg_db = TDatabasePDG::Instance();
   TParticlePDG* part;

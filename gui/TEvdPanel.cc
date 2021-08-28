@@ -44,7 +44,7 @@ TEvdPanel::TEvdPanel(): TObject() {
 }
 
 //_____________________________________________________________________________
-TEvdPanel::TEvdPanel(int ID, const mu2e::Panel* Panel, TEvdPlane* Plane): TObject() {
+  TEvdPanel::TEvdPanel(int ID, const mu2e::Panel* Panel, TEvdPlane* Plane, const mu2e::Tracker* Tracker): TObject() {
 
   TEvdStraw* evd_straw;
 
@@ -80,7 +80,7 @@ TEvdPanel::TEvdPanel(int ID, const mu2e::Panel* Panel, TEvdPlane* Plane): TObjec
 	     istation, ipp, ill, iss, straw->getMidPoint().z());
     }
 
-    evd_straw = new TEvdStraw(id,straw,this);
+    evd_straw = new TEvdStraw(id,straw,this,Tracker);
     fListOfStraws[ill]->Add(evd_straw);
   }
 }

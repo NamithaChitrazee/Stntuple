@@ -49,42 +49,40 @@
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
 // Mu2e includes.
-#include "ConditionsService/inc/ConditionsHandle.hh"
-#include "TrackerConditions/inc/StrawResponse.hh"
+#include "Offline/ConditionsService/inc/ConditionsHandle.hh"
+#include "Offline/TrackerConditions/inc/StrawResponse.hh"
 
-#include "GeometryService/inc/GeometryService.hh"
-#include "GeometryService/inc/GeomHandle.hh"
+#include "Offline/GeometryService/inc/GeometryService.hh"
+#include "Offline/GeometryService/inc/GeomHandle.hh"
 
-#include "TrackerGeom/inc/Tracker.hh"
-#include "CalorimeterGeom/inc/DiskCalorimeter.hh"
-#include "CalorimeterGeom/inc/Calorimeter.hh"
-#include "Mu2eUtilities/inc/SortedStepPoints.hh"
-#include "Mu2eUtilities/inc/TrackTool.hh"
+#include "Offline/TrackerGeom/inc/Tracker.hh"
+#include "Offline/CalorimeterGeom/inc/DiskCalorimeter.hh"
+#include "Offline/CalorimeterGeom/inc/Calorimeter.hh"
+#include "Offline/Mu2eUtilities/inc/SortedStepPoints.hh"
+#include "Offline/Mu2eUtilities/inc/TrackTool.hh"
 
-#include "MCDataProducts/inc/GenParticleCollection.hh"
-#include "MCDataProducts/inc/SimParticleCollection.hh"
-#include "MCDataProducts/inc/StepPointMCCollection.hh"
-#include "MCDataProducts/inc/StrawDigiMCCollection.hh"
+#include "Offline/MCDataProducts/inc/GenParticleCollection.hh"
+#include "Offline/MCDataProducts/inc/SimParticleCollection.hh"
+#include "Offline/MCDataProducts/inc/StepPointMCCollection.hh"
+#include "Offline/MCDataProducts/inc/StrawDigiMCCollection.hh"
 
 #include "BTrk/TrkBase/HelixParams.hh"
 #include "BTrk/KalmanTrack/KalHit.hh"
 
-#include "RecoDataProducts/inc/CaloCrystalHit.hh"
-#include "RecoDataProducts/inc/CaloCrystalHitCollection.hh"
-#include "RecoDataProducts/inc/CaloClusterCollection.hh"
-#include "RecoDataProducts/inc/ComboHit.hh"
-#include "DataProducts/inc/XYZVec.hh"
-#include "RecoDataProducts/inc/StrawHitFlagCollection.hh"
+#include "Offline/RecoDataProducts/inc/CaloHit.hh"
+#include "Offline/RecoDataProducts/inc/CaloCluster.hh"
+#include "Offline/RecoDataProducts/inc/ComboHit.hh"
+#include "Offline/DataProducts/inc/XYZVec.hh"
+#include "Offline/RecoDataProducts/inc/StrawHitFlag.hh"
 
-#include "RecoDataProducts/inc/CrvRecoPulseCollection.hh"
-#include "RecoDataProducts/inc/CrvRecoPulse.hh"
-#include "RecoDataProducts/inc/TimeCluster.hh"
+#include "Offline/RecoDataProducts/inc/CrvRecoPulse.hh"
+#include "Offline/RecoDataProducts/inc/TimeCluster.hh"
 
-#include "BTrkData/inc/TrkStrawHit.hh"
-#include "RecoDataProducts/inc/KalRepPtrCollection.hh"
+#include "Offline/BTrkData/inc/TrkStrawHit.hh"
+#include "Offline/RecoDataProducts/inc/KalRepPtrCollection.hh"
 
-#include "TrkReco/inc/DoubletAmbigResolver.hh"
-#include "TrkDiag/inc/KalDiag.hh"
+#include "Offline/TrkReco/inc/DoubletAmbigResolver.hh"
+// #include "Offline/TrkDiag/inc/KalDiag.hh"
 
 // ROOT includes
 #include "TApplication.h"
@@ -119,7 +117,7 @@
 
 #include "Stntuple/obj/TStnHeaderBlock.hh"
 
-#include "Mu2eUtilities/inc/McUtilsToolBase.hh"
+#include "Offline/Mu2eUtilities/inc/McUtilsToolBase.hh"
 
 using namespace std;
 using CLHEP::Hep3Vector;
@@ -192,7 +190,7 @@ private:
   const mu2e::StrawHitFlagCollection*   fStrawHitFlagColl; //
   const mu2e::StrawDigiMCCollection*    _strawDigiMCColl; //
   
-  const mu2e::CaloCrystalHitCollection* fListOfCrystalHits;//
+  const mu2e::CaloHitCollection*        fListOfCrystalHits;//
   const mu2e::CaloClusterCollection*    fListOfClusters;   //
   
   const mu2e::StepPointMCCollection*    _stepPointMCColl;  //
@@ -230,10 +228,10 @@ private:
   const Tracker*         fTracker;    // straw tracker geometry
 
   TNamedHandle*          fDarHandle;
-  TNamedHandle*          fKalDiagHandle;
+  //  TNamedHandle*          fKalDiagHandle;
 
   DoubletAmbigResolver*  fDar;
-  KalDiag*               fKalDiag;
+  //  KalDiag*               fKalDiag;
 
 public:
   explicit MuHitDisplay(fhicl::ParameterSet const& pset);
@@ -316,11 +314,11 @@ MuHitDisplay::MuHitDisplay(fhicl::ParameterSet const& pset) :
   fDar           = new DoubletAmbigResolver (pset.get<fhicl::ParameterSet>("DoubletAmbigResolver"),0.,0,0);
   fDarHandle     = new TNamedHandle("DarHandle",fDar);
 
-  fKalDiag       = new KalDiag(pset.get<fhicl::ParameterSet>("KalDiag",fhicl::ParameterSet()));
-  fKalDiagHandle = new TNamedHandle("KalDiagHandle",fKalDiag);
+  // fKalDiag       = new KalDiag(pset.get<fhicl::ParameterSet>("KalDiag",fhicl::ParameterSet()));
+  // fKalDiagHandle = new TNamedHandle("KalDiagHandle",fKalDiag);
 
   fFolder->Add(fDarHandle);
-  fFolder->Add(fKalDiagHandle);
+  // fFolder->Add(fKalDiagHandle);
 }
 
 //-----------------------------------------------------------------------------
@@ -335,7 +333,7 @@ MuHitDisplay::~MuHitDisplay() {
   delete fCrvPulseColl_Dwnstrm;
   delete fCrvPulseColl_Upstrm;
 
-  delete fKalDiag;
+  //  delete fKalDiag;
   delete fDar;
 }
 
@@ -594,7 +592,6 @@ int MuHitDisplay::getData(const art::Event* Evt) {
       Evt->get(getTrackerSteps, stepsHandle);
 
       if (stepsHandle.isValid()) _stepPointMCColl = stepsHandle.product();
-
       else                       _stepPointMCColl = NULL;
 //-----------------------------------------------------------------------------
 //  straw hit information
@@ -643,15 +640,15 @@ int MuHitDisplay::getData(const art::Event* Evt) {
 //-----------------------------------------------------------------------------
 // calorimeter crystal hit data
 //-----------------------------------------------------------------------------
-      art::Handle<CaloCrystalHitCollection> ccHandle;
+      art::Handle<CaloHitCollection> ccHandle;
       Evt->getByLabel(fCrystalHitMaker.data(), ccHandle);
 
       if (ccHandle.isValid()) {
-	fListOfCrystalHits = (CaloCrystalHitCollection*) ccHandle.product();
+	fListOfCrystalHits = (CaloHitCollection*) ccHandle.product();
       }
       else {
 	fListOfCrystalHits = NULL;
-	printf(">>> [%s] ERROR: CaloCrystalHitCollection by %s is missing. BAIL OUT\n",
+	printf(">>> [%s] ERROR: CaloHitCollection by %s is missing. BAIL OUT\n",
 	       oname, fCrystalHitMaker.data());
       }
 //-----------------------------------------------------------------------------

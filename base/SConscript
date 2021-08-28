@@ -14,7 +14,7 @@ def local_build():
     rootlibs = local_env['ROOTLIBS']
     if ( not ("EG" in rootlibs)): rootlibs.insert(rootlibs.index("Physics")+1,"EG");
 
-    debug     = False; 
+    debug     = True; 
     helper    = stntuple_helper(local_env,debug);
 
     helper.handle_dictionaries();

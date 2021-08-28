@@ -50,7 +50,7 @@ TEvdStation::TEvdStation(int ID, const mu2e::Tracker* Tracker): TObject() {
     id = 2*ID+i;
     const mu2e::Plane* plane = &Tracker->getPlane(id);
 
-    evd_plane = new TEvdPlane(id,plane,this);
+    evd_plane = new TEvdPlane(id,plane,this,Tracker);
 
     fListOfPlanes->Add(evd_plane);
   }

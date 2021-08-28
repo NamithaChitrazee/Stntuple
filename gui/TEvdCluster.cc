@@ -58,7 +58,7 @@ TEvdCluster::TEvdCluster(const mu2e::CaloCluster* Cl): TObject() {
   //   color = 2;
   // } else 
     if(geom->hasElement<mu2e::DiskCalorimeter>()){
-    color = module_color[Cl->diskId()];
+    color = module_color[Cl->diskID()];
   }
 
   fTrkEllipse->SetFillColor(color);
@@ -87,7 +87,7 @@ void TEvdCluster::Paint(Option_t* Option) {
   if      (view == TStnView::kXY ) PaintXY(Option);
   else if (view == TStnView::kCal) {
     int index = TVisManager::Instance()->GetCurrentView()->Index();
-    if (index == fCluster->diskId()) PaintCal(Option);
+    if (index == fCluster->diskID()) PaintCal(Option);
   }
   else {
     printf("[%s] >>> ERROR: unknown view: %i, DO NOTHING\n",oname,view);

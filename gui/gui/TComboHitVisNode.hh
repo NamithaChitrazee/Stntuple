@@ -12,8 +12,8 @@
 
 #include "Stntuple/gui/TStnVisNode.hh"
 
-#include "RecoDataProducts/inc/ComboHit.hh"
-#include "MCDataProducts/inc/StrawDigiMC.hh"
+#include "Offline/RecoDataProducts/inc/ComboHit.hh"
+#include "Offline/MCDataProducts/inc/StrawDigiMC.hh"
 
 class TComboHitVisNode: public TStnVisNode {
 public:

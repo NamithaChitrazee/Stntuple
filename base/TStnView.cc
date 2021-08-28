@@ -2,6 +2,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 #include "TObjArray.h"
+#include "TVirtualX.h"
 
 #include "Stntuple/base/TStnView.hh"
 #include "Stntuple/base/TVisNode.hh"

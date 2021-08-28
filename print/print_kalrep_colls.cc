@@ -9,12 +9,12 @@
 void print_kalrep_colls() {
   printf("Available KalRepPtrCollections: \n");
 
-  std::vector<art::Handle<mu2e::KalRepPtrCollection>> vcoll;
-
   const art::Event* event = TAnaDump::Instance()->Event();
 
   art::Selector  selector(art::ProductInstanceNameSelector(""));
-  event->getMany(selector,vcoll);
+
+  // std::vector<art::Handle<mu2e::KalRepPtrCollection>> vcoll;
+  auto vcoll = event->getMany<mu2e::KalRepPtrCollection>(selector);
 
   for (auto handle = vcoll.begin(); handle != vcoll.end(); handle++) {
     if (handle->isValid()) {

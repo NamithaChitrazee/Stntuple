@@ -18,14 +18,14 @@
 #include "Stntuple/gui/TStnVisManager.hh"
 #include "Stntuple/gui/TEvdCrvBar.hh"
 
-#include "CosmicRayShieldGeom/inc/CosmicRayShield.hh"
-#include "CosmicRayShieldGeom/inc/CRSScintillatorShield.hh"
-#include "CosmicRayShieldGeom/inc/CRSScintillatorModule.hh"
-#include "CosmicRayShieldGeom/inc/CRSScintillatorLayer.hh"
-#include "CosmicRayShieldGeom/inc/CRSScintillatorBar.hh"
-#include "DataProducts/inc/CRSScintillatorBarIndex.hh"
+#include "Offline/CosmicRayShieldGeom/inc/CosmicRayShield.hh"
+#include "Offline/CosmicRayShieldGeom/inc/CRSScintillatorShield.hh"
+#include "Offline/CosmicRayShieldGeom/inc/CRSScintillatorModule.hh"
+#include "Offline/CosmicRayShieldGeom/inc/CRSScintillatorLayer.hh"
+#include "Offline/CosmicRayShieldGeom/inc/CRSScintillatorBar.hh"
+#include "Offline/DataProducts/inc/CRSScintillatorBarIndex.hh"
 
-#include "RecoDataProducts/inc/CrvRecoPulseCollection.hh"
+#include "Offline/RecoDataProducts/inc/CrvRecoPulse.hh"
 
 
 ClassImp(TCrvVisNode)

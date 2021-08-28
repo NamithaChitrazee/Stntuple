@@ -17,16 +17,14 @@
 
 #include "art/Framework/Principal/Event.h"
 
-#include "MCDataProducts/inc/CaloClusterMCTruthAssn.hh"
-#include "MCDataProducts/inc/CaloHitMCTruthAssn.hh"
-#include "MCDataProducts/inc/StrawDigiMCCollection.hh"
+#include "Offline/MCDataProducts/inc/CaloMCTruthAssns.hh"
+#include "Offline/MCDataProducts/inc/StrawDigiMC.hh"
 
-#include "RecoDataProducts/inc/ComboHit.hh"
-#include "RecoDataProducts/inc/HelixHit.hh"
-#include "RecoDataProducts/inc/StrawHitPositionCollection.hh"
-#include "DataProducts/inc/XYZVec.hh"
+#include "Offline/RecoDataProducts/inc/ComboHit.hh"
+#include "Offline/RecoDataProducts/inc/HelixHit.hh"
+#include "Offline/DataProducts/inc/XYZVec.hh"
 
-#include "TrkReco/inc/TrkPrintUtils.hh"
+#include "Offline/TrkReco/inc/TrkPrintUtils.hh"
 
 #else
 
@@ -150,7 +148,7 @@ public:
 
   void printCaloCluster          (const mu2e::CaloCluster* Cluster ,
 				  const char*              Opt = "",
-				  const mu2e::CaloHitMCTruthAssns* CaloHitTruth=NULL);
+				  const mu2e::CaloHitMCTruthAssn* CaloHitTruth=NULL);
   
   void printCaloClusterCollection (const char* ModuleLabel, 
 				   const char* ProductName= "",

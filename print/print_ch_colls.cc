@@ -14,12 +14,12 @@ void print_ch_colls() {
 
   printf("Available ComboHitCollections: \n");
 
-  std::vector<art::Handle<mu2e::ComboHitCollection>> vcoll;
-
   const art::Event* event = TAnaDump::Instance()->Event();
 
   art::Selector  selector(art::ProductInstanceNameSelector(""));
-  event->getMany(selector,vcoll);
+
+  // std::vector<art::Handle<mu2e::ComboHitCollection>> vcoll;
+  auto vcoll = event->getMany<mu2e::ComboHitCollection>(selector);
 
   for (auto handle = vcoll.begin(); handle != vcoll.end(); handle++) {
     if (handle->isValid()) {

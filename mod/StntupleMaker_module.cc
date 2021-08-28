@@ -66,7 +66,7 @@
 
 #include "Mu2eUtilities/inc/SimParticleTimeOffset.hh"
 #include "TrkReco/inc/DoubletAmbigResolver.hh"
-#include "TrkDiag/inc/KalDiag.hh"
+// #include "TrkDiag/inc/KalDiag.hh"
 #include "MCDataProducts/inc/GenId.hh"
 #include "RecoDataProducts/inc/HelixSeed.hh"
 
@@ -180,11 +180,11 @@ protected:
   TNamed*                  fVersion;
 
   TNamedHandle*            fDarHandle;
-  TNamedHandle*            fKalDiagHandle;
+  //  TNamedHandle*            fKalDiagHandle;
   TNamedHandle*            fTimeOffsetMapsHandle;
 
   DoubletAmbigResolver*    fDar;
-  KalDiag*                 fKalDiag;
+  // KalDiag*                 fKalDiag;
   SimParticleTimeOffset*   fTimeOffsets;
 //------------------------------------------------------------------------------
 // function members
@@ -316,11 +316,11 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
   fTimeOffsetMapsHandle = new TNamedHandle("TimeOffsetMapsHandle",fTimeOffsets);
   fDar                  = new DoubletAmbigResolver (PSet.get<fhicl::ParameterSet>("DoubletAmbigResolver"),0.,0,0);
   fDarHandle            = new TNamedHandle("DarHandle",fDar);
-  fKalDiag              = new KalDiag     (PSet.get<fhicl::ParameterSet>("KalDiag",fhicl::ParameterSet()));
-  fKalDiagHandle        = new TNamedHandle("KalDiagHandle"      ,fKalDiag);
+  // fKalDiag              = new KalDiag     (PSet.get<fhicl::ParameterSet>("KalDiag",fhicl::ParameterSet()));
+  // fKalDiagHandle        = new TNamedHandle("KalDiagHandle"      ,fKalDiag);
 
   fFolder->Add(fDarHandle);
-  fFolder->Add(fKalDiagHandle);
+  // fFolder->Add(fKalDiagHandle);
   fFolder->Add(fTimeOffsetMapsHandle);
 }
 
@@ -428,7 +428,7 @@ void StntupleMaker::beginJob() {
 			    split_mode,
 			    compression_level);
     if (cal_data) {
-      cal_data->AddCollName("mu2e::CaloCrystalHitCollection",fCaloCrystalHitMaker.data());
+      cal_data->AddCollName("mu2e::CaloHitCollection",fCaloCrystalHitMaker.data());
     }
   }
 //-----------------------------------------------------------------------------
@@ -708,7 +708,7 @@ void StntupleMaker::beginJob() {
 	track_data->AddCollName("mu2e::PIDProductCollection"          ,fPidCollTag[i].data()      );
 	track_data->AddCollName("mu2e::StepPointMCCollection"         ,fVDHitsCollTag.data()      );
 	track_data->AddCollName("DarHandle"                           ,GetName()                  ,"DarHandle"    );
-	track_data->AddCollName("KalDiagHandle"                       ,GetName()                  ,"KalDiagHandle");
+	//	track_data->AddCollName("KalDiagHandle"                       ,GetName()                  ,"KalDiagHandle");
 	if (fTrackTsBlockName.size() > 0) {
 	  track_data->AddCollName("TrackTsBlockName"                    ,fTrackTsBlockName[i].data());
 	  track_data->AddCollName("TrackTsCollTag"                      ,fTrackTsCollTag  [i].data());

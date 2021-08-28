@@ -17,7 +17,7 @@ def local_build():
 
     debug  = False
     # env.Append(FORTRANFLAGS = ['-Iinclude','-g']);
-    local_env.Append(FORTRANFLAGS = ['-Iinclude']);
+    # local_env.Append(FORTRANFLAGS = ['-I'+include']);
     helper = stntuple_helper(local_env,debug);
 
     helper.handle_dictionaries();

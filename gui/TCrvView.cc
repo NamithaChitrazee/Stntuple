@@ -2,6 +2,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 #include "TObjArray.h"
+#include "TVirtualX.h"
 
 #include "Stntuple/gui/TCrvVisNode.hh"
 #include "Stntuple/gui/TCrvView.hh"

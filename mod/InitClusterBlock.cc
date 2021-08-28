@@ -16,26 +16,22 @@
 #include "art/Framework/Principal/Handle.h"
 #include "art/Framework/Principal/Event.h"
 
-#include "GeometryService/inc/GeometryService.hh"
-#include "GeometryService/inc/GeomHandle.hh"
+#include "Offline/GeometryService/inc/GeometryService.hh"
+#include "Offline/GeometryService/inc/GeomHandle.hh"
 
-#include "CalorimeterGeom/inc/DiskCalorimeter.hh"
+#include "Offline/CalorimeterGeom/inc/DiskCalorimeter.hh"
 
-#include "RecoDataProducts/inc/KalRepPtrCollection.hh"
-// #include "TrkReco/inc/TrkStrawHit.hh"
+#include "Offline/RecoDataProducts/inc/KalRepPtrCollection.hh"
 
-// #include "TrackCaloMatching/inc/TrkToCaloExtrapolCollection.hh"
-#include "RecoDataProducts/inc/TrackClusterMatch.hh"
-// #include "TrackCaloMatching/inc/TrkToCaloExtrapol.hh"
+#include "Offline/RecoDataProducts/inc/TrackClusterMatch.hh"
 
-#include "MCDataProducts/inc/GenParticleCollection.hh"
-#include "MCDataProducts/inc/SimParticleCollection.hh"
-#include "MCDataProducts/inc/StepPointMCCollection.hh"
+#include "Offline/MCDataProducts/inc/GenParticleCollection.hh"
+#include "Offline/MCDataProducts/inc/SimParticleCollection.hh"
+#include "Offline/MCDataProducts/inc/StepPointMCCollection.hh"
 
-#include "RecoDataProducts/inc/StrawHitCollection.hh"
-#include "RecoDataProducts/inc/CaloCrystalHitCollection.hh"
-#include "RecoDataProducts/inc/CaloHitCollection.hh"
-#include "RecoDataProducts/inc/CaloClusterCollection.hh"
+#include "Offline/RecoDataProducts/inc/StrawHit.hh"
+#include "Offline/RecoDataProducts/inc/CaloHit.hh"
+#include "Offline/RecoDataProducts/inc/CaloCluster.hh"
 //-----------------------------------------------------------------------------
 // assume that the collection name is set, so we could grab it from the event
 //-----------------------------------------------------------------------------
@@ -116,8 +112,7 @@ int  StntupleInitMu2eClusterBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mode)
 //-----------------------------------------------------------------------------
 // tracks are supposed to be already initialized
 //-----------------------------------------------------------------------------
-  const mu2e::Crystal           *cr;
-  const mu2e::CaloCrystalHit    *hit;
+  const mu2e::CaloHit           *hit;
   const CLHEP::Hep3Vector       *pos;
   int                           id, ncl;
 
@@ -127,14 +122,13 @@ int  StntupleInitMu2eClusterBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mode)
   ncl = list_of_clusters->size();
   for (int i=0; i<ncl; i++) {
     cluster               = cb->NewCluster();
-    //    cl                    = &list_of_clusters->at(i);
     cl                    = list_of_pcl.at(i);
     cluster->fCaloCluster = cl;
-    cluster->fDiskID      = cl->diskId();
+    cluster->fDiskID      = cl->diskID();
     cluster->fEnergy      = cl->energyDep();
     cluster->fTime        = cl->time();
     
-    const mu2e::CaloCluster::CaloCrystalHitPtrVector list_of_crystals = cluster->fCaloCluster->caloCrystalHitsPtrVector();
+    const mu2e::CaloHitPtrVector& list_of_crystals = cluster->fCaloCluster->caloHitsPtrVector();
 
     int nh = list_of_crystals.size();
 //-----------------------------------------------------------------------------
@@ -155,8 +149,8 @@ int  StntupleInitMu2eClusterBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mode)
     for (int ih=0; ih<nh; ih++) {
       hit = &(*list_of_crystals.at(ih));
       e   = hit->energyDep();
-      id  = hit->id();
-      cr = &cal->crystal(id);
+      id  = hit->crystalID();
+      const mu2e::Crystal* cr = &cal->crystal(id);
 
       pos = &cr->localPosition();
       

@@ -11,74 +11,66 @@
 #include "art/Framework/Principal/Run.h"
 #include "art/Framework/Principal/Selector.h"
 
-#include "GeometryService/inc/GeometryService.hh"
-#include "GeometryService/inc/GeomHandle.hh"
+#include "Offline/GeometryService/inc/GeometryService.hh"
+#include "Offline/GeometryService/inc/GeomHandle.hh"
 
-#include "TrackerGeom/inc/Tracker.hh"
-//  #include "CalorimeterGeom/inc/VaneCalorimeter.hh"
-#include "CalorimeterGeom/inc/DiskCalorimeter.hh"
-#include "CalorimeterGeom/inc/Calorimeter.hh"
+#include "Offline/TrackerGeom/inc/Tracker.hh"
+#include "Offline/CalorimeterGeom/inc/DiskCalorimeter.hh"
+#include "Offline/CalorimeterGeom/inc/Calorimeter.hh"
 
-#include "RecoDataProducts/inc/CaloCluster.hh"
-#include "RecoDataProducts/inc/CaloClusterCollection.hh"
-#include "RecoDataProducts/inc/CaloProtoCluster.hh"
-#include "RecoDataProducts/inc/CaloProtoClusterCollection.hh"
-#include "RecoDataProducts/inc/CaloCrystalHitCollection.hh"
-#include "RecoDataProducts/inc/CaloCrystalHit.hh"
-#include "RecoDataProducts/inc/CaloHitCollection.hh"
+#include "Offline/RecoDataProducts/inc/CaloCluster.hh"
+#include "Offline/RecoDataProducts/inc/CaloProtoCluster.hh"
+#include "Offline/RecoDataProducts/inc/CaloHit.hh"
 
-#include "RecoDataProducts/inc/CrvRecoPulse.hh"
+#include "Offline/RecoDataProducts/inc/CrvRecoPulse.hh"
 
-#include "RecoDataProducts/inc/CrvDigi.hh"
+#include "Offline/RecoDataProducts/inc/CrvDigi.hh"
 
-#include "RecoDataProducts/inc/CrvCoincidence.hh"
-#include "RecoDataProducts/inc/CrvCoincidenceCollection.hh"
+#include "Offline/RecoDataProducts/inc/CrvCoincidence.hh"
+#include "Offline/RecoDataProducts/inc/CrvCoincidenceCluster.hh"
 
-#include "RecoDataProducts/inc/CrvCoincidenceCluster.hh"
+#include "Offline/RecoDataProducts/inc/StrawHitCollection.hh"
+#include "Offline/RecoDataProducts/inc/StrawHitFlagCollection.hh"
+#include "Offline/RecoDataProducts/inc/KalSeed.hh"
+#include "Offline/RecoDataProducts/inc/HelixSeed.hh"
+#include "Offline/RecoDataProducts/inc/ComboHit.hh"
+#include "Offline/RecoDataProducts/inc/TrkStrawHitSeed.hh"
+#include "Offline/RecoDataProducts/inc/TimeCluster.hh"
 
-#include "RecoDataProducts/inc/StrawHitCollection.hh"
-#include "RecoDataProducts/inc/StrawHitFlagCollection.hh"
-#include "RecoDataProducts/inc/KalSeed.hh"
-#include "RecoDataProducts/inc/HelixSeed.hh"
-#include "RecoDataProducts/inc/ComboHit.hh"
-#include "RecoDataProducts/inc/TrkStrawHitSeed.hh"
-#include "RecoDataProducts/inc/TimeCluster.hh"
+#include "Offline/RecoDataProducts/inc/CaloDigi.hh"
+	  // #include "Offline/RecoDataProducts/inc/CaloDigiCollection.hh"
+#include "Offline/RecoDataProducts/inc/CaloRecoDigi.hh"
+	  // #include "Offline/RecoDataProducts/inc/CaloRecoDigiCollection.hh"
 
-#include "RecoDataProducts/inc/CaloDigi.hh"
-#include "RecoDataProducts/inc/CaloDigiCollection.hh"
-#include "RecoDataProducts/inc/CaloRecoDigi.hh"
-#include "RecoDataProducts/inc/CaloRecoDigiCollection.hh"
+#include "Offline/MCDataProducts/inc/GenParticle.hh"
+	  // #include "Offline/MCDataProducts/inc/GenParticleCollection.hh"
+#include "Offline/MCDataProducts/inc/SimParticle.hh"
+	  // #include "Offline/MCDataProducts/inc/SimParticleCollection.hh"
+#include "Offline/MCDataProducts/inc/StrawGasStep.hh"
+#include "Offline/MCDataProducts/inc/StepPointMC.hh"
+	  // #include "Offline/MCDataProducts/inc/StepPointMCCollection.hh"
+#include "Offline/MCDataProducts/inc/PhysicalVolumeInfo.hh"
+#include "Offline/MCDataProducts/inc/PhysicalVolumeInfoMultiCollection.hh"
+          // #include "Offline/CaloMC/inc/CrystalContentMC.hh"
 
-#include "MCDataProducts/inc/GenParticle.hh"
-#include "MCDataProducts/inc/GenParticleCollection.hh"
-#include "MCDataProducts/inc/SimParticle.hh"
-#include "MCDataProducts/inc/SimParticleCollection.hh"
-#include "MCDataProducts/inc/StrawGasStep.hh"
-#include "MCDataProducts/inc/StepPointMC.hh"
-#include "MCDataProducts/inc/StepPointMCCollection.hh"
-#include "MCDataProducts/inc/PhysicalVolumeInfo.hh"
-#include "MCDataProducts/inc/PhysicalVolumeInfoCollection.hh"
-#include "CaloMC/inc/ClusterContentMC.hh"
-#include "CaloMC/inc/CrystalContentMC.hh"
+#include "Offline/BTrkData/inc/TrkCaloHit.hh"
+#include "Offline/BTrkData/inc/TrkStrawHit.hh"
+#include "Offline/RecoDataProducts/inc/KalRepPtrCollection.hh"
 
-#include "BTrkData/inc/TrkCaloHit.hh"
-#include "BTrkData/inc/TrkStrawHit.hh"
-#include "RecoDataProducts/inc/KalRepPtrCollection.hh"
+#include "Offline/RecoDataProducts/inc/TrkToCaloExtrapol.hh"
+#include "Offline/RecoDataProducts/inc/TrkCaloIntersectCollection.hh"
+#include "Offline/RecoDataProducts/inc/TrackClusterMatch.hh"
+#include "Offline/TrkDiag/inc/TrkMCTools.hh"
 
-#include "RecoDataProducts/inc/TrkToCaloExtrapol.hh"
-#include "RecoDataProducts/inc/TrkCaloIntersectCollection.hh"
-#include "RecoDataProducts/inc/TrackClusterMatch.hh"
-#include "TrkDiag/inc/TrkMCTools.hh"
-
-#include "Mu2eUtilities/inc/LsqSums4.hh"
+#include "Offline/Mu2eUtilities/inc/LsqSums4.hh"
 
 #include "Stntuple/base/TNamedHandle.hh"
 
-#include "Mu2eUtilities/inc/SimParticleTimeOffset.hh"
-#include "TrkDiag/inc/TrkMCTools.hh"
+#include "Offline/Mu2eUtilities/inc/SimParticleTimeOffset.hh"
+#include "Offline/TrkDiag/inc/TrkMCTools.hh"
 
 
-//BaBar includes
+// BTRK (BaBar) includes
 #include "BTrk/BbrGeom/TrkLineTraj.hh"
 #include "BTrk/TrkBase/TrkPoca.hh"
 #include "BTrk/KalmanTrack/KalHit.hh"
@@ -278,7 +270,7 @@ void* TAnaDump::FindNamedObject(const char* Name) {
 //-----------------------------------------------------------------------------
 void TAnaDump::printCaloCluster(const mu2e::CaloCluster* Cl, 
 				const char* Opt, 
-				const mu2e::CaloHitMCTruthAssns* CaloHitTruth) {
+				const mu2e::CaloHitMCTruthAssn* CaloHitTruth) {
   int row, col;
   TString opt = Opt;
 
@@ -299,7 +291,7 @@ void TAnaDump::printCaloCluster(const mu2e::CaloCluster* Cl,
     row = -1; // Cl->cogRow();
     col = -1; // Cl->cogColumn();
     
-    const mu2e::CaloCluster::CaloCrystalHitPtrVector caloClusterHits = Cl->caloCrystalHitsPtrVector();
+    const mu2e::CaloHitPtrVector caloClusterHits = Cl->caloHitsPtrVector();
     int nh = caloClusterHits.size();
 
     if ((row < 0) || (row > 9999)) row = -99;
@@ -307,13 +299,13 @@ void TAnaDump::printCaloCluster(const mu2e::CaloCluster* Cl,
 //-----------------------------------------------------------------------------
 // transform cluster coordinates to the tracker coordiante system
 //-----------------------------------------------------------------------------
-    gpos = cal->geomUtil().diskToMu2e(Cl->diskId(),Cl->cog3Vector());
+    gpos = cal->geomUtil().diskToMu2e(Cl->diskID(),Cl->cog3Vector());
     tpos = cal->geomUtil().mu2eToTracker(gpos);
 
     printf(" %3i %3i %-16p %2i %6i %3i %8.3f %8.3f %10.3f %10.3f %10.3f %10.3f %10.3f %10.3f\n",
 	   row, col,
 	   Cl,
-	   Cl->diskId(),
+	   Cl->diskID(),
 	   -999, 
 	   nh,
 	   Cl->energyDep(),
@@ -335,10 +327,10 @@ void TAnaDump::printCaloCluster(const mu2e::CaloCluster* Cl,
 //-----------------------------------------------------------------------------
 // print individual crystals in local vane coordinate system
 //-----------------------------------------------------------------------------
-    const mu2e::CaloCluster::CaloCrystalHitPtrVector caloClusterHits = Cl->caloCrystalHitsPtrVector();
+    const mu2e::CaloHitPtrVector caloClusterHits = Cl->caloHitsPtrVector();
     int nh = caloClusterHits.size();
     
-    mu2e::Calorimeter const & calo = *(mu2e::GeomHandle<mu2e::Calorimeter>());
+    //    mu2e::Calorimeter const & calo = *(mu2e::GeomHandle<mu2e::Calorimeter>());
 
     printf("-----------------------------------------------------------------------------------------------");
     printf("-------------------------------\n");
@@ -347,37 +339,41 @@ void TAnaDump::printCaloCluster(const mu2e::CaloCluster* Cl,
     printf("-------------------------------\n");
    
     for (int i=0; i<nh; i++) {
-      const mu2e::CaloCrystalHit* hit = &(*caloClusterHits.at(i));
-      int id = hit->id();
+      const mu2e::CaloHit* hit = &(*caloClusterHits.at(i));
+      int id = hit->crystalID();
       
       cr = &cal->crystal(id);
 
       pos = &cr->localPosition();
   
-      mu2e::CrystalContentMC contentMC(calo, *CaloHitTruth, *hit);
+      printf("TAnaDump::printCaloCluster ERROR: CrystalContentMC is gone, FIXIT\n");
+
+      //      mu2e::CrystalContentMC contentMC(calo, *CaloHitTruth, *hit);
       double                 simMaxEdep(0);
       int                    simPDGId(9999), simPDGM(9999), simCreationCode(9999), /*simTime(9999),*/ simID(9999);
 
       //search the simParticle that gave the largest energy contribution
+
       int  nSimPart(0);
-      for (const auto& contentMap : contentMC.simContentMap() )	{	       
-	art::Ptr<mu2e::SimParticle> sim  = contentMap.first;
-	mu2e::CaloContentSim        data = contentMap.second;
+
+      // for (const auto& contentMap : contentMC.simContentMap() )	{	       
+      // 	art::Ptr<mu2e::SimParticle> sim  = contentMap.first;
+      // 	mu2e::CaloContentSim        data = contentMap.second;
                
-	auto parent(sim);
-	while ( parent->hasParent()) parent = parent->parent();               
+      // 	auto parent(sim);
+      // 	while ( parent->hasParent()) parent = parent->parent();               
                
-	if (data.edep() > simMaxEdep){
-	  simMaxEdep = data.edep();
+      // 	if (data.edep() > simMaxEdep){
+      // 	  simMaxEdep = data.edep();
 	    
-	  simID            = sim->id().asInt();
-	  simPDGId         = sim->pdgId();
-	  simCreationCode  = parent->creationCode();
-	  // simTime          = data.time();
-	  simPDGM          = parent->pdgId(); 
-	}
-	++nSimPart;
-      }
+      // 	  simID            = sim->id().asInt();
+      // 	  simPDGId         = sim->pdgId();
+      // 	  simCreationCode  = parent->creationCode();
+      // 	  // simTime          = data.time();
+      // 	  simPDGM          = parent->pdgId(); 
+      // 	}
+      // 	++nSimPart;
+      // }
       
       printf("%6i   %10.3f %8i %8i %5i %5i    %10.3f   %10.3f %10.3f %10.3f %10.3f %8i\n",
 	     id,
@@ -411,8 +407,8 @@ void TAnaDump::printCaloClusterCollection(const char* ModuleLabel,
   art::Handle<mu2e::CaloClusterCollection> handle;
   const mu2e::CaloClusterCollection* caloCluster;
 
-  art::Handle<mu2e::CaloHitMCTruthAssns> caloHitTruthHandle;
-  const mu2e::CaloHitMCTruthAssns* caloHitTruth(0);
+  art::Handle<mu2e::CaloHitMCTruthAssn> caloHitTruthHandle;
+  const mu2e::CaloHitMCTruthAssn* caloHitTruth(0);
   
   if (ProductName[0] != 0) {
     art::Selector  selector(art::ProductInstanceNameSelector(ProductName) &&
@@ -493,7 +489,7 @@ void TAnaDump::printCaloProtoCluster(const mu2e::CaloProtoCluster* Cluster, cons
     printf("-----------------------------------------------------------------------------------------------------\n");
   }
  
-  const mu2e::CaloProtoCluster::CaloCrystalHitPtrVector caloClusterHits = Cluster->caloCrystalHitsPtrVector();
+  const mu2e::CaloHitPtrVector caloClusterHits = Cluster->caloHitsPtrVector();
   int nh = caloClusterHits.size();
 
   if ((opt == "") || (opt.Index("data") >= 0)) {
@@ -513,8 +509,8 @@ void TAnaDump::printCaloProtoCluster(const mu2e::CaloProtoCluster* Cluster, cons
 // print individual crystals in local vane coordinate system
 //-----------------------------------------------------------------------------
     for (int i=0; i<nh; i++) {
-      const mu2e::CaloCrystalHit* hit = &(*caloClusterHits.at(i));
-      int id = hit->id();
+      const mu2e::CaloHit* hit = &(*caloClusterHits.at(i));
+      int id = hit->crystalID();
       
       cr  = &cal->crystal(id);
       pos = &cr->localPosition();
@@ -996,9 +992,6 @@ void TAnaDump::printCrvDigiCollection(const char* ModuleLabel,
   art::Handle<mu2e::CrvDigiCollection> handle;
   const mu2e::CrvDigiCollection*       crpColl;
 
-  // art::Handle<mu2e::CaloHitMCTruthAssns> caloHitTruthHandle;
-  // const mu2e::CaloHitMCTruthAssns* caloHitTruth(0);
-  
   if (ProductName[0] != 0) {
     art::Selector  selector(art::ProductInstanceNameSelector(ProductName) &&
 			    art::ProcessNameSelector(ProcessName)         && 
@@ -1064,9 +1057,6 @@ void TAnaDump::printCrvRecoPulseCollection(const char* ModuleLabel,
   art::Handle<mu2e::CrvRecoPulseCollection> handle;
   const mu2e::CrvRecoPulseCollection*       crpColl;
 
-  // art::Handle<mu2e::CaloHitMCTruthAssns> caloHitTruthHandle;
-  // const mu2e::CaloHitMCTruthAssns* caloHitTruth(0);
-  
   if (ProductName[0] != 0) {
     art::Selector  selector(art::ProductInstanceNameSelector(ProductName) &&
 			    art::ProcessNameSelector(ProcessName)         && 
@@ -1207,7 +1197,7 @@ void TAnaDump::printTrackSeed(const mu2e::KalSeed* TrkSeed           ,
       const  art::Handle<mu2e::StrawDigiMCCollection>*  handle;
       const art::Provenance*                       prov;
       
-      fEvent->getManyByType(list);
+      list  = fEvent->getMany<mu2e::StrawDigiMCCollection>();
 
       for (auto it = list.begin(); it != list.end(); it++) {
 	handle = it.operator -> ();
@@ -1294,7 +1284,7 @@ void TAnaDump::printTrackSeedCollection(const char* TrackSeedCollTag  ,
     const art::Handle<mu2e::StrawDigiMCCollection>*  handle;
     const art::Provenance*                       prov;
     
-    fEvent->getManyByType(list);
+    list = fEvent->getMany<mu2e::StrawDigiMCCollection>();
 
     for (auto it = list.begin(); it != list.end(); it++) {
       handle = it.operator -> ();
@@ -1689,7 +1679,12 @@ void TAnaDump::printKalRepCollection(const char* KalRepCollTag     ,
   TString sdmc_tag = StrawDigiMCCollTag;
   if (sdmc_tag == "") sdmc_tag = fStrawDigiMCCollTag;
 
-  _mcdigis = &fEvent->getByLabel<mu2e::StrawDigiMCCollection>(sdmc_tag.Data());
+  art::Handle<mu2e::StrawDigiMCCollection> mcdh;
+  fEvent->getByLabel<mu2e::StrawDigiMCCollection>(sdmc_tag.Data(),mcdh);
+
+  if (mcdh.isValid()) _mcdigis = mcdh.product();
+  else                _mcdigis = nullptr;
+
   if (_mcdigis == nullptr) {
     printf(">>> ERROR in TAnaDump::printKalRepCollection: failed to locate StepPointMCCollection:: by %s\n",sdmc_tag.Data());
   }
@@ -1749,7 +1744,7 @@ void TAnaDump::printGenParticleCollections() {
   
   vector<art::Handle<mu2e::GenParticleCollection>> list_of_gp;
 
-  const mu2e::GenParticleCollection*        coll(0);
+  const mu2e::GenParticleCollection*   coll(0);
   const mu2e::GenParticle*        genp(0);
 
   const art::Provenance* prov;
@@ -1757,7 +1752,7 @@ void TAnaDump::printGenParticleCollections() {
   //  art::Selector  selector(art::ProductInstanceNameSelector("mu2e::GenParticleCollection"));
   art::Selector  selector(art::ProductInstanceNameSelector(""));
 
-  fEvent->getMany(selector, list_of_gp);
+  list_of_gp = fEvent->getMany<mu2e::GenParticleCollection>(selector);
 
   const art::Handle<mu2e::GenParticleCollection>* handle;
 
@@ -1849,7 +1844,7 @@ void TAnaDump::printCaloHits(const char* ModuleLabel,
   for (int ic=0; ic<nhits; ic++) {
     hit  = &caloHits->at(ic);
     printf("%7i  %10.3f %10.3f \n",
-	   hit->id(),
+	   hit->crystalID(),
 	   hit->time(),
 	   hit->energyDep()); 
   }
@@ -1903,31 +1898,31 @@ void TAnaDump::printCaloCrystalHits(const char* ModuleLabel,
 			  art::ProcessNameSelector(ProcessName)         && 
 			  art::ModuleLabelSelector(ModuleLabel)            );
 
-  art::Handle<mu2e::CaloCrystalHitCollection> caloCrystalHitsHandle;
+  art::Handle<mu2e::CaloHitCollection> caloCrystalHitsHandle;
 
   fEvent->get(selector,caloCrystalHitsHandle);
 
-  const mu2e::CaloCrystalHitCollection* caloCrystalHits;
+  const mu2e::CaloHitCollection* caloCrystalHits;
 
-  caloCrystalHits = caloCrystalHitsHandle.operator->();
+  caloCrystalHits = caloCrystalHitsHandle.product();// operator->();
 
   int nhits = caloCrystalHits->size();
 
-  const mu2e::CaloCrystalHit* hit;
+  const mu2e::CaloHit* hit;
 
   printf("----------------------------------------------------------------\n");
-  printf("CrystalID      Time   Energy    EnergyTot  NRoids               \n");
+  printf("CrystalID      Time   Energy    EnergyTot  NSiPMs               \n");
   printf("----------------------------------------------------------------\n");
 
   for (int ic=0; ic<nhits; ic++) {
     hit  = &caloCrystalHits->at(ic);
 
     printf("%7i  %10.3f %10.3f %10.3f %5i\n",
-	   hit->id(),
+	   hit->crystalID(),
 	   hit->time(),
 	   hit->energyDep(),
 	   hit->energyDepTot(),
-	   hit->nROId());
+	   hit->nSiPMs());
   }
 }
 
@@ -1961,12 +1956,11 @@ void TAnaDump::printCaloDigiCollection(const char* ModuleLabel,
     int pulse_size =  hit->waveform().size();
 
     printf("%7i  %5i %5i\n",
-	   hit->roId(),
+	   hit->SiPMID(),
 	   hit->t0(),
 	   pulse_size);
   }
 }
-
 
 
 //-----------------------------------------------------------------------------
@@ -1998,7 +1992,7 @@ void TAnaDump::printCaloRecoDigiCollection(const char* ModuleLabel,
     hit  = &recocalodigis->at(ic);
 
     printf("%7i  %10.3f   %10.3f   %10.3f   %10.3f   %10.3f\n",
-	   hit->ROid(),
+	   hit->SiPMID(),
 	   hit->time(),
 	   hit->chi2(), 
 	   hit->energyDep(),
@@ -2337,7 +2331,12 @@ void TAnaDump::printStrawHitCollection(const char* StrawHitCollTag   ,
   const char* sdmcc_tag = StrawDigiMCCollTag;
   if (sdmcc_tag == nullptr) sdmcc_tag = fStrawDigiMCCollTag.Data();
 
-  _mcdigis = &fEvent->getByLabel<mu2e::StrawDigiMCCollection>(sdmcc_tag);
+  art::Handle<mu2e::StrawDigiMCCollection> mcdh;
+  fEvent->getByLabel<mu2e::StrawDigiMCCollection>(sdmcc_tag,mcdh);
+
+  if (mcdh.isValid()) _mcdigis = mcdh.product();
+  else                _mcdigis = nullptr;
+
   if (_mcdigis == nullptr) {
     printf(">>> ERROR in %s: failed to locate StrawDigiMCCollection with tag=%s, BAIL OUT.\n",
 	   oname,fStrawDigiMCCollTag.Data());
@@ -2486,10 +2485,10 @@ void TAnaDump::printStrawGasStepCollection(const char* CollTag,
   if (sgscH.isValid()) sgsc = sgscH.product();
   else {
     printf("ERROR: cant find StrawHitCollection tag=%s, print available, EXIT\n",CollTag);
-    vector<art::Handle<mu2e::StrawGasStepCollection>> vcoll;
 
+    // vector<art::Handle<mu2e::StrawGasStepCollection>> vcoll;
     art::Selector  selector(art::ProductInstanceNameSelector(""));
-    fEvent->getMany(selector,vcoll);
+    auto vcoll = fEvent->getMany<mu2e::StrawGasStepCollection>(selector);
 
     for (auto it = vcoll.begin(); it != vcoll.end(); it++) {
       const art::Handle<mu2e::StrawGasStepCollection>*  handle = it.operator -> ();
@@ -2705,7 +2704,7 @@ void TAnaDump::printStepPointMC(const mu2e::StepPointMC* Step, const char* Detec
     Hep3Vector mom = Step->momentum();
     double pt = sqrt(pabs*pabs - mom.z()*mom.z());
 
-    art::Handle<mu2e::PhysicalVolumeInfoCollection> volumes;
+    art::Handle<mu2e::PhysicalVolumeInfoMultiCollection> volumes;
     fEvent->getRun().getByLabel("g4run", volumes);
 
 //2014-26-11 gianipez added the timeoffsets to the steppoints time
@@ -2967,9 +2966,8 @@ void TAnaDump::printTimeClusterCollection(const char* TimeClusterCollTag  ,
     printf(">>> ERROR in TAnaDump::printTimeClusterCollection: failed to locate collection %s. Available ones:",
 	   TimeClusterCollTag);
 
-    vector<art::Handle<mu2e::TimeClusterCollection>> list_of_handles;
-
-    fEvent->getManyByType(list_of_handles);
+    // vector<art::Handle<mu2e::TimeClusterCollection>> list_of_handles;
+    auto list_of_handles = fEvent->getMany<mu2e::TimeClusterCollection>();
 
     for (auto ih=list_of_handles.begin(); ih<list_of_handles.end(); ih++) {
       printf("%s\n", ih->provenance()->moduleLabel().data());
@@ -3022,7 +3020,7 @@ void TAnaDump::printTrackClusterMatch(const mu2e::TrackClusterMatch* Tcm, const 
     const mu2e::CaloCluster*      cl  = Tcm->caloCluster();
     const mu2e::TrkCaloIntersect* tex = Tcm->textrapol  ();
 
-    int disk     = cl->diskId();
+    int disk     = cl->diskID();
     double chi2  = Tcm->chi2();
 
     printf("%5i %16p  %16p  %8.3f %8.3f %8.3f %8.3f %8.3f\n",
@@ -3052,9 +3050,8 @@ void TAnaDump::printTrackClusterMatchCollection(const char* ModuleLabel,
   else {
     printf(">>> ERROR in TAnaDump::printTrackClusterMatchCollection: failed to locate requested collection. Available:");
 
-    vector<art::Handle<mu2e::TrackClusterMatchCollection>> list_of_handles;
-
-    fEvent->getManyByType(list_of_handles);
+    // vector<art::Handle<mu2e::TrackClusterMatchCollection>> list_of_handles;
+    auto list_of_handles = fEvent->getMany<mu2e::TrackClusterMatchCollection>();
 
     for (auto ih=list_of_handles.begin(); ih<list_of_handles.end(); ih++) {
       printf("%s\n", ih->provenance()->moduleLabel().data());
