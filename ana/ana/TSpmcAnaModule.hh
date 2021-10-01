@@ -137,6 +137,7 @@ public:
   TSimpBlock*           fSimpBlock;  
   TStepPointMCBlock*    fStepPointMCBlock;
   TStepPointMCBlock*    fVDetBlock;
+  TStepPointMCBlock*    fSpmcBlockVDet;
 					// histograms filled
   Hist_t                fHist;
 

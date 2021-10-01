@@ -82,7 +82,7 @@ StntupleMakerTemplate : { module_type:StntupleMaker
     vdHitsCollTag        : @local::STN_VDHITS_COLL_TAG           # was "g4run" before
     simpMinEnergy        : 5.0                                   # MeV , simpMinEnergy < 0: store all
     simpMaxZ             : 11800.0                               # not used
-    simpUseTimeOffsets   : 0                                     # legacy default 
+    simpUseTimeOffsets   : 1                                     # legacy default 
 
     genpCollTag          : "compressDigiMCs"                     # save signal-only: "generate" 
     genId                : @local::GEN_ID                        # defined in Stntuple/fcl/stnmaker.fcl, by default, store all simparticles

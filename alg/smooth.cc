@@ -42,7 +42,7 @@ double smooth::Eval(double* X) {
     dx = x-x1;
     f1 = fP0[i1] + dx*fP1[i1] + dx*dx*fP2[i1];
     w1 = 1;
-    //    printf("smooth::Eval i1,x1,dx,f1,w1 = %i %12.5e %12.5e %12.5e %12.5e \n",i1,x1,dx,f1,w1);
+    //   printf("smooth::Eval i1,x1,dx,f1,w1 = %i %12.5e %12.5e %12.5e %12.5e \n",i1,x1,dx,f1,w1);
   }
   else {
     x0  = fX[i0];
@@ -61,7 +61,7 @@ double smooth::Eval(double* X) {
   f   = f0*w0+f1*w1;
 
   //  printf("%10.3f %10.3f %3i %10.3f %3i %10.3f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f\n",
-  //  	 x,f,i0,x0,i1,x1,fP0[i0],fP1[i0],fP2[i0],dx0,f0,w0,dx1,f1,w1);
+  //	 x,f,i0,x0,i1,x1,fP0[i0],fP1[i0],fP2[i0],dx0,f0,w0,dx1,f1,w1);
 
   double scale = fFunc->GetParameter(0);
   return f*scale;
@@ -105,6 +105,7 @@ smooth::smooth(const TH1* Hist, double XMin, double XMax) {
     fP2   = NULL;
     fX    = NULL;
     fFunc = NULL;
+    printf("no hist to smooth\n");
   }
   else {
 
@@ -122,7 +123,7 @@ smooth::smooth(const TH1* Hist, double XMin, double XMax) {
       XMax = Hist->GetXaxis()->GetXmax();
     }
 
-    //    printf("nx, XMin,XMax = %3i %12.5f %12.5f\n",nx,XMin,XMax);
+    //   printf("nx, XMin,XMax = %3i %12.5f %12.5f\n",nx,XMin,XMax);
 
     double  dx21, dx32, dx31, dy32, dy12, d;
     
@@ -151,7 +152,7 @@ smooth::smooth(const TH1* Hist, double XMin, double XMax) {
       fP2[i] = (dy32*dx21+dy12*dx32)/d;
       fX [i] = x2;
       
-      // printf(" i,Fx[i]: %2i %12.5e",i,fX[i]);
+      //  printf(" i,Fx[i]: %2i %12.5e",i,fX[i]);
       // printf(" %12.5le %12.5le %12.5le ",y1,y2,y3);
       // printf(" %12.5le %12.5le %12.5le %12.5le ",dx21, dx31, dx32, d);
       // printf(" %12.5le %12.5le ",dy32, dy12);
