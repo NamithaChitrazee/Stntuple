@@ -13,8 +13,6 @@
 
 #include "MCDataProducts/inc/SimParticle.hh"
 #include "MCDataProducts/inc/StepPointMC.hh"
-#include "MCDataProducts/inc/StepPointMCCollection.hh"
-#include "MCDataProducts/inc/PtrStepPointMCVectorCollection.hh"
 
 #include "GlobalConstantsService/inc/GlobalConstantsHandle.hh"
 #include "GlobalConstantsService/inc/ParticleDataTable.hh"

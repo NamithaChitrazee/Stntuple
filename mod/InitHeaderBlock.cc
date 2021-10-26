@@ -10,7 +10,7 @@
 #include <Stntuple/mod/InitStntupleDataBlocks.hh>
 #include <Stntuple/mod/StntupleUtilities.hh>
 
-#include "RecoDataProducts/inc/StrawHitCollection.hh"
+#include "RecoDataProducts/inc/StrawHit.hh"
 #include "MCDataProducts/inc/ProtonBunchIntensity.hh"
 
 #include "messagefacility/MessageLogger/MessageLogger.h"

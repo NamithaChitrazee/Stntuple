@@ -12,6 +12,8 @@
 
 #include "Stntuple/gui/TStnVisNode.hh"
 
+#include "canvas/Persistency/Provenance/ProductID.h"
+
 #include "Offline/RecoDataProducts/inc/ComboHit.hh"
 #include "Offline/MCDataProducts/inc/StrawDigiMC.hh"
 

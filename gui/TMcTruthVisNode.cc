@@ -24,9 +24,9 @@
 #include "Mu2eUtilities/inc/SortedStepPoints.hh"
 #include "Mu2eUtilities/inc/TrackTool.hh"
 
-#include "MCDataProducts/inc/GenParticleCollection.hh"
-#include "MCDataProducts/inc/SimParticleCollection.hh"
-#include "MCDataProducts/inc/StepPointMCCollection.hh"
+#include "MCDataProducts/inc/GenParticle.hh"
+#include "MCDataProducts/inc/SimParticle.hh"
+#include "MCDataProducts/inc/StepPointMC.hh"
 
 #include <vector>
 

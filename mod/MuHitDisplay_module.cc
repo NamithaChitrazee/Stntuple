@@ -61,10 +61,10 @@
 #include "Offline/Mu2eUtilities/inc/SortedStepPoints.hh"
 #include "Offline/Mu2eUtilities/inc/TrackTool.hh"
 
-#include "Offline/MCDataProducts/inc/GenParticleCollection.hh"
-#include "Offline/MCDataProducts/inc/SimParticleCollection.hh"
-#include "Offline/MCDataProducts/inc/StepPointMCCollection.hh"
-#include "Offline/MCDataProducts/inc/StrawDigiMCCollection.hh"
+#include "Offline/MCDataProducts/inc/GenParticle.hh"
+#include "Offline/MCDataProducts/inc/SimParticle.hh"
+#include "Offline/MCDataProducts/inc/StepPointMC.hh"
+#include "Offline/MCDataProducts/inc/StrawDigiMC.hh"
 
 #include "BTrk/TrkBase/HelixParams.hh"
 #include "BTrk/KalmanTrack/KalHit.hh"
@@ -72,7 +72,6 @@
 #include "Offline/RecoDataProducts/inc/CaloHit.hh"
 #include "Offline/RecoDataProducts/inc/CaloCluster.hh"
 #include "Offline/RecoDataProducts/inc/ComboHit.hh"
-#include "Offline/DataProducts/inc/XYZVec.hh"
 #include "Offline/RecoDataProducts/inc/StrawHitFlag.hh"
 
 #include "Offline/RecoDataProducts/inc/CrvRecoPulse.hh"
@@ -1067,7 +1066,7 @@ int MuHitDisplay::getData(const art::Event* Evt) {
 // //     const ComboHit*              hit;
 // //     const ComboHit*              sh;
 // //     const StrawHitFlag*          hit_id_word;
-// //     XYZVec                       vx0, vx1, vx2, w;
+// //     CLHEP::Hep3Vector            vx0, vx1, vx2, w;
 
 // //     n_displayed_hits = 0;
 // // //-----------------------------------------------------------------------------

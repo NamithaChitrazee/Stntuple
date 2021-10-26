@@ -29,8 +29,8 @@
 #include "Offline/RecoDataProducts/inc/CrvCoincidence.hh"
 #include "Offline/RecoDataProducts/inc/CrvCoincidenceCluster.hh"
 
-#include "Offline/RecoDataProducts/inc/StrawHitCollection.hh"
-#include "Offline/RecoDataProducts/inc/StrawHitFlagCollection.hh"
+#include "Offline/RecoDataProducts/inc/StrawHit.hh"
+#include "Offline/RecoDataProducts/inc/StrawHitFlag.hh"
 #include "Offline/RecoDataProducts/inc/KalSeed.hh"
 #include "Offline/RecoDataProducts/inc/HelixSeed.hh"
 #include "Offline/RecoDataProducts/inc/ComboHit.hh"
@@ -38,27 +38,21 @@
 #include "Offline/RecoDataProducts/inc/TimeCluster.hh"
 
 #include "Offline/RecoDataProducts/inc/CaloDigi.hh"
-	  // #include "Offline/RecoDataProducts/inc/CaloDigiCollection.hh"
 #include "Offline/RecoDataProducts/inc/CaloRecoDigi.hh"
-	  // #include "Offline/RecoDataProducts/inc/CaloRecoDigiCollection.hh"
 
 #include "Offline/MCDataProducts/inc/GenParticle.hh"
-	  // #include "Offline/MCDataProducts/inc/GenParticleCollection.hh"
 #include "Offline/MCDataProducts/inc/SimParticle.hh"
-	  // #include "Offline/MCDataProducts/inc/SimParticleCollection.hh"
 #include "Offline/MCDataProducts/inc/StrawGasStep.hh"
 #include "Offline/MCDataProducts/inc/StepPointMC.hh"
-	  // #include "Offline/MCDataProducts/inc/StepPointMCCollection.hh"
 #include "Offline/MCDataProducts/inc/PhysicalVolumeInfo.hh"
 #include "Offline/MCDataProducts/inc/PhysicalVolumeInfoMultiCollection.hh"
-          // #include "Offline/CaloMC/inc/CrystalContentMC.hh"
 
 #include "Offline/BTrkData/inc/TrkCaloHit.hh"
 #include "Offline/BTrkData/inc/TrkStrawHit.hh"
 #include "Offline/RecoDataProducts/inc/KalRepPtrCollection.hh"
 
 #include "Offline/RecoDataProducts/inc/TrkToCaloExtrapol.hh"
-#include "Offline/RecoDataProducts/inc/TrkCaloIntersectCollection.hh"
+#include "Offline/RecoDataProducts/inc/TrkCaloIntersect.hh"
 #include "Offline/RecoDataProducts/inc/TrackClusterMatch.hh"
 #include "Offline/TrkDiag/inc/TrkMCTools.hh"
 
@@ -84,9 +78,9 @@ ClassImp(TAnaDump)
 
 TAnaDump* TAnaDump::fgInstance = 0;
 
-void TAnaDump::evalHelixInfo(const mu2e::HelixSeed*         Helix,
-			     int   &NLoops,
-			     int   &NHitsLoopFailed){
+void TAnaDump::evalHelixInfo(const mu2e::HelixSeed* Helix,
+			     int&                   NLoops,
+			     int&                   NHitsLoopFailed){
   const mu2e::ComboHit*     hit(0);
 
   //init
@@ -150,11 +144,11 @@ void TAnaDump::evalHelixInfo(const mu2e::HelixSeed*         Helix,
 
   
 
-double TAnaDump::evalWeight(const mu2e::ComboHit* Hit   ,
-			    XYZVec&   StrawDir ,
-			    XYZVec&   HelCenter, 
-			    double             Radius   ,
-			    int                WeightMode,
+double TAnaDump::evalWeight(const mu2e::ComboHit*      Hit   ,
+			    CLHEP::Hep3Vector&         StrawDir ,
+			    CLHEP::Hep3Vector&         HelCenter, 
+			    double                     Radius   ,
+			    int                        WeightMode,
 			    fhicl::ParameterSet const& Pset) {//WeightMode = 1 is for XY chi2 , WeightMode = 0 is for Phi-z chi2
   
   // double    rs(2.5);   // straw radius, mm
@@ -1352,7 +1346,7 @@ void TAnaDump::printHelixHit(const mu2e::HelixHit*    HelHit, const mu2e::ComboH
   double   mc_mom(-1.), mc_pT(-1.), mc_pZ(0.);
   double   x(0), y(0), z(0), phi(0);
   
-  XYZVec shPos = HelHit->pos();
+  XYZVectorF shPos = HelHit->pos();
   x      = shPos.x();
   y      = shPos.y();
   z      = shPos.z();    

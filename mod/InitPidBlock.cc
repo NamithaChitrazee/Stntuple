@@ -18,7 +18,7 @@
 #include "GeometryService/inc/GeometryService.hh"
 #include "GeometryService/inc/GeomHandle.hh"
 
-#include "RecoDataProducts/inc/AvikPIDNewProductCollection.hh"
+#include "RecoDataProducts/inc/AvikPIDNewProduct.hh"
 //-----------------------------------------------------------------------------
 // assume that the collection name is set, so we could grab it from the event
 //-----------------------------------------------------------------------------

@@ -42,22 +42,22 @@
 #include "Offline/RecoDataProducts/inc/TrkQual.hh"
 #include "Offline/TrkReco/inc/DoubletAmbigResolver.hh"
 
-#include "Offline/RecoDataProducts/inc/TrkCaloIntersectCollection.hh"
+#include "Offline/RecoDataProducts/inc/TrkCaloIntersect.hh"
 #include "Offline/RecoDataProducts/inc/TrackClusterMatch.hh"
 
 #include "Offline/MCDataProducts/inc/GenParticle.hh"
 #include "Offline/MCDataProducts/inc/SimParticle.hh"
 #include "Offline/MCDataProducts/inc/StepPointMC.hh"
-#include "Offline/MCDataProducts/inc/StrawDigiMCCollection.hh"
+#include "Offline/MCDataProducts/inc/StrawDigiMC.hh"
 #include "Offline/MCDataProducts/inc/StrawGasStep.hh"
 #include "Offline/DataProducts/inc/VirtualDetectorId.hh"
 
 #include "Offline/RecoDataProducts/inc/StrawDigi.hh"
-#include "Offline/RecoDataProducts/inc/StrawHitCollection.hh"
+#include "Offline/RecoDataProducts/inc/StrawHit.hh"
 #include "Offline/RecoDataProducts/inc/CaloHit.hh"
 #include "Offline/RecoDataProducts/inc/CaloCluster.hh"
-#include "Offline/RecoDataProducts/inc/PIDProductCollection.hh"
-#include "Offline/RecoDataProducts/inc/AlgorithmIDCollection.hh"
+#include "Offline/RecoDataProducts/inc/PIDProduct.hh"
+#include "Offline/RecoDataProducts/inc/AlgorithmID.hh"
 
 					          // BaBar 
 #include "BTrk/ProbTools/ChisqConsistency.hh"
@@ -1050,7 +1050,7 @@ Int_t StntupleInitMu2eTrackBlock  (TStnDataBlock* Block, AbsEvent* AnEvent, Int_
       if (! tch) continue;
       vtch = &(track->fTrkCaloHit);
       const mu2e::CaloCluster*cl = &(tch->caloCluster());
-      XYZVec cpos = Geom::toXYZVec(bc->geomUtil().mu2eToTracker(bc->geomUtil().diskFFToMu2e( cl->diskID(), cl->cog3Vector())));
+      CLHEP::Hep3Vector cpos = bc->geomUtil().mu2eToTracker(bc->geomUtil().diskFFToMu2e( cl->diskID(), cl->cog3Vector()));
     
       CLHEP::Hep3Vector pos;
       tch->hitPosition(pos);

@@ -8,8 +8,7 @@
 #include "art/Framework/Principal/Handle.h"
 
 #include "MCDataProducts/inc/StatusG4.hh"
-#include "MCDataProducts/inc/StepPointMCCollection.hh"
-// #include "DataProducts/inc/VirtualDetectorId.hh"
+#include "MCDataProducts/inc/StepPointMC.hh"
 
 #include "Stntuple/obj/TStepPointMCBlock.hh"
 #include "Stntuple/mod/InitStepPointMCBlock.hh"

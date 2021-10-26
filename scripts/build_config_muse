@@ -5,7 +5,7 @@
 base=$MUSE_WORK_DIR/build
 echo build_config_muse: 1: $0 : PWD=$PWD
 
-pkg=`pwd | awk -F / '{print $NF}'`
+pkg=Stntuple
 pkg_dir=$MUSE_WORK_DIR/$pkg
 
 # pkg=Stntuple
@@ -25,7 +25,7 @@ fi
 for d in $list_of_subpackages ; do
     if [[ -e $base/include/$pkg ]] && [[ ! -e $base/include/$pkg/$d ]] ; then 
 	echo `pwd`/$0 : creating symbolic link to $base/include/$pkg/$d
-	ln -s ../../../Stntuple/$d/$d $base/include/$pkg/$d
+	ln -s $pkg_dir/$d/$d $base/include/$pkg/$d
     fi
 done
 #------------------------------------------------------------------------------

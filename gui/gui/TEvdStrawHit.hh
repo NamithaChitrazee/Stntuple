@@ -16,6 +16,7 @@
 
 #ifndef __CINT__
 
+#include "canvas/Persistency/Provenance/ProductID.h"
 #include "Offline/RecoDataProducts/inc/ComboHit.hh"
 #include "Offline/MCDataProducts/inc/StrawDigiMC.hh"
 // #include "Offline/MCDataProducts/inc/PtrStepPointMCVectorCollection.hh"

@@ -13,7 +13,6 @@
 #include "canvas/Utilities/InputTag.h"
 
 #include "MCDataProducts/inc/GenParticle.hh"
-#include "MCDataProducts/inc/GenParticleCollection.hh"
 #include "MCDataProducts/inc/EventWeight.hh"
 
 #include "Stntuple/obj/TGenpBlock.hh"

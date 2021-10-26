@@ -12,7 +12,7 @@
 #include "Offline/TrackerGeom/inc/Tracker.hh"
 #include "Offline/RecoDataProducts/inc/ComboHit.hh"
 #include "Offline/RecoDataProducts/inc/TimeCluster.hh"
-#include "Offline/MCDataProducts/inc/StrawDigiMCCollection.hh"
+#include "Offline/MCDataProducts/inc/StrawDigiMC.hh"
 
 #else
 namespace mu2e {

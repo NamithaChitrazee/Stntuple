@@ -20,11 +20,10 @@
 
 #include "MCDataProducts/inc/GenParticle.hh"
 #include "MCDataProducts/inc/SimParticle.hh"
-#include "MCDataProducts/inc/SimParticleCollection.hh"
-#include "MCDataProducts/inc/StepPointMCCollection.hh"
-#include "MCDataProducts/inc/StrawDigiMCCollection.hh"
+#include "MCDataProducts/inc/StepPointMC.hh"
+#include "MCDataProducts/inc/StrawDigiMC.hh"
 
-#include "RecoDataProducts/inc/StrawHitCollection.hh"
+#include "RecoDataProducts/inc/StrawHit.hh"
 
 #include "Stntuple/obj/TSimpBlock.hh"
 
@@ -197,7 +196,7 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
 //-----------------------------------------------------------------------------
 // by default, do not store low energy SimParticles not making hits in the tracker
 //-----------------------------------------------------------------------------
-      const CLHEP::Hep3Vector* sp = &sim->startPosition();
+      CLHEP::Hep3Vector sp = sim->startPosition();
 
       if (fMinSimpEnergy >= 0) {
 	if ((nhits == 0) and (energy < fMinSimpEnergy))       continue;
@@ -208,13 +207,13 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
 				       start_vol_id, end_vol_id,
 				       generator_id);
       simp->SetStartMom(px, py, pz, energy);
-      simp->SetStartPos(sp->x(),sp->y(),sp->z(),sim->startGlobalTime());
+      simp->SetStartPos(sp.x(),sp.y(),sp.z(),sim->startGlobalTime());
       simp->SetEndMom  (sim->endMomentum().x(),
 			sim->endMomentum().y(),
 			sim->endMomentum().z(),
 			sim->endMomentum().e());
-      const CLHEP::Hep3Vector* ep = &sim->endPosition();
-      simp->SetEndPos(ep->x(),ep->y(),ep->z(),sim->endGlobalTime());
+      const CLHEP::Hep3Vector ep = sim->endPosition();
+      simp->SetEndPos(ep.x(),ep.y(),ep.z(),sim->endGlobalTime());
       simp->SetNStrawHits(nhits);
 //-----------------------------------------------------------------------------
 // particle parameters at virtual detectors

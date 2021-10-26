@@ -26,18 +26,14 @@
 #include "Stntuple/gui/TEvdStrawHit.hh"
 #include "Stntuple/gui/TEvdTrkStrawHit.hh"
 #include "Stntuple/gui/TEvdStation.hh"
-// #include "Stntuple/gui/TEvdFace.hh"
 #include "Stntuple/gui/TEvdPanel.hh"
 #include "Stntuple/gui/TEvdPlane.hh"
 #include "Stntuple/gui/TEvdStrawTracker.hh"
 #include "Stntuple/gui/TStnVisManager.hh"
 
-#include "RecoDataProducts/inc/StrawHitCollection.hh"
+#include "RecoDataProducts/inc/StrawHit.hh"
 
 #include "DataProducts/inc/StrawId.hh"
-#include "DataProducts/inc/XYZVec.hh"
-
-// #include "Stntuple/mod/TAnaDump.hh"
 
 ClassImp(TTrkVisNode)
 

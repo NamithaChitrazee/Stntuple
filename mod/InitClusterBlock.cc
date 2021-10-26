@@ -25,9 +25,9 @@
 
 #include "Offline/RecoDataProducts/inc/TrackClusterMatch.hh"
 
-#include "Offline/MCDataProducts/inc/GenParticleCollection.hh"
-#include "Offline/MCDataProducts/inc/SimParticleCollection.hh"
-#include "Offline/MCDataProducts/inc/StepPointMCCollection.hh"
+#include "Offline/MCDataProducts/inc/GenParticle.hh"
+#include "Offline/MCDataProducts/inc/SimParticle.hh"
+#include "Offline/MCDataProducts/inc/StepPointMC.hh"
 
 #include "Offline/RecoDataProducts/inc/StrawHit.hh"
 #include "Offline/RecoDataProducts/inc/CaloHit.hh"

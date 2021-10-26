@@ -31,7 +31,7 @@
 #include "RecoDataProducts/inc/HelixSeed.hh"
 #include "RecoDataProducts/inc/StrawHitIndex.hh"
 
-#include "MCDataProducts/inc/StrawDigiMCCollection.hh"
+#include "MCDataProducts/inc/StrawDigiMC.hh"
 #include "MCDataProducts/inc/StrawGasStep.hh"
 #include "MCDataProducts/inc/SimParticle.hh"
 

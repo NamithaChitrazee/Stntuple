@@ -27,13 +27,11 @@
 
 #include "RecoDataProducts/inc/KalSeed.hh"
 #include "RecoDataProducts/inc/CaloCluster.hh"
-#include "RecoDataProducts/inc/StrawHitCollection.hh"
 #include "RecoDataProducts/inc/StrawHit.hh"
 
 #include "MCDataProducts/inc/SimParticle.hh"
-#include "MCDataProducts/inc/SimParticleCollection.hh"
 #include "MCDataProducts/inc/StrawGasStep.hh"
-#include "MCDataProducts/inc/StrawDigiMCCollection.hh"
+#include "MCDataProducts/inc/StrawDigiMC.hh"
 //-----------------------------------------------------------------------------
 // assume that the collection name is set, so we could grab it from the event
 //-----------------------------------------------------------------------------
@@ -229,8 +227,8 @@ int  StntupleInitMu2eTrackSeedBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mod
       }
       trackSeed->fMom1.SetPxPyPzE(px,py,pz,energy);
 
-      const CLHEP::Hep3Vector* sp = &simptr->startPosition();
-      trackSeed->fOrigin1.SetXYZT(sp->x(),sp->y(),sp->z(),simptr->startGlobalTime());
+      const CLHEP::Hep3Vector sp = simptr->startPosition();
+      trackSeed->fOrigin1.SetXYZT(sp.x(),sp.y(),sp.z(),simptr->startGlobalTime());
     }
     
     //look for the second most frequent hit
@@ -287,8 +285,8 @@ int  StntupleInitMu2eTrackSeedBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mod
 	  }
 	  trackSeed->fMom2.SetPxPyPzE(px,py,pz,energy);
 
-	  const CLHEP::Hep3Vector* sp = &simptr->startPosition();
-	  trackSeed->fOrigin2.SetXYZT(sp->x(),sp->y(),sp->z(),simptr->startGlobalTime());
+	  const CLHEP::Hep3Vector sp = simptr->startPosition();
+	  trackSeed->fOrigin2.SetXYZT(sp.x(),sp.y(),sp.z(),simptr->startGlobalTime());
 	}      
       }
     }

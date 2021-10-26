@@ -32,23 +32,18 @@
 
 #include "CalorimeterGeom/inc/Calorimeter.hh"
 
-#include "DataProducts/inc/XYZVec.hh"
+// #include "DataProducts/inc/XYZVec.hh"
 #include "RecoDataProducts/inc/TimeCluster.hh"
 #include "RecoDataProducts/inc/HelixSeed.hh"
 #include "RecoDataProducts/inc/HelixHit.hh"
 #include "RecoDataProducts/inc/KalSeed.hh"
 
-// #include "RecoDataProducts/inc/AlgorithmIDCollection.hh"
 #include "RecoDataProducts/inc/CaloCluster.hh"
-#include "RecoDataProducts/inc/StrawHitPositionCollection.hh"
+// #include "RecoDataProducts/inc/StrawHitPositionCollection.hh"
 
-// #include "MCDataProducts/inc/PtrStepPointMCVectorCollection.hh"
 #include "MCDataProducts/inc/StrawDigiMC.hh"
 #include "MCDataProducts/inc/SimParticle.hh"
-#include "MCDataProducts/inc/SimParticleCollection.hh"
 #include "MCDataProducts/inc/StepPointMC.hh"
-#include "MCDataProducts/inc/StepPointMCCollection.hh"
-#include "MCDataProducts/inc/StrawDigiMCCollection.hh"
 #include "TrkDiag/inc/TrkMCTools.hh"
 
 #include "Mu2eUtilities/inc/LsqSums4.hh"
@@ -112,7 +107,7 @@ int  StntupleInitMu2eHelixBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mode) {
   TParticlePDG* part(nullptr);
   TDatabasePDG* pdg_db = TDatabasePDG::Instance();
 
-  static XYZVec zaxis(0.0,0.0,1.0); // unit in z direction
+  static  CLHEP::Hep3Vector zaxis(0.0,0.0,1.0); // unit in z direction
 
   for (int i=0; i<nhelices; i++) {
     std::vector<int>     hits_simp_id, hits_simp_index, hits_simp_z;
@@ -284,8 +279,8 @@ int  StntupleInitMu2eHelixBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mode) {
       }
       helix->fMom1.SetPxPyPzE(px,py,pz,energy);
 
-      const CLHEP::Hep3Vector* sp = &simptr->startPosition();
-      helix->fOrigin1.SetXYZT(sp->x(),sp->y(),sp->z(),simptr->startGlobalTime());
+      CLHEP::Hep3Vector sp = simptr->startPosition();
+      helix->fOrigin1.SetXYZT(sp.x(),sp.y(),sp.z(),simptr->startGlobalTime());
     }
     
     //look for the second most frequent hit
@@ -344,8 +339,8 @@ int  StntupleInitMu2eHelixBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mode) {
 	  }
 	  helix->fMom2.SetPxPyPzE(px,py,pz,energy);
 
-	  const CLHEP::Hep3Vector* sp = &simptr->startPosition();
-	  helix->fOrigin2.SetXYZT(sp->x(),sp->y(),sp->z(),simptr->startGlobalTime());
+	  CLHEP::Hep3Vector sp = simptr->startPosition();
+	  helix->fOrigin2.SetXYZT(sp.x(),sp.y(),sp.z(),simptr->startGlobalTime());
 	}      
       }
     }
