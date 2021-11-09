@@ -441,7 +441,10 @@ int plot_hist_1d(hist_data_t* Hist, int NHist, int Print = 0) {
 //-----------------------------------------------------------------------------
   c->Modified(); c->Update();
 
-  if (leg) leg->Draw();
+  if (leg) {
+    leg->SetTextSize(Hist1->fLabelFontSize);
+    leg->Draw();
+  }
 //-----------------------------------------------------------------------------
 // write DS names inside the plot
 //-----------------------------------------------------------------------------
@@ -488,7 +491,7 @@ int plot_hist_1d(hist_data_t* Hist, int NHist, int Print = 0) {
     }
   }
   
-  Hist1->fOutputFn = Form("%s/eps/%s.eps",gEnv->GetValue("FiguresDir","./"),Hist1->fPlotName.Data());
+  Hist1->fOutputFn = Form("%s/eps/%s.eps",gEnv->GetValue("FiguresDir","."),Hist1->fPlotName.Data());
   if (Print == 1) {
     c->Print(Form("%s",Hist1->fOutputFn.Data())) ;
   }
