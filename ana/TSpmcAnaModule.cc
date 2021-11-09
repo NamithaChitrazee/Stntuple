@@ -26,7 +26,9 @@
 #include "TSystem.h"
 
 #include "Stntuple/loop/TStnAna.hh"
+#include "Stntuple/obj/TStnNode.hh"
 #include "Stntuple/obj/TStnHeaderBlock.hh"
+#include "Stntuple/alg/TStntuple.hh"
 #include "Stntuple/val/stntuple_val_functions.hh"
 //-----------------------------------------------------------------------------
 #include "Stntuple/ana/TSpmcAnaModule.hh"
@@ -76,9 +78,10 @@ int TSpmcAnaModule::BeginJob() {
 // register data blocks 'SpmcBlock' or 'StepPointMCBlock' (old)
 //-----------------------------------------------------------------------------
   RegisterDataBlock("GenpBlock"          ,"TGenpBlock"       ,&fGenpBlock       );
-  RegisterDataBlock(fSpmcBlockName.Data(),"TStepPointMCBlock",&fStepPointMCBlock);
+  // RegisterDataBlock(fSpmcBlockName.Data(),"TStepPointMCBlock",&fStepPointMCBlock);
+ RegisterDataBlock("SpmcBlockVDet"         , "TStepPointMCBlock"   , &fSpmcBlockVDet   );
   RegisterDataBlock("SimpBlock"          ,"TSimpBlock"       ,&fSimpBlock       );
-  RegisterDataBlock(fVDetBlockName.Data(),"TStepPointMCBlock",&fVDetBlock       );
+  //  RegisterDataBlock(fVDetBlockName.Data(),"TStepPointMCBlock",&fVDetBlock       );
 //-----------------------------------------------------------------------------
 // book histograms
 //-----------------------------------------------------------------------------
@@ -771,7 +774,6 @@ void TSpmcAnaModule::FillHistograms() {
   SimpData_t* sd = nullptr;  // temp
 
   int pbar_stopped_in_st = 0;
-
   for (int i=0; i<fNSimp; i++) {
     TSimParticle* simp = fSimpBlock->Particle(i);
     int pdg_code  = simp->PDGCode();
@@ -877,9 +879,11 @@ void TSpmcAnaModule::FillHistograms() {
 
   //  SimpData_t    sd1
 
-  int nsteps = fStepPointMCBlock->NStepPoints();
+  //  int nsteps = fStepPointMCBlock->NStepPoints();
+  int nsteps = fSpmcBlockVDet->NStepPoints();
   for (int i=0; i<nsteps; i++) {
-    spmc             = fStepPointMCBlock->StepPointMC(i);
+    //  spmc             = fStepPointMCBlock->StepPointMC(i);
+    spmc             = fSpmcBlockVDet->StepPointMC(i);
     float p          = spmc->Mom()->Mag();
     float t          = spmc->Time();
     int pdg_code     = spmc->PDGCode();
@@ -972,7 +976,7 @@ void TSpmcAnaModule::FillHistograms() {
 //-----------------------------------------------------------------------------
       int nh = 0;
       for (int i=0; i<fNVDetHits; i++) {
-	TStepPointMC* step = fVDetBlock->StepPointMC(i);
+		TStepPointMC* step = fSpmcBlockVDet->StepPointMC(i);
 	if (step->PDGCode() == -2212) {
 	  if      ((step->SimID() < 100000) && (step->VolumeID() ==  91)) {
 	    FillVDetHistograms(fHist.fVDet[3091],step);
@@ -1006,7 +1010,7 @@ void TSpmcAnaModule::FillHistograms() {
 //-----------------------------------------------------------------------------
 	int nh = 0;
 	for (int i=0; i<fNVDetHits; i++) {
-	  TStepPointMC* step = fVDetBlock->StepPointMC(i);
+	  TStepPointMC* step = fSpmcBlockVDet->StepPointMC(i);
 	  if (step->PDGCode() == -2212) {
 	    if      ((step->SimID() < 100000) && (step->VolumeID() ==  91)) {
 	      FillVDetHistograms(fHist.fVDet[4091],step);
@@ -1057,7 +1061,7 @@ void TSpmcAnaModule::FillHistograms() {
 // VDET histograms
 //-----------------------------------------------------------------------------
   for (int i=0; i<fNVDetHits; i++) {
-    TStepPointMC* step = fVDetBlock->StepPointMC(i);
+    TStepPointMC* step = fSpmcBlockVDet->StepPointMC(i);
 
     if (step->VolumeID() ==  9) FillVDetHistograms(fHist.fVDet[ 9],step);
     if (step->VolumeID() == 13) {
@@ -1270,16 +1274,16 @@ int TSpmcAnaModule::BeginRun() {
 //_____________________________________________________________________________
 int TSpmcAnaModule::Event(int ientry) {
 
-  fStepPointMCBlock->GetEntry(ientry);
+  fSpmcBlockVDet->GetEntry(ientry);
   fGenpBlock->GetEntry(ientry);
   fSimpBlock->GetEntry(ientry);
-  fVDetBlock->GetEntry(ientry);
+  // fVDetBlock->GetEntry(ientry);
 //-----------------------------------------------------------------------------
 // assume electron in the first particle, otherwise the logic will need to 
 // be changed
 // if there are several hits, use the first one
 //-----------------------------------------------------------------------------
-  fNVDetHits = fVDetBlock->NStepPoints();
+  fNVDetHits = fSpmcBlockVDet->NStepPoints();
 
   fNSimp = fSimpBlock->NParticles();
 
@@ -1330,9 +1334,9 @@ int TSpmcAnaModule::Event(int ientry) {
 // determine t(max) for steps
 //-----------------------------------------------------------------------------
   fTMaxSpmc = -1;
-  int nsteps = fStepPointMCBlock->NStepPoints();
+  int nsteps = fSpmcBlockVDet->NStepPoints();
   for (int i=0; i<nsteps; i++) {
-    TStepPointMC* spmc = fStepPointMCBlock->StepPointMC(i);
+    TStepPointMC* spmc = fSpmcBlockVDet->StepPointMC(i);
     //float p          = spmc->Mom()->Mag();
     float t            = spmc->Time();
     if (t > fTMaxSpmc) fTMaxSpmc = t;
@@ -1404,9 +1408,9 @@ void TSpmcAnaModule::Debug() {
 // the "STOP" volume, one hit per particle
 //-----------------------------------------------------------------------------
   if (GetDebugBit(6) == 1) {
-    int nsteps = fStepPointMCBlock->NStepPoints();
+    int nsteps = fSpmcBlockVDet->NStepPoints();
     for (int i=0; i<nsteps; i++) {
-      TStepPointMC* spmc = fStepPointMCBlock->StepPointMC(i);
+      TStepPointMC* spmc = fSpmcBlockVDet->StepPointMC(i);
       float p            = spmc->Mom()->Mag();
       float t            = spmc->Time();
       int pdg_code       = spmc->PDGCode();
@@ -1417,9 +1421,9 @@ void TSpmcAnaModule::Debug() {
     }
   }    
   if (GetDebugBit(7) == 1) {
-    int nsteps = fStepPointMCBlock->NStepPoints();
+    int nsteps = fSpmcBlockVDet->NStepPoints();
     for (int i=0; i<nsteps; i++) {
-      TStepPointMC* spmc = fStepPointMCBlock->StepPointMC(i);
+      TStepPointMC* spmc = fSpmcBlockVDet->StepPointMC(i);
       float p            = spmc->Mom()->Mag();
       float t            = spmc->Time();
       int pdg_code       = spmc->PDGCode();
@@ -1434,7 +1438,7 @@ void TSpmcAnaModule::Debug() {
 //-----------------------------------------------------------------------------
   if (GetDebugBit(8) == 1) {
     for (int i=0; i<fNVDetHits; i++) {
-      TStepPointMC* step = fVDetBlock->StepPointMC(i);
+      TStepPointMC* step = fSpmcBlockVDet->StepPointMC(i);
       if      ((step->PDGCode() == -211) && (step->VolumeID() ==  9)) {
 	float p            = step->Mom()->Mag();
 	float t            = step->Time();
@@ -1462,9 +1466,9 @@ void TSpmcAnaModule::Debug() {
 // bit:10  electrons with T > 1000 ns and momentum > 20 MeV/c
 //-----------------------------------------------------------------------------
   if (GetDebugBit(10) == 1) {
-    int nsteps = fStepPointMCBlock->NStepPoints();
+    int nsteps = fSpmcBlockVDet->NStepPoints();
     for (int i=0; i<nsteps; i++) {
-      TStepPointMC* step = fStepPointMCBlock->StepPointMC(i);
+      TStepPointMC* step = fSpmcBlockVDet->StepPointMC(i);
       if (step->PDGCode() == 11) {
 	float p            = step->Mom()->Mag();
 	float t            = step->Time();
@@ -1478,9 +1482,9 @@ void TSpmcAnaModule::Debug() {
 // bit:11  electrons with T > 1000 ns and momentum < 2 MeV/c
 //-----------------------------------------------------------------------------
   if (GetDebugBit(11) == 1) {
-    int nsteps = fStepPointMCBlock->NStepPoints();
+    int nsteps = fSpmcBlockVDet->NStepPoints();
     for (int i=0; i<nsteps; i++) {
-      TStepPointMC* step = fStepPointMCBlock->StepPointMC(i);
+      TStepPointMC* step = fSpmcBlockVDet->StepPointMC(i);
       if (step->PDGCode() == 11) {
 	float p            = step->Mom()->Mag();
 	float t            = step->Time();
@@ -1494,9 +1498,9 @@ void TSpmcAnaModule::Debug() {
 // bit:12  hits with parent mom < 2 MeV and T > 1000 ns 
 //-----------------------------------------------------------------------------
   if (GetDebugBit(12) == 1) {
-    int nsteps = fStepPointMCBlock->NStepPoints();
+    int nsteps = fSpmcBlockVDet->NStepPoints();
     for (int i=0; i<nsteps; i++) {
-      TStepPointMC* step = fStepPointMCBlock->StepPointMC(i);
+      TStepPointMC* step = fSpmcBlockVDet->StepPointMC(i);
       float t            = step->Time();
       int sim_id        = step->SimID();
 
