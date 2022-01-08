@@ -59,6 +59,10 @@ void plot_hist_2D(hist_data_t* Hd, int Print = 0) {
 
   TCanvas* c = new TCanvas(canvas_name.Data(),canvas_name.Data(),cx,cy);
   c->SetLogy(Hd->fYLogScale);
+  if(Hd->fCanvasLeftMargin   >= 0.) c->SetLeftMargin  (Hd->fCanvasLeftMargin);
+  if(Hd->fCanvasRightMargin  >= 0.) c->SetRightMargin (Hd->fCanvasRightMargin);
+  if(Hd->fCanvasBottomMargin >= 0.) c->SetBottomMargin(Hd->fCanvasBottomMargin);
+  if(Hd->fCanvasTopMargin    >= 0.) c->SetTopMargin   (Hd->fCanvasTopMargin);
 //-----------------------------------------------------------------------------
 // the two histograms correspond to slightly different NPOT
 //-----------------------------------------------------------------------------
@@ -70,6 +74,12 @@ void plot_hist_2D(hist_data_t* Hd, int Print = 0) {
   
   if (Hd->fXAxisTitle != ""   ) hpx1->GetXaxis()->SetTitle(Hd->fXAxisTitle.Data());
   if (Hd->fYAxisTitle != ""   ) hpx1->GetYaxis()->SetTitle(Hd->fYAxisTitle.Data());
+  if (Hd->fAxisFontSize >= 0. ) {
+    hpx1->GetXaxis()->SetTitleSize(Hd->fAxisFontSize);
+    hpx1->GetXaxis()->SetLabelSize(Hd->fAxisFontSize);
+    hpx1->GetYaxis()->SetTitleSize(Hd->fAxisFontSize);
+    hpx1->GetYaxis()->SetLabelSize(Hd->fAxisFontSize);
+  }
 
   if (Hd->fMarkerStyle >=0) hpx1->SetMarkerStyle(Hd->fMarkerStyle);
   if (Hd->fMarkerColor >=0) hpx1->SetMarkerColor(Hd->fMarkerColor);
@@ -195,6 +205,11 @@ void plot_hist_2D(hist_data_t* Hist1,  hist_data_t*  Hist2, int Print = 0) {
 
   TCanvas* c = new TCanvas(canvas_name.Data(),canvas_name.Data(),cx,cy);
   c->SetLogy(Hist1->fYLogScale);
+  if(Hist1->fCanvasLeftMargin   >= 0.) c->SetLeftMargin  (Hist1->fCanvasLeftMargin);
+  if(Hist1->fCanvasRightMargin  >= 0.) c->SetRightMargin (Hist1->fCanvasRightMargin);
+  if(Hist1->fCanvasBottomMargin >= 0.) c->SetBottomMargin(Hist1->fCanvasBottomMargin);
+  if(Hist1->fCanvasTopMargin    >= 0.) c->SetTopMargin   (Hist1->fCanvasTopMargin);
+
 //-----------------------------------------------------------------------------
 // the two histograms correspond to slightly different NPOT
 //-----------------------------------------------------------------------------
@@ -211,6 +226,12 @@ void plot_hist_2D(hist_data_t* Hist1,  hist_data_t*  Hist2, int Print = 0) {
 
   if (Hist1->fYMin < Hist1->fYMax) hpx1->GetYaxis()->SetRangeUser(Hist1->fYMin,Hist1->fYMax);
   if (Hist1->fYAxisTitle != ""   ) hpx1->GetYaxis()->SetTitle(Hist1->fYAxisTitle.Data());
+  if (Hist1->fAxisFontSize >= 0. ) {
+    hpx1->GetXaxis()->SetTitleSize(Hist1->fAxisFontSize);
+    hpx1->GetXaxis()->SetLabelSize(Hist1->fAxisFontSize);
+    hpx1->GetYaxis()->SetTitleSize(Hist1->fAxisFontSize);
+    hpx1->GetYaxis()->SetLabelSize(Hist1->fAxisFontSize);
+  }
 
   if (Hist1->fStats == 0         ) hpx1->SetStats(0);
 
