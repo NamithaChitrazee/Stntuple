@@ -46,8 +46,12 @@ void plot_hist_1D(hist_data_t* Hist1,  hist_data_t*  Hist2, int Print = 0) {
   TH1F* hpx1 = (TH1F*) Hist1->fHist->Clone(h1name);
 
   if (Hist1->fRebin > 0) hpx1->Rebin(Hist1->fRebin);  // rebin, if requested
-  if (Hist1->fScale > 0) hpx1->Scale(Hist1->fScale);  // scale, if requested
-  
+
+  if (Hist2->fScale == 3) { //normalize to unity
+    double scale = 1./hpx1->Integral();
+    hpx1->Scale(scale);
+  } else if (Hist1->fScale > 0) hpx1->Scale(Hist1->fScale);  // scale, if requested
+
   TH1F* hpx2 = (TH1F*) Hist2->fHist->Clone(h2name);
 
   if (Hist2->fRebin > 0) hpx2->Rebin(Hist2->fRebin);  // rebin, if requested
@@ -70,6 +74,11 @@ void plot_hist_1D(hist_data_t* Hist1,  hist_data_t*  Hist2, int Print = 0) {
   
   if (Hist2->fScale == 2) {
     double scale = hpx1->Integral()/hpx2->Integral();
+    hpx2->Scale(scale);
+  }
+
+  if (Hist2->fScale == 3) { //normalize to unity
+    double scale = 1./hpx2->Integral();
     hpx2->Scale(scale);
   }
 //-----------------------------------------------------------------------------
@@ -115,6 +124,12 @@ void plot_hist_1D(hist_data_t* Hist1,  hist_data_t*  Hist2, int Print = 0) {
 
   if (Hist1->fXMin < Hist1->fXMax) hpx1->GetXaxis()->SetRangeUser(Hist1->fXMin,Hist1->fXMax);
   if (Hist1->fXAxisTitle != ""   ) hpx1->GetXaxis()->SetTitle(Hist1->fXAxisTitle.Data());
+  if (Hist1->fAxisFontSize >= 0. ) {
+    hpx1->GetXaxis()->SetTitleSize(Hist1->fAxisFontSize);
+    hpx1->GetXaxis()->SetLabelSize(Hist1->fAxisFontSize);
+    hpx1->GetYaxis()->SetTitleSize(Hist1->fAxisFontSize);
+    hpx1->GetYaxis()->SetLabelSize(Hist1->fAxisFontSize);
+  }
 
   if (Hist1->fYMin < Hist1->fYMax) hpx1->GetYaxis()->SetRangeUser(Hist1->fYMin,Hist1->fYMax);
   if (Hist1->fYAxisTitle != ""   ) hpx1->GetYaxis()->SetTitle(Hist1->fYAxisTitle.Data());
@@ -249,7 +264,8 @@ int plot_hist_1d(hist_data_t* Hist, int NHist, int Print = 0) {
 // scale, if requested
 // fLumiSF : implement luminosity-based scaling
 //-----------------------------------------------------------------------------
-  if (Hist1->fScale  > 0) hpx1->Scale(Hist1->fScale);
+  if (Hist1->fScale  == 3) hpx1->Scale(1./hpx1->Integral());
+  else if (Hist1->fScale  > 0) hpx1->Scale(Hist1->fScale);
   if (Hist1->fLumiSF > 0) hpx1->Scale(Hist1->fLumiSF);
   
   stn_dataset_t* ds1(nullptr);
@@ -280,6 +296,11 @@ int plot_hist_1d(hist_data_t* Hist, int NHist, int Print = 0) {
 //-----------------------------------------------------------------------------
   TCanvas* c = new TCanvas(canvas_name,canvas_name,cx,cy);
   c->SetLogy(Hist1->fYLogScale);
+  if(Hist1->fCanvasLeftMargin   >= 0.) c->SetLeftMargin  (Hist1->fCanvasLeftMargin);
+  if(Hist1->fCanvasRightMargin  >= 0.) c->SetRightMargin (Hist1->fCanvasRightMargin);
+  if(Hist1->fCanvasBottomMargin >= 0.) c->SetBottomMargin(Hist1->fCanvasBottomMargin);
+  if(Hist1->fCanvasTopMargin    >= 0.) c->SetTopMargin   (Hist1->fCanvasTopMargin);
+
 //-----------------------------------------------------------------------------
 // the two histograms may correspond to slightly different NPOT
 //-----------------------------------------------------------------------------
@@ -300,6 +321,12 @@ int plot_hist_1d(hist_data_t* Hist, int NHist, int Print = 0) {
 
   if (Hist1->fXMin < Hist1->fXMax) hpx1->GetXaxis()->SetRangeUser(Hist1->fXMin,Hist1->fXMax);
   if (Hist1->fXAxisTitle != ""   ) hpx1->GetXaxis()->SetTitle(Hist1->fXAxisTitle.Data());
+  if (Hist1->fAxisFontSize >= 0. ) {
+    hpx1->GetXaxis()->SetTitleSize(Hist1->fAxisFontSize);
+    hpx1->GetXaxis()->SetLabelSize(Hist1->fAxisFontSize);
+    hpx1->GetYaxis()->SetTitleSize(Hist1->fAxisFontSize);
+    hpx1->GetYaxis()->SetLabelSize(Hist1->fAxisFontSize);
+  }
 
   if (Hist1->fYMin < Hist1->fYMax) hpx1->GetYaxis()->SetRangeUser(Hist1->fYMin,Hist1->fYMax);
 
@@ -393,7 +420,15 @@ int plot_hist_1d(hist_data_t* Hist, int NHist, int Print = 0) {
       hpx2->Scale(scale);
     }
 
-    if (Hist2->fLumiSF > 0) hpx2->Scale(Hist2->fLumiSF);
+//-----------------------------------------------------------------------------
+// normalize to unity
+//-----------------------------------------------------------------------------
+  if (Hist2->fScale == 3) {
+    double scale = 1./hpx2->Integral();
+    hpx2->Scale(scale);
+  }
+
+  if (Hist2->fLumiSF > 0) hpx2->Scale(Hist2->fLumiSF);
   
     hpx2->SetLineWidth(1);
 
