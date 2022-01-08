@@ -52,6 +52,7 @@ public:
   TString       fPlotLabel;
   TString       fXAxisTitle;
   TString       fYAxisTitle;
+  float         fAxisFontSize;
   TString       fYTitFormat;		// if "", Y axis title is not printed
   float         fLegendXMin;
   float         fLegendYMin;
@@ -60,6 +61,10 @@ public:
   TString       fCanvasName;
   int           fCanvasSizeX;
   int           fCanvasSizeY;
+  float         fCanvasLeftMargin;
+  float         fCanvasRightMargin;
+  float         fCanvasBottomMargin;
+  float         fCanvasTopMargin;
   TCanvas*      fCanvas;
   TString       fOutputFn;
 
@@ -118,6 +123,10 @@ public:
     fCanvasName  = "";
     fCanvasSizeX = 1200.;
     fCanvasSizeY =  800.;
+    fCanvasLeftMargin   = -1.;
+    fCanvasRightMargin  = -1.;
+    fCanvasBottomMargin = -1.;
+    fCanvasTopMargin    = -1.;
     fNewName     = "";
     fLabel         = "";
     fLabelXMin     = 0.15;
@@ -150,6 +159,7 @@ public:
     fPlotLabel   = "";
     fXAxisTitle  = "";
     fYAxisTitle  = "";
+    fAxisFontSize = -1.;
     fYTitFormat  = "N / %10.3f";
     fLegendXMin  = 0.65;
     fLegendYMin  = 0.15;
