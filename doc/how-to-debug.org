@@ -1,20 +1,18 @@
 # -*- mode:org -*- 
-
  *How to debug STNTUPLE jobs with GDB* 
 
  - Here, I describe only one approach, which seems the most adequate.
-
  - the following assumes that STNUPLE has been set up correctly, and the Stntuple/scripts/.rootrc 
    is a base for the .rootrc file 
-
  - use google GDB manual, get an idea of what it is, read how to use it with GNU emacs
  - in a shell window, setup Mu2e environment, start emacs
+
 #+begin_src
-... do your setups...
+... run your setups...
 emacs & 
 #+end_src
 
- - start gdb in emacs window ('Alt-X gdb'), read GDB manual, if confused
+ - start gdb in emacs window ('Alt-X gdb'), if confused, read the GDB manual
  - start ROOT in that same shell window, you will see the process ID to attach to (for this example, 902)
 #+begin_src
 projects/mu2e/app/users/murat/mu2e_dev>root.exe

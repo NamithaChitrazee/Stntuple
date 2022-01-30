@@ -3,9 +3,14 @@
 //
 // first example: 
 //
-// dmg = new DrawMu2eGeometry("/home/murat/figures/mu2e/gdml/mu2e_geometry_v6_1_4.gdml")
+// dmg = new DrawMu2eGeometry("/projects/mu2e/figures/gdml/mu2e_geometry_v6_1_4.gdml")
 // dmg->HideBuilding(1)
-// dmg->gm->GetVolume("HallAir")->Draw("ogl")
+// dmg->gm->GetVolume("World")->Draw("ogl")
+//
+// for proper 2D ZX view, choose:
+// - Camera/Orthographic ZnOX
+// - Guides/Axes/Origin
+// - Camera overlay/Show Mode; Grid Front or Axes
 //
 // comment: TGeoManager::Import chokes on filenames like "~/mu2e.gdml") 
 ///////////////////////////////////////////////////////////////////////////////
@@ -75,6 +80,7 @@ public:
   void DrawDetectorSolenoidDev2();
   void DrawProductionTarget();
   void DrawStrawTracker();
+  static void Help();
 };
 
 
@@ -444,6 +450,8 @@ void DrawMu2eGeometry::HideBuilding(int KeepOriginalColors) {
     "PSEnclosureWindow",   // part of PS
     
     "BearingBlock_DS2",
+    "psAreaHatchLid",
+    "remoteHandlingHatchLid",
     ""
   };
 
@@ -738,6 +746,11 @@ void DrawMu2eGeometry::DrawDetectorSolenoidDev2() {
   hall->Draw("ogl");
 }
 
-
 //-----------------------------------------------------------------------------
-
+void DrawMu2eGeometry::Help() {
+  printf("dmg = new DrawMu2eGeometry(\"/home/murat/figures/mu2e/gdml/mu2e_geometry_v6_1_4.gdml\")\n");
+  printf("dmg->HideBuilding(1)\n");
+  printf("dmg->gm->GetVolume(\"HallAir\")->Draw(\"ogl\")\n");
+  printf("\n");
+  printf("comment: TGeoManager::Import chokes on filenames like \"~/mu2e.gdml\"\n");
+}

@@ -1,6 +1,6 @@
 // my implementation of the Feldman-Cousins algorithm
 // 
-#include "Stntuple/alg/TFeldmanCousinsA.hh"
+#include "Stntuple/alg/TFeldmanCousins.hh"
 #include "TCanvas.h"
 #include "TMatrixD.h"
 #include "TVectorD.h"
@@ -8,13 +8,14 @@
 #include "Math/QuantFuncMathCore.h"
 #include "Math/DistFunc.h"
 
-ClassImp(TFeldmanCousinsA)
+ClassImp(stntuple::TFeldmanCousins)
 //-----------------------------------------------------------------------------
 // CL > 0: CL has the meaning of a probability - 0.9, 0.95 .. .0.99 etc
 //    < 0: CL is the "discovery probability", probability corresponding
 //         to 5 gaussian sigma level, 
 //-----------------------------------------------------------------------------
-TFeldmanCousinsA::TFeldmanCousinsA(const char* Name, double CL, int DebugLevel):
+namespace stntuple {
+TFeldmanCousins::TFeldmanCousins(const char* Name, double CL, int DebugLevel):
   TNamed(Name,Name),
   fRn()
 {
@@ -46,7 +47,7 @@ TFeldmanCousinsA::TFeldmanCousinsA(const char* Name, double CL, int DebugLevel):
   fBelt.fSMax      = -1e6;
 }
 
-TFeldmanCousinsA::~TFeldmanCousinsA() {
+TFeldmanCousins::~TFeldmanCousins() {
   delete fHist.fBgProb;
   delete fHist.fBsProb;
   delete fHist.fCumBgProb;
@@ -55,7 +56,7 @@ TFeldmanCousinsA::~TFeldmanCousinsA() {
   if (fHist.fBelt) delete fHist.fBelt;
 }
 
-void  TFeldmanCousinsA::SetCL(double CL) {
+void  TFeldmanCousins::SetCL(double CL) {
   double alpha = 1-TMath::Erf(5./sqrt(2));
   
   if (CL > 0) fCL = CL;
@@ -64,7 +65,7 @@ void  TFeldmanCousinsA::SetCL(double CL) {
   fLog1mCL        = log(1-fCL);
 }
 
-void TFeldmanCousinsA::InitPoissonDist(double Mean, double* Prob, double* CumProb, int N) {
+void TFeldmanCousins::InitPoissonDist(double Mean, double* Prob, double* CumProb, int N) {
 //-----------------------------------------------------------------------------
 // the length of 'Prob' should be at least N
 // CumProb[N]: probability, for a given Mean, to have rn <= N
@@ -85,7 +86,7 @@ void TFeldmanCousinsA::InitPoissonDist(double Mean, double* Prob, double* CumPro
 }
 
 //-----------------------------------------------------------------------------
-void TFeldmanCousinsA::Init(double Bgr, double Sig) {
+void TFeldmanCousins::Init(double Bgr, double Sig) {
   //  fSigMean = SigMean;
 
   fMeanBgr = Bgr;
@@ -107,7 +108,7 @@ void TFeldmanCousinsA::Init(double Bgr, double Sig) {
   }
 }
 
-int TFeldmanCousinsA::ConstructInterval(double MuB, double MuS) {
+int TFeldmanCousins::ConstructInterval(double MuB, double MuS) {
 //-----------------------------------------------------------------------------
 // output: [fIMin,fIMax] : a CL interval constructed using FC ordering for given 
 //         MuB and MuS
@@ -188,7 +189,7 @@ int TFeldmanCousinsA::ConstructInterval(double MuB, double MuS) {
 // fBelt is the FC belt histogram
 // avoid multiple useless re-initializations
 //-----------------------------------------------------------------------------
-int TFeldmanCousinsA::ConstructBelt(double Bgr, double SMin, double SMax, int NPoints) {
+int TFeldmanCousins::ConstructBelt(double Bgr, double SMin, double SMax, int NPoints) {
 
   if ((fBelt.fBgr == Bgr) and (fBelt.fNy == NPoints) and (fBelt.fSMin == SMin) and (fBelt.fSMax == SMax)) return 0;
 
@@ -201,7 +202,7 @@ int TFeldmanCousinsA::ConstructBelt(double Bgr, double SMin, double SMax, int NP
 
   // if (fHist.fBelt) delete fHist.fBelt;
 
-  // fHist.fBelt = new TH2D(Form("h_belt_%s",GetName()),"FC belt",TFeldmanCousinsA::MaxNx,0,TFeldmanCousinsA::MaxNx,
+  // fHist.fBelt = new TH2D(Form("h_belt_%s",GetName()),"FC belt",TFeldmanCousins::MaxNx,0,TFeldmanCousins::MaxNx,
   // 			 NPoints,SMin-step/2,SMax-step/2);
   
   for (int iy=0; iy<NPoints; iy++) {
@@ -251,7 +252,7 @@ int TFeldmanCousinsA::ConstructBelt(double Bgr, double SMin, double SMax, int NP
 //-----------------------------------------------------------------------------
 // in general, need to scan a range of signals, call this function multiple times
 //-----------------------------------------------------------------------------
-void TFeldmanCousinsA::DiscoveryProb(double MuB, double SMin, double SMax, int NPoints, double* MuS, double* Prob) {
+void TFeldmanCousins::DiscoveryProb(double MuB, double SMin, double SMax, int NPoints, double* MuS, double* Prob) {
 //-----------------------------------------------------------------------------
 // construct FC CL confidence interval (covering fCL) assuming Signal=0
 //-----------------------------------------------------------------------------
@@ -279,7 +280,7 @@ void TFeldmanCousinsA::DiscoveryProb(double MuB, double SMin, double SMax, int N
   }
 }
 
-void TFeldmanCousinsA::DiscoveryProbMean(double MuB, double SMin, double SMax, int NPoints, double* MuS, double* Prob) {
+void TFeldmanCousins::DiscoveryProbMean(double MuB, double SMin, double SMax, int NPoints, double* MuS, double* Prob) {
 //-----------------------------------------------------------------------------
 // in general, need to scan a range of signals, call this function multiple times
 // watch for 5 
@@ -326,7 +327,7 @@ void TFeldmanCousinsA::DiscoveryProbMean(double MuB, double SMin, double SMax, i
   }
 }
 
-void TFeldmanCousinsA::PlotDiscoveryProbMean(double MuB, double MuS) {
+void TFeldmanCousins::PlotDiscoveryProbMean(double MuB, double MuS) {
   // double mus;
   // ConstructInterval(MuB,mus=0);
 
@@ -370,7 +371,7 @@ void TFeldmanCousinsA::PlotDiscoveryProbMean(double MuB, double MuS) {
 }
 
 
-void TFeldmanCousinsA::PrintData(const char* Title, char DataType, void* Data, int MaxInd) {
+void TFeldmanCousins::PrintData(const char* Title, char DataType, void* Data, int MaxInd) {
 
   int k      = 0;
   int findex = 0;
@@ -393,7 +394,7 @@ void TFeldmanCousinsA::PrintData(const char* Title, char DataType, void* Data, i
   if (k > 0) printf("\n");
 }
 
-void TFeldmanCousinsA::PrintProbs(int N) {
+void TFeldmanCousins::PrintProbs(int N) {
 //-----------------------------------------------------------------------------
 // print results
 //-----------------------------------------------------------------------------
@@ -410,7 +411,7 @@ void TFeldmanCousinsA::PrintProbs(int N) {
 }
 
 
-int TFeldmanCousinsA::SolveFor(double Val, const double* X, const double* Y, int NPoints, double* XVal) {
+int TFeldmanCousins::SolveFor(double Val, const double* X, const double* Y, int NPoints, double* XVal) {
 //-----------------------------------------------------------------------------
 // fiven NPoints (X,Y) representing a smooth curve f(X), find XVal,
 // such that f(XVal) = Val
@@ -426,7 +427,7 @@ int TFeldmanCousinsA::SolveFor(double Val, const double* X, const double* Y, int
   }
 
   if (i0 == -1) {
-    printf("TFeldmanCousinsA::solve_for in trouble: wrong range, bail out\n");
+    printf("TFeldmanCousins::solve_for in trouble: wrong range, bail out\n");
     return -1;
   }
   
@@ -465,7 +466,7 @@ int TFeldmanCousinsA::SolveFor(double Val, const double* X, const double* Y, int
 
 
 
-void TFeldmanCousinsA::UpperLimit(double MuB, double SMin, double SMax, int NPoints, double* S, double* Prob) {
+void TFeldmanCousins::UpperLimit(double MuB, double SMin, double SMax, int NPoints, double* S, double* Prob) {
 //-----------------------------------------------------------------------------
 // construct FC CL confidence belt
 // constructing the FC belt assumes dividing the signal interval into (NPoints-1) steps,
@@ -497,3 +498,4 @@ void TFeldmanCousinsA::UpperLimit(double MuB, double SMin, double SMax, int NPoi
     Prob[is] = double(nexcl)/double(fNExp);
   }
 }
+};

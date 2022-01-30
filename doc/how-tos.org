@@ -8,6 +8,9 @@ _Stntuple How-To's_
 
 2) [[file:how-to-print-branch-sizes.org][how to print sizes of different STNTUPLE branches]]
 3) [[file:how-to-debug.org][how to debug an Stntuple job with GDB]]
+4) how to display Mu2e geometry
+   - assume you have a .gdml file named, for example, geometry.gdml
+   - load [[file:../scripts/draw_mu2e_geometry.C][Stntuple/scripts/draw_mu2e_geometry.C]], read instructions on top of the file
 * ------------------------------------------------------------------------------
 * back to the top: [[file:Stntuple.org][Stntuple.org]]
 * ------------------------------------------------------------------------------

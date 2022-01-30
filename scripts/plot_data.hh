@@ -98,7 +98,7 @@ public:
     fOutputFn      = "";
   }
 //-----------------------------------------------------------------------------
-//
+// what ROOT does is defined by the file extention
 //-----------------------------------------------------------------------------
   int  print(const char* Fn = "") {
     TString fn = Fn;

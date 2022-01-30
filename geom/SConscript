@@ -12,7 +12,8 @@ def local_build():
     local_env = stntuple_env.Clone()
 
     rootlibs = local_env['ROOTLIBS']
-    if ( not ("EG" in rootlibs)): rootlibs.insert(rootlibs.index("Physics")+1,"EG");
+    if ( not ("EG"   in rootlibs)): rootlibs.insert(rootlibs.index("Physics")+1,"EG");
+    if ( not ("Geom" in rootlibs)): rootlibs.insert(rootlibs.index("Physics")+1,"Geom");
 
     debug     = False; 
     helper    = stntuple_helper(local_env,debug);

@@ -22,6 +22,8 @@
 // HistName like "spmc_1/mom"
 //-----------------------------------------------------------------------------
 void plot_hist_1D(hist_data_t* Hist1,  hist_data_t*  Hist2, int Print = 0) {
+
+  printf("WARNING: plot_hist_1D(hist_data_t*,...) is OBSOLETE, use plot_hist_1D(plot_data_t*, ...)\n");
   
   char figure_name[200];
 //-----------------------------------------------------------------------------
@@ -237,6 +239,8 @@ void plot_hist_1D(hist_data_t* Hist1,  hist_data_t*  Hist2, int Print = 0) {
 //-----------------------------------------------------------------------------
 int plot_hist_1d(hist_data_t* Hist, int NHist, int Print = 0) {
   
+  printf("WARNING: plot_hist_1D(hist_data_t*,...) is OBSOLETE, use plot_hist_1D(plot_data_t*, ...)\n");
+
   char figure_name[200];
 //-----------------------------------------------------------------------------
 // figure out clone histogram names
@@ -540,7 +544,7 @@ int plot_hist_1d(hist_data_t* Hist, int NHist, int Print = 0) {
 // other ones - not necessarily
 // may have the problem with namng the output file
 //-----------------------------------------------------------------------------
-int plot_hist_1d(plot_data_t* Plot, int Print = 0) {
+int plot_hist_1d(plot_data_t* Plot, int Print = 0, const char* Format = "eps") {
   
   char figure_name[200];
 //-----------------------------------------------------------------------------
@@ -566,7 +570,7 @@ int plot_hist_1d(plot_data_t* Plot, int Print = 0) {
 //-----------------------------------------------------------------------------
   int rebin = Hist1->fRebin;
   if (rebin <= 0) rebin = Plot->fRebin;
-  if (rebin >  0) hpx1->Rebin(rebin);
+  if (rebin >  1) hpx1->Rebin(rebin);
 //-----------------------------------------------------------------------------
 // scale, if requested
 // fLumiSF : implement luminosity-based scaling
@@ -657,7 +661,10 @@ int plot_hist_1d(plot_data_t* Plot, int Print = 0) {
 
   if (Hist1->fLabel != "") {
     leg = new TLegend(Plot->fLegendXMin,Plot->fLegendYMin,Plot->fLegendXMax,Plot->fLegendYMax);
-    leg->AddEntry(hpx1,Hist1->fLabel.Data(),"pl");
+    // decide in the representation
+    TString lopt("pl");
+    if (Hist1->fFillStyle != 0) lopt = "f";
+    leg->AddEntry(hpx1,Hist1->fLabel.Data(),lopt.Data());
     leg->SetBorderSize(0);
     leg->SetFillStyle(0);
   }
@@ -757,7 +764,11 @@ int plot_hist_1d(plot_data_t* Plot, int Print = 0) {
       plot_stat_box(hpx2,opt_stat,Hist2->fStatBoxXMin,sb2_ymin,Hist2->fStatBoxXMax,sb2_ymax);
     }
 
-    if (leg) leg->AddEntry(hpx2,Hist2->fLabel.Data(),"pl");
+    if (leg) {
+      TString lopt("pl");
+      if (Hist2->fFillStyle != 0) lopt = "f";
+      leg->AddEntry(hpx2,Hist2->fLabel.Data(),lopt.Data());
+    }
   }
 //-----------------------------------------------------------------------------
 // position statboxes - need to update the canvas first
@@ -811,8 +822,9 @@ int plot_hist_1d(plot_data_t* Plot, int Print = 0) {
 //-----------------------------------------------------------------------------
 // determine the output file name. always print in '.eps'
 //-----------------------------------------------------------------------------
-//  printf (" debug 003\n");
-  Plot->fOutputFn = Form("%s/eps/%s.eps",gEnv->GetValue("FiguresDir","./"),Plot->fName.Data());
+  TString ext(Format);
+  ext.ToLower();
+  Plot->fOutputFn = Form("%s/%s/%s.%s",gEnv->GetValue("FiguresDir","./"),ext.Data(),Plot->fName.Data(),ext.Data());
   if (Print == 1) {
     c->Print(Form("%s",Plot->fOutputFn.Data())) ;
   }

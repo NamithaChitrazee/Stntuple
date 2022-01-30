@@ -6,22 +6,28 @@
 #include "TGeoManager.h"
 
 #include "Stntuple/gui/TEvdCrvSection.hh"
+#include "Stntuple/geom/TStnTracker.hh"
 
 class TStnGeoManager : public TNamed {
 public:
   enum { kNCrvSections = 22 };
   
-  TGeoNode*    fTop; 
-  TGeoNode*    fDs2Vacuum; 
-  TGeoNode*    fDs3Vacuum; 
-  TGeoNode*    fSttMother; 
-  TGeoNode*    fCalMother; 
-  TGeoNode*    fTrkMother;
-  TGeoNode*    fMbsMother;
+  TGeoNode*       fTop; 
+
+  TGeoNode*       fDs2Vacuum; 
+  TGeoNode*       fDs3Vacuum; 
+  TGeoNode*       fSttMother; 
+  TGeoNode*       fCalMother; 
+  TGeoNode*       fTrkMother;
+  TGeoNode*       fMbsMother;
 
   TEvdCrvSection* fCrvSection[kNCrvSections];
 
-  int          fTransp;
+  TGeoManager*    fGeoManager;
+
+  TStnTracker*    fTracker;
+
+  int             fTransp;
 
   TStnGeoManager(const char* Name = "");
   TStnGeoManager(const char* Name, const char* Fn, int OriginalColors = 0);
@@ -30,7 +36,9 @@ public:
 // accessors
 //-----------------------------------------------------------------------------
   TEvdCrvSection* CrvSection(int I) { return fCrvSection[I] ; }
-  
+//-----------------------------------------------------------------------------
+// setters
+//-----------------------------------------------------------------------------
   void SetRecursiveVisibility(TGeoVolume* Vol, int OnOff);
   void SetRecursiveVisibility(TGeoNode*   Vol, int OnOff);
 
@@ -52,14 +60,15 @@ public:
   void HideTsCoils (int OriginalColors);
   void HideDsCoils (int OriginalColors);
   void HideBuilding(int OriginalColors);
-  
-				// Mu2e-specific - Node name starts with 'Pattern'
-				// assume it is unique
-  
+//-----------------------------------------------------------------------------
+// Mu2e-specific - Node name starts with 'Pattern' assume it is unique
+//-----------------------------------------------------------------------------
   TGeoNode* FindNodeByName      (TGeoNode*   Top, const char* Name      );
   TGeoNode* FindNodeByVolumeName(TGeoNode*   Top, const char* VolumeName);
   TGeoNode* FindNodeByVolumeName(TGeoVolume* Top, const char* VolumeName);
-    
+//-----------------------------------------------------------------------------
+// other methods
+//-----------------------------------------------------------------------------
   void DrawCRV();
   void DrawStrawTracker();
   void DrawCalorimeter();
@@ -67,6 +76,13 @@ public:
   void DrawExtShielding();
   void DrawDetectorSolenoid();
   void DrawDetectorSolenoidDev2();
+//-----------------------------------------------------------------------------
+// geometry initialization
+//-----------------------------------------------------------------------------
+  int InitGeometry(); 
+  int InitCalorimeterGeometry();
+  int InitCrvGeometry();
+  int InitTrackerGeometry();
 
   ClassDef(TStnGeoManager,0)
 };
