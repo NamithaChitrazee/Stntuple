@@ -751,7 +751,7 @@ int plot_hist_1d(plot_data_t* Plot, int Print = 0, const char* Format = "eps") {
 
     c->Modified(); c->Update();
     
-    if (Hist1->fStats != 0) {
+    if ((Hist1->fStats != 0) and (Hist2->fStats != 0)) {
 //-----------------------------------------------------------------------------
 // plot statbox for Hist2. If Hist2->fOptStat is not specified assume the same as for Hist1
 //-----------------------------------------------------------------------------
@@ -820,7 +820,7 @@ int plot_hist_1d(plot_data_t* Plot, int Print = 0, const char* Format = "eps") {
     }
   }
 //-----------------------------------------------------------------------------
-// determine the output file name. always print in '.eps'
+// determine the output file name. Extension defines the file format (default: ".eps")
 //-----------------------------------------------------------------------------
   TString ext(Format);
   ext.ToLower();
