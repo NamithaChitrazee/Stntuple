@@ -12,8 +12,8 @@
 emacs & 
 #+end_src
 
- - start gdb in emacs window ('Alt-X gdb'), if confused, read the GDB manual
- - start ROOT in that same shell window, you will see the process ID to attach to (for this example, 902)
+- start gdb in emacs window ('Alt-X gdb'), if confused, read the GDB manual
+- start ROOT in that same shell window, you will see the process ID to attach to (for this example, 902)
 #+begin_src
 projects/mu2e/app/users/murat/mu2e_dev>root.exe
    ------------------------------------------------------------
@@ -28,14 +28,19 @@ projects/mu2e/app/users/murat/mu2e_dev>root.exe
  nargs =  1 exec_name = root.exe
  process ID: 902
     902 pts/0    00:00:02 root.exe
-at GDB prompt, type
+#+end_src
+
+- at GDB prompt, type
+
+#+begin_src
 (gdb) file root.exe
 (gdb) att 902
 #+end_src
 
- - wait for GDB to read symbols from the shared libraries, during that time the ROOT prompt is frozen
- - when the libraries are loaded, set your breakpoints or else you need
- - type 'continue' , hit return - command prompt of your ROOT session becomes active again
+- wait for GDB to read symbols from the shared libraries, during that time the ROOT prompt is frozen
+- when the libraries are loaded, set your breakpoints or else you need
+- type 'continue' , hit return - command prompt of your ROOT session becomes active again
+
 #+begin_src
 (gdb) continue 
 #+end_src
