@@ -2,21 +2,22 @@
 * concatenating and cataloging stntuples:      - this is an example   , not instructions :)
 
 # create list of files to concatenate: 
-
+#+begin_src
    dir=/pnfs/mu2e/persistent/users/mu2epro/workflow/su2020.pos00s41b0.s5_reco_stn/outstage/35214508
    dsid=pos00s51b0
    ls -al $dir/00/000??/* | grep .stn$ > su2020.$dsid.stn.list
 
    Stntuple/scripts/make_concat_requests.rb -l su2020.$dsid.stn.list -b su2020 -d $dsid \ 
    -o $PWD -f stntuple -t $PWD/${dsid}_concat_request.C
+#+end_src
 
    this step will create a ROOT script pos00s51b0_concat_request.C configuring the concatenation job.
    Next:
-   
+#+begin_src   
    root.exe
    .L Stntuple/scripts/dh.C
    dh::concatenate("pos00s51b0_concat_request.C")      // 
-
+#+end_src
 # uploading to SAM : to be written
 * ------------------------------------------------------------------------------
 * back to <[[file:Stntuple.org][Stntuple.org]]> <[[file:stntuple-datasets.org][Stntuple datasets]]>
