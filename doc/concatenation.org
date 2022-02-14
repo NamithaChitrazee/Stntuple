@@ -10,13 +10,14 @@
    Stntuple/scripts/make_concat_requests.rb -l su2020.$dsid.stn.list -b su2020 -d $dsid \ 
    -o $PWD -f stntuple -t $PWD/${dsid}_concat_request.C
 
-   this step will create a script with N jobs
+   this step will create a ROOT script pos00s51b0_concat_request.C configuring the concatenation job.
+   Next:
+   
    root.exe
-   .L pos00s51b0_concat_request.C  // defines init_chain and n_concatenation_jobs
-   .L Stntuple/ana/scripts/dh.C
-   dh::concatenate()               // 
+   .L Stntuple/scripts/dh.C
+   dh::concatenate("pos00s51b0_concat_request.C")      // 
 
-# uploading to SAM
+# uploading to SAM : to be written
 * ------------------------------------------------------------------------------
 * back to <[[file:Stntuple.org][Stntuple.org]]> <[[file:stntuple-datasets.org][Stntuple datasets]]>
 * ------------------------------------------------------------------------------
