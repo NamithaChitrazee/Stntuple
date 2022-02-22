@@ -33,6 +33,7 @@ physics : { @table::Stntuple.physics
 	    makeTracks       : 0
 	    makeTrigger      : 0
 
+	    genpCollTag      : "generate"
 	    simpCollTag      : "muonBeamFilter"
 
 	    spmcBlockName    : ["SpmcBlock"            , "VDetBlock"                      ]

@@ -154,7 +154,7 @@ root[10] g.x->Continue(1);
 root[11] m_ele->fTrackBlock->Print() 
 #+end_src
 
-* analysis packages                                                     
+* analysis packages                                                          
 
  - User analysis code is organized in packages, similar to Offline packages. 
 
@@ -231,7 +231,7 @@ root[11] m_ele->fTrackBlock->Print()
   -rw-r--r-- 1 murat mu2e  674 Jun 22 18:32 trk.C
 #+end_src
 
-* how to clone Stntuple/ana and create a user analysis package               
+* [[file:analysis_packages.org][how to create a user analysis package]]                                      
 
    - run [[file:../scripts/make_analysis_package][Stntuple/scripts/make_analysis_package]] script:
 
@@ -244,4 +244,5 @@ root[11] m_ele->fTrackBlock->Print()
    3) not all modules are cloned
 
 * ------------------------------------------------------------------------------
-* back to [[file:./Stntuple.org]]
+* back to [[file:./Stntuple.org][Stntuple.org]]
+* ------------------------------------------------------------------------------

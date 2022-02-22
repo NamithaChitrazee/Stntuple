@@ -5,6 +5,7 @@
 BEGIN_PROLOG
   TIME_MAPS        @protect_ignore: [ ]
   TRIGGER_PATHS    @protect_ignore: [ stntuple_p0 ]
+  GEN_ID           @protect_ignore: "unknown"  
 END_PROLOG
 
 #include "Stntuple/fcl/stnmaker.fcl"
@@ -30,6 +31,7 @@ physics : { @table::Stntuple.physics
 	    makeTracks      : 0
 	    makeStepPointMC : 1
 
+	    genpCollTag     : "generate"
 	    simpCollTag     : "tgtStopFilter"
 
 	    spmcBlockName   : [ "SpmcBlock"                    , "VDetBlock"                     ]

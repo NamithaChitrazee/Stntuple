@@ -6,6 +6,7 @@ BEGIN_PROLOG
   TIME_MAPS        @protect_ignore: [ ]
   TIME_OFFSET_MAPS @protect_ignore: { inputs : @local::TIME_MAPS }
   TRIGGER_PATHS    @protect_ignore: [ stntuple_p0 ]
+  GEN_ID           @protect_ignore: "unknown"  
 END_PROLOG
 
 #include "Stntuple/fcl/stnmaker.fcl"
@@ -32,6 +33,7 @@ physics : { @table::Stntuple.physics
 	    makeTracks       : 0
 	    makeTrigger      : 0
 
+	    genpCollTag      : "generate"
 	    simpCollTag      : "mothersFilter"
 
 	    spmcBlockName    : [ "SpmcBlock"                    , "VDetBlock"                     ]
@@ -51,6 +53,6 @@ physics : { @table::Stntuple.physics
 # physics.out                               : [ detectorOutput ]
 # outputs.detectorOutput.SelectEvents       : [ path_gen_digi_reco_stn_dem_dmm ]
 
-services.TFileService.fileName            : "nts.user.s1_g4mothers_stn.project.sequencer.hist"
+services.TFileService.fileName            : "nts.user.s1_g4mothers_stn.project.sequencer.root"
 physics.filters.InitStntuple.histFileName : "nts.user.s1_g4mothers_stn.project.sequencer.stn"
 outputs.detectorOutput.fileName           : "sim.user.s1_g4mothers_stn.project.sequencer.art"

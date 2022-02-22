@@ -6,6 +6,7 @@ BEGIN_PROLOG
   TIME_MAPS        @protect_ignore: [ ]
   TIME_OFFSET_MAPS @protect_ignore: { inputs : @local::TIME_MAPS }
   TRIGGER_PATHS    @protect_ignore: [ stntuple_p0 ]
+  GEN_ID           @protect_ignore: "unknown"  
 END_PROLOG
 
 #include "Stntuple/fcl/stnmaker.fcl"
@@ -32,6 +33,7 @@ physics : { @table::Stntuple.physics
 	    makeTracks       : 0
 	    makeTrigger      : 0
 
+	    genpCollTag      : "generate"
 	    simpCollTag      : "muonBeamFilter"
 
 	    spmcBlockName    : ["SpmcBlock"              , "VDetBlock"                      ]
