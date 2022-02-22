@@ -232,17 +232,6 @@ root[11] m_ele->fTrackBlock->Print()
 #+end_src
 
 * [[file:analysis_packages.org][how to create a user analysis package]]                                      
-
-   - run [[file:../scripts/make_analysis_package][Stntuple/scripts/make_analysis_package]] script:
-
-#+begin_src
-  Stntuple/scripts/make_analysis_package  [package_name]
-#+end_src
-
-   1) if not specified, the *package_name* defaults to $USER
-   2) in the created package, the module names are placed into a *package_name* namespace
-   3) not all modules are cloned
-
 * ------------------------------------------------------------------------------
 * back to [[file:./Stntuple.org][Stntuple.org]]
 * ------------------------------------------------------------------------------
