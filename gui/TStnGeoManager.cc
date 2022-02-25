@@ -770,7 +770,7 @@ int TStnGeoManager::InitCrvGeometry() {
       
       TString rname;
       
-      double theta1, phi1, theta2, phi2, theta3, phi3;
+      double theta1(0), phi1(0), theta2(0), phi2(0), theta3(0), phi3(0);
 
       if ((iwy == 1) and (iwx == 2) and (iwz == 0)) {
 	rname = "rot_00";
