@@ -3,7 +3,7 @@
 //
 // first example: 
 //
-// dmg = new DrawMu2eGeometry("/projects/mu2e/figures/gdml/mu2e_geometry_v6_1_4.gdml")
+// dmg = new DrawMu2eGeometry("/projects/mu2e/geom/gdml/mu2e_geometry_v6_1_4.gdml")
 // dmg->HideBuilding(1)
 // dmg->gm->GetVolume("World")->Draw("ogl")
 //
@@ -14,75 +14,7 @@
 //
 // comment: TGeoManager::Import chokes on filenames like "~/mu2e.gdml") 
 ///////////////////////////////////////////////////////////////////////////////
-
-#include "TGeoVolume.h"
-#include "TGeoManager.h"
-#include "TString.h"
-
-class DrawMu2eGeometry {
-public:
-  TGeoManager* gm;
-
-  TGeoNode*    fTop; 
-
-  TGeoNode*    fDS1Vacuum; 
-  TGeoNode*    fDS2Vacuum; 
-  TGeoNode*    fDS3Vacuum; 
-
-  TGeoNode*    fTS1Vacuum; 
-  TGeoNode*    fTS2Vacuum; 
-  TGeoNode*    fTS3Vacuum; 
-  TGeoNode*    fTS4Vacuum; 
-  TGeoNode*    fTS5Vacuum; 
-
-  TGeoNode*    fSttMother; 
-  TGeoNode*    fCalMother; 
-  TGeoNode*    fTrkMother;
-  TGeoNode*    fMbsMother;
-  
-  int          fTransp;
-
-  DrawMu2eGeometry(const char* Fn = "/home/murat/figures/mu2e/gdml/mu2e_geometry_v4_0_6.gdml", int OriginalColors = 0);
-  ~DrawMu2eGeometry();
-  
-  void SetRecursiveVisibility(TGeoVolume* Vol, int OnOff);
-  void SetRecursiveVisibility(TGeoNode*   Vol, int OnOff);
-
-  void SetDefaultColorTransp            ();
-  void SetRecursiveColorTransp          (TGeoVolume* Vol , Int_t Color, Int_t Transp);
-  void SetRecursiveColorTranspByName    (TGeoNode*   Vol , const char* Name   , Int_t Color, Int_t Transp);
-  void SetRecursiveColorTranspByMaterial(TGeoNode*   Node, const char* MatName, Int_t Color, Int_t Transp);
-
-  void SetRecursiveVisibilityColorTranspByNameAndMaterial(TGeoNode*   Top         ,
-							  const char* Name        ,
-							  const char* MatName     ,
-							  int         Visibility  ,
-							  int         Color       ,
-							  int         Transparency);
-    
-  void SetRecursiveVisibilityByName    (TGeoNode* Node, const char* NamePattern, int OnOff);
-  void SetRecursiveVisibilityByMaterial(TGeoNode* Node, const char* Material   , int OnOff);
-
-  void HideBuilding(int OriginalColors);
-  
-				// Mu2e-specific - Node name starts with 'Pattern'
-				// assume it is unique
-  
-  TGeoNode* FindNodeByName      (TGeoNode*   Top, const char* Name      );
-  TGeoNode* FindNodeByVolumeName(TGeoNode*   Top, const char* VolumeName);
-  TGeoNode* FindNodeByVolumeName(TGeoVolume* Top, const char* VolumeName);
-    
-  void DrawCRV();
-  void DrawCalorimeter();
-  void DrawCalorimeterDisk();
-  void DrawExtShielding();
-  void DrawDetectorSolenoid();
-  void DrawDetectorSolenoidDev2();
-  void DrawProductionTarget();
-  void DrawStrawTracker();
-  static void Help();
-};
-
+#include "Stntuple/gui/draw_mu2e_geometry.hh"
 
 //-----------------------------------------------------------------------------
 DrawMu2eGeometry::DrawMu2eGeometry(const char* Fn, int KeepOriginalColors) {
@@ -360,7 +292,7 @@ void DrawMu2eGeometry::SetDefaultColorTransp() {
   col             = kRed+2;
   nd              = ts1_vacuum->GetNdaughters();
   
-  int ts1_coll_transp = 60;
+  int ts1_coll_transp = 30;
   for (int i=0; i<nd; i++) {
     TGeoVolume* vd = ts1_vacuum->GetNode(i)->GetVolume();
     name = vd->GetName();
@@ -377,15 +309,15 @@ void DrawMu2eGeometry::SetDefaultColorTransp() {
   col             = kRed+2;
   nd              = ts3_vacuum->GetNdaughters();
   
-  int ts3_coll_transp = 60;
+  int ts3_coll_transp = 30;
   for (int i=0; i<nd; i++) {
     TGeoVolume* vd = ts3_vacuum->GetNode(i)->GetVolume();
     name = vd->GetName();
     printf(" TS3Vacuum daughter: %s\n",name);
-    if      (strcmp(name,"PbarAbs"     ) == 0) SetRecursiveColorTransp(vd,kRed+1,fTransp);
-    else if (strcmp(name,"PbarAbsWedge") == 0) SetRecursiveColorTransp(vd,kRed+3,fTransp);
-    if      (strcmp(name,"Coll31") == 0) SetRecursiveColorTransp(vd,kRed+1,ts3_coll_transp);
-    else if (strcmp(name,"Coll32") == 0) SetRecursiveColorTransp(vd,kRed+3,ts3_coll_transp);
+    if      (strcmp(name,"PbarAbs"     ) == 0) SetRecursiveColorTransp(vd,kRed+2,fTransp);
+    else if (strcmp(name,"PbarAbsWedge") == 0) SetRecursiveColorTransp(vd,kRed+2,fTransp);
+    if      (strcmp(name,"Coll31"      ) == 0) SetRecursiveColorTransp(vd,kRed+2,ts3_coll_transp);
+    else if (strcmp(name,"Coll32"      ) == 0) SetRecursiveColorTransp(vd,kRed+2,ts3_coll_transp);
   }
 //-----------------------------------------------------------------------------
 // color TS5 collimator
@@ -393,14 +325,34 @@ void DrawMu2eGeometry::SetDefaultColorTransp() {
   TGeoVolume* ts5_vacuum = gm->GetVolume("TS5Vacuum");
   nd              = ts5_vacuum->GetNdaughters();
   
-  int ts5_coll_transp = 60;
+  int ts5_coll_transp = 30;
   for (int i=0; i<nd; i++) {
     TGeoVolume* vd = ts5_vacuum->GetNode(i)->GetVolume();
     name = vd->GetName();
     printf(" TS5Vacuum daughter: %s\n",name);
-    if      (strcmp(name,"Coll51") == 0) SetRecursiveColorTransp(vd,kRed+1,ts5_coll_transp);
-    else if (strcmp(name,"Coll52") == 0) SetRecursiveColorTransp(vd,kRed+3,ts5_coll_transp);
+    if      (strcmp(name,"Coll51") == 0) SetRecursiveColorTransp(vd,kRed+2,ts5_coll_transp);
+    else if (strcmp(name,"Coll52") == 0) SetRecursiveColorTransp(vd,kRed+2,ts5_coll_transp);
   }
+//-----------------------------------------------------------------------------
+// color things in the DS2
+//-----------------------------------------------------------------------------
+  // TGeoVolume* ds2_vacuum = gm->GetVolume("DS2Vacuum");
+  // nd              = ds2_vacuum->GetNdaughters();
+  
+  // int ds2_coll_transp = 30;
+  // for (int i=0; i<nd; i++) {
+  //   TGeoVolume* vd = ds2_vacuum->GetNode(i)->GetVolume();
+  //   name = vd->GetName();
+  //   printf(" DS2Vacuum daughter: %s\n",name);
+  //   if      (strcmp(name,"protonabs1") == 0) SetRecursiveColorTransp(vd,kRed+2 ,70);
+  //   else if (strcmp(name,"protonabs3") == 0) SetRecursiveColorTransp(vd,kBlue+1,70);
+  // }
+//-----------------------------------------------------------------------------
+// color things in the tracker and the calorimeter
+//-----------------------------------------------------------------------------
+  SetAbsorberColors();
+  SetTrackerColors();
+  SetCalorimeterColors();
 }
 
 //-----------------------------------------------------------------------------
@@ -436,12 +388,10 @@ void DrawMu2eGeometry::HideBuilding(int KeepOriginalColors) {
     "DSleftSideRing",
     "DSrightSideRing",
     "BearingBlock",
-				// calorimeter
-    "DiskFEB",
+					// tracker support
+    "NorthRailDS",
+    "SouthRailDS",
 
-    "VPSP",			// pieces behind the calorimeter
-    "IFB",
-    
     "stmMagnet",           // STM magnet and its support
     "stmDet",              // STM far behind
     "collimatorSS",	     // STM
@@ -452,6 +402,7 @@ void DrawMu2eGeometry::HideBuilding(int KeepOriginalColors) {
     "BearingBlock_DS2",
     "psAreaHatchLid",
     "remoteHandlingHatchLid",
+    
     ""
   };
 
@@ -471,23 +422,14 @@ void DrawMu2eGeometry::HideBuilding(int KeepOriginalColors) {
   for (int i=0; material[i] != ""; i++) {
     SetRecursiveVisibilityByMaterial(fTop,material[i].Data(),0);
   }
-
 //-----------------------------------------------------------------------------
 // hide last saddle boxes
 //-----------------------------------------------------------------------------
-  SetRecursiveVisibilityByName(fTop,"SaddleBox_107",0);
-  SetRecursiveVisibilityByName(fTop,"SaddleBox_108",0);
-  SetRecursiveVisibilityByName(fTop,"SaddleBox_109",0);
-  SetRecursiveVisibilityByName(fTop,"SaddleBox_110",0);
-  SetRecursiveVisibilityByName(fTop,"SaddleBox_111",0);
-  SetRecursiveVisibilityByName(fTop,"SaddleBox_112",0);
-  SetRecursiveVisibilityByName(fTop,"SaddleBox_113",0);
-  SetRecursiveVisibilityByName(fTop,"SaddleBox_114",0);
-  SetRecursiveVisibilityByName(fTop,"SaddleBox_115",0);
-  SetRecursiveVisibilityByName(fTop,"SaddleBox_116",0);
-  SetRecursiveVisibilityByName(fTop,"SaddleBox_117",0);
-  SetRecursiveVisibilityByName(fTop,"SaddleBox_118",0);
-  SetRecursiveVisibilityByName(fTop,"SaddleBox_119",0);
+  char saddle_box_name[50];
+  for (int i=79; i<120; i++) {
+    sprintf(saddle_box_name,"SaddleBox_%i",i);
+    SetRecursiveVisibilityByName(fTop,saddle_box_name,0);
+  }
 //-----------------------------------------------------------------------------
 // inside DS3Vacuum: hide calorimeter electronics, MBS
 //-----------------------------------------------------------------------------
@@ -495,7 +437,33 @@ void DrawMu2eGeometry::HideBuilding(int KeepOriginalColors) {
   SetRecursiveVisibilityByName(fDS3Vacuum,"IFB_"      ,0);
   SetRecursiveVisibilityByName(fDS3Vacuum,"protonabs4",0);
 
-  SetRecursiveVisibilityByName(fCalMother,"DiskFEB"    ,0);
+//-----------------------------------------------------------------------------
+// hide things inside the tracker
+//-----------------------------------------------------------------------------
+  SetRecursiveVisibilityByName(fTrkMother,"TrackerSupport"    ,0);
+//-----------------------------------------------------------------------------
+// hide things inside the calorimeter
+//-----------------------------------------------------------------------------
+  SetRecursiveVisibilityByName(fCalMother,"CalorimeterFEB"    ,0);
+  SetRecursiveVisibilityByName(fCalMother,"DiskInnerRing"     ,0);
+  SetRecursiveVisibilityByName(fCalMother,"DiskOuterRing"     ,0);
+  SetRecursiveVisibilityByName(fCalMother,"DiskCase"          ,0);
+  SetRecursiveVisibilityByName(fCalMother,"CrystalROLog"      ,0);
+  SetRecursiveVisibilityByName(fCalMother,"ElectronicsROLog"  ,0);
+  SetRecursiveVisibilityByName(fCalMother,"WrapLog"           ,0);
+  SetRecursiveVisibilityByName(fCalMother,"UnitLog"           ,0);
+  
+  SetRecursiveVisibilityByName(fDS3Vacuum,"crateBoxLog"       ,0);
+  SetRecursiveVisibilityByName(fDS3Vacuum,"crateSideLog"      ,0);
+  SetRecursiveVisibilityByName(fDS3Vacuum,"crateTopLog"       ,0);
+  SetRecursiveVisibilityByName(fDS3Vacuum,"crateBottomALog"   ,0);
+  SetRecursiveVisibilityByName(fDS3Vacuum,"crateBottomBLog"   ,0);
+  SetRecursiveVisibilityByName(fDS3Vacuum,"crateBottomBLog"   ,0);
+
+  SetRecursiveVisibilityByName(fDS3Vacuum,"boardCrateLog"       ,0);
+  SetRecursiveVisibilityByName(fDS3Vacuum,"radiatorBoardLog"    ,0);
+  SetRecursiveVisibilityByName(fDS3Vacuum,"activeStripBoardLog" ,0);
+  SetRecursiveVisibilityByName(fDS3Vacuum,"passiveStripBoardLog",0);
 
   SetRecursiveVisibility(fMbsMother,0);
 //-----------------------------------------------------------------------------
@@ -506,8 +474,35 @@ void DrawMu2eGeometry::HideBuilding(int KeepOriginalColors) {
 
 
 //-----------------------------------------------------------------------------
+void DrawMu2eGeometry::SetAbsorberColors() {
+  TGeoNode* abs_node = FindNodeByVolumeName(fDS2Vacuum,"protonabs1");
+				      
+  abs_node->GetVolume()->SetLineColor(804);
+  //  gm->GetVolume("protonabs3")->SetLineColor(808);
+
+  // gm->GetVolume("InternalNeutronAbsorber1")->SetLineColor(900); // default = 920
+  // gm->GetVolume("InternalNeutronAbsorber2")->SetLineColor(850); // default = 920
+}
+
+
+//-----------------------------------------------------------------------------
+// set crystal color to kOrange-2
+//-----------------------------------------------------------------------------
+void DrawMu2eGeometry::SetCalorimeterColors() {
+  SetRecursiveColorTranspByMaterial(fCalMother,"G4_CESIUM_IODIDE",kOrange-2  ,40);
+}
+
+//-----------------------------------------------------------------------------
+void DrawMu2eGeometry::DrawCalorimeterDisk() {
+  gm->GetVolume("DiskCalorimeter_0")->Draw("ogl");
+}
+
+//-----------------------------------------------------------------------------
 void DrawMu2eGeometry::DrawCalorimeter() {
+
   HideBuilding(0);
+
+  SetCalorimeterColors();
   gm->GetVolume("CalorimeterMother")->Draw("ogl");
 }
 
@@ -571,11 +566,10 @@ void DrawMu2eGeometry::DrawCRV() {
   gm->GetVolume("HallAir")->Draw("ogl");
 }
 
-//-----------------------------------------------------------------------------
-void DrawMu2eGeometry::DrawStrawTracker() {
 
-  HideBuilding(0);
-  
+
+//-----------------------------------------------------------------------------
+void DrawMu2eGeometry::SetTrackerColors() {
   static TString name[] = {
     "TTrackerSupport",
     "TTrackerEndRingUpstream",
@@ -586,17 +580,21 @@ void DrawMu2eGeometry::DrawStrawTracker() {
   SetRecursiveColorTranspByName(fTrkMother,"Plane"   ,kYellow   ,99);
   SetRecursiveColorTranspByName(fTrkMother,"Panel"   ,kYellow   ,99);
   
-  SetRecursiveColorTranspByName(fTrkMother,"TTrackerEndRingUpstream"    ,kGray,0);
-  SetRecursiveColorTranspByName(fTrkMother,"TTrackerSupport"    ,kGray,     0);
-  SetRecursiveColorTranspByName(fTrkMother,"TTrackerSupportBeam",kGray+2,0);
-  SetRecursiveColorTranspByName(fTrkMother,"TTrackerStrawGas"   ,kYellow  ,0);
-  gm->GetVolume("TrackerMother")->Draw("ogl");
+  SetRecursiveColorTranspByName(fTrkMother,"TTrackerEndRingUpstream",kGray  ,0);
+  SetRecursiveColorTranspByName(fTrkMother,"TTrackerSupport"        ,kGray  ,0);
+  SetRecursiveColorTranspByName(fTrkMother,"TTrackerSupportBeam"    ,kGray+2,0);
+  SetRecursiveColorTranspByName(fTrkMother,"TTrackerStrawGas"       ,kYellow,0);
 }
 
 //-----------------------------------------------------------------------------
-void DrawMu2eGeometry::DrawCalorimeterDisk() {
-  gm->GetVolume("DiskCalorimeter_0")->Draw("ogl");
+void DrawMu2eGeometry::DrawStrawTracker() {
+
+  HideBuilding(0);
+
+  SetTrackerColors();
+  gm->GetVolume("TrackerMother")->Draw("ogl");
 }
+
 
 //-----------------------------------------------------------------------------
 void DrawMu2eGeometry::DrawProductionTarget() {
@@ -663,7 +661,6 @@ void DrawMu2eGeometry::DrawDetectorSolenoid() {
 
   hall->Draw("ogl");
 }
-
 
 //-----------------------------------------------------------------------------
 // the names are this is for v4_0_6
@@ -732,13 +729,8 @@ void DrawMu2eGeometry::DrawDetectorSolenoidDev2() {
     }
   }
 
-  gm->GetVolume("protonabs1")->SetLineColor(804);
-  gm->GetVolume("protonabs3")->SetLineColor(808);
-
-  gm->GetVolume("InternalNeutronAbsorber1")->SetLineColor(900); // default = 920
-  gm->GetVolume("InternalNeutronAbsorber2")->SetLineColor(850); // default = 920
-
-
+  SetAbsorberColors();
+  
   //  gm->GetVolume("InternalNeutronAbsorber3a")->SetLineColor(860); // default = 920
 
   //  gm->GetVolume("Foil")->SetLineColor(20);
