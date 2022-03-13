@@ -17,7 +17,6 @@
 #else
 namespace mu2e {
   class ComboHitCollection;
-  // class StrawHitFlagCollection;
   class StrawDigiMCCollection;
   class KalRepPtrCollection;
   class Tracker;
@@ -45,7 +44,6 @@ public:
 protected:
 
   const mu2e::ComboHitCollection**             fComboHitColl;
-  // const mu2e::StrawHitFlagCollection**         fStrawHitFlagColl; //
   const mu2e::TimeClusterCollection**          fTimeClusterColl;  //
   const mu2e::StrawDigiMCCollection**          fStrawDigiMCColl; 
   const mu2e::KalRepPtrCollection**            fKalRepPtrColl;

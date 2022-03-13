@@ -22,6 +22,7 @@
 
 #include "Offline/RecoDataProducts/inc/ComboHit.hh"
 #include "Offline/RecoDataProducts/inc/HelixHit.hh"
+// #include "Offline/DataProducts/inc/XYZVec.hh"
 
 #include "Offline/TrkReco/inc/TrkPrintUtils.hh"
 
@@ -112,12 +113,12 @@ public:
   void   SetFlagBgrHitsModuleLabel(const char* Tag) { fFlagBgrHitsModuleLabel = Tag; }
   void   SetStrawDigiMCCollTag    (const char* Tag) { fStrawDigiMCCollTag     = Tag; }
 
-  double evalWeight(const mu2e::ComboHit*      Hit   ,
-		    CLHEP::Hep3Vector&         StrawDir ,
-		    CLHEP::Hep3Vector&         HelCenter, 
-		    double                     Radius   ,
+  double evalWeight(const mu2e::ComboHit*      Hit       ,
+		    CLHEP::Hep3Vector&         StrawDir  ,
+		    CLHEP::Hep3Vector&         HelCenter , 
+		    double                     Radius    ,
 		    int                        WeightMode,
-		    fhicl::ParameterSet const& Pset);
+		    fhicl::ParameterSet const& Pset      );
 
   void   evalHelixInfo(const mu2e::HelixSeed*  Helix,
 		       int&                    NLoops,

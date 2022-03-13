@@ -8,10 +8,9 @@
 
 #include "canvas/Utilities/InputTag.h"
 
-#include "Mu2eUtilities/inc/SimParticleTimeOffset.hh"
+#include "Offline/Mu2eUtilities/inc/SimParticleTimeOffset.hh"
 
 #include "Stntuple/obj/TStnInitDataBlock.hh"
-// #include "Stntuple/obj/TStepPointMCBlock.hh"
 
 class StntupleInitStepPointMCBlock : public TStnInitDataBlock {
 public:

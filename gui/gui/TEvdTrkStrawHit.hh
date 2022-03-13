@@ -13,7 +13,6 @@
 #include "TLine.h"
 
 #include "canvas/Persistency/Provenance/ProductID.h"
-
 #ifndef __CINT__
 #include "Offline/BTrkData/inc/TrkStrawHit.hh"
 #else

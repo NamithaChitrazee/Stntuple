@@ -20,7 +20,6 @@
 #else
 
 namespace mu2e {
-  class PtrStepPointMCVectorCollection;
   class SimParticlesWithHits;
   class StepPointMCCollection;
   class GenParticleCollection;

@@ -19,9 +19,6 @@
 
 #include "Offline/CosmicRayShieldGeom/inc/CRSScintillatorBar.hh"
 #include "Offline/DataProducts/inc/CRSScintillatorBarIndex.hh"
-//#include "CosmicRayShieldGeom/inc/CRSScintillatorShield.hh"
-//#include "RecoDataProducts/inc/CrvRecoPulse.hh"
-
 #include "Offline/RecoDataProducts/inc/CrvRecoPulse.hh" //
 
 

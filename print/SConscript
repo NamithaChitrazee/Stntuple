@@ -47,8 +47,8 @@ def local_build():
                         'mu2e_BTrkData',
                         'mu2e_Mu2eInterfaces',
                         
-                            'HepPDT',
-                        'HepPID',
+#                            'HepPDT',
+#                        'HepPID',
                         
                             babarlibs,
                         

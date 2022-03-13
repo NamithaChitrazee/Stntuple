@@ -9,7 +9,7 @@ BEGIN_PROLOG
   GEN_ID           @protect_ignore: "unknown"                            # ignore GEN_ID check
 END_PROLOG
 
-#include "Stntuple/fcl/stnmaker.fcl"
+#include "Stntuple/fcl/stntuple.fcl"
 
 process_name : S1G4MubeamStn
 

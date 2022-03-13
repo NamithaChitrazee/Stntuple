@@ -19,13 +19,11 @@
 #include "canvas/Persistency/Provenance/ProductID.h"
 #include "Offline/RecoDataProducts/inc/ComboHit.hh"
 #include "Offline/MCDataProducts/inc/StrawDigiMC.hh"
-// #include "Offline/MCDataProducts/inc/PtrStepPointMCVectorCollection.hh"
 
 #else
 namespace mu2e {
   class ComboHit;
   class StrawDigiMC;
-  //   class PtrStepPointMCVector;
 };
 #endif
 
@@ -45,7 +43,6 @@ protected:
 
   const mu2e::ComboHit*             fHit;
   const mu2e::StrawDigiMC*          fStrawDigiMC;
-  //  const mu2e::PtrStepPointMCVector* fListOfStepPointMCs;
 
   TEvdStraw*  fStraw;                 // pointer to the straw -  geometry
 

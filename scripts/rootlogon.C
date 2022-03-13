@@ -9,7 +9,7 @@
                                 // the line below tells rootcling where to look for 
 				// the include files
 
-  gInterpreter->AddIncludePath("./include");
+  gInterpreter->AddIncludePath("./build/include");
   gInterpreter->AddIncludePath(gSystem->Getenv("CLHEP_INC"));
   gInterpreter->AddIncludePath(Form("%s/include",gSystem->Getenv("ROOTSYS")));
 
@@ -64,12 +64,12 @@
 //     //     gSystem->Load("lib/libmu2e_Mu2eInterfaces.so");
 //     //     gSystem->Load("lib/libmu2e_CalorimeterGeom.so");
 // 
-      gSystem->Load("lib/libStntuple_base.so");
-      gSystem->Load("lib/libStntuple_obj.so");
-      gSystem->Load("lib/libStntuple_loop.so");
-      gSystem->Load("lib/libStntuple_alg.so");
-      gSystem->Load("lib/libStntuple_ana.so");
-      gSystem->Load("lib/libStntuple_val.so");
+      gSystem->Load("$MUSE_BUILD_DIR/Stntuple/lib/libStntuple_base.so");
+      gSystem->Load("$MUSE_BUILD_DIR/Stntuple/lib/libStntuple_obj.so");
+      gSystem->Load("$MUSE_BUILD_DIR/Stntuple/lib/libStntuple_loop.so");
+      gSystem->Load("$MUSE_BUILD_DIR/Stntuple/lib/libStntuple_alg.so");
+      gSystem->Load("$MUSE_BUILD_DIR/Stntuple/lib/libStntuple_ana.so");
+      gSystem->Load("$MUSE_BUILD_DIR/Stntuple/lib/libStntuple_val.so");
 
 //insert_user_libs_here    
 					// print overflows/underflows in the stat box

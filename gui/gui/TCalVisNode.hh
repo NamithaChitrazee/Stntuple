@@ -14,13 +14,11 @@
 
 #ifndef __CINT__
 
-//#include "CalorimeterGeom/inc/CaloSection.hh"
 #include "Offline/RecoDataProducts/inc/CaloCluster.hh"
 #include "Offline/RecoDataProducts/inc/CaloHit.hh"
 #include "Offline/RecoDataProducts/inc/TimeCluster.hh"
 #include "Offline/CalorimeterGeom/inc/Disk.hh"
 #include "Offline/CalorimeterGeom/inc/DiskCalorimeter.hh"
-
 
 #else
 

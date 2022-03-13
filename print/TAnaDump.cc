@@ -30,7 +30,6 @@
 #include "Offline/RecoDataProducts/inc/CrvCoincidenceCluster.hh"
 
 #include "Offline/RecoDataProducts/inc/StrawHit.hh"
-#include "Offline/RecoDataProducts/inc/StrawHitFlag.hh"
 #include "Offline/RecoDataProducts/inc/KalSeed.hh"
 #include "Offline/RecoDataProducts/inc/HelixSeed.hh"
 #include "Offline/RecoDataProducts/inc/ComboHit.hh"
@@ -144,11 +143,11 @@ void TAnaDump::evalHelixInfo(const mu2e::HelixSeed* Helix,
 
   
 
-double TAnaDump::evalWeight(const mu2e::ComboHit*      Hit   ,
-			    CLHEP::Hep3Vector&         StrawDir ,
-			    CLHEP::Hep3Vector&         HelCenter, 
-			    double                     Radius   ,
-			    int                        WeightMode,
+double TAnaDump::evalWeight(const mu2e::ComboHit* Hit   ,
+			    CLHEP::Hep3Vector&    StrawDir ,
+			    CLHEP::Hep3Vector&    HelCenter, 
+			    double                Radius   ,
+			    int                   WeightMode,
 			    fhicl::ParameterSet const& Pset) {//WeightMode = 1 is for XY chi2 , WeightMode = 0 is for Phi-z chi2
   
   // double    rs(2.5);   // straw radius, mm
@@ -1346,7 +1345,7 @@ void TAnaDump::printHelixHit(const mu2e::HelixHit*    HelHit, const mu2e::ComboH
   double   mc_mom(-1.), mc_pT(-1.), mc_pZ(0.);
   double   x(0), y(0), z(0), phi(0);
   
-  XYZVectorF shPos = HelHit->pos();
+  const XYZVectorF shPos = HelHit->pos();
   x      = shPos.x();
   y      = shPos.y();
   z      = shPos.z();    

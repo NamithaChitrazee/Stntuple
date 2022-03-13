@@ -3,29 +3,35 @@
 # BUILD_BASE doesn't replace the SATELLITE_RELEASE, need both
 #------------------------------------------------------------------------------
 base=$MUSE_WORK_DIR/build
-echo build_config_muse: 1: $0 : PWD=$PWD
 
-pkg=Stntuple
-pkg_dir=$MUSE_WORK_DIR/$pkg
+echo Stntuple::build_config_muse:000: MU2E_VERBOSE:.$MU2E_VERBOSE.
 
-# pkg=Stntuple
-echo build_config_muse: package=$pkg
+if [ ".$MU2E_VERBOSE" != ".0" ] ; then echo Stntuple::build_config_muse:001: $\0:$0 : \$PWD=$PWD  \$base=$base ; fi
+
+# pkg=`pwd | awk -F / '{print $(NF-1)}'`
+pkg=`echo $0 | awk -F / '{print $(NF-2)}'`
+
+        pkg_dir=$MUSE_WORK_DIR/$pkg
+pkg_include_dir=$base/include/$pkg
+
+echo Stntuple::build_config_muse: package=$pkg
 
 list_of_subpackages="alg ana base geom gui loop mod obj print val"
 #------------------------------------------------------------------------------
-# Stntuple and its subpackages
+# package and its subpackages
 #------------------------------------------------------------------------------
-if [ ! -d $base/include/$pkg ] ; then
-    echo pwd=$pwd ; creating $base/include/$pkg
-    mkdir -p $base/include/$pkg ;
+if [ ! -d $pkg_include_dir ] ; then
+    if [ $MU2E_VERBOSE != 0 ] ; then echo Stntuple::build_config_muse: pwd=$pwd ; creating $base/include/$pkg ; fi
+    mkdir -p $pkg_include_dir
 fi
 #------------------------------------------------------------------------------
 # make symbolic links local, as they are 
 #------------------------------------------------------------------------------
 for d in $list_of_subpackages ; do
     if [[ -e $base/include/$pkg ]] && [[ ! -e $base/include/$pkg/$d ]] ; then 
-	echo `pwd`/$0 : creating symbolic link to $base/include/$pkg/$d
-	ln -s $pkg_dir/$d/$d $base/include/$pkg/$d
+	cmd="ln -s ../../../$pkg/$d/$d $pkg_include_dir/$d"
+	if [ $MU2E_VERBOSE != 0 ] ; then echo `pwd`$0 : executing: $cmd ; fi
+	$cmd
     fi
 done
 #------------------------------------------------------------------------------
@@ -34,8 +40,8 @@ done
 # execution in Stntuple
 #------------------------------------------------------------------------------
 if [ ! -d $MUSE_WORK_DIR/site_scons ] ; then mkdir $MUSE_WORK_DIR/site_scons ; fi
-cp -u $pkg_dir/scripts/stntuple_site_init.py    $MUSE_WORK_DIR/site_scons/.
-cp -u $pkg_dir/scripts/stntuple_helper.py       $MUSE_WORK_DIR/site_scons/.
+cp -u $pkg_dir/scripts/stntuple_site_init.py       $MUSE_WORK_DIR/site_scons/.
+cp -u $pkg_dir/scripts/stntuple_helper.py          $MUSE_WORK_DIR/site_scons/.
 #------------------------------------------------------------------------------
 # .rootrc and rootlogon.C could be modified by the user, copy them just once
 #------------------------------------------------------------------------------

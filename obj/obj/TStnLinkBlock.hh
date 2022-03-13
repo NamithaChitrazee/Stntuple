@@ -7,7 +7,7 @@
 // 
 //-----------------------------------------------------------------------------
 #include "TArrayI.h"
-#include <Stntuple/obj/TStnDataBlock.hh>
+#include "Stntuple/obj/TStnDataBlock.hh"
 
 class TStnLinkBlock: public TStnDataBlock {
 public:

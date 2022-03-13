@@ -12,7 +12,7 @@ BEGIN_PROLOG
   TIME_MAPS           @protect_ignore: [ "compressDigiMCs:protonTimeMap", "compressDigiMCs:muonTimeMap" ]
 END_PROLOG
 
-#include "Stntuple/fcl/stnmaker.fcl"
+#include "Stntuple/fcl/stntuple.fcl"
 
 process_name : ReadStrawHitsStn
 

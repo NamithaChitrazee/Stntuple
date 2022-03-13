@@ -926,11 +926,11 @@ Int_t StntupleInitMu2eTrackBlock  (TStnDataBlock* Block, AbsEvent* AnEvent, Int_
 	iv   = cl->diskID();
 	vint = &track->fDisk[iv];
 	if (bc == 0) {
-	  printf(">>> ERROR: %s VANE calorimeter is not defined \n",oname);
+	  printf(">>> InitTrackBlock ERROR: %s calorimeter is not defined \n",oname);
 	  continue;
 	}
 
-	x1   = bc->geomUtil().mu2eToDisk(iv,cl->cog3Vector());//toSectionFrame(iv,cl->cog3Vector());
+	x1   = bc->geomUtil().mu2eToDisk(iv,cl->cog3Vector());
 
 	if ((track->fClosestCaloCluster == NULL) || (tcm->chi2() < best_chi2_match )) {
 //-----------------------------------------------------------------------------

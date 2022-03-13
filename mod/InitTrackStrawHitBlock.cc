@@ -5,14 +5,14 @@
 #include "Stntuple/mod/InitStntupleDataBlocks.hh"
 #include "Stntuple/obj/TTrackStrawHitBlock.hh"
 
-#include "RecoDataProducts/inc/StrawHit.hh"
+#include "Offline/RecoDataProducts/inc/StrawHit.hh"
 
-#include "RecoDataProducts/inc/KalRepPtrCollection.hh"
-#include "BTrkData/inc/TrkStrawHit.hh"
+#include "Offline/RecoDataProducts/inc/KalRepPtrCollection.hh"
+#include "Offline/BTrkData/inc/TrkStrawHit.hh"
 
-#include "MCDataProducts/inc/SimParticle.hh"
-#include "MCDataProducts/inc/StrawGasStep.hh"
-#include "MCDataProducts/inc/StrawDigiMC.hh"
+#include "Offline/MCDataProducts/inc/SimParticle.hh"
+#include "Offline/MCDataProducts/inc/StrawGasStep.hh"
+#include "Offline/MCDataProducts/inc/StrawDigiMC.hh"
 
 //-----------------------------------------------------------------------------
 Int_t StntupleInitMu2eTrackStrawHitBlock(TStnDataBlock* Block, AbsEvent* AnEvent, int Mode) 

@@ -11,7 +11,7 @@ BEGIN_PROLOG
 END_PROLOG
 
 
-#include "Stntuple/fcl/stnmaker.fcl"
+#include "Stntuple/fcl/stntuple.fcl"
 
 process_name : Display
 

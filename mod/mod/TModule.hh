@@ -1,14 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
 //
-
-// Mu2e includes.
-// #include "RecoDataProducts/inc/StrawHitCollection.hh"
-// #include "RecoDataProducts/inc/CaloCrystalHitCollection.hh"
-// #include "RecoDataProducts/inc/CaloHitCollection.hh"
-// #include "RecoDataProducts/inc/CaloClusterCollection.hh"
-// #include "MCDataProducts/inc/GenParticleCollection.hh"
-
 // Framework includes.
 #include "art/Framework/Core/EDFilter.h"
 #include "art/Framework/Core/ModuleMacros.h"

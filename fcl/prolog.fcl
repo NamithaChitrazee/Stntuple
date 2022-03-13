@@ -6,8 +6,8 @@ BEGIN_PROLOG
 # initialization template
 # 
 # they can be redefined 
-# see example of redefining GEN_ID in Stntuple/test/read_reco_stnmaker.fcl
-# to be included by Stntuple/fcl/stnmaker.fcl
+# see example of redefining GEN_ID in Stntuple/test/read_reco_stntuple.fcl
+# to be included by Stntuple/fcl/stntuple.fcl
 #------------------------------------------------------------------------------
 StntupleModuleFclDefaults : {
     interactiveMode : 0
@@ -84,8 +84,8 @@ StntupleMakerTemplate : { module_type:StntupleMaker
     simpMaxZ             : 11800.0                               # not used
 
     genpCollTag          : "compressDigiMCs"                     # save signal-only: "generate" 
-    genId                : @local::GEN_ID                        # defined in Stntuple/fcl/stnmaker.fcl, by default, store all simparticles
-    pdgId                : @local::PDG_ID                        # defined in Stntuple/fcl/stnmaker.fcl, by default, don't check PDG ID
+    genId                : @local::GEN_ID                        # defined in Stntuple/fcl/stntuple.fcl, by default, store all simparticles
+    pdgId                : @local::PDG_ID                        # defined in Stntuple/fcl/stntuple.fcl, by default, don't check PDG ID
     
     timeClusterBlockName : ["TimeClusterBlock"   ]               # to be renamed, *FIXME*
     timeClusterCollTag   : ["TimeClusterFinderDe"]               # 

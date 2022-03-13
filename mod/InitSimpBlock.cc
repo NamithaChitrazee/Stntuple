@@ -12,18 +12,18 @@
 #include "art/Framework/Principal/Selector.h"
 #include "canvas/Utilities/InputTag.h"
 
-#include "GeometryService/inc/GeometryService.hh"
-#include "GeometryService/inc/GeomHandle.hh"
-#include "GeometryService/inc/VirtualDetector.hh"
+#include "Offline/GeometryService/inc/GeometryService.hh"
+#include "Offline/GeometryService/inc/GeomHandle.hh"
+#include "Offline/GeometryService/inc/VirtualDetector.hh"
 
-#include "DataProducts/inc/VirtualDetectorId.hh"
+#include "Offline/DataProducts/inc/VirtualDetectorId.hh"
 
-#include "MCDataProducts/inc/GenParticle.hh"
-#include "MCDataProducts/inc/SimParticle.hh"
-#include "MCDataProducts/inc/StepPointMC.hh"
-#include "MCDataProducts/inc/StrawDigiMC.hh"
+#include "Offline/MCDataProducts/inc/GenParticle.hh"
+#include "Offline/MCDataProducts/inc/SimParticle.hh"
+#include "Offline/MCDataProducts/inc/StepPointMC.hh"
+#include "Offline/MCDataProducts/inc/StrawDigiMC.hh"
 
-#include "RecoDataProducts/inc/StrawHit.hh"
+#include "Offline/RecoDataProducts/inc/StrawHit.hh"
 
 #include "Stntuple/obj/TSimpBlock.hh"
 
@@ -196,7 +196,7 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
 //-----------------------------------------------------------------------------
 // by default, do not store low energy SimParticles not making hits in the tracker
 //-----------------------------------------------------------------------------
-      CLHEP::Hep3Vector sp = sim->startPosition();
+      const CLHEP::Hep3Vector sp = sim->startPosition();
 
       if (fMinSimpEnergy >= 0) {
 	if ((nhits == 0) and (energy < fMinSimpEnergy))       continue;

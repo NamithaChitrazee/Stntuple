@@ -31,7 +31,6 @@ END_PROLOG
 
 #include "JobConfig/reco/prolog.fcl"
 #include "TrkDiag/fcl/prolog.fcl"
-#include "Stntuple/fcl/prolog.fcl"
 
 #include "TrkPatRec/fcl/prolog_trigger.fcl"
 #include "CalPatRec/fcl/prolog_trigger.fcl"
@@ -41,14 +40,17 @@ END_PROLOG
 #include "TrkReco/fcl/prolog_trigger.fcl"
 #include "TrkFilters/fcl/prolog_trigger.fcl"
 #include "CaloFilters/fcl/prolog_trigger.fcl"
+
+#include "Stntuple/fcl/prolog.fcl"
+
 #------------------------------------------------------------------------------
 # templates: do not include prologs, 
 # define table and sequence templates combining information from multiples packages
 # services are initialized in Stntuple/fcl/stntuple_templates.fcl
 #------------------------------------------------------------------------------
-#include "JobConfig/common/trigger_templates.fcl"
-#include "JobConfig/common/su2020_mixing_templates.fcl"
-#include "JobConfig/common/su2020_templates.fcl"
+#include "Stntuple/fcl/trigger_templates.fcl"
+#include "Stntuple/fcl/mixing_templates.fcl"
+#include "Stntuple/fcl/production_templates.fcl"
 #include "Stntuple/fcl/stntuple_templates.fcl"
 
 Stntuple.outputs      : { @table::su2020.outputs   }

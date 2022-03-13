@@ -15,7 +15,7 @@ BEGIN_PROLOG
   TIME_MAPS     @protect_ignore: [ "compressDigiMCs:protonTimeMap", "compressDigiMCs:muonTimeMap", "compressDigiMCs:cosmicTimeMap" ]
 END_PROLOG
 
-#include "Stntuple/fcl/stnmaker.fcl"
+#include "Stntuple/fcl/stntuple.fcl"
 
 process_name                              : @local::PROCESS_NAME
 outputs                                   : { @table::Stntuple.outputs }  

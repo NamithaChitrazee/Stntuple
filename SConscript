@@ -4,7 +4,7 @@ import os, re, string, subprocess, sys, importlib
 Import('env')
 sys.path.append(os.getenv("MUSE_WORK_DIR")+'/site_scons')
 
-from SCons.Script import *
+# from SCons.Script import *
 #------------------------------------------------------------------------------
 # last two components of the path. Ex: /not/this/but/THIS/AND_THIS
 #                                      "AND_THIS" is usually "src"
