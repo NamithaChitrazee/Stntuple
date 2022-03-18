@@ -73,6 +73,8 @@ def local_build():
                  'canvas',
                  'cetlib',
                  'cetlib_except',
+				  'Trajectory',
+				  'General',
                  'xerces-c',
                  'boost_filesystem',
                  'boost_system'

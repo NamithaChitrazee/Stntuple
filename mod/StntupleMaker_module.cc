@@ -55,6 +55,7 @@
 #include "Stntuple/mod/InitSimpBlock.hh"
 #include "Stntuple/mod/InitStrawDataBlock.hh"
 #include "Stntuple/mod/InitStepPointMCBlock.hh"
+#include "Stntuple/mod/InitTrackBlock.hh"
 #include "Stntuple/mod/InitTriggerBlock.hh"
 #include "Stntuple/mod/InitTimeClusterBlock.hh"
 
@@ -161,6 +162,7 @@ protected:
   StntupleInitSimpBlock*       fInitSimpBlock;
   StntupleInitStrawDataBlock*  fInitStrawDataBlock;
   StntupleInitTriggerBlock*    fInitTriggerBlock;
+  TObjArray*                   fInitTrackBlock;
   TObjArray*                   fInitStepPointMCBlock;
   TObjArray*                   fInitTimeClusterBlock;
 //-----------------------------------------------------------------------------
@@ -180,11 +182,9 @@ protected:
   TNamed*                  fVersion;
 
   TNamedHandle*            fDarHandle;
-  //  TNamedHandle*            fKalDiagHandle;
   TNamedHandle*            fTimeOffsetMapsHandle;
 
   DoubletAmbigResolver*    fDar;
-  // KalDiag*                 fKalDiag;
   SimParticleTimeOffset*   fTimeOffsets;
 //------------------------------------------------------------------------------
 // function members
@@ -306,6 +306,9 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
   fInitStepPointMCBlock = new TObjArray();
   fInitStepPointMCBlock->SetOwner(kTRUE);
 
+  fInitTrackBlock       = new TObjArray();
+  fInitTrackBlock->SetOwner(kTRUE);
+
   fInitTimeClusterBlock = new TObjArray();
   fInitTimeClusterBlock->SetOwner(kTRUE);
 //-----------------------------------------------------------------------------
@@ -336,6 +339,7 @@ StntupleMaker::~StntupleMaker() {
   if (fInitSimpBlock      ) delete fInitSimpBlock;
 
   delete fInitStepPointMCBlock;
+  delete fInitTrackBlock;
 }
 
 
@@ -687,34 +691,48 @@ void StntupleMaker::beginJob() {
 
     for (int i=0; i<nblocks; i++) {
       const char* block_name = fTrackBlockName[i].data();
-      TStnDataBlock *track_data = AddDataBlock(block_name,
-					       "TStnTrackBlock",
-					       StntupleInitMu2eTrackBlock,
-					       buffer_size,
-					       split_mode,
-					       compression_level);
+      StntupleInitTrackBlock* init_block = new StntupleInitTrackBlock();
+      fInitTrackBlock->Add(init_block);
+
+      init_block->SetCaloClusterCollTag (fCaloClusterMaker);
+      init_block->SetComboHitCollTag    (fStrawHitCollTag );
+      init_block->SetKalSeedCollTag     (fTrackCollTag[i] );  // tracks saved as lists of KalSeeds
+      init_block->SetPIDProductCollTag  (fPidCollTag[i]   );
+      init_block->SetSpmcCollTag        (fSpmcCollTag[i]  );
+      init_block->SetStrawDigiMCCollTag (fStrawDigiMCCollTag);
+      init_block->SetTciCollTag         (fTciCollTag[i]);
+      init_block->SetTcmCollTag         (fTcmCollTag[i]);
+      init_block->SetTrkQualCollTag     (fTrkQualCollTag[i]);
+
+      init_block->SetDoubletAmbigResolver(fDar);
+
+      TStnDataBlock* db = AddDataBlock(block_name,
+				       "TStnTracklock",
+				       init_block,
+				       buffer_size,
+				       split_mode,
+				       compression_level);
 //-----------------------------------------------------------------------------
 // each track points back to its seed
 // if nshortblocks != 0, for each track we store an index to that tracks's seed
 //-----------------------------------------------------------------------------
-      if (track_data) {
-	track_data->AddCollName("mu2e::KalRepCollection"              ,fTrackCollTag[i].data()    );
-	track_data->AddCollName("mu2e::ComboHitCollection"            ,fStrawHitCollTag.data()    );
-	track_data->AddCollName("mu2e::StrawDigiMCCollection"         ,fStrawDigiMCCollTag.data() );
-	track_data->AddCollName("mu2e::TrkCaloIntersectCollection"    ,fTciCollTag [i].data()     );
-	track_data->AddCollName("mu2e::CaloClusterCollection"         ,fCaloClusterMaker.data()   );
-	track_data->AddCollName("mu2e::TrackClusterMatchCollection"   ,fTcmCollTag[i].data()      );
-	track_data->AddCollName("mu2e::TrkQualCollection"             ,fTrkQualCollTag[i].data()  );
-	track_data->AddCollName("mu2e::PIDProductCollection"          ,fPidCollTag[i].data()      );
-	track_data->AddCollName("mu2e::StepPointMCCollection"         ,fVDHitsCollTag.data()      );
-	track_data->AddCollName("DarHandle"                           ,GetName()                  ,"DarHandle"    );
-	//	track_data->AddCollName("KalDiagHandle"                       ,GetName()                  ,"KalDiagHandle");
-	if (fTrackTsBlockName.size() > 0) {
-	  track_data->AddCollName("TrackTsBlockName"                    ,fTrackTsBlockName[i].data());
-	  track_data->AddCollName("TrackTsCollTag"                      ,fTrackTsCollTag  [i].data());
-	}
+      if (db) {
+	// track_data->AddCollName("mu2e::CaloClusterCollection"         ,fCaloClusterMaker.data()   );
+	// track_data->AddCollName("mu2e::KalRepCollection"              ,fTrackCollTag[i].data()    );
+	// track_data->AddCollName("mu2e::ComboHitCollection"            ,fStrawHitCollTag.data()    );
+	// track_data->AddCollName("mu2e::StrawDigiMCCollection"         ,fStrawDigiMCCollTag.data() );
+	// track_data->AddCollName("mu2e::TrkCaloIntersectCollection"    ,fTciCollTag [i].data()     );
+	// track_data->AddCollName("mu2e::TrackClusterMatchCollection"   ,fTcmCollTag[i].data()      );
+	// track_data->AddCollName("mu2e::TrkQualCollection"             ,fTrkQualCollTag[i].data()  );
+	// track_data->AddCollName("mu2e::PIDProductCollection"          ,fPidCollTag[i].data()      );
+	// track_data->AddCollName("mu2e::StepPointMCCollection"         ,fVDHitsCollTag.data()      );
+	// track_data->AddCollName("DarHandle"                           ,GetName()                  ,"DarHandle"    );
+	// track_data->AddCollName("KalDiagHandle"                       ,GetName()                  ,"KalDiagHandle");
 
-	SetResolveLinksMethod(block_name,StntupleInitMu2eTrackBlockLinks);
+	if (fTrackTsBlockName.size() > 0) {
+	  init_block->SetTrackTsBlockName(fTrackTsBlockName[i].data());
+	  init_block->SetTrackTsCollTag  (fTrackTsCollTag  [i]);
+	}
       }
     }
   }
