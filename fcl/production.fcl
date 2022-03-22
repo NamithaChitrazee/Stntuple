@@ -23,7 +23,7 @@ END_PROLOG
 #include "fcl/standardProducers.fcl"
 #include "fcl/standardServices.fcl"
 
-#include "JobConfig/reco/prolog.fcl"
+# #include "JobConfig/reco/prolog.fcl"
 #include "TrkDiag/fcl/prolog.fcl"
 
 #include "TrkPatRec/fcl/prolog_trigger.fcl"
@@ -36,7 +36,7 @@ END_PROLOG
 #include "CaloFilters/fcl/prolog_trigger.fcl"
 
 #include "Stntuple/fcl/trigger_templates.fcl"
-#include "Stntuple/fcl/mixing_templates.fcl"
+# #include "Stntuple/fcl/mixing_templates.fcl"
 #include "Stntuple/fcl/production_templates.fcl"
 
 outputs      : { @table::production.outputs   }

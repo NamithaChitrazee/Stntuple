@@ -94,7 +94,7 @@ mu2e.physics.g4s4CommonBase: {
     producers: {
 	g4run: @nil
 	
-	CaloShowerStepFromStepPt: @local::CaloShowerStepFromStepPt
+#	CaloShowerStepFromStepPt: @local::CaloShowerStepFromStepPt
 
 	CaloShowerCrystalSteps: {
 	    module_type: CaloShowerUpdater
@@ -129,7 +129,10 @@ mu2e.physics.g4s4CommonBase: {
     }
     
     filters: {
-	g4status: { @table::g4status } # defined in Filters/fcl/prolog.fcl
+	g4status: { module_type: FilterStatusG4
+	    input            : "g4run"
+	    maxAcceptedStatus: 9  #  status 10 and above means StepPointMCCollection may have non-dereferencable pointers
+	}
 
 	detectorFilter: {
 	    module_type     : FilterG4Out
@@ -220,7 +223,11 @@ Primary: {
 #    }
 
     filters : {
-	g4status: { @table::g4status } 
+	g4status: { module_type: FilterStatusG4
+	    input            : "g4run"
+	    maxAcceptedStatus: 9  #  status 10 and above means StepPointMCCollection may have non-dereferencable pointers
+	}
+
 
 	# filter gen particle by mom -- default is no filtering
 	genFilter : { module_type : GenParticleMomFilter
@@ -230,7 +237,7 @@ Primary: {
 	}
 
 	# digi filtering for Primary selection.
-	StrawDigiMCFilter : { @table::StrawDigiMCFilter }              # Filters/fcl/prolog.fcl
+	StrawDigiMCFilter : { } # @table::StrawDigiMCFilter }              # Filters/fcl/prolog.fcl
 
 	# shower filter for calorimeter selection
 	CaloFilter : { module_type : CaloShowerSimFilter }

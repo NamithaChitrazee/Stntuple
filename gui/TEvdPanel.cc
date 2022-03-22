@@ -18,18 +18,18 @@
 #include "art/Framework/Principal/Event.h"
 #include "art/Framework/Principal/Handle.h"
 
-#include "GeometryService/inc/GeometryService.hh"
-#include "GeometryService/inc/GeomHandle.hh"
+#include "Offline/GeometryService/inc/GeometryService.hh"
+#include "Offline/GeometryService/inc/GeomHandle.hh"
 
 // #include "TrackerGeom/inc/Layer.hh"
-#include "TrackerGeom/inc/Straw.hh"
+#include "Offline/TrackerGeom/inc/Straw.hh"
 // #include "TrackerGeom/inc/Sector.hh"
 
 #include "Stntuple/gui/TEvdPanel.hh"
 #include "Stntuple/gui/TEvdStraw.hh"
 #include "Stntuple/gui/TStnVisManager.hh"
 
-#include "TrackerGeom/inc/Panel.hh"
+#include "Offline/TrackerGeom/inc/Panel.hh"
 //#include "TTrackerGeom/inc/ZLayer.hh"
 
 ClassImp(stntuple::TEvdPanel)

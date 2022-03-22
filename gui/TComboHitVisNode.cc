@@ -15,12 +15,12 @@
 // #include "art/Framework/Principal/Event.h"
 // #include "art/Framework/Principal/Handle.h"
 
-#include "GeometryService/inc/GeometryService.hh"
-#include "GeometryService/inc/GeomHandle.hh"
-#include "ConditionsService/inc/ConditionsHandle.hh"
-#include "TrackerConditions/inc/StrawResponse.hh"
+#include "Offline/GeometryService/inc/GeometryService.hh"
+#include "Offline/GeometryService/inc/GeomHandle.hh"
+#include "Offline/ConditionsService/inc/ConditionsHandle.hh"
+#include "Offline/TrackerConditions/inc/StrawResponse.hh"
 
-#include "RecoDataProducts/inc/StrawHitIndex.hh"
+#include "Offline/RecoDataProducts/inc/StrawHitIndex.hh"
 
 #include "Stntuple/gui/TComboHitVisNode.hh"
 #include "Stntuple/gui/TEvdComboHit.hh"

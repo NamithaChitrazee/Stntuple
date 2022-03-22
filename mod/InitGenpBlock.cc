@@ -12,8 +12,8 @@
 #include "art/Framework/Principal/Selector.h"
 #include "canvas/Utilities/InputTag.h"
 
-#include "MCDataProducts/inc/GenParticle.hh"
-#include "MCDataProducts/inc/EventWeight.hh"
+#include "Offline/MCDataProducts/inc/GenParticle.hh"
+#include "Offline/MCDataProducts/inc/EventWeight.hh"
 
 #include "Stntuple/obj/TGenpBlock.hh"
 #include "Stntuple/mod/InitGenpBlock.hh"

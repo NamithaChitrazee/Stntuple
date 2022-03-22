@@ -18,15 +18,15 @@
 #include "art/Framework/Principal/Event.h"
 #include "art/Framework/Principal/Handle.h"
 
-#include "GeometryService/inc/GeometryService.hh"
-#include "GeometryService/inc/GeomHandle.hh"
+#include "Offline/GeometryService/inc/GeometryService.hh"
+#include "Offline/GeometryService/inc/GeomHandle.hh"
 
 #include "Stntuple/gui/TEvdStation.hh"
 #include "Stntuple/gui/TEvdPlane.hh"
 #include "Stntuple/gui/TEvdPanel.hh"
 #include "Stntuple/gui/TStnVisManager.hh"
 
-#include "TrackerGeom/inc/Plane.hh"
+#include "Offline/TrackerGeom/inc/Plane.hh"
 
 
 ClassImp(stntuple::TEvdPlane)

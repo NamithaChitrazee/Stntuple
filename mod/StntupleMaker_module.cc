@@ -29,8 +29,8 @@
 #include "TSystem.h"
 
 // conditions
-#include "ConditionsService/inc/ConditionsHandle.hh"
-#include "ConditionsService/inc/AcceleratorParams.hh"
+#include "Offline/ConditionsService/inc/ConditionsHandle.hh"
+#include "Offline/ConditionsService/inc/AcceleratorParams.hh"
 
 #include "Stntuple/obj/TStnNode.hh"
 #include "Stntuple/obj/TStnErrorLogger.hh"
@@ -65,11 +65,11 @@
 #include "Stntuple/base/TNamedHandle.hh"
 #include "Stntuple/alg/TStntuple.hh"
 
-#include "Mu2eUtilities/inc/SimParticleTimeOffset.hh"
-#include "TrkReco/inc/DoubletAmbigResolver.hh"
+#include "Offline/Mu2eUtilities/inc/SimParticleTimeOffset.hh"
+#include "Offline/TrkReco/inc/DoubletAmbigResolver.hh"
+#include "Offline/MCDataProducts/inc/GenId.hh"
+#include "Offline/RecoDataProducts/inc/HelixSeed.hh"
 // #include "TrkDiag/inc/KalDiag.hh"
-#include "MCDataProducts/inc/GenId.hh"
-#include "RecoDataProducts/inc/HelixSeed.hh"
 
 using namespace std; 
 

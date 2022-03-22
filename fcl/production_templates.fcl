@@ -62,22 +62,22 @@ production : {
 	@table::EventGenerator.producers  # defined in EventGenerator
 	@table::CommonMC.producers        # FIXME
 	@table::Mu2eG4.producers          # defined in Mu2eG4/fcl
-	@table::CaloDigiMC.producers      # defined in CaloDigiMC
-	@table::CaloDigiMC.producersMC    # defined in CaloDigiMC
-	@table::CaloCluster.producersMC   # defined in CaloCluster
+	@table::CaloMC.producers          # defined in CaloMC
+#	@table::CaloMC.producersMC    # defined in CaloDigiMC
+#	@table::CaloCluster.producersMC   # defined in CaloCluster
 	@table::CrvDAQPackage.producers   # 
 	@table::TrackerMC.producers       # defined in TrackerMC
 
-	compressDigiMCs : { @table::DigiCompression.Primary       # defined in Filters/fcl/
-	    crvDigiMCTag         : ""
-	}
+#	compressDigiMCs : { @table::DigiCompression.Primary       # defined in Filters/fcl/#
+#	    crvDigiMCTag         : ""
+#	}
                                                                   # need these tags for mixing
-	makeSGSPrimary   : { @table::makeSGS }
+#	makeSGSPrimary   : { @table::makeSGS }
 	                                                          # in mixing mode, still filter on primary
-	makeSDPrimary    : { @table::makeSD
-	    StrawGasStepModule : makeSGSPrimary
-	    TimeOffsets        : [ @sequence::CommonMC.TimeMapsPrimary ]
-	}
+#	makeSDPrimary    : { @table::makeSD
+#	    StrawGasStepModule : makeSGSPrimary
+#	    TimeOffsets        : [ @sequence::CommonMC.TimeMapsPrimary ]
+#	}
 
 	generate  : { @table::EventGenerator.producers.egun }      # to avoid unnecessary diagnostics
 	genCounter: { module_type: GenEventCounter }
@@ -88,15 +88,15 @@ production : {
 	    halfWidth : 1.0
 	}
 
-	SeparateCaloShowerSteps : { @table::SeparateCaloShowerSteps } # defined in Filters
+#	SeparateCaloShowerSteps : { @table::SeparateCaloShowerSteps } # defined in Filters
 #------------------------------------------------------------------------------
 # reco producers, compressDigiMCs defined there 
 #------------------------------------------------------------------------------
 
-	@table::Reconstruction.producers   # inherited from JobConfig/reco/prolog.fcl
+#	@table::Reconstruction.producers   # inherited from JobConfig/reco/prolog.fcl
 
 	@table::ParticleID.producers
-	@table::TrackCaloMatching.producers
+#	@table::TrackCaloMatching.producers
 
 	@table::CommonTrk.producers
 
@@ -157,7 +157,10 @@ production : {
     filters : {
 	@table::Trigger.filters
 
-	g4status       : { @table::g4status }   # in Filters/fcl/prolog.fcl
+	g4status: { module_type: FilterStatusG4
+	    input            : "g4run"
+	    maxAcceptedStatus: 9  #  status 10 and above means StepPointMCCollection may have non-dereferencable pointers
+	}
 
 	detectorFilter : { module_type: FilterG4Out
 	    mainHitInputs   : [ "g4run:tracker" ]
@@ -178,8 +181,8 @@ production : {
 
 	@table::CalPatRec.filters
 
-	SimParticleFilter : { @table::SimParticleFilter }              # Filters/fcl/prolog.fcl
-	StrawDigiMCFilter : { @table::StrawDigiMCFilter }              # Filters/fcl/prolog.fcl
+#	SimParticleFilter : { @table::SimParticleFilter }              # Filters/fcl/prolog.fcl
+#	StrawDigiMCFilter : { @table::StrawDigiMCFilter }              # Filters/fcl/prolog.fcl
 
 	CaloShowerSimFilter : { module_type :CaloShowerSimFilter
 	    particleTypes     : [ 22, 11, -11, 13, -13, 2212, -2212  ] # save photons, electrons, muons, and protons
@@ -250,8 +253,8 @@ production.outputs: {
 	SelectEvents  : [ @sequence::TRIGGER_PATHS ]
 	outputCommands: [ "keep *_*_*_*" ]
     }
-    FullOutput : { @table::Mixing.Output  outputCommands : [ "keep *_*_*_*"                  ] }
-    DetOutput  : { @table::Mixing.Output  outputCommands : [ @sequence::production.mixing_output ] }
+#    FullOutput : { @table::Mixing.Output  outputCommands : [ "keep *_*_*_*"                  ] }
+#    DetOutput  : { @table::Mixing.Output  outputCommands : [ @sequence::production.mixing_output ] }
 }
 
 #------------------------------------------------------------------------------
@@ -266,22 +269,23 @@ production.gen_g4_pbi_detFilter: [ generate, genCounter, g4run, protonBunchInten
 production.pbi_ewm             : [ protonBunchIntensity, EWMProducer ]
 
 production.digis               : [ @sequence::TrackerMC.DigiSim, StrawDigiMCFilter, 
-			       @sequence::CaloDigiMC.DigiSim, 
-			       @sequence::CrvDAQPackage.CrvDAQSequence 
-			       # compressDigiMCs 
-			      ]
+				   ## FIXME @sequence::CaloDigiMC.DigiSim, 
+				   @sequence::CrvDAQPackage.CrvDAQSequence 
+				   # compressDigiMCs 
+				  ]
 
 production.digis_no_filter     : [ @sequence::TrackerMC.DigiSim, 
 			       # StrawDigiMCFilter, 
-			       @sequence::CaloDigiMC.DigiSim, 
+				   ## FIXME @sequence::CaloDigiMC.DigiSim, 
 			       @sequence::CrvDAQPackage.CrvDAQSequence
 			       # compressDigiMCs 
 			      ]
 
-production.digisCaloFilter     : [ @sequence::CaloDigiMC.DigiSim, CaloShowerSimFilter,
-			       @sequence::TrackerMC.DigiSim, 
-			       @sequence::CrvDAQPackage.CrvDAQSequence 
-			       # compressDigiMCs 
+production.digisCaloFilter     : [ # FIXME @sequence::CaloDigiMC.DigiSim, 
+				   CaloShowerSimFilter,
+				   @sequence::TrackerMC.DigiSim, 
+				   @sequence::CrvDAQPackage.CrvDAQSequence 
+				   # compressDigiMCs 
 			      ]
 
 # calorimeter reconstruction
@@ -377,17 +381,17 @@ production.trk_reco_umu : [
 
 # tracks reconstructions: positive and negative charges separate
 # use sequecnes defined in JobConfig/reco/prolog.fcl
-production.trk_reco_sep  : [ @sequence::Reconstruction.DeSequence,
-			 @sequence::Reconstruction.UeSequence,
-			 @sequence::Reconstruction.DmuSequence,
-			 @sequence::Reconstruction.UmuSequence
-		       ]
+production.trk_reco_sep  : [ # FIXME @sequence::Reconstruction.DeSequence,
+			     # @sequence::Reconstruction.UeSequence,
+			     # @sequence::Reconstruction.DmuSequence,
+			     # @sequence::Reconstruction.UmuSequence
+			    ]
 
 # MC compression at the end of reco, assume the pulse punch intensity to be present
 production.reco_compression : [ FindMCPrimary,        # find the primary particle
-			    SelectRecoMC,         # identify the MC information we want to keep
-			    compressRecoMCs       # compress
-			  ]
+				SelectRecoMC,         # identify the MC information we want to keep
+				compressRecoMCs       # compress
+			       ]
 
 # trigger paths considered, include into digi datasets
 production.triggers         : [
@@ -522,8 +526,8 @@ services.DbService.verbose                                   : 0
 services.ProditionsService.strawElectronics.useDb            : false
 services.ProditionsService.strawElectronics.verbose          : 0
 
-services.ProditionsService.strawElectronics.flashEnd         : @erase
-services.ProditionsService.strawElectronics.flashEnd         : @local::BLIND_TIME
+# services.ProditionsService.strawElectronics.flashEnd         : @erase
+# services.ProditionsService.strawElectronics.flashEnd         : @local::BLIND_TIME
 
 physics.producers.makeSH.minimumTime                         : @erase
 physics.producers.makeSH.minimumTime                         : @local::BLIND_TIME

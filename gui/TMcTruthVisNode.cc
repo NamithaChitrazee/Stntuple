@@ -21,12 +21,12 @@
 #include "Stntuple/gui/TMcTruthVisNode.hh"
 #include "Stntuple/gui/TStnVisManager.hh"
 
-#include "Mu2eUtilities/inc/SortedStepPoints.hh"
-#include "Mu2eUtilities/inc/TrackTool.hh"
+#include "Offline/Mu2eUtilities/inc/SortedStepPoints.hh"
+#include "Offline/Mu2eUtilities/inc/TrackTool.hh"
 
-#include "MCDataProducts/inc/GenParticle.hh"
-#include "MCDataProducts/inc/SimParticle.hh"
-#include "MCDataProducts/inc/StepPointMC.hh"
+#include "Offline/MCDataProducts/inc/GenParticle.hh"
+#include "Offline/MCDataProducts/inc/SimParticle.hh"
+#include "Offline/MCDataProducts/inc/StepPointMC.hh"
 
 #include <vector>
 
