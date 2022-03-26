@@ -22,7 +22,7 @@ using namespace std;
 
 //-----------------------------------------------------------------------------
 TModule::TModule(fhicl::ParameterSet const& PSet, const char* Name):
-  art::EDFilter(PSet),
+  art::EDAnalyzer(PSet),
   TNamed(Name,Name)
 {
 
@@ -71,12 +71,11 @@ void TModule::beginJob() {
 
 
 //-----------------------------------------------------------------------------
-bool TModule::beginRun(art::Run &  Rn) {
-  return true;
+void TModule::beginRun(const art::Run &  Rn) {
 };
 
 //-----------------------------------------------------------------------------
-bool TModule::filter  (art::Event& Evt) {
+void TModule::analyze  (const art::Event& Evt) {
   if (fInteractiveMode != 0) {
     fDump->SetEvent(Evt);
     fAnaRint->SetInteractiveMode(fInteractiveMode);
@@ -85,7 +84,6 @@ bool TModule::filter  (art::Event& Evt) {
 
     fAnaRint->GetInteractiveMode(fInteractiveMode);
   }
-  return true;
 };
 
 //-----------------------------------------------------------------------------

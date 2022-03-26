@@ -41,8 +41,7 @@ FillStntuple::~FillStntuple() {
 }
 
 //------------------------------------------------------------------------------
-bool FillStntuple::beginRun(art::Run &  aRun) 
-{
+void FillStntuple::beginRun(const art::Run &  aRun) {
 
   THistModule::beforeBeginRun(aRun);
 
@@ -57,22 +56,17 @@ bool FillStntuple::beginRun(art::Run &  aRun)
   }
 
   THistModule::afterBeginRun(aRun);
-
-  return true;
 }
 
 //------------------------------------------------------------------------------
-bool FillStntuple::endRun(art::Run &  Rn) {
+void FillStntuple::endRun(const art::Run &  Rn) {
 
   THistModule::beforeEndRun(Rn);
   THistModule::afterEndRun (Rn);
-
-  return true;
 }
 
 //------------------------------------------------------------------------------
-Int_t FillStntuple::ProcessNewRun(art::Run*  Rn) 
-{
+  Int_t FillStntuple::ProcessNewRun(const art::Run*  Rn)  {
   // create subdirectory with the name run_xxxxxxxx to store database-type
   // constants for this run
 
@@ -111,7 +105,7 @@ Int_t FillStntuple::ProcessNewRun(art::Run*  Rn)
 }
 
 //------------------------------------------------------------------------------
-bool FillStntuple::filter(AbsEvent& anEvent) {
+void FillStntuple::analyze(const AbsEvent& anEvent) {
   // it only fills the tree
 
   TTree* tree;
@@ -131,7 +125,7 @@ bool FillStntuple::filter(AbsEvent& anEvent) {
   unsigned long rtime = (unsigned long)(gSystem->Now());
   while(TStnNode* node = (TStnNode*) it.Next()) {
     TStnDataBlock* block = node->GetDataBlock();
-    rc = block->ResolveLinks(&anEvent,0);
+    rc = block->ResolveLinks((AbsEvent*) &anEvent,0);
     if (rc != 0) {
 					// pass all the messages/warnings
 					// to the error logger
@@ -247,8 +241,6 @@ bool FillStntuple::filter(AbsEvent& anEvent) {
 
   THistModule::afterEvent(anEvent);
 
-
-  return true;
 }
 
 } // end namespace mu2e

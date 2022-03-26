@@ -156,19 +156,19 @@ int THistModule::afterBeginJob() {
 
 
 //______________________________________________________________________________
-int THistModule::beforeBeginRun(art::Run& aRun) {
+int THistModule::beforeBeginRun(const art::Run& aRun) {
   return 0;
 }
     
 
 //______________________________________________________________________________
-int THistModule::afterBeginRun(art::Run& aRun) {
+int THistModule::afterBeginRun(const art::Run& aRun) {
   return 0;
 }
     
 
 //______________________________________________________________________________
-int THistModule::beforeEvent(AbsEvent& event) {
+int THistModule::beforeEvent(const AbsEvent& event) {
   if (fgFile) {
 					// don't forget to change the directory
 					// before starting filling histograms
@@ -205,7 +205,7 @@ int THistModule::beforeEvent(AbsEvent& event) {
     
 
 //______________________________________________________________________________
-int THistModule::afterEvent(AbsEvent& event) {
+int THistModule::afterEvent(const AbsEvent& event) {
   // need to cd() back 
 
   char par[200] ;
@@ -227,13 +227,13 @@ int THistModule::afterEvent(AbsEvent& event) {
     
 
 //______________________________________________________________________________
-int THistModule::beforeEndRun(art::Run& aRun) {
+int THistModule::beforeEndRun(const art::Run& aRun) {
   return 0;
 }
     
 
 //______________________________________________________________________________
-int THistModule::afterEndRun(art::Run& aRun) {
+int THistModule::afterEndRun(const art::Run& aRun) {
   return 0;
 }
     

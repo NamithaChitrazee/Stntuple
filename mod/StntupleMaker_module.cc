@@ -205,11 +205,11 @@ public:
 //-----------------------------------------------------------------------------
 // overloaded virtual functions of EDFilter
 //-----------------------------------------------------------------------------
-  virtual bool beginRun(art::Run& ARun);
-  virtual bool endRun  (art::Run& ARun);
+  virtual void beginRun(const art::Run& ARun);
+  virtual void endRun  (const art::Run& ARun);
   virtual void beginJob();
   virtual void endJob  ();
-  virtual bool filter  (AbsEvent& event);
+  virtual void analyze (const AbsEvent& event);
 
   //  ClassDef(StntupleMaker,0)
 };
@@ -344,7 +344,7 @@ StntupleMaker::~StntupleMaker() {
 
 
 //------------------------------------------------------------------------------
-bool StntupleMaker::beginRun(art::Run& aRun) {
+void StntupleMaker::beginRun(const art::Run& aRun) {
 
   static int first_begin_run = 1;
 
@@ -376,15 +376,12 @@ bool StntupleMaker::beginRun(art::Run& aRun) {
   }
 
   THistModule::afterBeginRun(aRun);
-
-  return 1;
 }
 
 //------------------------------------------------------------------------------
-bool StntupleMaker::endRun(art::Run& aRun ) {
+void StntupleMaker::endRun(const art::Run& aRun ) {
   THistModule::beforeEndRun(aRun);
   THistModule::afterEndRun (aRun);
-  return 1;
 }
 
 
@@ -754,7 +751,7 @@ void StntupleMaker::beginJob() {
 }
 
 //_____________________________________________________________________________
-bool StntupleMaker::filter(AbsEvent& AnEvent) {
+void StntupleMaker::analyze(const AbsEvent& AnEvent) {
 
   // when execution comes here al the registered data blocks are already
   // initialized with the event data. Left: variables in the data blocks
@@ -777,15 +774,13 @@ bool StntupleMaker::filter(AbsEvent& AnEvent) {
 //   logger->Disconnect("Report(Int_t,const char*)",
 // 		     this,"LogError(Int_t,const char*)");
 
-  bool passed(1);
+  // bool passed(1);
 
-  if (fMinNHelices > 0) {
-    auto hH = AnEvent.getValidHandle<mu2e::HelixSeedCollection>(fCutHelixSeedCollTag);
-    int  nh = hH->size();
-    passed  = (nh >= fMinNHelices);
-  }
-
-  return passed;
+  // if (fMinNHelices > 0) {
+  //   auto hH = AnEvent.getValidHandle<mu2e::HelixSeedCollection>(fCutHelixSeedCollTag);
+  //   int  nh = hH->size();
+  //   passed  = (nh >= fMinNHelices);
+  // }
 }
 
 

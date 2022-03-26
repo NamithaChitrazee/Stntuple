@@ -92,12 +92,12 @@ public:
 
   virtual int beforeBeginJob();
   virtual int afterBeginJob ();
-  virtual int beforeBeginRun(art::Run& aRun );
-  virtual int afterBeginRun (art::Run& aRun );
-  virtual int beforeEvent   (AbsEvent& event);
-  virtual int afterEvent    (AbsEvent& event);
-  virtual int beforeEndRun  (art::Run& aRun );
-  virtual int afterEndRun   (art::Run& aRun );
+  virtual int beforeBeginRun(const art::Run& aRun );
+  virtual int afterBeginRun (const art::Run& aRun );
+  virtual int beforeEvent   (const AbsEvent& event);
+  virtual int afterEvent    (const AbsEvent& event);
+  virtual int beforeEndRun  (const art::Run& aRun );
+  virtual int afterEndRun   (const art::Run& aRun );
   virtual int beforeEndJob  ();
   virtual int afterEndJob   ();
 

@@ -108,7 +108,7 @@ public:
   void   AddObject      (const char* Name, void* Object);
   void*  FindNamedObject(const char* Name);
 
-  void   SetEvent(art::Event& Evt) { fEvent = &Evt; }
+  void   SetEvent(const art::Event& Evt) { fEvent = &Evt; }
 
   void   SetFlagBgrHitsModuleLabel(const char* Tag) { fFlagBgrHitsModuleLabel = Tag; }
   void   SetStrawDigiMCCollTag    (const char* Tag) { fStrawDigiMCCollTag     = Tag; }

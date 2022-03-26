@@ -2,7 +2,7 @@
 //
 //
 // Framework includes.
-#include "art/Framework/Core/EDFilter.h"
+#include "art/Framework/Core/EDAnalyzer.h"
 #include "art/Framework/Core/ModuleMacros.h"
 #include "art/Framework/Principal/Event.h"
 #include "art/Framework/Principal/Run.h"
@@ -24,7 +24,7 @@
 class TAnaRint;
 class TAnaDump;
 
-class TModule : public art::EDFilter, public TNamed {
+class TModule : public art::EDAnalyzer, public TNamed {
 
   enum { kNDebugBits = 100 };
 
@@ -48,7 +48,7 @@ public:
   TAnaRint*           fAnaRint;
   TAnaDump*           fDump;
 
-  art::Run*           fRun;
+  const art::Run*     fRun;
 				// provides for a possibility for any ROOT 
 				// module to call (whenever necessary) a
 				// loaded in interpreted function which 
@@ -70,8 +70,8 @@ public:
   virtual ~TModule();
 
   virtual void beginJob();
-  virtual bool beginRun(art::Run &  Rn);
-  virtual bool filter  (art::Event& Evt);
+  virtual void beginRun(const art::Run &  Rn);
+  virtual void analyze (const art::Event& Evt);
   virtual void endJob  ();
 //-----------------------------------------------------------------------------
 // accessors

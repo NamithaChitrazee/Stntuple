@@ -189,10 +189,10 @@ MuHitDisplay: { module_type:MuHitDisplay                 # the class name;
 #------------------------------------------------------------------------------
 Stntuple : {
     producers : {}  # empty table
-
-    analyzers : {}  # empty table
-
-    filters : {
+#------------------------------------------------------------------------------
+# STNTUPLE modules become analyzers - need to deal with the trigger intormation
+#------------------------------------------------------------------------------
+    analyzers : {
 	InitStntuple : { module_type:InitStntuple
 	    @table::StntupleModuleFclDefaults                   # defaults of the base class
 	    module_name       : InitStntuple
@@ -249,6 +249,9 @@ Stntuple : {
 	    pidBlockName            : [ "PidBlockDep"              ] 
 	    pidCollTag              : [ "AvikPIDNewDep"            ]
 	}
+    }
+
+    filters : {
 #------------------------------------------------------------------------------
 # downstream proton reco
 #------------------------------------------------------------------------------

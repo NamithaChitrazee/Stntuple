@@ -246,8 +246,8 @@ public:
 // overloaded virtual methods of the base class
 //-----------------------------------------------------------------------------
   virtual void     beginJob();
-  virtual bool     beginRun(art::Run& aRun);
-  virtual bool     filter(art::Event& Evt);
+  virtual void     beginRun(const art::Run& aRun);
+  virtual void     analyze (const art::Event& Evt);
 };
 
 
@@ -362,10 +362,9 @@ void MuHitDisplay::beginJob() {
 }
 
 //-----------------------------------------------------------------------------
-bool MuHitDisplay::beginRun(art::Run& Run) {
+void MuHitDisplay::beginRun(const art::Run& Run) {
   mu2e::GeomHandle<mu2e::Tracker> handle;
   fTracker = handle.get();
-  return true;
 }
 
 
@@ -798,7 +797,7 @@ int MuHitDisplay::getData(const art::Event* Evt) {
 
 
 //-----------------------------------------------------------------------------
-  bool MuHitDisplay::filter(art::Event& Evt) {
+  void MuHitDisplay::analyze(const art::Event& Evt) {
     const char* oname = "MuHitDisplay::filter";
 
     static int          firstCall(1);
@@ -848,7 +847,7 @@ int MuHitDisplay::getData(const art::Event* Evt) {
     int rc = getData(&Evt);
     if (rc < 0) {
       printf(">>> [%s] ERROR: not all data products present, BAIL OUT\n", oname);
-      return true;
+      return;
     }
     
     //    Init(&Evt);
@@ -1219,7 +1218,7 @@ int MuHitDisplay::getData(const art::Event* Evt) {
 //-----------------------------------------------------------------------------
 // go into interactive mode, till '.q' is pressed
 //-----------------------------------------------------------------------------
-    TModule::filter(Evt);
+    TModule::analyze(Evt);
 //-----------------------------------------------------------------------------
 // memory cleanup
 //-----------------------------------------------------------------------------
@@ -1233,7 +1232,7 @@ int MuHitDisplay::getData(const art::Event* Evt) {
 
     // if (graph) delete graph;
 
-    return true;
+    return;
   } 
 
 //-----------------------------------------------------------------------------

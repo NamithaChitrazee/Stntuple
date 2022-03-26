@@ -10,30 +10,30 @@ Stntuple : {
     @table::Stntuple             # defined in Stntuple/fcl/prolog.fcl
 
     producers : { 
-	@table::su2020.producers
+	@table::production.producers
 	@table::Stntuple.producers
     }
 
     filters : { 
-	@table::su2020.filters
+	@table::production.filters
 	@table::Stntuple.filters
     }
 
     analyzers : { 
-	@table::su2020.analyzers
+	@table::production.analyzers
 	@table::Stntuple.analyzers
     }
 }
 
 #------------------------------------------------------------------------------
 # sequences: can't define recursively within one namespace
-# aiming for ultimate unification of the reco sequences, use su2020 sequences as much as possible 
+# aiming for ultimate unification of the reco sequences, use production sequences as much as possible 
 #------------------------------------------------------------------------------
-Stntuple.gen_g4              : [ @sequence::su2020.gen_g4               ]
-Stntuple.gen_g4_pbi          : [ @sequence::su2020.gen_g4_pbi           ]
-Stntuple.gen_g4_pbi_detFilter: [ @sequence::su2020.gen_g4_pbi_detFilter ]
+Stntuple.gen_g4              : [ @sequence::production.gen_g4               ]
+Stntuple.gen_g4_pbi          : [ @sequence::production.gen_g4_pbi           ]
+Stntuple.gen_g4_pbi_detFilter: [ @sequence::production.gen_g4_pbi_detFilter ]
 
-Stntuple.digis               : [ @sequence::su2020.digis ]
+Stntuple.digis               : [ @sequence::production.digis ]
 
 Stntuple.mix                 : [ dioMixer, protonMixer, neutronMixer, photonMixer, ootMixer, flashMixer ]
 Stntuple.mix_time_map        : [ @sequence::Stntuple.mix, @sequence::CommonMC.DigiSim ]
@@ -45,11 +45,11 @@ Stntuple.mix_time_map        : [ @sequence::Stntuple.mix, @sequence::CommonMC.Di
 #------------------------------------------------------------------------------
 kludge_Tracking_TPRDpP       : [ TimeClusterFinder, HelixFinder, KSFDpP, KFFDpP ]
 
-Stntuple.trk_hit_reco        : [ @sequence::su2020.trk_hit_reco ]
-Stntuple.trk_reco_de         : [ @sequence::su2020.trk_reco_de  ]
-Stntuple.trk_reco_dmu        : [ @sequence::su2020.trk_reco_dmu ]
-Stntuple.calo_reco           : [ @sequence::su2020.calo_reco    ] 
-Stntuple.crv_reco            : [ @sequence::su2020.crv_reco     ]
+Stntuple.trk_hit_reco        : [ @sequence::production.trk_hit_reco ]
+Stntuple.trk_reco_de         : [ @sequence::production.trk_reco_de  ]
+Stntuple.trk_reco_dmu        : [ @sequence::production.trk_reco_dmu ]
+Stntuple.calo_reco           : [ @sequence::production.calo_reco    ] 
+Stntuple.crv_reco            : [ @sequence::production.crv_reco     ]
 
 #------------------------------------------------------------------------------
 # downstream electron post-core-reconstruction path
@@ -105,7 +105,7 @@ Stntuple.post_reco_dmu     : [ @sequence::Stntuple.post_reco_dmu_par,
 # paths
 #------------------------------------------------------------------------------
 Stntuple.paths : {
-    @table::su2020.paths
+    @table::production.paths
 
     stntuple_p0  : [ @sequence::Stntuple.stnmaker ]
 #------------------------------------------------------------------------------
@@ -113,38 +113,38 @@ Stntuple.paths : {
 # p1  : generate, simulate, reconstruct - no digi_compression ... 
 # p01 : read    , simulate ... 
 #------------------------------------------------------------------------------
-    stntuple_p1  : [ # @sequence::su2020.gen_g4_time_map,
-		     @sequence::su2020.gen_g4_pbi     , 
+    stntuple_p1  : [ # @sequence::production.gen_g4_time_map,
+		     @sequence::production.gen_g4_pbi     , 
 		     @sequence::CommonMC.DigiSim      ,     # time maps + window marker
-		     @sequence::su2020.digis          ,
+		     @sequence::production.digis          ,
 #		     compressDigiMCs                  ,
-		     @sequence::su2020.trk_hit_reco   ,
-		     @sequence::su2020.calo_reco      ,
-		     @sequence::su2020.trk_reco_de    ,
-		     @sequence::su2020.crv_reco       ,
+		     @sequence::production.trk_hit_reco   ,
+		     @sequence::production.calo_reco      ,
+		     @sequence::production.trk_reco_de    ,
+		     @sequence::production.crv_reco       ,
 		     @sequence::Stntuple.post_reco_de , 
 		     @sequence::Stntuple.stnmaker_De
 		    ]
 
     stntuple_p01 : [ g4run, filterStepPointMomentum   , 
 		     @sequence::CommonMC.DigiSim      ,     #  time maps + window marker
-		     @sequence::su2020.digis          ,
+		     @sequence::production.digis          ,
 		     compressDigiMCs                  ,
-		     @sequence::su2020.trk_hit_reco   ,
-		     @sequence::su2020.calo_reco      ,
-		     @sequence::su2020.trk_reco_de    ,
-		     @sequence::su2020.crv_reco       ,
+		     @sequence::production.trk_hit_reco   ,
+		     @sequence::production.calo_reco      ,
+		     @sequence::production.trk_reco_de    ,
+		     @sequence::production.crv_reco       ,
 		     @sequence::Stntuple.post_reco_de , 
 		     @sequence::Stntuple.stnmaker_De
 		    ]
 
-    stntuple_p02_dar : [ @sequence::su2020.gen_g4_pbi       , 
+    stntuple_p02_dar : [ @sequence::production.gen_g4_pbi       , 
 			 @sequence::CommonMC.DigiSim        ,     # time maps + window marker
-			 @sequence::su2020.digis            ,
-			 @sequence::su2020.trk_hit_reco     ,
-			 @sequence::su2020.calo_reco        ,
-			 @sequence::su2020.trk_reco_de_dar  ,
-			 @sequence::su2020.trk_reco_dmu_dar ,
+			 @sequence::production.digis            ,
+			 @sequence::production.trk_hit_reco     ,
+			 @sequence::production.calo_reco        ,
+			 @sequence::production.trk_reco_de_dar  ,
+			 @sequence::production.trk_reco_dmu_dar ,
 			 @sequence::Stntuple.post_reco_de_dar,    # track-calo matching and electron PID
 			 @sequence::Stntuple.post_reco_dmu_dar,    # track-calo matching and muo PID
 			 @sequence::Stntuple.stnmaker_De_Dmu_dar 
@@ -153,17 +153,17 @@ Stntuple.paths : {
 # p2  : electron reconstruction and stntuple making
 # p21 : the same as p2, but no CRV reco
 #------------------------------------------------------------------------------
-    stntuple_p2  : [ @sequence::su2020.trk_hit_reco   ,
-		     @sequence::su2020.calo_reco      ,
-		     @sequence::su2020.trk_reco_de    ,
-		     @sequence::su2020.crv_reco       ,
+    stntuple_p2  : [ @sequence::production.trk_hit_reco   ,
+		     @sequence::production.calo_reco      ,
+		     @sequence::production.trk_reco_de    ,
+		     @sequence::production.crv_reco       ,
 		     @sequence::Stntuple.post_reco_de ,     # track-calo matching and PID
 		     @sequence::Stntuple.stnmaker_De
 		   ]
 
-    stntuple_p21 : [ @sequence::su2020.trk_hit_reco   ,
-		     @sequence::su2020.calo_reco      ,
-		     @sequence::su2020.trk_reco_de    ,
+    stntuple_p21 : [ @sequence::production.trk_hit_reco   ,
+		     @sequence::production.calo_reco      ,
+		     @sequence::production.trk_reco_de    ,
 		     @sequence::Stntuple.post_reco_de ,     # track-calo matching and PID
 		     @sequence::Stntuple.stnmaker_De        # stntupling
 		    ]
@@ -171,17 +171,17 @@ Stntuple.paths : {
 # p3  : muon reconstruction and stntuple making
 # p31 : the same as p3, but no CRV reco
 #------------------------------------------------------------------------------
-    stntuple_p3  : [ @sequence::su2020.trk_hit_reco    ,
-		     @sequence::su2020.calo_reco       ,
-		     @sequence::su2020.trk_reco_dmu    ,
-		     @sequence::su2020.crv_reco        ,
+    stntuple_p3  : [ @sequence::production.trk_hit_reco    ,
+		     @sequence::production.calo_reco       ,
+		     @sequence::production.trk_reco_dmu    ,
+		     @sequence::production.crv_reco        ,
 		     @sequence::Stntuple.post_reco_dmu ,    # track-calo matching and PID
 		     @sequence::Stntuple.stnmaker_Dmu
 		    ]
 
-    stntuple_p31 : [ @sequence::su2020.trk_hit_reco    ,
-		     @sequence::su2020.calo_reco       ,
-		     @sequence::su2020.trk_reco_dmu    ,
+    stntuple_p31 : [ @sequence::production.trk_hit_reco    ,
+		     @sequence::production.calo_reco       ,
+		     @sequence::production.trk_reco_dmu    ,
 		     @sequence::Stntuple.post_reco_dmu ,    # track-calo matching and PID
 		     @sequence::Stntuple.stnmaker_Dmu       # stntupling
 		    ]
@@ -193,92 +193,92 @@ Stntuple.paths : {
 # p42_dar : (De+Ue) , only DAR reco 
 # p401*   : event display sequences
 #------------------------------------------------------------------------------
-    stntuple_p40 : [ @sequence::su2020.trk_hit_reco     ,
-		     @sequence::su2020.calo_reco        ,
-		     @sequence::su2020.trk_reco_de      ,
-		     @sequence::su2020.trk_reco_dmu     ,
-		     @sequence::su2020.trk_reco_sep     ,    # Andy
-		     @sequence::su2020.crv_reco         ,    # Andy
-		     # @sequence::su2020.reco_compression ,
+    stntuple_p40 : [ @sequence::production.trk_hit_reco     ,
+		     @sequence::production.calo_reco        ,
+		     @sequence::production.trk_reco_de      ,
+		     @sequence::production.trk_reco_dmu     ,
+		     @sequence::production.trk_reco_sep     ,    # Andy
+		     @sequence::production.crv_reco         ,    # Andy
+		     # @sequence::production.reco_compression ,
 		     @sequence::Stntuple.post_reco_de   ,    # track-calo matching and electron PID
 		     @sequence::Stntuple.post_reco_dmu  ,    # track-calo matching and muo PID
 		     @sequence::Stntuple.stnmaker_De_Dmu
 		   ]
 
-    stntuple_p401 : [ @sequence::su2020.trk_hit_reco     ,
-		      @sequence::su2020.calo_reco        ,
-		      @sequence::su2020.trk_reco_de      ,
-		      @sequence::su2020.trk_reco_ue      ,
-		      @sequence::su2020.crv_reco         ,
-		      # @sequence::su2020.reco_compression ,    # Andy
+    stntuple_p401 : [ @sequence::production.trk_hit_reco     ,
+		      @sequence::production.calo_reco        ,
+		      @sequence::production.trk_reco_de      ,
+		      @sequence::production.trk_reco_ue      ,
+		      @sequence::production.crv_reco         ,
+		      # @sequence::production.reco_compression ,    # Andy
 		      @sequence::Stntuple.post_reco_de   ,    # track-calo matching and ele PID
 		      @sequence::Stntuple.post_reco_ue   ,    # track-calo matching and muo PID
 		      MuHitDisplayDe
 		   ]
 
-    stntuple_p401_dar : [ @sequence::su2020.trk_hit_reco     ,
-			  @sequence::su2020.calo_reco        ,
-			  @sequence::su2020.trk_reco_de_dar      ,
-			  @sequence::su2020.trk_reco_ue_dar      ,
-			  @sequence::su2020.crv_reco         ,
+    stntuple_p401_dar : [ @sequence::production.trk_hit_reco     ,
+			  @sequence::production.calo_reco        ,
+			  @sequence::production.trk_reco_de_dar      ,
+			  @sequence::production.trk_reco_ue_dar      ,
+			  @sequence::production.crv_reco         ,
 			  @sequence::Stntuple.post_reco_de_dar   ,    # track-calo matching and ele PID
 			  @sequence::Stntuple.post_reco_ue_dar   ,    # track-calo matching and muo PID
 			  MuHitDisplayDeDar
 		   ]
 
-    stntuple_p40_crv : [ # @sequence::su2020.trk_hit_reco     ,
-			 # @sequence::su2020.calo_reco        ,
-			 # @sequence::su2020.trk_reco_de      ,
-			 # @sequence::su2020.trk_reco_dmu     ,
-			 # @sequence::su2020.trk_reco_sep     ,    # Andy
-			 @sequence::su2020.crv_reco         ,    # Andy
-			 # @sequence::su2020.reco_compression ,
+    stntuple_p40_crv : [ # @sequence::production.trk_hit_reco     ,
+			 # @sequence::production.calo_reco        ,
+			 # @sequence::production.trk_reco_de      ,
+			 # @sequence::production.trk_reco_dmu     ,
+			 # @sequence::production.trk_reco_sep     ,    # Andy
+			 @sequence::production.crv_reco         ,    # Andy
+			 # @sequence::production.reco_compression ,
 			 # @sequence::Stntuple.post_reco_de   ,    # track-calo matching and electron PID
 			 # @sequence::Stntuple.post_reco_dmu  ,    # track-calo matching and muo PID
 			 @sequence::Stntuple.stnmaker_De_Dmu
 			]
 
-    stntuple_p41 : [ @sequence::su2020.trk_hit_reco     ,
-		     @sequence::su2020.calo_reco        ,
-		     @sequence::su2020.trk_reco_de      ,
-		     @sequence::su2020.trk_reco_dmu     ,
-		     # @sequence::su2020.crv_reco       ,
-		     @sequence::su2020.reco_compression ,    # Andy
+    stntuple_p41 : [ @sequence::production.trk_hit_reco     ,
+		     @sequence::production.calo_reco        ,
+		     @sequence::production.trk_reco_de      ,
+		     @sequence::production.trk_reco_dmu     ,
+		     # @sequence::production.crv_reco       ,
+		     @sequence::production.reco_compression ,    # Andy
 		     @sequence::Stntuple.post_reco_de   ,    # track-calo matching and electron PID
 		     @sequence::Stntuple.post_reco_dmu  ,    # track-calo matching and muo PID
 		     @sequence::Stntuple.stnmaker_De_Dmu 
 		   ]
 
-    stntuple_p42 : [ @sequence::su2020.trk_hit_reco     ,
-		     @sequence::su2020.calo_reco        ,
-		     @sequence::su2020.crv_reco         ,
-		     @sequence::su2020.trk_reco_de      ,
-		     @sequence::su2020.trk_reco_dmu     ,
-		     # @sequence::su2020.trk_reco_sep     ,    # Andy
-		     # @sequence::su2020.reco_compression ,    # Andy
+    stntuple_p42 : [ @sequence::production.trk_hit_reco     ,
+		     @sequence::production.calo_reco        ,
+		     @sequence::production.crv_reco         ,
+		     @sequence::production.trk_reco_de      ,
+		     @sequence::production.trk_reco_dmu     ,
+		     # @sequence::production.trk_reco_sep     ,    # Andy
+		     # @sequence::production.reco_compression ,    # Andy
 		     @sequence::Stntuple.post_reco_de   ,    # track-calo matching and electron PID
 		     @sequence::Stntuple.post_reco_dmu  ,    # track-calo matching and muo PID
 		     @sequence::Stntuple.stnmaker_De_Dmu 
 		   ]
 
-    stntuple_p42_dar : [ @sequence::su2020.trk_hit_reco        ,
-			 @sequence::su2020.calo_reco           ,
-			 @sequence::su2020.crv_reco            ,
-			 @sequence::su2020.trk_reco_de_dar     ,
-			 @sequence::su2020.trk_reco_ue_dar     ,
+    stntuple_p42_dar : [ @sequence::production.trk_hit_reco        ,
+			 @sequence::production.calo_reco           ,
+			 @sequence::production.crv_reco            ,
+			 @sequence::production.trk_reco_de_dar     ,
+			 @sequence::production.trk_reco_ue_dar     ,
 			 @sequence::Stntuple.post_reco_de_dar  , # track-calo matching and electron PID
 			 @sequence::Stntuple.post_reco_ue_dar  , # track-calo matching and muo PID
 			 @sequence::Stntuple.stnmaker_De_Ue_dar 
 			]
 
     stntuple_p43 : [ @sequence::CrvDAQPackage.CrvDAQSequence, 
-		     @sequence::su2020.trk_hit_reco     ,
-		     @sequence::su2020.calo_reco        ,
-		     @sequence::su2020.trk_reco_de      ,
-		     @sequence::su2020.trk_reco_dmu     ,
-		     @sequence::su2020.trk_reco_sep     ,    # Andy
-		     @sequence::su2020.crv_reco         ,    # Andy
-		     @sequence::su2020.reco_compression ,
+		     @sequence::production.trk_hit_reco     ,
+		     @sequence::production.calo_reco        ,
+		     @sequence::production.trk_reco_de      ,
+		     @sequence::production.trk_reco_dmu     ,
+		     @sequence::production.trk_reco_sep     ,    # Andy
+		     @sequence::production.crv_reco         ,    # Andy
+		     @sequence::production.reco_compression ,
 		     @sequence::Stntuple.post_reco_de   ,    # track-calo matching and electron PID
 		     @sequence::Stntuple.post_reco_dmu  ,    # track-calo matching and muo PID
 		     @sequence::Stntuple.stnmaker_De_Dmu
@@ -287,10 +287,10 @@ Stntuple.paths : {
 # read, reconstruct
 #------------------------------------------------------------------------------
     stntuple_p5  : [ EventFilter,
-		     @sequence::su2020.trk_hit_reco   ,
-		     @sequence::su2020.calo_reco      ,
-		     @sequence::su2020.trk_reco_de    ,
-		     @sequence::su2020.crv_reco       ,
+		     @sequence::production.trk_hit_reco   ,
+		     @sequence::production.calo_reco      ,
+		     @sequence::production.trk_reco_de    ,
+		     @sequence::production.crv_reco       ,
 		     @sequence::Stntuple.post_reco_de         # track-calo matching and PID;
 		    ]
 
@@ -303,30 +303,30 @@ Stntuple.paths : {
 		      MuHitDisplayDeMHDar]
 
     stntuple_p61  : [ EventFilter,
-		      @sequence::su2020.trk_hit_reco   ,
-		      @sequence::su2020.calo_reco      ,
-		      @sequence::su2020.trk_reco_de    ,
-		      @sequence::su2020.crv_reco       ,
+		      @sequence::production.trk_hit_reco   ,
+		      @sequence::production.calo_reco      ,
+		      @sequence::production.trk_reco_de    ,
+		      @sequence::production.crv_reco       ,
 		      MuHitDisplayDeMHDar
 		    ]
     stntuple_p62  : [ EventFilter,
-		      @sequence::su2020.trk_hit_reco   ,
-		      @sequence::su2020.calo_reco      ,
-		      @sequence::su2020.trk_reco_de    ,
-		      # @sequence::su2020.crv_reco       ,
+		      @sequence::production.trk_hit_reco   ,
+		      @sequence::production.calo_reco      ,
+		      @sequence::production.trk_reco_de    ,
+		      # @sequence::production.crv_reco       ,
 		      MuHitDisplayDeMHDar
 		    ]
 #------------------------------------------------------------------------------
 # p7: MC generation, G4, reconstruction and Event Display
 #------------------------------------------------------------------------------
-    stntuple_p7  : [ @sequence::su2020.gen_g4_pbi     ,
+    stntuple_p7  : [ @sequence::production.gen_g4_pbi     ,
 		     @sequence::CommonMC.DigiSim      ,  # TimeMaps, EWMProducer
-		     @sequence::su2020.digis          ,
+		     @sequence::production.digis          ,
 		     compressDigMCs                   ,
-		     @sequence::su2020.trk_hit_reco   ,
-		     @sequence::su2020.calo_reco      ,
-		     @sequence::su2020.trk_reco_de    ,
-		     @sequence::su2020.crv_reco       ,
+		     @sequence::production.trk_hit_reco   ,
+		     @sequence::production.calo_reco      ,
+		     @sequence::production.trk_reco_de    ,
+		     @sequence::production.crv_reco       ,
 		     MuHitDisplayDeMHDar                
 		    ]
 #------------------------------------------------------------------------------

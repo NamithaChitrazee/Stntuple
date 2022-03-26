@@ -149,7 +149,7 @@ public:
   //-----------------------------------------------------------------------------
   // modifiers
   //-----------------------------------------------------------------------------
-  void SetEvent(art::Event& Evt) { fEvent = &Evt; }
+  void SetEvent(const art::Event& Evt) { fEvent = &Evt; }
 
   void SetDisplayStrawDigiMC(int Display) {
     fDisplayStrawDigiMC = Display;
