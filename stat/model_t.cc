@@ -10,8 +10,10 @@
 namespace stntuple {
 
   model_t::model_t(const char* name) : TNamed(name,name) {
-    fListOfChannels = new TObjArray();
-    fRn             = new TRandom3();
+    fListOfChannels   = new TObjArray();
+    fListOfParameters = new TObjArray();
+    fRn               = new TRandom3();
+    fHistPDF          = new TH1D(Form("h_model_%s",name),"PDF",50,0,50);
   }
 
 
