@@ -13,7 +13,7 @@ def local_build():
     local_env = env.Clone()
     rootlibs  = local_env['ROOTLIBS']
 
-#    if ( not ("EG"   in rootlibs)): rootlibs.insert(rootlibs.index("Physics")+1,"EG");
+    if ( not ("MathMore"   in rootlibs)): rootlibs.insert(rootlibs.index("MathCore")+1,"MathMore");
 
     debug  = False
     helper = stntuple_helper(local_env,debug);

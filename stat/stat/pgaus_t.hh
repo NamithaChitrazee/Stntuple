@@ -8,8 +8,6 @@ class  pgaus_t : public parameter_t {
 public:
   double   fMean;
   double   fSigma;
-  double   fVal;	                // initialized value 
-  TH1D*    fHistPdf;			// PDF distribution
 // -----------------------------------------------------------------------------
 // functions
 //-----------------------------------------------------------------------------

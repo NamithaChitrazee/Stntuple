@@ -14,12 +14,13 @@ namespace stntuple {
     fListOfParameters = new TObjArray();
     fRn               = new TRandom3();
     fHistPDF          = new TH1D(Form("h_model_%s",name),"PDF",50,0,50);
+    fNPExp            = 1000000;
   }
 
 
   int model_t::GeneratePDF() {
 
-    for (int i=0; i<1000000; i++) {
+    for (int i=0; i<fNPExp; i++) {
 					// step 1: initalize all parameters
       InitParameters();
 					// for now, val is the total expected background 

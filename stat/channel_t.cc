@@ -8,11 +8,10 @@
 
 namespace stntuple {
 
-  channel_t::channel_t(const char* Name): TNamed(Name,Name) {
+  channel_t::channel_t(const char* Name, int Debug): TNamed(Name,Name) {
     fHistPDF        = nullptr;
-    if (fDebug) {
-      //      fHistPDF = new TH1D(Form("h_%s",Name),"par",1000,fMean-10*Sigma,fMean+10*Sigma);
-    }
+    fDebug          = Debug;
+    fRn             = new TRandom3();
   }
 
 //-----------------------------------------------------------------------------

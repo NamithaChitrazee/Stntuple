@@ -11,12 +11,13 @@ ClassImp(stntuple::parameter_t)
 namespace stntuple {
 
   parameter_t::parameter_t(const char* name, int Debug) : TNamed(name,name) {
-    fRn    = new TRandom3();
+    fRng   = new ROOT::Math::RandomRanLux();
     fDebug = Debug;
+    fFixed = 0;
   }
 
   parameter_t::~parameter_t() {
-    delete fRn;
+    delete fRng;
   }
 
   void parameter_t::InitValue() {

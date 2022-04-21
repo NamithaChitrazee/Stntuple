@@ -24,6 +24,7 @@ namespace stntuple {
     TRandom3*  fRn;
 
     TH1D*      fHistPDF;
+    int        fNPExp;             // N(pseudoexperiments) to run to generate PDF
 // -----------------------------------------------------------------------------
 // functions
 //-----------------------------------------------------------------------------

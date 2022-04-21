@@ -8,14 +8,13 @@
 
 namespace stntuple {
 
-  dio_channel_t::dio_channel_t(const char* Name, double Mean, double Sigma, int Debug) : channel_t(Name) {
+  dio_channel_t::dio_channel_t(const char* Name, double Mean, double Sigma, int Debug) : channel_t(Name, Debug) {
     fRn             = new TRandom3();
     fMean           = Mean;
     fSigma          = Sigma;
-    fDebug          = Debug;
-    fHistPDF        = nullptr;
-    if (fDebug) {
-      fHistPDF = new TH1D(Form("h_%s",Name),"par",1000,fMean-10*Sigma,fMean+10*Sigma);
+    fLumi           = nullptr;
+    if (Debug) {
+      fHistPDF = new TH1D(Form("h_channel_%s",Name),"par",1000,0,fMean+10*Sigma);
     }
   }
 
@@ -28,7 +27,9 @@ namespace stntuple {
 
     // scale with fluctuated luminosity:
 
-    fVal = fVal*fLumi->GetValue()/fLumi->Mean();
+    if (fLumi) {
+      fVal = fVal*fLumi->GetValue()/fLumi->Mean();
+    }
 
     if (fDebug) {
       fHistPDF->Fill(fVal);

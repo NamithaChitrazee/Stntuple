@@ -14,16 +14,12 @@ namespace stntuple {
     double     fSigma;
     double     fVal;
     pgaus_t*   fLumi;			// explicitly - just one nuisanse parameter
-    
-    int        fDebug;
-    TH1D*      fHistPDF;
-    TRandom3*  fRn;
 // -----------------------------------------------------------------------------
 // functions
 //-----------------------------------------------------------------------------
     dio_channel_t(const char* Name,double Mean, double Sigma, int Debug = 0);
   
-    double  GetValue() ;
+    virtual double  GetValue() ;
 
   };
 }
