@@ -630,7 +630,10 @@ int plot_hist_1d(plot_data_t* Plot, int Print = 0, const char* Format = "eps") {
 //-----------------------------------------------------------------------------
 // Y axis title:  by default, assume constant bin size. Sometimes want to disable
 //-----------------------------------------------------------------------------
-  if (Plot->fYTitFormat != "") {
+  if (Plot->fYAxisTitle != "") {
+    hpx1->GetYaxis()->SetTitle(Plot->fYAxisTitle.Data());
+  }
+  else if (Plot->fYTitFormat != "") {
     float bin      = hpx1->GetXaxis()->GetBinWidth(1);
     TString ytitle = Form(Plot->fYTitFormat,bin);
     hpx1->GetYaxis()->SetTitle(ytitle);
