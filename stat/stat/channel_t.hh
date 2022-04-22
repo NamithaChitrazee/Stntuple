@@ -17,12 +17,15 @@ public:
   parameter_t*  fBgr;
   TH1D*         fHistPDF;
   int           fDebug;
+  int           fSignal;        // normally - zero, for signal = 1
 // -----------------------------------------------------------------------------
 // functions
 //-----------------------------------------------------------------------------
   channel_t(const char* Name="undefined_channel", int Debug = 0);
   ~channel_t();
 
+  void SetSignal(int Signal) { fSignal = Signal; }
+  
   void SetBgr(parameter_t* Bgr);
 
   TH1D* GetHistPDF() { return fHistPDF; }

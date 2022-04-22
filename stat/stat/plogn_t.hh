@@ -6,7 +6,6 @@
 namespace stntuple {
   class  plogn_t : public parameter_t {
   public:
-    double   fMean;			// inputs
     double   fSigmaOverMean;
     double   fMu;			        // parameters of teh lognormal dist
     double   fSigma;
@@ -16,15 +15,15 @@ namespace stntuple {
     // this is good for gaussian, log-normal, uniform
     plogn_t(const char* Name, double Mean, double SigmaOverMean, int Debug = 0);
     
-    double Mean () { return fMean ; }
-    double Mu   () { return fMu   ; }
-    double Sigma() { return fSigma; }
+    double Mu         () { return fMu     ; }
+    double Sigma      () { return fSigma  ; }
 
     virtual double XMin();
     virtual double XMax();
-    virtual void InitValue();
     
-    virtual void Print(const Option_t* Opt) const ;
+    virtual void   InitValue();
+    
+    virtual void   Print(const Option_t* Opt) const ;
     
   };
 }

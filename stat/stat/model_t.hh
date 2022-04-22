@@ -36,7 +36,10 @@ namespace stntuple {
     
     double  GetValue();
 
-    void    AddChannel  (channel_t* Channel) { fListOfChannels->Add(Channel); }
+    void    AddChannel  (channel_t* Channel, int Signal = 0) { 
+      Channel->SetSignal(Signal);
+      fListOfChannels->Add(Channel); 
+    }
 
     void    AddParameter(parameter_t* Par  ) { fListOfParameters->Add(Par); }
     

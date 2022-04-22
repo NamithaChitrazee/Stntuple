@@ -13,6 +13,8 @@ namespace stntuple {
     
     fXMin = XMin;
     fXMax = XMax;
+
+    fMean = (XMin+XMax)/2; 
     
     TString name = Form("h_par_%s",Name);
     fHistPDF = new TH1D(name,Form("parameter %s",Name),nbins,fXMin,fXMax);
@@ -24,7 +26,7 @@ namespace stntuple {
   void pflat_t::InitValue() {
 
     if (fFixed == 0) fValue = fXMin+fRng->Rndm()*(fXMax-fXMin);
-    else             fValue = (fXMin+fXMax)/2;
+    else             fValue = fMean;
 
     if (fDebug > 0) fHistPDF->Fill(fValue);
   }

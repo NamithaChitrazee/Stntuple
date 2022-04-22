@@ -14,7 +14,8 @@ namespace stntuple {
     // this is good for gaussian, log-normal, uniform
     pgaus_t(const char* Name, double Mean, double Sigma, int Debug = 0);
 
-    double Mean() { return fMean; }
+    double Mean       () { return fMean;    }
+    double InverseMean() { return 1./fMean; }
 
     virtual double XMin();
     virtual double XMax();

@@ -13,6 +13,7 @@ namespace stntuple {
   class  parameter_t : public TNamed {
   public:
     double                    fValue;
+    double                    fMean;
     ROOT::Math::RandomRanLux* fRng;
     TH1D*                     fHistPDF;			// PDF distribution
     int                       fDebug;
@@ -24,12 +25,16 @@ namespace stntuple {
     parameter_t (const char* Name = "undefined_parameter", int Debug = 0);
     ~parameter_t();
 
+    double         InverseMean() { return 1./fMean; }
+    double         Mean       () { return fMean   ; }
+
     virtual double  XMin();
     virtual double  XMax();
 
     virtual void    InitValue();
     
-    double          GetValue() { return fValue; };
+    double          GetValue    () { return fValue; };
+    double          InverseValue() { return 1./fValue; };
 
     TH1D*           GetHistPDF() { return fHistPDF; };
 

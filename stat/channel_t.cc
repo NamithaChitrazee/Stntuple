@@ -12,6 +12,7 @@ namespace stntuple {
     fBgr            = nullptr;
     fHistPDF        = nullptr;
     fDebug          = Debug;
+    fSignal         = 0;
   }
 
   channel_t::~channel_t() {
