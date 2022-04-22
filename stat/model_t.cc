@@ -10,14 +10,27 @@
 namespace stntuple {
 
   model_t::model_t(const char* name) : TNamed(name,name) {
+
     fListOfChannels   = new TObjArray();
+    fListOfChannels->SetOwner(kTRUE);
+
     fListOfParameters = new TObjArray();
-    fRn               = new TRandom3();
+    fListOfParameters->SetOwner(kTRUE);
+
+    fRng              = new ROOT::Math::RandomRanLux();
     fHistPDF          = new TH1D(Form("h_model_%s",name),"PDF",50,0,50);
     fNPExp            = 1000000;
   }
 
 
+  model_t::~model_t() {
+    delete fListOfChannels;
+    delete fListOfParameters;
+    delete fRng;
+    delete fHistPDF;
+  }
+
+  
   int model_t::GeneratePDF() {
 
     for (int i=0; i<fNPExp; i++) {
@@ -25,7 +38,7 @@ namespace stntuple {
       InitParameters();
 					// for now, val is the total expected background 
       double val = GetValue();
-      double x   = fRn->Poisson(val);
+      double x   = fRng->Poisson(val);
       fHistPDF->Fill(x);
     }
     return 0;
@@ -77,12 +90,14 @@ namespace stntuple {
     // }
 
     int np = fListOfParameters->GetEntries();
+    printf("model_t::%s: np = %2i\n",__func__,np);
     for (int i=0; i<np; i++) {
       parameter_t* p = (parameter_t*) fListOfParameters->At(i);
       p->GetHistPDF()->Write();
     }
 
     int nch = fListOfChannels->GetEntries();
+    printf("model_t::%s: nch = %2i\n",__func__,nch);
     for (int i=0; i<nch; i++) {
       channel_t* ch = (channel_t*) fListOfChannels->At(i);
       ch->GetHistPDF()->Write();
@@ -90,6 +105,6 @@ namespace stntuple {
     
     f->Close();
     delete f;
-     return 0;
+    return 0;
   }
 }

@@ -12,28 +12,31 @@
 namespace stntuple {
   class  parameter_t : public TNamed {
   public:
-    double    fValue;
+    double                    fValue;
     ROOT::Math::RandomRanLux* fRng;
-    TH1D*     fHistPDF;			// PDF distribution
-    int       fDebug;
-    int       fFixed;                   // =0 by default
+    TH1D*                     fHistPDF;			// PDF distribution
+    int                       fDebug;
+    int                       fFixed;                   // =0 by default
 // -----------------------------------------------------------------------------
 // functions
 //-----------------------------------------------------------------------------
 
-    parameter_t(const char* Name, int Debug = 0);
+    parameter_t (const char* Name = "undefined_parameter", int Debug = 0);
     ~parameter_t();
 
-    virtual void  InitValue();
-    
-    double  GetValue() { return fValue; };
+    virtual double  XMin();
+    virtual double  XMax();
 
-    TH1D*  GetHistPDF() { return fHistPDF; };
-
-    void   SetDebug(int Value) { fDebug = Value; }
-    void   SetFixed(int Value) { fFixed = Value; }
+    virtual void    InitValue();
     
-    virtual void Print(const Option_t* Opt) const ;
+    double          GetValue() { return fValue; };
+
+    TH1D*           GetHistPDF() { return fHistPDF; };
+
+    void            SetDebug(int Value) { fDebug = Value; }
+    void            SetFixed(int Value) { fFixed = Value; }
+    
+    virtual void    Print(const Option_t* Opt) const ;
 
     ClassDef(stntuple::parameter_t,0)
     

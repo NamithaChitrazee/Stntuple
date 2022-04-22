@@ -23,6 +23,16 @@ namespace stntuple {
   void parameter_t::InitValue() {
   }
 
+  double parameter_t::XMin() {
+    // for histogramming
+    return -1.;
+  }
+
+  double parameter_t::XMax() {
+    // for histogramming
+    return 1;
+  }
+
   void parameter_t::Print(const Option_t* Opt) const {
   }
 

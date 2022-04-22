@@ -1,25 +1,29 @@
-#ifndef __Stntuple_stat_pflat_t_hh__
-#define __Stntuple_stat_pflat_t_hh__
+#ifndef __Stntuple_stat_plogn_t_hh__
+#define __Stntuple_stat_plogn_t_hh__
 
 #include "Stntuple/stat/parameter_t.hh"
 
 namespace stntuple {
-  class  pflat_t : public parameter_t {
+  class  plogn_t : public parameter_t {
   public:
-    double   fXMin;
-    double   fXMax;
+    double   fMean;			// inputs
+    double   fSigmaOverMean;
+    double   fMu;			        // parameters of teh lognormal dist
+    double   fSigma;
 // -----------------------------------------------------------------------------
 // functions
 //-----------------------------------------------------------------------------
-
     // this is good for gaussian, log-normal, uniform
-    pflat_t(const char* Name, double XMin, double XMax, int Debug = 0);
+    plogn_t(const char* Name, double Mean, double SigmaOverMean, int Debug = 0);
     
+    double Mean () { return fMean ; }
+    double Mu   () { return fMu   ; }
+    double Sigma() { return fSigma; }
+
     virtual double XMin();
     virtual double XMax();
-    
     virtual void InitValue();
-
+    
     virtual void Print(const Option_t* Opt) const ;
     
   };

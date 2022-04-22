@@ -4,44 +4,42 @@
 //         = 2: print value
 //         > 2: more detailed printout
 ////////////////////////////////////////////////////////////////////////////////
-#include "Stntuple/stat/pgaus_t.hh"
+#include "Stntuple/stat/pflat_t.hh"
 namespace stntuple {
 
 //-----------------------------------------------------------------------------
-  pgaus_t::pgaus_t(const char* Name, double Mean, double Sigma, int Debug) : parameter_t(Name,Debug) {
+  pflat_t::pflat_t(const char* Name, double XMin, double XMax, int Debug) : parameter_t(Name,Debug) {
     int nbins(1000);
     
-    fMean  = Mean ;
-    fSigma = Sigma;
+    fXMin = XMin;
+    fXMax = XMax;
     
-    // double bin = (Mean+10*Sigma)/nbins;
-    fHistPDF = new TH1D(Form("h_par_%s",Name),"parameter",nbins,0,Mean+10*Sigma);
+    TString name = Form("h_par_%s",Name);
+    fHistPDF = new TH1D(name,Form("parameter %s",Name),nbins,fXMin,fXMax);
   }
 
 //-----------------------------------------------------------------------------
 // initialize the parameter value just once per pseudoexperiment
 //-----------------------------------------------------------------------------
-  void pgaus_t::InitValue() {
+  void pflat_t::InitValue() {
 
-    if (fFixed == 0) {
-      do { fValue = fRng->Gaus(fMean,fSigma); } while (fValue < 0);
-    }
-    else             fValue = fMean;
+    if (fFixed == 0) fValue = fXMin+fRng->Rndm()*(fXMax-fXMin);
+    else             fValue = (fXMin+fXMax)/2;
 
     if (fDebug > 0) fHistPDF->Fill(fValue);
   }
 
-  double pgaus_t::XMin() {
+  double pflat_t::XMin() {
     // for histogramming
-    return 0;
+    return fXMin;
   }
 
-  double pgaus_t::XMax() {
+  double pflat_t::XMax() {
     // for histogramming
-    return fMean + 10*fSigma;
+    return fXMax;
   }
 //-----------------------------------------------------------------------------
-  void pgaus_t::Print(const Option_t* Opt) const {
+  void pflat_t::Print(const Option_t* Opt) const {
   }
 
 }

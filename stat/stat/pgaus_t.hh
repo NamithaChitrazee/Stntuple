@@ -4,22 +4,25 @@
 #include "Stntuple/stat/parameter_t.hh"
 
 namespace stntuple {
-class  pgaus_t : public parameter_t {
-public:
-  double   fMean;
-  double   fSigma;
+  class  pgaus_t : public parameter_t {
+  public:
+    double   fMean;
+    double   fSigma;
 // -----------------------------------------------------------------------------
 // functions
 //-----------------------------------------------------------------------------
-  // this is good for gaussian, log-normal, uniform
-  pgaus_t(const char* Name, double Mean, double Sigma, int Debug = 0);
+    // this is good for gaussian, log-normal, uniform
+    pgaus_t(const char* Name, double Mean, double Sigma, int Debug = 0);
 
-  double Mean() { return fMean; }
+    double Mean() { return fMean; }
 
-  virtual void InitValue();
-
-  virtual void Print(const Option_t* Opt) const ;
-
-};
+    virtual double XMin();
+    virtual double XMax();
+    
+    virtual void   InitValue();
+    
+    virtual void   Print(const Option_t* Opt) const ;
+    
+  };
 }
 #endif

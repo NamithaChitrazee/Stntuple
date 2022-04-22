@@ -9,16 +9,35 @@
 namespace stntuple {
 
   channel_t::channel_t(const char* Name, int Debug): TNamed(Name,Name) {
+    fBgr            = nullptr;
     fHistPDF        = nullptr;
     fDebug          = Debug;
-    fRn             = new TRandom3();
   }
 
+  channel_t::~channel_t() {
+    // do not delete fBgr - it is owned by model list
+    delete fHistPDF;
+  }
 //-----------------------------------------------------------------------------
 //  assume that all nuisanse parameters have been initalized
 //-----------------------------------------------------------------------------
   double channel_t::GetValue() {
-    return -1; //fVal;
+    double val = fBgr->GetValue();
+
+    if (fDebug > 0) fHistPDF->Fill(val);
+    return val;
   }
+
+  void channel_t::SetBgr(parameter_t* Bgr) {
+    int nbins(1000);
+    
+    fBgr = Bgr;
+    if (fDebug) {
+      TString name = Form("h_channel_%s",GetName());
+      fHistPDF     = new TH1D(name,Form("BGR channel %s",GetName()),nbins,fBgr->XMin(),fBgr->XMax());
+    }
+  }
+  
+
 
 }

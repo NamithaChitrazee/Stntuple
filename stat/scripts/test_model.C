@@ -37,20 +37,65 @@ void build_model(stntuple::model_t* m, const char* Config, int Debug = 0) {
   
   m->AddChannel(dio_channel);
 //-----------------------------------------------------------------------------
+// fixed luminosity 
+//-----------------------------------------------------------------------------
+  lumi->SetFixed(1);
+//-----------------------------------------------------------------------------
 // at this point all initializations are done
 //-----------------------------------------------------------------------------
 }
 
 //-----------------------------------------------------------------------------
-// test gaussian channel smeared with the gaussian
+// test gaussian channel with fixed luminosity
 //-----------------------------------------------------------------------------
 void test_001(int SaveHist = 0) {
-  const char* name = "test_001";
+  TString name = Form("%s",__func__);
   int debug = 1;
 
   if (m) delete m;
   
-  m = new stntuple::model_t(name);
+  m = new stntuple::model_t(name.Data());
+
+  stntuple::pgaus_t* lumi  = new stntuple::pgaus_t("lumi"   ,1.0, 0.1 ,debug);
+  stntuple::pgaus_t* dio   = new stntuple::pgaus_t("dio_var",0.1 ,0.01,debug);
+
+  dio_channel_t* dio_channel = new dio_channel_t("dio"    ,debug); // 
+
+  dio_channel->SetBgr(dio);
+  dio_channel->fLumi = lumi;
+
+  m->AddParameter(lumi);
+  m->AddParameter(dio);
+  
+  m->AddChannel(dio_channel);
+//-----------------------------------------------------------------------------
+// fix luminosity
+//-----------------------------------------------------------------------------
+  lumi->SetFixed(1);
+//-----------------------------------------------------------------------------
+// done with the initializations
+//-----------------------------------------------------------------------------  
+  m->GeneratePDF();
+
+  // at this point can draw PDF...and save histograms
+  
+  if (SaveHist > 0) {
+    TString fn = Form("mu2e_sensitivity.%s.hist",name.Data());
+    m->SaveHist(fn.Data());
+  }
+}
+
+//-----------------------------------------------------------------------------
+// test gaussian with luminosity fluctuating by 10%
+//-----------------------------------------------------------------------------
+void test_002(int SaveHist = 0) {
+
+  TString name = Form("%s",__func__);
+  int debug = 1;
+  
+  if (m) delete m;
+
+  m = new stntuple::model_t(name.Data());
 
   stntuple::pgaus_t* lumi  = new stntuple::pgaus_t("lumi"   ,1.0, 0.1 ,debug);
   stntuple::pgaus_t* dio   = new stntuple::pgaus_t("dio_var",0.1 ,0.01,debug);
@@ -65,6 +110,10 @@ void test_001(int SaveHist = 0) {
 
   m->AddChannel(dio_channel);
 //-----------------------------------------------------------------------------
+// fix luminosity
+//-----------------------------------------------------------------------------
+  lumi->SetFixed(0);
+//-----------------------------------------------------------------------------
 // done with the initializations
 //-----------------------------------------------------------------------------  
   m->GeneratePDF();
@@ -72,7 +121,7 @@ void test_001(int SaveHist = 0) {
   // at this point can draw PDF...and save histograms
   
   if (SaveHist > 0) {
-    TString fn = Form("mu2e_sensitivity.%s.hist",name);
+    TString fn = Form("mu2e_sensitivity.%s.hist",name.Data());
     m->SaveHist(fn.Data());
   }
 }
@@ -80,17 +129,17 @@ void test_001(int SaveHist = 0) {
 //-----------------------------------------------------------------------------
 // test gaussian with fixed luminosity
 //-----------------------------------------------------------------------------
-void test_002(int SaveHist = 0) {
+void test_003(int SaveHist = 0) {
 
+  TString name = Form("%s",__func__);
   int debug = 1;
-  const char* name = "test_002";
   
   if (m) delete m;
 
-  m = new stntuple::model_t(name);
+  m = new stntuple::model_t(name.Data());
 
   stntuple::pgaus_t* lumi  = new stntuple::pgaus_t("lumi"   ,1.0, 0.1 ,debug);
-  stntuple::pgaus_t* dio   = new stntuple::pgaus_t("dio_var",0.1 ,0.01,debug);
+  stntuple::pgaus_t* dio   = new stntuple::pgaus_t("dio_var",0.1 ,0.1 ,debug);
 
   m->AddParameter(lumi);
   m->AddParameter(dio);
@@ -113,20 +162,61 @@ void test_002(int SaveHist = 0) {
   // at this point can draw PDF...and save histograms
   
   if (SaveHist > 0) {
-    TString fn = Form("mu2e_sensitivity.%s.hist",name);
+    TString fn = Form("mu2e_sensitivity.%s.hist",name.Data());
     m->SaveHist(fn.Data());
   }
 }
 
 //-----------------------------------------------------------------------------
-// test lognormal channel smeared with the gaussian
+// test gaussian with luminosity fluctuating by 10\%
 //-----------------------------------------------------------------------------
-void test_003(int SaveHist = 0) {
+void test_004(int SaveHist = 0) {
+
+  TString name = Form("%s",__func__);
   int debug = 1;
-  const char* name = "test_003";
+  
+  if (m) delete m;
+
+  m = new stntuple::model_t(name.Data());
+
+  stntuple::pgaus_t* lumi  = new stntuple::pgaus_t("lumi"   ,1.0, 0.1 ,debug);
+  stntuple::pgaus_t* dio   = new stntuple::pgaus_t("dio_var",0.1 ,0.1 ,debug);
+
+  m->AddParameter(lumi);
+  m->AddParameter(dio);
+  
+  dio_channel_t* dio_channel = new dio_channel_t("dio"    ,debug); // 
+
+  dio_channel->SetBgr(dio);
+  dio_channel->fLumi = lumi;
+
+  m->AddChannel(dio_channel);
+//-----------------------------------------------------------------------------
+// fix luminosity
+//-----------------------------------------------------------------------------
+  lumi->SetFixed(0);
+//-----------------------------------------------------------------------------
+// done with the initializations
+//-----------------------------------------------------------------------------  
+  m->GeneratePDF();
+
+  // at this point can draw PDF...and save histograms
+  
+  if (SaveHist > 0) {
+    TString fn = Form("mu2e_sensitivity.%s.hist",name.Data());
+    m->SaveHist(fn.Data());
+  }
+}
+
+//-----------------------------------------------------------------------------
+// test lognormal channel not smeared with the gaussian
+//-----------------------------------------------------------------------------
+void test_011(int SaveHist = 0) {
+  int debug = 1;
+  TString name = Form("%s",__func__);
 
   if (m) delete m;
-  m = new stntuple::model_t(name);
+  m = new stntuple::model_t(name.Data());
 
   // luminosity: simple parameter with gaussian fluctuations, 10% relative uncertainty
   
@@ -143,6 +233,10 @@ void test_003(int SaveHist = 0) {
 
   m->AddChannel(pbar_channel);
 //-----------------------------------------------------------------------------
+// fix luminosity
+//-----------------------------------------------------------------------------
+  lumi->SetFixed(1);
+//-----------------------------------------------------------------------------
 // end initialization
 //-----------------------------------------------------------------------------
   m->GeneratePDF();
@@ -150,7 +244,7 @@ void test_003(int SaveHist = 0) {
   // at this point can draw PDF...and save histograms
   
   if (SaveHist > 0) {
-    TString fn = Form("mu2e_sensitivity.%s.hist",name);
+    TString fn = Form("mu2e_sensitivity.%s.hist",name.Data());
     m->SaveHist(fn.Data());
   }
 }
@@ -158,7 +252,7 @@ void test_003(int SaveHist = 0) {
 //-----------------------------------------------------------------------------
 // test lognormal channel smeared with the gaussian
 //-----------------------------------------------------------------------------
-void test_004(int SaveHist = 0) {
+void test_012(int SaveHist = 0) {
   int debug = 1;
   TString name = Form("%s",__func__);
 
@@ -178,9 +272,9 @@ void test_004(int SaveHist = 0) {
   pbar_channel->SetBgr(pbar);
   pbar_channel->fLumi              = lumi;
 //-----------------------------------------------------------------------------
-// fix luminosity
+// luminosity
 //-----------------------------------------------------------------------------
-  lumi->SetFixed(1);
+  lumi->SetFixed(0);
 
   m->AddChannel(pbar_channel);
 //-----------------------------------------------------------------------------

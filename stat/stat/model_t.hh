@@ -10,7 +10,9 @@
 #include "TH1.h"
 #include "TH2.h"
 #include "TObjArray.h"
-#include "TRandom3.h"
+
+#include "Math/GSLRandom.h"
+#include "Math/Random.h"
 
 #include "Stntuple/stat/parameter_t.hh"
 #include "Stntuple/stat/channel_t.hh"
@@ -18,21 +20,25 @@
 namespace stntuple {
   class  model_t : public TNamed {
   public:
-    TObjArray* fListOfParameters;			// should be sufficient
-    TObjArray* fListOfChannels;			// should be sufficient
-    int        fNPseudoExperiments;
-    TRandom3*  fRn;
+    TObjArray*                fListOfParameters;			// should be sufficient
+    TObjArray*                fListOfChannels;			// should be sufficient
 
-    TH1D*      fHistPDF;
-    int        fNPExp;             // N(pseudoexperiments) to run to generate PDF
+    int                       fNPseudoExperiments;
+
+    ROOT::Math::RandomRanLux* fRng;
+    TH1D*                     fHistPDF;
+    int                       fNPExp;             // N(pseudoexperiments) to run to generate PDF
 // -----------------------------------------------------------------------------
 // functions
 //-----------------------------------------------------------------------------
     model_t(const char* Name);
+    ~model_t();
     
     double  GetValue();
 
-    void    AddChannel(channel_t* Channel) { fListOfChannels->Add(Channel); }
+    void    AddChannel  (channel_t* Channel) { fListOfChannels->Add(Channel); }
+
+    void    AddParameter(parameter_t* Par  ) { fListOfParameters->Add(Par); }
     
     // set parameter values for the next event (pseudoexperiment)
     int     InitParameters();

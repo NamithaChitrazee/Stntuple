@@ -4,23 +4,22 @@
 //         = 2: print value
 //         > 2: more detailed printout
 ////////////////////////////////////////////////////////////////////////////////
-#include "Stntuple/stat/dio_channel_t.hh"
+#include "Stntuple/stat/pbar_channel_t.hh"
 
 namespace stntuple {
 
-  dio_channel_t::dio_channel_t(const char* Name, int Debug) : channel_t(Name, Debug) {
+  pbar_channel_t::pbar_channel_t(const char* Name, int Debug) : channel_t(Name, Debug) {
     fLumi           = nullptr;
   }
 
 //-----------------------------------------------------------------------------
-//  assume that all nuisanse and non-nuisance parameters have been initalized
+//  assume that all nuisanse parameters have been initalized
+//  BGR \propto N(events)/lumi 
 //-----------------------------------------------------------------------------
-  double dio_channel_t::GetValue() {
+  double pbar_channel_t::GetValue() {
 
     fVal = fBgr->GetValue();
-
-    // scale with fluctuated luminosity:
-
+					// scale with fluctuated luminosity:
     if (fLumi) {
       fVal = fVal*fLumi->GetValue()/fLumi->Mean();
     }
