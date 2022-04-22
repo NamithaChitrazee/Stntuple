@@ -3,17 +3,17 @@
 # Script to build the files found in this directory.
 #------------------------------------------------------------------------------
 import os
-Import('env')
+Import('stntuple_env')
 Import('stntuple_helper')
 #------------------------------------------------------------------------------
 # 2016-10-10: add ROOT 'EG' library after 'Physics' library
 #------------------------------------------------------------------------------
 def local_build():
 
-    local_env = env.Clone()
+    local_env = stntuple_env.Clone()
     rootlibs  = local_env['ROOTLIBS']
 
-    if ( not ("MathMore"   in rootlibs)): rootlibs.insert(rootlibs.index("MathCore")+1,"MathMore");
+    if ( not ("MathMore" in rootlibs)): rootlibs.insert(rootlibs.index("MathCore")+1,"MathMore");
 
     debug  = False
     helper = stntuple_helper(local_env,debug);
