@@ -4,18 +4,19 @@
 //         = 2: print value
 //         > 2: more detailed printout
 ////////////////////////////////////////////////////////////////////////////////
-#include "Stntuple/stat/dio_channel_t.hh"
+#include "Stntuple/stat/rpco_channel_t.hh"
 
 namespace stntuple {
 
-  dio_channel_t::dio_channel_t(const char* Name, int Debug) : channel_t(Name, Debug) {
+  rpco_channel_t::rpco_channel_t(const char* Name, int Debug) : channel_t(Name, Debug) {
     fLumi           = nullptr;
   }
 
 //-----------------------------------------------------------------------------
-//  assume that all nuisanse and non-nuisance parameters have been initalized
+//  assume that all nuisanse parameters have been initalized
+//  BGR \propto N(events)/lumi 
 //-----------------------------------------------------------------------------
-  double dio_channel_t::GetValue() {
+  double rpco_channel_t::GetValue() {
 
     fVal = fBgr->GetValue();
 					// scale with fluctuated luminosity:
@@ -26,7 +27,7 @@ namespace stntuple {
 					// expect addcorr to be close to 1
     double add_corr = GetAddCorr();
     fVal = fVal*add_corr;
-    
+
     if (fDebug) {
       fHistPDF->Fill(fVal);
     }

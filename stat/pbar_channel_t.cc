@@ -23,6 +23,10 @@ namespace stntuple {
     if (fLumi) {
       fVal = fVal*fLumi->GetValue()/fLumi->Mean();
     }
+					// additive smearing
+					// expect addcorr to be close to 1
+    double add_corr = GetAddCorr();
+    fVal = fVal*add_corr;
 
     if (fDebug) {
       fHistPDF->Fill(fVal);

@@ -2,91 +2,146 @@
 // init file shoudl define a function void init_mu2e_model(su2020::Mu2e_model* M)
 ///////////////////////////////////////////////////////////////////////////////
 #include "Stntuple/stat/model_t.hh"
+
 #include "Stntuple/stat/pgaus_t.hh"
 #include "Stntuple/stat/plogn_t.hh"
+#include "Stntuple/stat/ppoi_t.hh"
+
 #include "Stntuple/stat/dio_channel_t.hh"
 #include "Stntuple/stat/pbar_channel_t.hh"
+#include "Stntuple/stat/rpci_channel_t.hh"
+#include "Stntuple/stat/rpco_channel_t.hh"
+#include "Stntuple/stat/cosm_channel_t.hh"
+#include "Stntuple/stat/mu2e_channel_t.hh"
 
 using namespace stntuple;
 
 stntuple::model_t* m(nullptr);
 //-----------------------------------------------------------------------------
-void build_model(stntuple::model_t* m, const char* Config, int Debug = 0) {
+void build_model(stntuple::model_t* m) {
 
+  int debug(1);
+  
   // nuisanse parameters
   // initialize default SU2020 configuration
   // luminosity: simple parameter with gaussian fluctuations, 10% relative uncertainty
   // definition of the relative uncertainty: sigma/mean
 
-  double pbar_bkg_mean = 9.76248e-03;
-  double pbar_bkg_relu = 1.;               // sigma/mean = 100%
+  double pbar_bkg_mean  = 9.76248e-03;
+  double pbar_bkg_relu  = 1.;               // sigma/mean = 100%
   
-  double dio_bkg_mean  = 3.75955e-02;
-  double dio_bkg_relu  = 0.63;             // sigma/mean = 63% (the larger part)
+  double dio_bkg_mean   = 3.75955e-02;
+  double dio_bkg_relu   = 0.63;             // sigma/mean = 63% (the larger part)
   
   double rpci_bkg_mean  = 1.06887e-02;
-  double rpci_rel_unc   = 0.29;             // sigma/mean = 29% 
+  double rpci_bkg_relu  = 0.29;             // sigma/mean = 29% 
 
   double extinction     = 0.; // 1          // in units of 1.e-10;    
 
   double rpco_bkg_mean  = 14.5e-4;
-  double rpco_rel_unc   = 0.12;             // no low-momentum dependence 
+  double rpco_bkg_relu  = 0.12;             // no low-momentum dependence 
   
   double cosm_bkg_mean  = 4.74529e-2;
-  double cosm_rel_unc   = 0.20;             // no low-momentum dependence 
+  double cosm_bkg_relu  = 0.20;             // no low-momentum dependence 
   
   pgaus_t* lumi = new pgaus_t("lumi",1.0, 0.1 , debug);
+//-----------------------------------------------------------------------------
+// luminosity : high-luminosity cut-off in the simulation introduces additional
+//-----------------------------------------------------------------------------
+  double npot_1b   = 2.86e19;		               // one-batch mode POT, for separate batch uncertainties
+  double npot_2b   = 9.03e18;                          // two-batch mode POT, for separate batch uncertainties
 
-  pgaus_t* dio  = new plogn_t("dio" ,dio_bkg_mean ,dio_bkg_relu ,debug);
+  double eff_ur_1b       = 0.994;                      // inefficiency of the upstream track rejection
+  double eff_ur_2b       = 0.986;		       //
+  
+  float crv_deadtime_1b    (0.040094062);   // wrong weights: (1.67927e-02);
+  float crv_deadtime_2b    (0.15103281) ;   // wrong weights: (7.62028e-02);
+
+  float crv_deadtime_c_1b  (0.015486111);   // cosmic flux is independent on the beam
+  float crv_deadtime_c_2b  (0.076176295);
+
+  double lumi_cutoff_1b  = 1-0.99342;	               // simulation cutoff - didn't simulate pulse intensities 
+  double lumi_cutoff_2b  = 1-0.88785;		       // above 12e7/pulse
+
+  // these fluctuate with 
+  double np_1b           = npot_1b*(1-crv_deadtime_1b)*eff_ur_1b*(1-lumi_cutoff_1b/2.);
+  double np_2b           = npot_2b*(1-crv_deadtime_2b)*eff_ur_2b*(1-lumi_cutoff_2b/2.);
+
+  double np_tot          = np_1b + np_2b;
+
+  // uniform uncertainty on the reco efficiency above 12e7 protons/pulse - an additive parameter
+  
+  double x1b_max        = npot_1b*(1-crv_deadtime_1b)*eff_ur_1b/np_tot*(lumi_cutoff_1b/2);
+  double x1b_min        = -x1b_max;
+  
+  double x2b_max        = npot_2b*(1-crv_deadtime_2b)*eff_ur_2b/np_tot*(lumi_cutoff_2b/2);
+  double x2b_min        = -x2b_max;
+
+  pflat_t* eff1b         = new pflat_t("eff1b",x1b_min,x1b_max,debug); 
+  pflat_t* eff2b         = new pflat_t("eff2b",x2b_min,x2b_max,debug); 
+//-----------------------------------------------------------------------------
+// effect of luminosity cutoff for cosmics: 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+// background means
+//-----------------------------------------------------------------------------
+  plogn_t* dio  = new plogn_t("dio" ,dio_bkg_mean ,dio_bkg_relu ,debug);
   plogn_t* pbar = new plogn_t("pbar",pbar_bkg_mean,pbar_bkg_relu,debug);
   plogn_t* rpci = new plogn_t("rpci",rpci_bkg_mean,rpci_bkg_relu,debug);
   plogn_t* rpco = new plogn_t("rpco",rpco_bkg_mean,rpco_bkg_relu,debug);
   plogn_t* cosm = new plogn_t("cosm",cosm_bkg_mean,cosm_bkg_relu,debug);
 
-  dio_channel_t* dio_channel = new dio_channel_t("dio"    ,Debug);
+  dio_channel_t* dio_channel = new dio_channel_t("dio"    ,debug);
   dio_channel->SetBgr(dio);
   dio_channel->fLumi = lumi;
+  dio_channel->AddPAdd(eff1b);
+  dio_channel->AddPAdd(eff2b);
 
   pbar_channel_t* pbar_channel = new pbar_channel_t("pbar",debug);
   pbar_channel->SetBgr(pbar);
   pbar_channel->fLumi = lumi;
+  pbar_channel->AddPAdd(eff1b);
+  pbar_channel->AddPAdd(eff2b);
 
   rpci_channel_t* rpci_channel = new rpci_channel_t("rpci",debug);
   rpci_channel->SetBgr(rpci);
   rpci_channel->fLumi = lumi;
+  rpci_channel->AddPAdd(eff1b);
+  rpci_channel->AddPAdd(eff2b);
 
   rpco_channel_t* rpco_channel = new rpco_channel_t("rpco",debug);
   rpco_channel->SetBgr(rpco);
   rpco_channel->fLumi = lumi;
+  rpco_channel->AddPAdd(eff1b);
+  rpco_channel->AddPAdd(eff2b);
 //-----------------------------------------------------------------------------
+// cosmics
 // no luminosity related uncertainty for cosmics
 // make sure cosmics iis anti-correlated with the luminosity
 //-----------------------------------------------------------------------------
   cosm_channel_t* cosm_channel = new cosm_channel_t("cosm",debug);
   cosm_channel->SetBgr(cosm);
 //-----------------------------------------------------------------------------
-// now - mu --> e signal 
+// mu --> e signal 
 //-----------------------------------------------------------------------------
   double assumed_Rmue  = 1.e-15;
   double sign_mean     = 4.08396;
   double sign_relu     = 0.04;		                // uncertainty on the signal acceptance - mom scale
-  double ses           = 1./(*tot_pot*1.59e-3*0.609);   // for signal strength -> R_mue, SES if acceptance was 100%
+  double ses           = 1./(np_tot*1.59e-3*0.609);     // for signal strength -> R_mue, SES if acceptance was 100%
   double sign_acc      = sign_mean*(ses/assumed_Rmue) ; // 4.23637*ses/assumed_Rmue ;  // 0.11735881;
+
+  ppoi_t* mu2e = new ppoi_t("mu2e_poi",sign_mean,sign_relu,debug);
 
   mu2e_channel_t* mu2e_channel = new mu2e_channel_t("mu2e",debug);
   mu2e_channel->SetBgr(mu2e);
-  mu2e_channel->fLumi = mu2e;
+  mu2e_channel->fLumi = lumi;
+  mu2e_channel->AddPAdd(eff1b);
+  mu2e_channel->AddPAdd(eff2b);
+  mu2e_channel->SetSignal(1);
 //-----------------------------------------------------------------------------
-// luminosity : high-luminosity cut-off in the simulation introduces additional
-// uncertainty: 
+// for cosmics it is different
 //-----------------------------------------------------------------------------
-  double one_batch_pot   = 2.86e19;
-  double two_batch_pot   = 9.03e18;                    // two-batch mode POT, for separate batch uncertainties
-  double eff_ur_1b       = 0.994;
-  double eff_ur_1b       = 0.;
-  double tot_pot         = one_batch_pot + two_batch_pot;
-  double two_batch_ineff = 0.;           // inefficiency due to intensity cut-off already in background estimates
-  double two_batch_unc   = scaleUncertainty_*1.00; // assume two-batch mode loss is 6% +- 6%
+
 //-----------------------------------------------------------------------------
 // to make it easy to loop over all channels, the signal is supposed to be the last
 // channel and it should have a flag
@@ -96,15 +151,18 @@ void build_model(stntuple::model_t* m, const char* Config, int Debug = 0) {
   m->AddParameter(pbar);
   m->AddParameter(rpci);
   m->AddParameter(rpco);
+  m->AddParameter(cosm);
   m->AddParameter(mu2e);
+  m->AddParameter(eff1b);
+  m->AddParameter(eff2b);
 					// add background channels
-  m->AddChannel(dio_channel ,0);
-  m->AddChannel(pbar_channel,0);
-  m->AddChannel(rpci_channel,0);
-  m->AddChannel(rpco_channel,0);
-  m->AddChannel(cosm_channel,0);
+  m->AddChannel(dio_channel );
+  m->AddChannel(pbar_channel);
+  m->AddChannel(rpci_channel);
+  m->AddChannel(rpco_channel);
+  m->AddChannel(cosm_channel);
 					// add signal
-  m->AddChannel(mu2e_channel,1);        // doesn't have to be the last one 
+  m->AddChannel(mu2e_channel);        // doesn't have to be the last one 
 //-----------------------------------------------------------------------------
 // fixed luminosity 
 //-----------------------------------------------------------------------------
@@ -360,20 +418,23 @@ void test_012(int SaveHist = 0) {
 }
 
 //-----------------------------------------------------------------------------
-void test_010(int NEvents = 10, int SaveHist = 0) {
+// buld null PDF of the Mu2e SU2020 statitical model
+//-----------------------------------------------------------------------------
+void test_101(int SaveHist = 0) {
 
+  TString name = Form("%s",__func__);
   if (m) delete m;
   
-  m = new stntuple::model_t("aaa");
+  m = new stntuple::model_t(name.Data());
 
-  build_model(m,"default");
+  build_model(m);
 
-  m->GeneratePDF();
+  m->GenerateNullPDF();
 
   // at this point can draw PDF...and save histograms
   
   if (SaveHist > 0) {
-    TString fn = Form("mu2e_sensitivity.%s.hist","test_001");
+    TString fn = Form("mu2e_sensitivity.%s.hist",name.Data());
     m->SaveHist(fn.Data());
   }
 }

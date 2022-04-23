@@ -31,6 +31,20 @@ namespace stntuple {
   }
 
   
+  int model_t::GenerateNullPDF() {
+
+    for (int i=0; i<fNPExp; i++) {
+					// step 1: initalize all parameters
+      InitParameters();
+					// for now, val is the total expected background 
+      double val = GetNullValue();
+      double x   = fRng->Poisson(val);
+      fHistPDF->Fill(x);
+    }
+    return 0;
+  }
+
+
   int model_t::GeneratePDF() {
 
     for (int i=0; i<fNPExp; i++) {
@@ -58,6 +72,24 @@ namespace stntuple {
 
 //-----------------------------------------------------------------------------
 // get total expected Poisson mean (background)
+//-----------------------------------------------------------------------------
+  double model_t::GetNullValue() {
+
+    int nc = fListOfChannels->GetEntriesFast();
+
+    double val = 0;
+    
+    for (int i=0; i<nc; i++) {
+      channel_t* ch = GetChannel(i);
+      if (ch->Signal() == 0) {
+	val += ch->GetValue();
+      }
+    }
+    return val;
+  }
+
+//-----------------------------------------------------------------------------
+// get total expected Poisson mean, including signal
 //-----------------------------------------------------------------------------
   double model_t::GetValue() {
 

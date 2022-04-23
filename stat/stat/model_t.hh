@@ -34,10 +34,11 @@ namespace stntuple {
     model_t(const char* Name);
     ~model_t();
     
+    double  GetNullValue();
+
     double  GetValue();
 
-    void    AddChannel  (channel_t* Channel, int Signal = 0) { 
-      Channel->SetSignal(Signal);
+    void    AddChannel  (channel_t* Channel) { 
       fListOfChannels->Add(Channel); 
     }
 
@@ -46,6 +47,8 @@ namespace stntuple {
     // set parameter values for the next event (pseudoexperiment)
     int     InitParameters();
     
+    int     GenerateNullPDF();
+
     int     GeneratePDF();
 
     int     SaveHist(const char* Filename);
