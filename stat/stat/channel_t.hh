@@ -15,7 +15,7 @@
 namespace stntuple {
   class  channel_t : public TNamed {
   public:
-    parameter_t*  fBgr;
+    parameter_t*  fProcess;
     TH1D*         fHistPDF;
     int           fDebug;
     int           fSignal;        // normally - zero, for signal = 1
@@ -36,7 +36,7 @@ namespace stntuple {
     
     void   SetSignal(int Signal) { fSignal = Signal; }
     
-    void   SetBgr(parameter_t* Bgr);
+    void   SetProcess(parameter_t* Process);
     
     void   AddPAdd(parameter_t* Par) { fListOfPAdd->Add(Par); }
   };

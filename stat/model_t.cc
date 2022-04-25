@@ -18,7 +18,9 @@ namespace stntuple {
     fListOfParameters->SetOwner(kTRUE);
 
     fRng              = new ROOT::Math::RandomRanLux();
-    fHistPDF          = new TH1D(Form("h_model_%s",name),"PDF",50,0,50);
+    fHistNullPDF      = new TH1D(Form("h_model_%s_null_pdf",name),"Null PDF"       ,50,0,50);
+    fHistS0BPDF       = new TH1D(Form("h_model_%s_s0b_pdf"  ,name),"S+B  PDF"      ,50,0,50);
+    fHistS1BPDF       = new TH1D(Form("h_model_%s_s1b_pdf"  ,name),"S(mean)+B  PDF",50,0,50);
     fNPExp            = 1000000;
   }
 
@@ -27,47 +29,9 @@ namespace stntuple {
     delete fListOfChannels;
     delete fListOfParameters;
     delete fRng;
-    delete fHistPDF;
-  }
-
-  
-  int model_t::GenerateNullPDF() {
-
-    for (int i=0; i<fNPExp; i++) {
-					// step 1: initalize all parameters
-      InitParameters();
-					// for now, val is the total expected background 
-      double val = GetNullValue();
-      double x   = fRng->Poisson(val);
-      fHistPDF->Fill(x);
-    }
-    return 0;
-  }
-
-
-  int model_t::GeneratePDF() {
-
-    for (int i=0; i<fNPExp; i++) {
-					// step 1: initalize all parameters
-      InitParameters();
-					// for now, val is the total expected background 
-      double val = GetValue();
-      double x   = fRng->Poisson(val);
-      fHistPDF->Fill(x);
-    }
-    return 0;
-  }
-
-
-  int model_t::InitParameters() {
-
-    int np = fListOfParameters->GetEntriesFast();
-
-    for (int i=0; i<np; i++) {
-      parameter_t* p = GetParameter(i);
-      p->InitValue();
-    }
-    return 0;
+    delete fHistNullPDF;
+    delete fHistS0BPDF;
+    delete fHistS1BPDF;
   }
 
 //-----------------------------------------------------------------------------
@@ -104,11 +68,55 @@ namespace stntuple {
     return val;
   }
 
+  
+  int model_t::GeneratePDF() {
+
+    for (int i=0; i<fNPExp; i++) {
+					// step 1: initalize all parameters
+      InitParameters();
+					// for now, val is the total expected background 
+      double null_val = GetNullValue(); // this returns the fluctuated background mean
+      double x_null   = fRng->Poisson(null_val);
+      fHistNullPDF->Fill(x_null);
+					// account for correlations
+
+      channel_t* sig   = SignalChannel();
+
+      double s0    = sig->fProcess->Mean(); // assume Poisson, fluctuate only the mean
+      double x_s0  = fRng->Poisson(s0);
+      double x_s0b = x_null+x_s0;
+      fHistS0BPDF->Fill(x_s0b);
+
+
+      // in the calculation of the s1b value, sig and background are fluctuated in GetValue()
+      // with parameters defining the signal also fluctuated
+      double s1      = sig->GetValue();
+      double x_s1  = fRng->Poisson(s1);
+      double x_s1b = x_null+x_s1;
+      fHistS1BPDF->Fill(x_s1b);
+
+    }
+    return 0;
+  }
+
+  int model_t::InitParameters() {
+
+    int np = fListOfParameters->GetEntriesFast();
+
+    for (int i=0; i<np; i++) {
+      parameter_t* p = GetParameter(i);
+      p->InitValue();
+    }
+    return 0;
+  }
+
   int model_t::SaveHist(const char* Filename) {
 
     TFile* f = new TFile(Filename,"recreate");
 
-    fHistPDF->Write();
+    fHistNullPDF->Write();
+    fHistS0BPDF->Write();
+    fHistS1BPDF->Write();
 
     // hUL->Write();
     // hULR->Write();

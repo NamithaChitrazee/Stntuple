@@ -18,7 +18,7 @@ namespace stntuple {
 //-----------------------------------------------------------------------------
   double cosm_channel_t::GetValue() {
 
-    fVal = fBgr->GetValue();
+    fVal = fProcess->GetValue();
 //-----------------------------------------------------------------------------
 // cosmics: scale with fluctuated *inverse* luminosity - the lower is the luminosity,
 // the longer is the data taking time

@@ -12,8 +12,6 @@
 namespace stntuple {
   class  cosm_channel_t : public channel_t {
   public:
-    double     fMean;
-    double     fSigma;
     double     fVal;
     
     pgaus_t*   fLumi;			// explicitly - just one nuisanse parameter

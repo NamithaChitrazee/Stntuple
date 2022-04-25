@@ -92,25 +92,25 @@ void build_model(stntuple::model_t* m) {
   plogn_t* cosm = new plogn_t("cosm",cosm_bkg_mean,cosm_bkg_relu,debug);
 
   dio_channel_t* dio_channel = new dio_channel_t("dio"    ,debug);
-  dio_channel->SetBgr(dio);
+  dio_channel->SetProcess(dio);
   dio_channel->fLumi = lumi;
   dio_channel->AddPAdd(eff1b);
   dio_channel->AddPAdd(eff2b);
 
   pbar_channel_t* pbar_channel = new pbar_channel_t("pbar",debug);
-  pbar_channel->SetBgr(pbar);
+  pbar_channel->SetProcess(pbar);
   pbar_channel->fLumi = lumi;
   pbar_channel->AddPAdd(eff1b);
   pbar_channel->AddPAdd(eff2b);
 
   rpci_channel_t* rpci_channel = new rpci_channel_t("rpci",debug);
-  rpci_channel->SetBgr(rpci);
+  rpci_channel->SetProcess(rpci);
   rpci_channel->fLumi = lumi;
   rpci_channel->AddPAdd(eff1b);
   rpci_channel->AddPAdd(eff2b);
 
   rpco_channel_t* rpco_channel = new rpco_channel_t("rpco",debug);
-  rpco_channel->SetBgr(rpco);
+  rpco_channel->SetProcess(rpco);
   rpco_channel->fLumi = lumi;
   rpco_channel->AddPAdd(eff1b);
   rpco_channel->AddPAdd(eff2b);
@@ -120,7 +120,7 @@ void build_model(stntuple::model_t* m) {
 // make sure cosmics iis anti-correlated with the luminosity
 //-----------------------------------------------------------------------------
   cosm_channel_t* cosm_channel = new cosm_channel_t("cosm",debug);
-  cosm_channel->SetBgr(cosm);
+  cosm_channel->SetProcess(cosm);
 //-----------------------------------------------------------------------------
 // mu --> e signal 
 //-----------------------------------------------------------------------------
@@ -133,7 +133,7 @@ void build_model(stntuple::model_t* m) {
   ppoi_t* mu2e = new ppoi_t("mu2e_poi",sign_mean,sign_relu,debug);
 
   mu2e_channel_t* mu2e_channel = new mu2e_channel_t("mu2e",debug);
-  mu2e_channel->SetBgr(mu2e);
+  mu2e_channel->SetProcess(mu2e);
   mu2e_channel->fLumi = lumi;
   mu2e_channel->AddPAdd(eff1b);
   mu2e_channel->AddPAdd(eff2b);
@@ -188,7 +188,7 @@ void test_001(int SaveHist = 0) {
 
   dio_channel_t* dio_channel = new dio_channel_t("dio"    ,debug); // 
 
-  dio_channel->SetBgr(dio);
+  dio_channel->SetProcess(dio);
   dio_channel->fLumi = lumi;
 
   m->AddParameter(lumi);
@@ -232,7 +232,7 @@ void test_002(int SaveHist = 0) {
   
   dio_channel_t* dio_channel = new dio_channel_t("dio"    ,debug); // 
 
-  dio_channel->SetBgr(dio);
+  dio_channel->SetProcess(dio);
   dio_channel->fLumi = lumi;
 
   m->AddChannel(dio_channel);
@@ -273,7 +273,7 @@ void test_003(int SaveHist = 0) {
   
   dio_channel_t* dio_channel = new dio_channel_t("dio"    ,debug); // 
 
-  dio_channel->SetBgr(dio);
+  dio_channel->SetProcess(dio);
   dio_channel->fLumi = lumi;
 
   m->AddChannel(dio_channel);
@@ -314,7 +314,7 @@ void test_004(int SaveHist = 0) {
   
   dio_channel_t* dio_channel = new dio_channel_t("dio"    ,debug); // 
 
-  dio_channel->SetBgr(dio);
+  dio_channel->SetProcess(dio);
   dio_channel->fLumi = lumi;
 
   m->AddChannel(dio_channel);
@@ -355,8 +355,8 @@ void test_011(int SaveHist = 0) {
 
   pbar_channel_t* pbar_channel = new pbar_channel_t("pbar",debug);
 
-  pbar_channel->SetBgr(pbar);
-  pbar_channel->fLumi              = lumi;
+  pbar_channel->SetProcess(pbar);
+  pbar_channel->fLumi = lumi;
 
   m->AddChannel(pbar_channel);
 //-----------------------------------------------------------------------------
@@ -396,8 +396,8 @@ void test_012(int SaveHist = 0) {
 
   pbar_channel_t* pbar_channel = new pbar_channel_t("pbar",debug);
 
-  pbar_channel->SetBgr(pbar);
-  pbar_channel->fLumi              = lumi;
+  pbar_channel->SetProcess(pbar);
+  pbar_channel->fLumi          = lumi;
 //-----------------------------------------------------------------------------
 // luminosity
 //-----------------------------------------------------------------------------
@@ -429,7 +429,7 @@ void test_101(int SaveHist = 0) {
 
   build_model(m);
 
-  m->GenerateNullPDF();
+  m->GeneratePDF();
 
   // at this point can draw PDF...and save histograms
   

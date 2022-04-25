@@ -9,7 +9,7 @@
 namespace stntuple {
 
   channel_t::channel_t(const char* Name, int Debug): TNamed(Name,Name) {
-    fBgr            = nullptr;
+    fProcess            = nullptr;
     fHistPDF        = nullptr;
     fDebug          = Debug;
     fSignal         = 0;
@@ -17,7 +17,7 @@ namespace stntuple {
   }
 
   channel_t::~channel_t() {
-    // do not delete fBgr - it is owned by model list
+    // do not delete fProcess - it is owned by model list
     if (fHistPDF) delete fHistPDF;
     delete fListOfPAdd;
   }
@@ -25,19 +25,19 @@ namespace stntuple {
 //  assume that all nuisanse parameters have been initalized
 //-----------------------------------------------------------------------------
   double channel_t::GetValue() {
-    double val = fBgr->GetValue();
+    double val = fProcess->GetValue();
 
     if (fDebug > 0) fHistPDF->Fill(val);
     return val;
   }
 
-  void channel_t::SetBgr(parameter_t* Bgr) {
+  void channel_t::SetProcess(parameter_t* Process) {
     int nbins(1000);
     
-    fBgr = Bgr;
+    fProcess = Process;
     if (fDebug) {
       TString name = Form("h_channel_%s",GetName());
-      fHistPDF     = new TH1D(name,Form("BGR channel %s",GetName()),nbins,fBgr->XMin(),fBgr->XMax());
+      fHistPDF     = new TH1D(name,Form("BGR channel %s",GetName()),nbins,fProcess->XMin(),fProcess->XMax());
     }
   }
 

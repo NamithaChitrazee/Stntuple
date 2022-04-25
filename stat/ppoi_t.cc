@@ -12,10 +12,13 @@ namespace stntuple {
     int nbins(1000);
     
     fMean  = Mean ;
-    fSigma = Sigma;			// doesn't make sense here
+    fSigma = Sigma;			// sigma - reflects fluctuations of the mean
     
     // double bin = (Mean+10*Sigma)/nbins;
-    fHistPDF = new TH1D(Form("h_par_%s",Name),"parameter",nbins,0,Mean+10*Sigma);
+
+    double xmax = Mean+10*sqrt(Mean);
+    xmax = (int (xmax/10.) + 1)*10;
+    fHistPDF = new TH1D(Form("h_par_%s",Name),"parameter",nbins,0,xmax);
   }
 
 //-----------------------------------------------------------------------------

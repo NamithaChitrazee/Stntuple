@@ -18,7 +18,7 @@ namespace stntuple {
 //-----------------------------------------------------------------------------
   double pbar_channel_t::GetValue() {
 
-    fVal = fBgr->GetValue();
+    fVal = fProcess->GetValue();
 					// scale with fluctuated luminosity:
     if (fLumi) {
       fVal = fVal*fLumi->GetValue()/fLumi->Mean();

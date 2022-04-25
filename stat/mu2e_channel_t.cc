@@ -17,8 +17,9 @@ namespace stntuple {
 //  BGR \propto N(events)/lumi 
 //-----------------------------------------------------------------------------
   double mu2e_channel_t::GetValue() {
-
-    fVal = fBgr->GetValue();
+					// don't fluctuate the Poisson, just
+					// corrected mean
+    fVal = fProcess->Mean();
 					// scale with fluctuated luminosity:
     if (fLumi) {
       fVal = fVal*fLumi->GetValue()/fLumi->Mean();

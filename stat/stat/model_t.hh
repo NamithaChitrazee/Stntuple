@@ -26,8 +26,12 @@ namespace stntuple {
     int                       fNPseudoExperiments;
 
     ROOT::Math::RandomRanLux* fRng;
-    TH1D*                     fHistPDF;
+    TH1D*                     fHistNullPDF;
+    TH1D*                     fHistS0BPDF;
+    TH1D*                     fHistS1BPDF;
     int                       fNPExp;             // N(pseudoexperiments) to run to generate PDF
+
+    channel_t*                fSignalChannel;
 // -----------------------------------------------------------------------------
 // functions
 //-----------------------------------------------------------------------------
@@ -38,18 +42,22 @@ namespace stntuple {
 
     double  GetValue();
 
-    void    AddChannel  (channel_t* Channel) { 
-      fListOfChannels->Add(Channel); 
+    void    AddChannel  (channel_t* Channel) {
+					// assume there is only one signal
+      fListOfChannels->Add(Channel);
+      if (Channel->Signal() != 0) fSignalChannel = Channel;
     }
+
+    channel_t* SignalChannel() { return fSignalChannel; }
 
     void    AddParameter(parameter_t* Par  ) { fListOfParameters->Add(Par); }
     
     // set parameter values for the next event (pseudoexperiment)
     int     InitParameters();
     
-    int     GenerateNullPDF();
-
     int     GeneratePDF();
+
+    //    int     GenerateSBPDF();
 
     int     SaveHist(const char* Filename);
 
