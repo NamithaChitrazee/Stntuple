@@ -12,8 +12,8 @@
 namespace stntuple {
   class  parameter_t : public TNamed {
   public:
-    double                    fValue;
-    double                    fMean;
+    double                    fValue;                   // current value
+    double                    fMean;                    // mean (set parameter)
     ROOT::Math::RandomRanLux* fRng;
     TH1D*                     fHistPDF;			// PDF distribution
     int                       fDebug;
@@ -32,14 +32,16 @@ namespace stntuple {
     virtual double  XMax();
 
     virtual void    InitValue();
-    
+					// GetValue returns fluctuated mean
+
     double          GetValue    () { return fValue; };
     double          InverseValue() { return 1./fValue; };
 
     TH1D*           GetHistPDF() { return fHistPDF; };
 
-    void            SetDebug(int Value) { fDebug = Value; }
-    void            SetFixed(int Value) { fFixed = Value; }
+    void            SetDebug(int    Value) { fDebug = Value; }
+    void            SetFixed(int    Value) { fFixed = Value; }
+    void            SetMean (double Mean ) { fMean  = Mean;  }
     
     virtual void    Print(const Option_t* Opt) const ;
 

@@ -86,6 +86,9 @@ void TFeldmanCousins::InitPoissonDist(double Mean, double* Prob, double* CumProb
 }
 
 //-----------------------------------------------------------------------------
+// initialize (Poisson) signal and background  PDF's and distributions
+// of their running integrals
+//-----------------------------------------------------------------------------
 void TFeldmanCousins::Init(double Bgr, double Sig) {
   //  fSigMean = SigMean;
 

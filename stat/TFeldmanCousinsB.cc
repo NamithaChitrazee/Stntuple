@@ -147,6 +147,87 @@ int TFeldmanCousinsB::ConstructInterval(double MuB, double MuS) {
       }
     }
 
+    if (fDebugLevel > 10) {
+      PrintData("Rank   " ,'i',fRank     ,18);
+    }
+  }
+//-----------------------------------------------------------------------------
+// build confidence interval corresponding to the probability fCL - 0.9 , 0.95, etc
+//-----------------------------------------------------------------------------
+  fIMin       = MaxNx;
+  fIMax       = -1;
+
+  int covered = 0;
+  fProb       = 0;
+  
+  for (int ix=0; ix<MaxNx; ix++) {
+    int ind = fRank[ix];
+    fProb  += fBsProb[ind];
+    if (ind < fIMin) fIMin = ind;
+    if (ind > fIMax) fIMax = ind;
+
+    if (fDebugLevel > 0) {
+      printf(" ix ind=fRank[ix] fBsProb[ind] fProb, 1-fProb fIMin fIMax :%3i %3i %10.3e %10.3e %10.3e %3i %3i\n",
+	     ix,ind,fBsProb[ind],fProb,1-fProb,fIMin,fIMax);
+    }
+    
+    if (fProb > fCL) {
+      covered = 1;
+      break;
+    }
+  }
+
+  if (covered == 0) {
+    printf("trouble ! interval not covered : prob = %12.5e , 1-CL = %12.5e\n",fProb,1-fCL);
+  }
+
+  return rc;
+}
+
+int TFeldmanCousinsB::ConstructInterval(model_t* Model) {
+//-----------------------------------------------------------------------------
+// Model already comes with initialized probability distributions and cumulative probability
+// distribution
+//
+// output: [fIMin,fIMax] : a CL interval constructed using FC ordering for given 
+//         MuB and MuS
+//-----------------------------------------------------------------------------
+  int rc(0);				// return code
+
+  //  Init(MuB,MuS);
+
+  double mub = Model->MuB();
+  
+  for (int ix=0; ix<MaxNx; ix++) {
+    double sbest = ix-mub;
+
+    if (sbest <= 0) sbest = 0;
+
+    double sb = sbest+mub;
+
+    fBestProb[ix] = TMath::Power(sb,ix)*TMath::Exp(-sb)/fFactorial[ix];
+    fBestSig [ix] = sbest;
+    fLhRatio [ix] = fBsProb[ix]/fBestProb[ix];
+  }
+//-----------------------------------------------------------------------------
+// sort ranks
+//-----------------------------------------------------------------------------
+  double rmax;
+    
+  for (int i=0; i<MaxNx; i++) fRank[i] = i;
+
+  for (int i1=0; i1<MaxNx-1; i1++) {
+    rmax = fLhRatio[fRank[i1]];
+    for (int i2=i1+1; i2<MaxNx; i2++) {
+      double r2 = fLhRatio[fRank[i2]];
+      if (r2 > rmax) {
+	rmax      = r2;
+	int i     = fRank[i1];
+	fRank[i1] = fRank[i2];
+	fRank[i2] = i;
+      }
+    }
+
     if (fDebugLevel > 0) {
       PrintData("Rank   " ,'i',fRank     ,18);
     }
@@ -314,7 +395,7 @@ void TFeldmanCousinsB::DiscoveryProbMean(double MuB, double SMin, double SMax, i
       sum      += sig;
       sumn     += 1;
       if (fDebugLevel > 0) {
-	printf("i, rn, p, sig, sum : %3i %3i %15.8e %12.5e %12.5e\n",i,rn, p,sig, sum);
+	printf("i, tot, rn, p, sig, sum : %3i %10.4f %3i %15.8e %12.5e %12.5e\n",i,tot,rn, p,sig, sum);
       }
     }
     
@@ -323,6 +404,73 @@ void TFeldmanCousinsB::DiscoveryProbMean(double MuB, double SMin, double SMax, i
     if (fDebugLevel > 0) {
       printf("ix, sum, sumn, MuS[ix], Prob[ix] : %3i %12.5e %10.3e %12.5e %12.5e\n",
 	     ix,sum,sumn,MuS[ix],Prob[ix]);
+    }
+  }
+}
+
+
+void TFeldmanCousinsB::DiscoveryProbMean(model_t* Model, double SMin, double SMax, int NPoints, double* MuS, double* NSig) {
+//-----------------------------------------------------------------------------
+// in general, need to scan a range of signals, call this function multiple times
+// watch for 5 
+// construct FC CL confidence interval (covering fCL) for MuS=0
+//-----------------------------------------------------------------------------
+  double step = (NPoints > 1) ? (SMax-SMin)/(NPoints-1) : 0;
+
+  parameter_t* signal_process = Model->SignalChannel()->Process();
+
+  for (int ix=0; ix<NPoints; ix++) {
+					// scan a range of signal strengths
+    MuS[ix]    = SMin+ix*step;
+    signal_process->SetMean(MuS[ix]);	// should be fixed
+//-----------------------------------------------------------------------------
+// ndisc: number of "discovery experiments", pseudoexperiments in which NULL
+// hypothesis is excluded at (1-fCL) level
+//-----------------------------------------------------------------------------
+    double sum  = 0;
+    for (long int i=0; i<fNExp; i++) {
+					// next pseudoexperiment: fluctuate nuisanse parameters
+      Model->InitParameters();
+					// fluctuated background mean for this pseudoexperiment
+      
+      double mub = Model->GetNullValue();
+					// why do I need to construct an interval here? - probably, I don't
+      //      ConstructInterval(Model);
+					// signal strength, fluctuated in a correlated way with the background
+
+      double mus = signal_process->GetValue();
+
+      // model->GetValue() should do the same, but need to test
+
+      // the total
+      double tot = mub+mus;
+      
+      int    nobs = fRn.Poisson(tot);
+//-----------------------------------------------------------------------------
+// define probability for the background to fluctuate and result in an observatioin
+// of 'nobs' or more events
+//-----------------------------------------------------------------------------
+      double p;
+      if (nobs > 0) p = ROOT::Math::poisson_cdf_c(nobs-1,mub);
+      else          p = ROOT::Math::poisson_cdf_c(0     ,mub);
+//-----------------------------------------------------------------------------
+// 'sig' is the deviation, in units of a 'gaussian sigma' corresponding
+// to the probability 'p' of the background to fluctuate and give 'nobs' or more events
+// such that p = Integral(sig,infinity)
+//-----------------------------------------------------------------------------
+      double sig = ROOT::Math::gaussian_quantile_c(p,1);
+
+      sum      += sig;
+      if (fDebugLevel > 0) {
+	printf("i, tot, nobs, p, sig, sum : %3li %10.4f %3i %15.8e %12.5e %12.5e\n",i,tot,nobs, p,sig, sum);
+      }
+    }
+    
+    NSig[ix]  = sum/fNExp; // ROOT::Math::gaussian_quantile(pp,1);
+
+    if (fDebugLevel > 0) {
+      printf("ix, sum, fNExp, MuS[ix], NSig[ix] : %3i %12.5e %12li %12.5e %12.5e\n",
+	     ix,sum,fNExp,MuS[ix],NSig[ix]);
     }
   }
 }

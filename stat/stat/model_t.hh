@@ -32,24 +32,40 @@ namespace stntuple {
     int                       fNPExp;             // N(pseudoexperiments) to run to generate PDF
 
     channel_t*                fSignalChannel;
+
+    double                    fMuB;	// mean
+    double                    fMuBx;	// mean, Poisson-smeared
+    double                    fMuS;     // mean
+    double                    fMuSx;    // mean, Poisson-smeared
 // -----------------------------------------------------------------------------
 // functions
 //-----------------------------------------------------------------------------
     model_t(const char* Name);
     ~model_t();
-    
-    double  GetNullValue();
 
-    double  GetValue();
+    double       GetBackgroundMean();
+    
+    double       GetNullValue();
+    double       GetValue();
+
+    double       MuB () { return fMuB;  }
+    double       MuBx() { return fMuBx; }
+    double       MuS () { return fMuS;  }
+    double       MuSx() { return fMuSx; }
+    int          NParameters() { return fListOfParameters->GetEntriesFast(); }
+    int          NChannels  () { return fListOfChannels->GetEntriesFast();   }
+
+    parameter_t* Parameter(int I) { return (parameter_t*) fListOfParameters->UncheckedAt(I); }
+    channel_t*   Channel  (int I) { return (channel_t*  ) fListOfChannels->UncheckedAt(I)  ; }
+    channel_t*   SignalChannel () { return fSignalChannel; }
+
 
     void    AddChannel  (channel_t* Channel) {
 					// assume there is only one signal
       fListOfChannels->Add(Channel);
       if (Channel->Signal() != 0) fSignalChannel = Channel;
     }
-
-    channel_t* SignalChannel() { return fSignalChannel; }
-
+    
     void    AddParameter(parameter_t* Par  ) { fListOfParameters->Add(Par); }
     
     // set parameter values for the next event (pseudoexperiment)
@@ -67,8 +83,13 @@ namespace stntuple {
 
     parameter_t* GetParameter(int I) { return (parameter_t*) fListOfParameters->At(I); }
 
-    channel_t* GetChannel(int I) { return (channel_t*) fListOfChannels->At(I); }
+    channel_t*   GetChannel  (int I) { return (channel_t*) fListOfChannels->At(I)    ; }
+
+//-----------------------------------------------------------------------------
+// overloaded functions of TObject
+//-----------------------------------------------------------------------------
+    void Print(const Option_t* Opt = "") const ;
     
-};
+  };
 }
 #endif

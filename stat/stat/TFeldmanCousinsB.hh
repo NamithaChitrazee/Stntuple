@@ -1,6 +1,8 @@
 //
-#ifndef __murat_alg_Stntuple_TFeldmanCousinsB__
-#define __murat_alg_Stntuple_TFeldmanCousinsB__
+// if needed, modify interface, to accomodate for the model with systematics
+//
+#ifndef __Stntuple_stat_TFeldmanCousinsB__
+#define __Stntuple_stat_TFeldmanCousinsB__
 
 #include "TRandom3.h"
 #include "TH1.h"
@@ -8,6 +10,8 @@
 #include "TMath.h"
 #include "TNamed.h"
 #include  "TGraph.h"
+
+#include "Stntuple/stat/model_t.hh"
 
 namespace stntuple {
 class TFeldmanCousinsB : public TNamed {
@@ -84,9 +88,12 @@ public:
   void   SetDebugLevel  (int Level ) { fDebugLevel = Level; };
   
   void   Init           (double Bgr, double Sig);
-  void   InitProbabilityDist(TStatModel* Model, double* Prob, double* CumProb, int NMax);
+
+  void   InitPoissonDist(double Mean, double* Prob, double* CumProb, int N);
 
   int    ConstructInterval(double Bgr, double Sig);
+
+  int    ConstructInterval(model_t* Model);
   
   int    ConstructBelt    (double Bgr, double SMin, double SMax, int NPoints);
 
@@ -104,7 +111,10 @@ public:
   // plot discovery probability for a given background and signal range
   // calling makes sense only if CL=-1
   // discovery corresponds to NSig = 5
-  void   DiscoveryProbMean(double MuB, double SMin, double SMax, int NPoints, double* MuS, double* NSig);
+  // output: arrays of MuS and NSig, NPoints in size each
+  // if NPoints=1, calculate NSig only for SMin
+  void   DiscoveryProbMean(double   MuB  , double SMin, double SMax, int NPoints, double* MuS, double* NSig);
+  void   DiscoveryProbMean(model_t* Model, double SMin, double SMax, int NPoints, double* MuS, double* NSig);
 
   void   PlotDiscoveryProbMean(double MuB, double Mu2);
 

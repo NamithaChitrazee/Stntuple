@@ -14,11 +14,13 @@
 #include "Stntuple/stat/cosm_channel_t.hh"
 #include "Stntuple/stat/mu2e_channel_t.hh"
 
+#include "Stntuple/stat/TFeldmanCousinsB.hh"
+
 using namespace stntuple;
 
 stntuple::model_t* m(nullptr);
 //-----------------------------------------------------------------------------
-void build_model(stntuple::model_t* m) {
+void build_model_001(stntuple::model_t* m) {
 
   int debug(1);
   
@@ -170,6 +172,47 @@ void build_model(stntuple::model_t* m) {
 //-----------------------------------------------------------------------------
 // at this point all initializations are done
 //-----------------------------------------------------------------------------
+}
+
+//-----------------------------------------------------------------------------
+// build a simple model with a signal and one background channel
+// vary signal and background, but not their uncertainties
+//-----------------------------------------------------------------------------
+void build_model_002(stntuple::model_t* m, double MuS, double MuB) {
+  int debug(1);
+  // parameters
+  
+  pgaus_t* lumi = new pgaus_t("lumi", 0.10, 0.01,debug);  // 10% fluctuations
+  plogn_t* pbar = new plogn_t("pbar", MuB , 1.00,debug);
+  ppoi_t*  mu2e = new ppoi_t ("mu2e", MuS , 0.1 ,debug);
+
+					// fix parameters
+  // lumi->SetFixed(1);
+  // pbar->SetFixed(1);
+  // mu2e->SetFixed(1);
+					// add parameters to the model
+  m->AddParameter(lumi);
+  m->AddParameter(pbar);
+  m->AddParameter(mu2e);
+//----------------------------------------------------------------------------- 
+// define two processes
+//----------------------------------------------------------------------------- 
+  pbar_channel_t* pbar_channel = new pbar_channel_t("bgr",debug);
+  pbar_channel->SetProcess(pbar);
+  pbar_channel->fLumi = lumi;
+
+  mu2e_channel_t* mu2e_channel = new mu2e_channel_t("mu2e",debug);
+  mu2e_channel->SetProcess(mu2e);
+  mu2e_channel->fLumi = lumi;
+  mu2e_channel->SetSignal(1);
+//-----------------------------------------------------------------------------
+// add channels, at this point all channels need to be fuully specified and
+// the signal channel flagged as such
+//-----------------------------------------------------------------------------
+  m->AddChannel(pbar_channel);
+  m->AddChannel(mu2e_channel);		// signal
+
+  if (debug) m->Print();
 }
 
 //-----------------------------------------------------------------------------
@@ -418,7 +461,7 @@ void test_012(int SaveHist = 0) {
 }
 
 //-----------------------------------------------------------------------------
-// buld null PDF of the Mu2e SU2020 statitical model
+// buld null and non-null PDFs of the Mu2e SU2020 statitical model
 //-----------------------------------------------------------------------------
 void test_101(int SaveHist = 0) {
 
@@ -427,9 +470,166 @@ void test_101(int SaveHist = 0) {
   
   m = new stntuple::model_t(name.Data());
 
-  build_model(m);
+  build_model_001(m);
 
   m->GeneratePDF();
+
+  // at this point can draw PDF...and save histograms
+  
+  if (SaveHist > 0) {
+    TString fn = Form("mu2e_sensitivity.%s.hist",name.Data());
+    m->SaveHist(fn.Data());
+  }
+}
+
+//-----------------------------------------------------------------------------
+// validate calculation of the discovery potential, using a simple model
+//-----------------------------------------------------------------------------
+void test_102(int FixParameters = 1, int SaveHist = 0) {
+
+  TString name = Form("%s",__func__);
+  if (m) delete m;
+//------------------------------------------------------------------------------
+// build a model
+//-----------------------------------------------------------------------------
+  m = new stntuple::model_t(name.Data());
+
+  double mub(0.1);
+  double mus(5.0);
+					// signal, then - background
+  build_model_002(m,mus,mub);
+					// for this test, don't need to generate a PDF
+  if (FixParameters) { 
+  					// fix values of all model parameters
+    int np = m->NParameters();
+    for (int i=0; i<np; i++) {
+      parameter_t* p = m->Parameter(i);
+      p->SetFixed(1);
+    }
+  }
+//------------------------------------------------------------------------------
+// create a statistical calculator
+//-----------------------------------------------------------------------------
+  int model_debug;
+  TFeldmanCousinsB* fc = new TFeldmanCousinsB(name.Data(),-1,model_debug=0);
+  fc->SetNExp(100000);
+
+  double sig[100], nsig[100], smin, smax;
+  int    npoints;
+
+  printf(" ------------ old interface:\n");
+  fc->DiscoveryProbMean(mub,smin=4.5,smax=5.5,npoints=11,sig,nsig);
+
+  for (int i=0; i<npoints; i++) {
+    printf("i, sig[i], nsig[i] : %3i %10.4f %10.4f\n",i,sig[i],nsig[i]);
+  }
+  
+  printf(" ------------ new interface:\n");
+  fc->DiscoveryProbMean(m, smin=4.5, smax=5.5, npoints=11, sig, nsig);
+
+  for (int i=0; i<npoints; i++) {
+    printf("i, sig[i], nsig[i] : %3i %10.4f %10.4f\n",i,sig[i],nsig[i]);
+  }
+  
+  // at this point can draw PDF...and save histograms
+  
+  if (SaveHist > 0) {
+    int par_code = FixParameters*1000;
+    TString fn = Form("mu2e_sensitivity.%s.%04i.hist",name.Data(), par_code);
+    m->SaveHist(fn.Data());
+  }
+}
+
+//-----------------------------------------------------------------------------
+// validate calculation of the discovery potential, using a simple model
+//-----------------------------------------------------------------------------
+void test_103(int FixParameters = 1, int SaveHist = 0) {
+
+  TString name = Form("%s",__func__);
+  if (m) delete m;
+//------------------------------------------------------------------------------
+// build a model
+//-----------------------------------------------------------------------------
+  m = new stntuple::model_t(name.Data());
+
+					// build_model_001 defines SU2020 backgrounds
+  build_model_001(m);
+					// for this test, don't need to generate a PDF
+  if (FixParameters) { 
+  					// fix values of all model parameters
+    int np = m->NParameters();
+    for (int i=0; i<np; i++) {
+      parameter_t* p = m->Parameter(i);
+      p->SetFixed(1);
+    }
+  }
+//------------------------------------------------------------------------------
+// create a statistical calculator
+//-----------------------------------------------------------------------------
+  int model_debug;
+  TFeldmanCousinsB* fc = new TFeldmanCousinsB(name.Data(),-1,model_debug=0);
+  fc->SetNExp(100000);
+
+  double sig[100], nsig[100], smin, smax;
+  int    npoints;
+
+  double mub = m->GetBackgroundMean();
+  
+  printf(" ------------ old interface: mub = %10.5f\n",mub);
+  fc->DiscoveryProbMean(mub,smin=4.5,smax=5.5,npoints=11,sig,nsig);
+
+  for (int i=0; i<npoints; i++) {
+    printf("i, sig[i], nsig[i] : %3i %10.4f %10.4f\n",i,sig[i],nsig[i]);
+  }
+  
+  printf(" ------------ new interface: mub = %10.5f\n",mub);
+  fc->DiscoveryProbMean(m, smin=4.5, smax=5.5, npoints=11, sig, nsig);
+
+  for (int i=0; i<npoints; i++) {
+    printf("i, sig[i], nsig[i] : %3i %10.4f %10.4f\n",i,sig[i],nsig[i]);
+  }
+  
+  // at this point can draw PDF...and save histograms
+  
+  if (SaveHist > 0) {
+    int par_code = FixParameters*1000;
+    TString fn = Form("mu2e_sensitivity.%s.%04i.hist",name.Data(), par_code);
+    m->SaveHist(fn.Data());
+  }
+}
+
+//-----------------------------------------------------------------------------
+// add construction of the Feldman-Cousins belt
+// to begin with, fix all parameters
+//-----------------------------------------------------------------------------
+void test_201(int SaveHist = 0) {
+
+  TString name = Form("%s",__func__);
+  if (m) delete m;
+  
+  m = new stntuple::model_t(name.Data());
+
+  build_model_001(m);
+					// fix values of all model parameters
+  int np = m->NParameters();
+  for (int i=0; i<np; i++) {
+    parameter_t* p = m->Parameter(i);
+    p->SetFixed(1);
+  }
+
+  m->GeneratePDF();
+
+  m->Print();
+
+  TFeldmanCousinsB* fc = new TFeldmanCousinsB(name.Data(),-1,1);
+
+  double mub = m->MuB();
+  double mus = m->MuS();
+  
+  fc->ConstructInterval(mub,mus);
+  
+					// in principle, need only PDF's, as 
+  fc->ConstructInterval(m);
 
   // at this point can draw PDF...and save histograms
   

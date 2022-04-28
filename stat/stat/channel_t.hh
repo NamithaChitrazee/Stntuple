@@ -26,19 +26,21 @@ namespace stntuple {
     channel_t(const char* Name="undefined_channel", int Debug = 0);
     ~channel_t();
 					// returns 1 for the signal channel
-    int    Signal() { return fSignal; }
+    int            Signal() { return fSignal; }
 
-    TH1D*  GetHistPDF() { return fHistPDF; }
+    parameter_t*   Process() { return fProcess; }
 
-    double GetAddCorr();
+    TH1D*          GetHistPDF() { return fHistPDF; }
+
+    double         GetAddCorr();
     
-    virtual double  GetValue();
+    virtual double GetValue();
     
-    void   SetSignal(int Signal) { fSignal = Signal; }
+    void           SetSignal(int Signal) { fSignal = Signal; }
     
-    void   SetProcess(parameter_t* Process);
+    void           SetProcess(parameter_t* Process);
     
-    void   AddPAdd(parameter_t* Par) { fListOfPAdd->Add(Par); }
+    void           AddPAdd(parameter_t* Par) { fListOfPAdd->Add(Par); }
   };
 }
 #endif
