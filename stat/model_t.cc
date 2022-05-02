@@ -35,7 +35,7 @@ namespace stntuple {
   }
 
 //-----------------------------------------------------------------------------
-// get total expected Poisson mean (background)
+// get total expected fluctuated (!) Poisson mean (background only)
 //-----------------------------------------------------------------------------
   double model_t::GetNullValue() {
 
@@ -53,7 +53,7 @@ namespace stntuple {
   }
 
 //-----------------------------------------------------------------------------
-// get total expected Poisson mean (background)
+// get total expected Poisson mean (background, no fluctuations of the nuisance parameters)
 //-----------------------------------------------------------------------------
   double model_t::GetBackgroundMean() {
 

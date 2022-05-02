@@ -17,8 +17,8 @@ namespace stntuple {
 class TFeldmanCousinsB : public TNamed {
 public:
   enum {
-	MaxNx = 200,                    // max Poisson bin
-	MaxNy = 10000,			// max steps in Mu
+	MaxNx = 50,                    // max Poisson bin
+	MaxNy = 100,		       // max steps in Mu
   };   
 
   struct Hist_t {
@@ -120,7 +120,8 @@ public:
 
   int    SolveFor(double Val, const double* X, const double* Y, int NPoints, double* XVal);
 
-  void   UpperLimit(double MuB, double SMin, double SMax, int NPoints, double* S, double* Prob);
+  void   UpperLimit(double   MuB  , double SMin, double SMax, int NPoints, double* S, double* Prob);
+  void   UpperLimit(model_t* Model, double SMin, double SMax, int NPoints, double* S, double* Prob);
   
   ClassDef(TFeldmanCousinsB,0)
 };

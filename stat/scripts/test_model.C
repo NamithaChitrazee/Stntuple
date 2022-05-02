@@ -18,7 +18,9 @@
 
 using namespace stntuple;
 
-stntuple::model_t* m(nullptr);
+stntuple::model_t*          m (nullptr);
+stntuple::TFeldmanCousinsB* fc(nullptr);
+
 //-----------------------------------------------------------------------------
 void build_model_001(stntuple::model_t* m) {
 
@@ -541,7 +543,7 @@ void test_102(int FixParameters = 1, int SaveHist = 0) {
 }
 
 //-----------------------------------------------------------------------------
-// validate calculation of the discovery potential, using a simple model
+// validate calculation of the discovery potential, using a full model
 //-----------------------------------------------------------------------------
 void test_103(int FixParameters = 1, int SaveHist = 0) {
 
@@ -599,42 +601,99 @@ void test_103(int FixParameters = 1, int SaveHist = 0) {
 }
 
 //-----------------------------------------------------------------------------
-// add construction of the Feldman-Cousins belt
-// to begin with, fix all parameters
+// validate calculation of an upper limit, using a simple model
 //-----------------------------------------------------------------------------
-void test_201(int SaveHist = 0) {
+void test_111(int FixParameters = 1, int SaveHist = 0) {
 
   TString name = Form("%s",__func__);
   if (m) delete m;
-  
+//------------------------------------------------------------------------------
+// build a model
+//-----------------------------------------------------------------------------
   m = new stntuple::model_t(name.Data());
 
-  build_model_001(m);
-					// fix values of all model parameters
-  int np = m->NParameters();
-  for (int i=0; i<np; i++) {
-    parameter_t* p = m->Parameter(i);
-    p->SetFixed(1);
+  double mub(0.1);
+  double mus(5.0);
+					// signal, then - background
+  build_model_002(m,mus,mub);
+					// for this test, don't need to generate a PDF
+  if (FixParameters) { 
+  					// fix values of all model parameters
+    int np = m->NParameters();
+    for (int i=0; i<np; i++) {
+      parameter_t* p = m->Parameter(i);
+      p->SetFixed(1);
+    }
   }
+					// create statistical calculator
+  int debug_fc;
 
-  m->GeneratePDF();
+  if (fc) delete fc;
+  fc = new TFeldmanCousinsB(name.Data(),-1,debug_fc=1);
+  fc->SetNExp(1);
 
-  m->Print();
+  double sig[100], prob[100], smin, smax;
+  int    npoints;
 
-  TFeldmanCousinsB* fc = new TFeldmanCousinsB(name.Data(),-1,1);
+  printf(" ------------ old interface:\n");
+  fc->UpperLimit(mub,smin=1.,smax=5.,npoints=1,sig,prob);
 
-  double mub = m->MuB();
-  double mus = m->MuS();
+  for (int i=0; i<npoints; i++) {
+    printf("i, sig[i], prob[i] : %3i %10.4f %10.4f\n",i,sig[i],prob[i]);
+  }
   
-  fc->ConstructInterval(mub,mus);
-  
-					// in principle, need only PDF's, as 
-  fc->ConstructInterval(m);
+  printf(" ------------ new interface:\n");
+  fc->UpperLimit(m, smin=1., smax=5., npoints=1, sig, prob);
 
-  // at this point can draw PDF...and save histograms
-  
+  for (int i=0; i<npoints; i++) {
+    printf("i, sig[i], prob[i] : %3i %10.4f %10.4f\n",i,sig[i],prob[i]);
+  }
+					// at this point can draw PDF...and save histograms
   if (SaveHist > 0) {
-    TString fn = Form("mu2e_sensitivity.%s.hist",name.Data());
+    int par_code = FixParameters*1000;
+    TString fn = Form("mu2e_sensitivity.%s.%04i.hist",name.Data(), par_code);
     m->SaveHist(fn.Data());
   }
 }
+
+
+
+//-----------------------------------------------------------------------------
+// validate calculation of a FC interval using a simple model
+//-----------------------------------------------------------------------------
+void test_121(int FixParameters = 1) {
+
+  TString name = Form("%s",__func__);
+  if (m) delete m;
+//------------------------------------------------------------------------------
+// build a model
+//-----------------------------------------------------------------------------
+  m = new stntuple::model_t(name.Data());
+
+  double mub(3.0);
+  double mus(0.5);
+					// signal, then - background
+  build_model_002(m,mus,mub);
+					// for this test, don't need to generate a PDF
+  if (FixParameters) { 
+  					// fix values of all model parameters
+    int np = m->NParameters();
+    for (int i=0; i<np; i++) {
+      parameter_t* p = m->Parameter(i);
+      p->SetFixed(1);
+    }
+  }
+					// create statistical calculator
+  int debug_fc;
+
+  if (fc) delete fc;
+  fc = new TFeldmanCousinsB(name.Data(),0.9,debug_fc=11);
+  fc->SetNExp(1);
+
+  double sig[100], prob[100], smin, smax;
+  int    npoints;
+
+  fc->ConstructInterval(mub,mus);
+
+}
+
