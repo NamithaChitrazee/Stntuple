@@ -17,7 +17,7 @@ namespace stntuple {
 class TFeldmanCousinsB : public TNamed {
 public:
   enum {
-    MaxNx =   20,                   // max Poisson bin
+    MaxNx =   50,                   // max Poisson bin
     MaxNy = 1001		    // max steps in Mu
   };   
 
@@ -123,6 +123,12 @@ public:
   // if NPoints=1, calculate NSig only for SMin
   void   DiscoveryProbMean(double   MuB  , double SMin, double SMax, int NPoints, double* MuS, double* NSig);
   void   DiscoveryProbMean(model_t* Model, double SMin, double SMax, int NPoints, double* MuS, double* NSig);
+
+					// MuS : signal corresponding to 50% prob
+					// Prob: probability corresponding to the signal (should be close to 50%)
+  
+  void   DiscoveryMedian  (double   MuB  , double SMin, double SMax, double* MuS, double* Prob) ;
+  void   DiscoveryMedian  (model_t* Model, double SMin, double SMax, double* MuS, double* Prob) ;
 
   void   PlotDiscoveryProbMean(double MuB, double Mu2);
 

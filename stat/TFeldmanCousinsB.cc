@@ -301,7 +301,9 @@ int TFeldmanCousinsB::ConstructBelt(double MuB, double SMin, double SMax, int NP
 
   if (NPoints > MaxNy) {
     NPoints = MaxNy;
-    printf("TFeldmanCousinsB::ConstructBelt WARNING: NPOints > MaxNY, truncating, NPoints=%i\n",MaxNy);
+    if (fDebugLevel.fConstructBelt > 0) {
+      printf("TFeldmanCousinsB::ConstructBelt WARNING: NPOints > MaxNY, truncating, NPoints=%i\n",MaxNy);
+    }
   }
   
   fBelt.fBgr  = MuB;
@@ -321,8 +323,10 @@ int TFeldmanCousinsB::ConstructBelt(double MuB, double SMin, double SMax, int NP
       }
     }
     else {
-      printf("TFeldmanCousinsB::ConstructBelt: ERROR: MuB=%10.4f mus=%10.4f IY = %3i interval not defined\n",
-	     MuB, mus,iy);
+      if (fDebugLevel.fConstructBelt > 0) {
+	printf("TFeldmanCousinsB::ConstructBelt: ERROR: MuB=%10.4f mus=%10.4f IY = %3i interval not defined\n",
+	       MuB, mus,iy);
+      }
       for (int ix=0; ix<MaxNx; ix++) {
 	fBelt.fCont[iy][ix] = 0;
       }
@@ -445,6 +449,219 @@ void TFeldmanCousinsB::DiscoveryProbMean(double MuB, double SMin, double SMax, i
 	     ix,sum,sumn,MuS[ix],Prob[ix]);
     }
   }
+}
+
+
+void TFeldmanCousinsB::DiscoveryMedian(double MuB, double SMin, double SMax, double* MuS, double* Prob) {
+//-----------------------------------------------------------------------------
+//
+//-----------------------------------------------------------------------------
+  *MuS  = -1;
+  *Prob = -1;
+
+  double NSIG(5.);
+  double EPS(1.e-3);
+//-----------------------------------------------------------------------------
+// ndisc: number of "discovery experiments", pseudoexperiments in which NULL
+// hypothesis is excluded at (1-fCL) level
+//-----------------------------------------------------------------------------
+  double ndisc = 0;
+  
+  double tot1 = MuB+SMin;
+  for (int i=0; i<fNExp; i++) {
+    int rn = fRn.Poisson(tot1);
+//-----------------------------------------------------------------------------
+// define probability for the background to fluctuate above rn
+//-----------------------------------------------------------------------------
+    double p;
+    if (rn > 0) p   = ROOT::Math::poisson_cdf_c(rn-1,MuB);
+    else        p   = ROOT::Math::poisson_cdf_c(0   ,MuB);
+    
+    double      sig = ROOT::Math::gaussian_quantile_c(p,1);
+    
+    if (sig > NSIG) ndisc++;
+  }
+    
+  double p1 = ndisc/fNExp;
+
+  printf("MuB = %10.5f Sig = %10.5f P = %10.5f\n",MuB,SMin,p1);
+
+
+  ndisc = 0;
+  double tot2 = MuB+SMax;
+  for (int i=0; i<fNExp; i++) {
+    int rn = fRn.Poisson(tot2);
+//-----------------------------------------------------------------------------
+// define probability for the background to fluctuate above rn
+//-----------------------------------------------------------------------------
+    double p;
+    if (rn > 0) p   = ROOT::Math::poisson_cdf_c(rn-1,MuB);
+    else        p   = ROOT::Math::poisson_cdf_c(0   ,MuB);
+    
+    double      sig = ROOT::Math::gaussian_quantile_c(p,1);
+    
+    if (sig > NSIG) ndisc++;
+  }
+    
+  double p2 = ndisc/fNExp;
+  printf("MuB = %10.5f Sig = %10.5f P = %10.5f\n",MuB,SMax,p2);
+
+  if (((p1 < 0.5) and (p2 < 0.5)) or ((p1 > 0.5) and (p2 > 0.5))) {
+    printf("eeeee\n");
+    return;
+  }
+
+  double smin = SMin;
+  double smax = SMax;
+
+  double prob(-1);
+  while (smax-smin > EPS) {
+    double s   = (smin+smax)/2;
+    double tot = s+MuB;
+
+    ndisc = 0;
+    for (int i=0; i<fNExp; i++) {
+      int rn = fRn.Poisson(tot);
+//-----------------------------------------------------------------------------
+// define probability for the background to fluctuate above rn
+//-----------------------------------------------------------------------------
+      double p;
+      if (rn > 0) p   = ROOT::Math::poisson_cdf_c(rn-1,MuB);
+      else        p   = ROOT::Math::poisson_cdf_c(0   ,MuB);
+      
+      double      sig = ROOT::Math::gaussian_quantile_c(p,1);
+    
+      if (sig > NSIG) ndisc++;
+    }
+
+    prob = ndisc/fNExp;
+    printf("MuB = %10.5f s   = %10.5f P = %10.5f\n",MuB,s,prob);
+
+    if   (prob < 0.5) smin = s;
+    else              smax = s;
+  }
+
+  *MuS  = (smin+smax)/2;
+  *Prob = prob;
+
+  printf("END: MuB = %10.5f s = %10.5f P = %10.5f\n",MuB,*MuS,*Prob);
+}
+
+  
+void TFeldmanCousinsB::DiscoveryMedian(model_t* Model, double SMin, double SMax, double* MuS, double* Prob) {
+//-----------------------------------------------------------------------------
+//
+//-----------------------------------------------------------------------------
+  *MuS  = -1;
+  *Prob = -1;
+
+  double sold = Model->SignalChannel()->Process()->Mean();
+
+  double NSIG(5.  );
+  double EPS(1.e-3);
+//-----------------------------------------------------------------------------
+// ndisc: number of "discovery experiments", pseudoexperiments in which NULL
+// hypothesis is excluded at (1-fCL) level
+//-----------------------------------------------------------------------------
+  double ndisc = 0;
+
+  double mub   = Model->GetBackgroundMean();
+  
+  double tot1 = mub+SMin;
+  for (int i=0; i<fNExp; i++) {
+    int rn = fRn.Poisson(tot1);
+//-----------------------------------------------------------------------------
+// define probability for the background to fluctuate above rn
+//-----------------------------------------------------------------------------
+    double p;
+    if (rn > 0) p   = ROOT::Math::poisson_cdf_c(rn-1,mub);
+    else        p   = ROOT::Math::poisson_cdf_c(0   ,mub);
+    
+    double      sig = ROOT::Math::gaussian_quantile_c(p,1);
+    
+    if (sig > NSIG) ndisc++;
+  }
+    
+  double p1 = ndisc/fNExp;
+
+  printf("MuB = %10.5f Sig = %10.5f P = %7.5f\n",mub,SMin,p1);
+
+
+  ndisc = 0;
+  double tot2 = mub+SMax;
+  for (int i=0; i<fNExp; i++) {
+    int rn = fRn.Poisson(tot2);
+//-----------------------------------------------------------------------------
+// define probability for the background to fluctuate to 'rn' or above
+//-----------------------------------------------------------------------------
+    double p;
+    if (rn > 0) p   = ROOT::Math::poisson_cdf_c(rn-1,mub);
+    else        p   = ROOT::Math::poisson_cdf_c(0   ,mub);
+    
+    double      sig = ROOT::Math::gaussian_quantile_c(p,1);
+    
+    if (sig > NSIG) ndisc++;
+  }
+    
+  double p2 = ndisc/fNExp;
+  printf("MuB = %10.5f Sig = %10.5f P = %7.5f\n",mub,SMax,p2); // 
+
+  if (((p1 < 0.5) and (p2 < 0.5)) or ((p1 > 0.5) and (p2 > 0.5))) {
+    printf("eeeee\n");
+    return;
+  }
+//-----------------------------------------------------------------------------
+// finally, do the job
+//-----------------------------------------------------------------------------
+  double smin = SMin;
+  double smax = SMax;
+
+  double mus, tot;
+  int    nobs;
+
+  double prob(-1);
+  while (smax-smin > EPS) {
+    double s   = (smin+smax)/2;
+    Model->SignalChannel()->Process()->SetMean(s);
+
+    ndisc = 0;
+    for (int i=0; i<fNExp; i++) {
+//-----------------------------------------------------------------------------
+// define probability for the background to fluctuate above rn
+// next pseudoexperiment
+//-----------------------------------------------------------------------------
+      Model->InitParameters();
+      
+      mub  = Model->GetNullValue  ();
+      mus  = Model->SignalChannel()->Process()->GetValue();
+      tot  = mub+mus;
+      
+      nobs = fRn.Poisson(tot);
+
+      double p;
+      if (nobs > 0) p = ROOT::Math::poisson_cdf_c(nobs-1,mub);
+      else          p = ROOT::Math::poisson_cdf_c(0     ,mub);
+      
+      double      sig = ROOT::Math::gaussian_quantile_c(p,1);
+    
+      if (sig > NSIG) ndisc++;
+    }
+
+    prob = ndisc/fNExp;
+    printf("MuB = %10.5f s   = %10.5f P = %7.5f\n",mub,s,prob);
+
+    if   (prob < 0.5) smin = s;
+    else              smax = s;
+  }
+//-----------------------------------------------------------------------------
+// done
+//-----------------------------------------------------------------------------
+  Model->SignalChannel()->Process()->SetMean(sold);
+  
+  *MuS  = (smin+smax)/2;
+  *Prob = prob;
+  
+  printf("END: MuB = %10.5f s = %10.5f P = %10.5f\n", Model->GetBackgroundMean(),*MuS,*Prob);
 }
 
 
@@ -728,7 +945,7 @@ void TFeldmanCousinsB::UpperLimit(double MuB, double SMin, double SMax, int NPoi
   }
   double p2 = double(nexcl)/double(fNExp);
 
-  if ((p1 > fCL) or  (p2 < fCL)) {
+  if ((p1 > 0.5) or  (p2 < 0.5)) {
     // the point of interest is whole interval is beyond the interval
     printf("TFeldmanCousinsB::UpperLimit: CL beyond the interval: p(SMin), p(SMax): %10.5f %10.5f\n",p1,p2);
     return -1;
@@ -741,7 +958,7 @@ void TFeldmanCousinsB::UpperLimit(double MuB, double SMin, double SMax, int NPoi
   double smin = SMin;
 
   double s(-1);
-  while ((p < fCL) or (smax-smin > EPS)) {
+  while ((p < 0.5) or (smax-smin > EPS)) {
     s = (smin+smax)/2;                 // calculate probability of S being excluded
 
     nexcl = 0;
@@ -752,7 +969,7 @@ void TFeldmanCousinsB::UpperLimit(double MuB, double SMin, double SMax, int NPoi
 
     p = double(nexcl)/double(fNExp);
 
-    if (p > fCL) smax = s;
+    if (p > 0.5) smax = s;
     else         smin = s;
 
     printf(" s, smin, smax, p : %10.5f %10.5f %10.5f %10.5f\n",s,smin,smax,p);
@@ -774,7 +991,7 @@ int TFeldmanCousinsB::UpperLimit(model_t* Model, double SMin, double SMax, doubl
   
   double mub = Model->GetBackgroundMean();
 
-  ConstructBelt(mub,0,10,1001);
+  ConstructBelt(mub,0,20,401);
 //-----------------------------------------------------------------------------
 // nexcl: number of pseudoexperiments in which the NULL hypothesis is excluded at (1-fCL) level
 // fCL fraction of pseudoexperiments excluded the hypothesis
@@ -794,20 +1011,20 @@ int TFeldmanCousinsB::UpperLimit(model_t* Model, double SMin, double SMax, doubl
   double p2 = double(nexcl)/double(fNExp);
 
   printf("TFeldmanCousinsB::UpperLimit: p(SMin), p(SMax): %10.5f %10.5f\n",p1,p2);
-  if ((p1 > fCL) or  (p2 < fCL)) {
+  if ((p1 > 0.5) or  (p2 < 0.5)) {
     // the point of interest is whole interval is beyond the interval
     printf("TFeldmanCousinsB::UpperLimit: ERROR: beyond the interval, BAIL OUT\n");
     return -1;
   }
 					// can't do anything smarter as the function has breaks
-  double p    (-1.);
+  double p    (-1.  );
   double EPS  (1.e-3);
 
   double smax = SMax;
   double smin = SMin;
 
   double s(-1);
-  while ((p < fCL) or (smax-smin > EPS)) {
+  while ((p < 0.5) or (smax-smin > EPS)) {
     s = (smin+smax)/2;                 // calculate probability of S being excluded
 
     nexcl = 0;
@@ -821,7 +1038,7 @@ int TFeldmanCousinsB::UpperLimit(model_t* Model, double SMin, double SMax, doubl
 	printf("i, mub : %10i %12.5f\n",i,mub);
       }
       
-      ConstructBelt(mub,0,10,1001);
+      ConstructBelt(mub,0,20,401);
       
       int nobs = fRn.Poisson(mub);
       if (s > fBelt.fSign[nobs][1]) nexcl++;
@@ -829,7 +1046,7 @@ int TFeldmanCousinsB::UpperLimit(model_t* Model, double SMin, double SMax, doubl
 
     p = double(nexcl)/double(fNExp);
 
-    if (p > fCL) smax = s;
+    if (p > 0.5) smax = s;
     else         smin = s;
 
     printf(" s, smin, smax, p : %10.5f %10.5f %10.5f %10.5f\n",s,smin,smax,p);

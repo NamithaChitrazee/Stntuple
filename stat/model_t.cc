@@ -186,5 +186,7 @@ namespace stntuple {
     printf("fMuBx = %10.4f\n",fMuBx);
     printf("fMuS  = %10.4f\n",fMuS );
     printf("fMuSx = %10.4f\n",fMuSx);
+
+    printf("<MuB> : 8.5f\n",GetBackgroundMean());
   }
 }

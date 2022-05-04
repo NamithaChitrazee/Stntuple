@@ -1,13 +1,35 @@
 ///////////////////////////////////////////////////////////////////////////////
-// init file shoudl define a function void init_mu2e_model(su2020::Mu2e_model* M)
+// regression testing
+// ------------------
+// init file should define a function void init_mu2e_model(su2020::Mu2e_model* M)
+//
+// build_model_001(stntuple::model_t* m) : SU2020 model
+//
+// build_model_002(stntuple::model_t* m, double MuS, double MuB):
+//                a simple model with a POI  signal channel,
+//                one background        LOGN channel,
+//                and a                 GAUS luminosity parameter which has a 10\% uncertainty
+//
+// test_001: test gaussian channel mub=0.01  with fixed luminosity
+// test_002: test gaussian channel mub=0.01  with luminosity fluctuating by 10%
+// test_003: test gaussian channel mub=0.10  with fixed luminosity
+// test_004: test gaussian channel mub=0.10  with luminosity fluctuating by 10%
+// test_011: test lognormal channel Mub=0.1 and sig/mean = 1 not smeared with the gaussian
+// test_012: test lognormal channel Mub=0.1 and sig/mean = 1     smeared with the gaussian
 //
 // test_112: validate calculation of an upper 90% CL limit, using a simple model, old interface
 // test_113: validate calculation of an upper 90% CL limit, using a simple model, new interface
+// test_114: calculation of the upper 90% CL limit, SU2020  model, old interface
+// test_115: calculation of the upper 90% CL limit, full SU2020 model, new interface
+//
 // test_121: validate calculation of a FC interval using a simple model
 //           default parameter values (MuB = 3.0, MuS = 0.5) are the ones from the FC
 //           paper example
+//
 // test_122: validate calculation of a FC belt using a simple model
-//           default parameter values (MuB = 3.0, MuS = 0 - 5) 
+//           default parameter values (MuB = 3.0, MuS = 0 - 5)
+//
+// test_201: test calculating the median discovery limit 
 ///////////////////////////////////////////////////////////////////////////////
 #include "Stntuple/stat/model_t.hh"
 
@@ -50,7 +72,7 @@ void build_model_001(stntuple::model_t* m) {
 
   double extinction     = 0.; // 1          // in units of 1.e-10;    
 
-  double rpco_bkg_mean  = 14.5e-4;
+  double rpco_bkg_mean  = 0.; // 14.5e-4;
   double rpco_bkg_relu  = 0.12;             // no low-momentum dependence 
   
   double cosm_bkg_mean  = 4.74529e-2;
@@ -182,6 +204,7 @@ void build_model_001(stntuple::model_t* m) {
 //-----------------------------------------------------------------------------
 // at this point all initializations are done
 //-----------------------------------------------------------------------------
+  m->Print();
 }
 
 //-----------------------------------------------------------------------------
@@ -226,7 +249,7 @@ void build_model_002(stntuple::model_t* m, double MuS, double MuB) {
 }
 
 //-----------------------------------------------------------------------------
-// test gaussian channel with fixed luminosity
+// test_001: test gaussian channel with fixed luminosity
 //-----------------------------------------------------------------------------
 void test_001(int SaveHist = 0) {
   TString name = Form("%s",__func__);
@@ -236,8 +259,8 @@ void test_001(int SaveHist = 0) {
   
   m = new stntuple::model_t(name.Data());
 
-  stntuple::pgaus_t* lumi  = new stntuple::pgaus_t("lumi"   ,1.0, 0.1 ,debug);
-  stntuple::pgaus_t* dio   = new stntuple::pgaus_t("dio_var",0.1 ,0.01,debug);
+  stntuple::pgaus_t* lumi  = new stntuple::pgaus_t("lumi"   , 1.0, 0.10, debug);
+  stntuple::pgaus_t* dio   = new stntuple::pgaus_t("dio_var", 0.1, 0.01, debug);
 
   dio_channel_t* dio_channel = new dio_channel_t("dio"    ,debug); // 
 
@@ -266,7 +289,7 @@ void test_001(int SaveHist = 0) {
 }
 
 //-----------------------------------------------------------------------------
-// test gaussian with luminosity fluctuating by 10%
+// test_002: test gaussian with luminosity fluctuating by 10%
 //-----------------------------------------------------------------------------
 void test_002(int SaveHist = 0) {
 
@@ -277,7 +300,7 @@ void test_002(int SaveHist = 0) {
 
   m = new stntuple::model_t(name.Data());
 
-  stntuple::pgaus_t* lumi  = new stntuple::pgaus_t("lumi"   ,1.0, 0.1 ,debug);
+  stntuple::pgaus_t* lumi  = new stntuple::pgaus_t("lumi"   ,1.0, 0.10 ,debug);
   stntuple::pgaus_t* dio   = new stntuple::pgaus_t("dio_var",0.1 ,0.01,debug);
 
   m->AddParameter(lumi);
@@ -307,7 +330,7 @@ void test_002(int SaveHist = 0) {
 }
 
 //-----------------------------------------------------------------------------
-// test gaussian with fixed luminosity
+// test_003: test gaussian with fixed luminosity
 //-----------------------------------------------------------------------------
 void test_003(int SaveHist = 0) {
 
@@ -389,7 +412,7 @@ void test_004(int SaveHist = 0) {
 }
 
 //-----------------------------------------------------------------------------
-// test lognormal channel not smeared with the gaussian
+// test_011: test lognormal channel Mub=0.1 and sig/mean = 1 not smeared with the gaussian
 //-----------------------------------------------------------------------------
 void test_011(int SaveHist = 0) {
   int debug = 1;
@@ -430,7 +453,7 @@ void test_011(int SaveHist = 0) {
 }
 
 //-----------------------------------------------------------------------------
-// test lognormal channel smeared with the gaussian
+// test_012: test lognormal channel MuB=0.1 sig/mean = 11 smeared with the gaussian
 //-----------------------------------------------------------------------------
 void test_012(int SaveHist = 0) {
   int debug = 1;
@@ -729,7 +752,7 @@ void test_112(int FixParameters = 1,
   }
 }
 //-----------------------------------------------------------------------------
-// validate calculation of an upper 90% CL limit, using a simple model
+// test_113: validate calculation of an upper 90% CL limit, using a simple model
 //-----------------------------------------------------------------------------
 void test_113(int FixParameters = 1,
 	      double MuB = 0.1, double SMin = 1., double SMax = 5., int SaveHist = 0) {
@@ -744,6 +767,117 @@ void test_113(int FixParameters = 1,
   double mus(5.0);
 					// signal, then - background
   build_model_002(m,mus,MuB);
+					// for this test, don't need to generate a PDF
+  if (FixParameters) { 
+  					// fix values of all model parameters
+    int np = m->NParameters();
+    for (int i=0; i<np; i++) {
+      parameter_t* p = m->Parameter(i);
+      p->SetFixed(1);
+    }
+  }
+					// create statistical calculator
+  int debug_fc;
+
+  if (fc) delete fc;
+  double CL(0.9);
+  fc = new TFeldmanCousinsB(name.Data(),CL,debug_fc=0);
+  fc->SetNExp(1000);
+  fc->fDebugLevel.fUpperLimit = 0;
+					// dimension of sig and prob >= npoints
+  double sig, prob;
+
+  printf(" ------------ new interface:\n");
+  fc->UpperLimit(m,SMin,SMax,&sig,&prob);
+
+  printf("sig, prob : %10.4f %10.4f\n",sig,prob);
+
+  fc->MakeBeltHistogram();
+  fc->fHist.fBelt->SetFillColor(41);
+  fc->fHist.fBelt->Draw("box");
+  
+  if (SaveHist > 0) {
+    int par_code = FixParameters*1000;
+    TString fn = Form("mu2e_sensitivity.%s.%04i.hist",name.Data(), par_code);
+    m->SaveHist(fn.Data());
+  }
+}
+
+
+//-----------------------------------------------------------------------------
+// test_114: calculation of an upper 90% CL limit, SU2020  model, old interface
+//-----------------------------------------------------------------------------
+void test_114(int FixParameters = 1, double SMin = 1., double SMax = 5., int SaveHist = 0) {
+
+  TString name = Form("%s",__func__);
+  if (m) delete m;
+//------------------------------------------------------------------------------
+// build a model
+//-----------------------------------------------------------------------------
+  m = new stntuple::model_t(name.Data());
+
+					// signal, then - background
+  build_model_001(m);
+					// for this test, don't need to generate a PDF
+  if (FixParameters) { 
+  					// fix values of all model parameters
+    int np = m->NParameters();
+    for (int i=0; i<np; i++) {
+      parameter_t* p = m->Parameter(i);
+      p->SetFixed(1);
+    }
+  }
+					// create statistical calculator
+  int debug_fc;
+
+  if (fc) delete fc;
+  double CL(-1);
+  fc = new TFeldmanCousinsB(name.Data(),CL=0.9,debug_fc=0);
+  fc->SetNExp(1000000);
+  fc->fDebugLevel.fUpperLimit = 0;
+					// dimension of sig and prob >= npoints
+  double sig, prob;
+
+  double mub = m->GetBackgroundMean();
+
+  printf(" ------------ old interface:\n");
+  fc->UpperLimit(mub,SMin,SMax,&sig,&prob);
+
+  printf("sig, prob : %10.4f %10.4f\n",sig,prob);
+
+  fc->MakeBeltHistogram();
+  fc->fHist.fBelt->SetFillColor(41);
+  fc->fHist.fBelt->Draw("box");
+  
+  // printf(" ------------ new interface:\n");
+  // fc->UpperLimit(m, SMin., SMax, NPoints, sig, prob);
+
+  // for (int i=0; i<NPoints; i++) {
+  //   printf("i, sig[i], prob[i] : %3i %10.4f %10.4f\n",i,sig[i],prob[i]);
+  // }
+					// at this point can draw PDF...and save histograms
+  if (SaveHist > 0) {
+    int par_code = FixParameters*1000;
+    TString fn = Form("mu2e_sensitivity.%s.%04i.hist",name.Data(), par_code);
+    m->SaveHist(fn.Data());
+  }
+}
+
+//-----------------------------------------------------------------------------
+// test_115: calculation of an upper 90% CL limit for full SU2020 model
+//-----------------------------------------------------------------------------
+void test_115(int FixParameters = 1, double SMin = 1., double SMax = 5., int SaveHist = 0) {
+
+  TString name = Form("%s",__func__);
+  if (m) delete m;
+//------------------------------------------------------------------------------
+// build a model
+//-----------------------------------------------------------------------------
+  m = new stntuple::model_t(name.Data());
+
+  double mus(5.0);
+					// signal, then - background
+  build_model_001(m);
 					// for this test, don't need to generate a PDF
   if (FixParameters) { 
   					// fix values of all model parameters
@@ -861,3 +995,73 @@ void test_122(int FixParameters = 1, double MuB = 3.0, double MuS1 = 0., double 
   fc->fHist.fBelt->Draw("box");
 }
 
+// -----------------------------------------------------------------------------
+//  test_201: validate calculation of a 90% CL FC belt using a simple model
+//            default parameter values (MuB = 3.0, MuS = 0.-5)
+// root [1] test_201(0.1,2,5)
+// END: MuB =    0.10000 s   =  4.57043 P = 0.49991
+// root [2] test_201(0.104,2,5)
+// END: MuB =    0.10400 s   =  4.56677 P = 0.50012
+// ----------------------------------------------------------------------------- 
+
+void test_201(double MuB = 3.0, double MuS1 = 0., double MuS2 = 5.) {
+
+  TString name = Form("%s",__func__);
+
+  int debug_fc;
+  if (fc) delete fc;
+  fc = new TFeldmanCousinsB(name.Data(),0.9,debug_fc=0);
+
+  double s(-1.);
+  double p(-1.);
+  
+  fc->SetNExp(100000);
+  fc->DiscoveryMedian(MuB,MuS1,MuS2,&s,&p);
+
+  printf("s,p : %10.5f %10.5f\n",s,p);
+ 
+}
+
+// -----------------------------------------------------------------------------
+// test_202: validate calculation of a 90% CL FC belt using a simple model
+//            default parameter values (MuB = 3.0, MuS = 0.-5)
+// root [1] test_201(0.1,2,5)
+// END: MuB =    0.10000 s   =  4.57043 P = 0.49991
+// root [2] test_201(0.104,2,5)
+// END: MuB =    0.10400 s   =  4.56677 P = 0.50012
+// ----------------------------------------------------------------------------- 
+
+void test_202(int FixParameters = 1, double MuS1 = 0., double MuS2 = 5.) {
+
+  TString name = Form("%s",__func__);
+  
+  if (m) delete m;
+//------------------------------------------------------------------------------
+// build a model
+//-----------------------------------------------------------------------------
+  m = new stntuple::model_t(name.Data());
+
+  build_model_001(m);
+					// for this test, don't need to generate a PDF
+  if (FixParameters) { 
+  					// fix values of all model parameters
+    int np = m->NParameters();
+    for (int i=0; i<np; i++) {
+      parameter_t* p = m->Parameter(i);
+      p->SetFixed(1);
+    }
+  }
+
+  int debug_fc;
+
+  if (fc) delete fc;
+  fc = new TFeldmanCousinsB(name.Data(),-1,debug_fc=0);
+
+  double s(-1.);
+  double p(-1.);
+  
+  fc->SetNExp(10000);
+  fc->DiscoveryMedian(m,MuS1,MuS2,&s,&p);
+
+  printf("s,p : %10.5f %10.5f\n",s,p);
+}
