@@ -187,6 +187,8 @@ namespace stntuple {
     printf("fMuS  = %10.4f\n",fMuS );
     printf("fMuSx = %10.4f\n",fMuSx);
 
-    printf("<MuB> : 8.5f\n",GetBackgroundMean());
+    model_t* m = (model_t*) this;
+
+    printf("<MuB> : %8.5f\n",m->GetBackgroundMean());
   }
 }

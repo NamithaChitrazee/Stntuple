@@ -44,9 +44,8 @@ namespace stntuple {
     ~model_t();
 
     double       GetBackgroundMean();
-    
-    double       GetNullValue();
-    double       GetValue();
+    double       GetNullValue     ();
+    double       GetValue         ();
 
     double       MuB () { return fMuB;  }
     double       MuBx() { return fMuBx; }
