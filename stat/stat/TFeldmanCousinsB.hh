@@ -17,8 +17,8 @@ namespace stntuple {
 class TFeldmanCousinsB : public TNamed {
 public:
   enum {
-	MaxNx = 50,                    // max Poisson bin
-	MaxNy = 100,		       // max steps in Mu
+    MaxNx =   20,                   // max Poisson bin
+    MaxNy = 1001		    // max steps in Mu
   };   
 
   struct Hist_t {
@@ -40,6 +40,12 @@ public:
     double fSign[MaxNx][2];      // fSBelt[ix][0] = SMin[ix], fSBelt[ix][1] = SMax[ix]
     int    fIndx[MaxNx][2];      // iymin, iymax
   } fBelt;
+
+  struct DebugLevel_t {
+    int    fAll;
+    int    fConstructBelt;
+    int    fUpperLimit;
+  } fDebugLevel;
   
   double   fCL;
   double   fLog1mCL;			// log(1-fCL)
@@ -67,7 +73,6 @@ public:
   
   long int fNExp;	      // N(pseudo experiments) to throw
 
-  int      fDebugLevel;
   int      fIMin;
   int      fIMax;
   int      fNSummed;          // likely, fIMax-fIMin+1
@@ -85,7 +90,7 @@ public:
 
   void   SetNExp        (long int N) { fNExp = N; };
   
-  void   SetDebugLevel  (int Level ) { fDebugLevel = Level; };
+  void   SetDebugLevel  (int Level ) { fDebugLevel.fAll = Level; };
   
   void   Init           (double Bgr, double Sig);
 
@@ -98,6 +103,9 @@ public:
   int    ConstructBelt    (double Bgr, double SMin, double SMax, int NPoints);
 
   double Factorial(int Ix) { return fFactorial[Ix]; }
+
+
+  void   MakeBeltHistogram();
 
   void   PrintData(const char* Title, char DataType, void* Data, int MaxInd);
   void   PrintProbs(int N);
@@ -121,8 +129,10 @@ public:
   int    SolveFor(double Val, const double* X, const double* Y, int NPoints, double* XVal);
 
   void   UpperLimit(double   MuB  , double SMin, double SMax, int NPoints, double* S, double* Prob);
-  void   UpperLimit(model_t* Model, double SMin, double SMax, int NPoints, double* S, double* Prob);
-  
+
+  int    UpperLimit(double   MuB  , double SMin, double SMax, double* S, double* Prob);
+  int    UpperLimit(model_t* Model, double SMin, double SMax, double* S, double* Prob);
+
   ClassDef(TFeldmanCousinsB,0)
 };
 };

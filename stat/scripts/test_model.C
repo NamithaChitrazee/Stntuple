@@ -1,5 +1,13 @@
 ///////////////////////////////////////////////////////////////////////////////
 // init file shoudl define a function void init_mu2e_model(su2020::Mu2e_model* M)
+//
+// test_112: validate calculation of an upper 90% CL limit, using a simple model, old interface
+// test_113: validate calculation of an upper 90% CL limit, using a simple model, new interface
+// test_121: validate calculation of a FC interval using a simple model
+//           default parameter values (MuB = 3.0, MuS = 0.5) are the ones from the FC
+//           paper example
+// test_122: validate calculation of a FC belt using a simple model
+//           default parameter values (MuB = 3.0, MuS = 0 - 5) 
 ///////////////////////////////////////////////////////////////////////////////
 #include "Stntuple/stat/model_t.hh"
 
@@ -601,9 +609,11 @@ void test_103(int FixParameters = 1, int SaveHist = 0) {
 }
 
 //-----------------------------------------------------------------------------
-// validate calculation of an upper limit, using a simple model
+// validate calculation of an upper 90% CL limit, using a simple model
 //-----------------------------------------------------------------------------
-void test_111(int FixParameters = 1, int SaveHist = 0) {
+void test_111(int FixParameters = 1,
+	      double MuB = 0.1, double SMin = 1., double SMax = 5., int NPoints=11,
+	      int SaveHist = 0) {
 
   TString name = Form("%s",__func__);
   if (m) delete m;
@@ -612,10 +622,9 @@ void test_111(int FixParameters = 1, int SaveHist = 0) {
 //-----------------------------------------------------------------------------
   m = new stntuple::model_t(name.Data());
 
-  double mub(0.1);
   double mus(5.0);
 					// signal, then - background
-  build_model_002(m,mus,mub);
+  build_model_002(m,mus,MuB);
 					// for this test, don't need to generate a PDF
   if (FixParameters) { 
   					// fix values of all model parameters
@@ -629,26 +638,141 @@ void test_111(int FixParameters = 1, int SaveHist = 0) {
   int debug_fc;
 
   if (fc) delete fc;
-  fc = new TFeldmanCousinsB(name.Data(),-1,debug_fc=1);
-  fc->SetNExp(1);
-
-  double sig[100], prob[100], smin, smax;
-  int    npoints;
+  double CL(0.9);
+  fc = new TFeldmanCousinsB(name.Data(),CL,debug_fc=0);
+  fc->SetNExp(100000);
+  fc->fDebugLevel.fUpperLimit = 0;
+					// dimension of sig and prob >= npoints
+  double sig[1000], prob[1000];
 
   printf(" ------------ old interface:\n");
-  fc->UpperLimit(mub,smin=1.,smax=5.,npoints=1,sig,prob);
+  fc->UpperLimit(MuB,SMin,SMax,NPoints,sig,prob);
 
-  for (int i=0; i<npoints; i++) {
+  for (int i=0; i<NPoints; i++) {
     printf("i, sig[i], prob[i] : %3i %10.4f %10.4f\n",i,sig[i],prob[i]);
   }
+
+  fc->MakeBeltHistogram();
+  fc->fHist.fBelt->SetFillColor(41);
+  fc->fHist.fBelt->Draw("box");
   
-  printf(" ------------ new interface:\n");
-  fc->UpperLimit(m, smin=1., smax=5., npoints=1, sig, prob);
+  // printf(" ------------ new interface:\n");
+  // fc->UpperLimit(m, SMin., SMax, NPoints, sig, prob);
 
-  for (int i=0; i<npoints; i++) {
-    printf("i, sig[i], prob[i] : %3i %10.4f %10.4f\n",i,sig[i],prob[i]);
-  }
+  // for (int i=0; i<NPoints; i++) {
+  //   printf("i, sig[i], prob[i] : %3i %10.4f %10.4f\n",i,sig[i],prob[i]);
+  // }
 					// at this point can draw PDF...and save histograms
+  if (SaveHist > 0) {
+    int par_code = FixParameters*1000;
+    TString fn = Form("mu2e_sensitivity.%s.%04i.hist",name.Data(), par_code);
+    m->SaveHist(fn.Data());
+  }
+}
+
+//-----------------------------------------------------------------------------
+// test_112: validate calculation of an upper 90% CL limit, using a simple model, old interface
+//-----------------------------------------------------------------------------
+void test_112(int FixParameters = 1,
+	      double MuB = 0.1, double SMin = 1., double SMax = 5., int SaveHist = 0) {
+
+  TString name = Form("%s",__func__);
+  if (m) delete m;
+//------------------------------------------------------------------------------
+// build a model
+//-----------------------------------------------------------------------------
+  m = new stntuple::model_t(name.Data());
+
+  double mus(5.0);
+					// signal, then - background
+  build_model_002(m,mus,MuB);
+					// for this test, don't need to generate a PDF
+  if (FixParameters) { 
+  					// fix values of all model parameters
+    int np = m->NParameters();
+    for (int i=0; i<np; i++) {
+      parameter_t* p = m->Parameter(i);
+      p->SetFixed(1);
+    }
+  }
+					// create statistical calculator
+  int debug_fc;
+
+  if (fc) delete fc;
+  double CL(0.9);
+  fc = new TFeldmanCousinsB(name.Data(),CL,debug_fc=0);
+  fc->SetNExp(100000);
+  fc->fDebugLevel.fUpperLimit = 0;
+					// dimension of sig and prob >= npoints
+  double sig, prob;
+
+  printf(" ------------ old interface:\n");
+  fc->UpperLimit(MuB,SMin,SMax,&sig,&prob);
+
+  printf("sig, prob : %10.4f %10.4f\n",sig,prob);
+
+  fc->MakeBeltHistogram();
+  fc->fHist.fBelt->SetFillColor(41);
+  fc->fHist.fBelt->Draw("box");
+  
+  // printf(" ------------ new interface:\n");
+  // fc->UpperLimit(m, SMin., SMax, NPoints, sig, prob);
+
+  // for (int i=0; i<NPoints; i++) {
+  //   printf("i, sig[i], prob[i] : %3i %10.4f %10.4f\n",i,sig[i],prob[i]);
+  // }
+					// at this point can draw PDF...and save histograms
+  if (SaveHist > 0) {
+    int par_code = FixParameters*1000;
+    TString fn = Form("mu2e_sensitivity.%s.%04i.hist",name.Data(), par_code);
+    m->SaveHist(fn.Data());
+  }
+}
+//-----------------------------------------------------------------------------
+// validate calculation of an upper 90% CL limit, using a simple model
+//-----------------------------------------------------------------------------
+void test_113(int FixParameters = 1,
+	      double MuB = 0.1, double SMin = 1., double SMax = 5., int SaveHist = 0) {
+
+  TString name = Form("%s",__func__);
+  if (m) delete m;
+//------------------------------------------------------------------------------
+// build a model
+//-----------------------------------------------------------------------------
+  m = new stntuple::model_t(name.Data());
+
+  double mus(5.0);
+					// signal, then - background
+  build_model_002(m,mus,MuB);
+					// for this test, don't need to generate a PDF
+  if (FixParameters) { 
+  					// fix values of all model parameters
+    int np = m->NParameters();
+    for (int i=0; i<np; i++) {
+      parameter_t* p = m->Parameter(i);
+      p->SetFixed(1);
+    }
+  }
+					// create statistical calculator
+  int debug_fc;
+
+  if (fc) delete fc;
+  double CL(0.9);
+  fc = new TFeldmanCousinsB(name.Data(),CL,debug_fc=0);
+  fc->SetNExp(1000);
+  fc->fDebugLevel.fUpperLimit = 0;
+					// dimension of sig and prob >= npoints
+  double sig, prob;
+
+  printf(" ------------ new interface:\n");
+  fc->UpperLimit(m,SMin,SMax,&sig,&prob);
+
+  printf("sig, prob : %10.4f %10.4f\n",sig,prob);
+
+  fc->MakeBeltHistogram();
+  fc->fHist.fBelt->SetFillColor(41);
+  fc->fHist.fBelt->Draw("box");
+  
   if (SaveHist > 0) {
     int par_code = FixParameters*1000;
     TString fn = Form("mu2e_sensitivity.%s.%04i.hist",name.Data(), par_code);
@@ -659,9 +783,11 @@ void test_111(int FixParameters = 1, int SaveHist = 0) {
 
 
 //-----------------------------------------------------------------------------
-// validate calculation of a FC interval using a simple model
+// test_121: validate calculation of a FC interval using a simple model
+//           default parameter values (MuB = 3.0, MuS = 0.5) are the ones from the FC
+//           paper example
 //-----------------------------------------------------------------------------
-void test_121(int FixParameters = 1) {
+void test_121(int FixParameters = 1, double MuB = 3.0, double MuS = 0.5) {
 
   TString name = Form("%s",__func__);
   if (m) delete m;
@@ -670,8 +796,8 @@ void test_121(int FixParameters = 1) {
 //-----------------------------------------------------------------------------
   m = new stntuple::model_t(name.Data());
 
-  double mub(3.0);
-  double mus(0.5);
+  double mub = MuB;
+  double mus = MuS;
 					// signal, then - background
   build_model_002(m,mus,mub);
 					// for this test, don't need to generate a PDF
@@ -695,5 +821,43 @@ void test_121(int FixParameters = 1) {
 
   fc->ConstructInterval(mub,mus);
 
+}
+
+//-----------------------------------------------------------------------------
+// test_122: validate calculation of a 90% CL FC belt using a simple model
+//           default parameter values (MuB = 3.0, MuS = 0.-5)
+//-----------------------------------------------------------------------------
+void test_122(int FixParameters = 1, double MuB = 3.0, double MuS1 = 0., double MuS2 = 5., int NPoints = 101) {
+
+  TString name = Form("%s",__func__);
+  if (m) delete m;
+//------------------------------------------------------------------------------
+// build a model
+//-----------------------------------------------------------------------------
+  m = new stntuple::model_t(name.Data());
+
+					// signal, then - background
+  build_model_002(m,MuS1,MuB);
+					// for this test, don't need to generate a PDF
+  if (FixParameters) { 
+  					// fix values of all model parameters
+    int np = m->NParameters();
+    for (int i=0; i<np; i++) {
+      parameter_t* p = m->Parameter(i);
+      p->SetFixed(1);
+    }
+  }
+					// create statistical calculator
+  int debug_fc;
+
+  if (fc) delete fc;
+  fc = new TFeldmanCousinsB(name.Data(),0.9,debug_fc=11);
+  fc->SetNExp(1);
+
+  fc->ConstructBelt(MuB,MuS1,MuS2,NPoints);
+  
+  fc->MakeBeltHistogram();
+  fc->fHist.fBelt->SetFillColor(41);
+  fc->fHist.fBelt->Draw("box");
 }
 
