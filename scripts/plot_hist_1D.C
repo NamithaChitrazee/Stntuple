@@ -666,7 +666,7 @@ int plot_hist_1d(plot_data_t* Plot, int Print = 0, const char* Format = "eps") {
     leg = new TLegend(Plot->fLegendXMin,Plot->fLegendYMin,Plot->fLegendXMax,Plot->fLegendYMax);
     // decide in the representation
     TString lopt("pl");
-    if (Hist1->fFillStyle != 0) lopt = "f";
+    if (Hist1->fFillStyle > 0) lopt = "f";
     leg->AddEntry(hpx1,Hist1->fLabel.Data(),lopt.Data());
     leg->SetBorderSize(0);
     leg->SetFillStyle(0);
@@ -769,7 +769,7 @@ int plot_hist_1d(plot_data_t* Plot, int Print = 0, const char* Format = "eps") {
 
     if (leg) {
       TString lopt("pl");
-      if (Hist2->fFillStyle != 0) lopt = "f";
+      if (Hist2->fFillStyle > 0) lopt = "f";
       leg->AddEntry(hpx2,Hist2->fLabel.Data(),lopt.Data());
     }
   }

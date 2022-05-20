@@ -33,8 +33,9 @@ namespace stntuple {
     TH1D*          GetHistPDF() { return fHistPDF; }
 
     double         GetAddCorr();
-    
+					// get fluctuated mean
     virtual double GetValue();
+					// sample, assuming Poisson mean = fVal
     
     void           SetSignal(int Signal) { fSignal = Signal; }
     

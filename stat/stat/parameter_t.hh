@@ -17,7 +17,7 @@ namespace stntuple {
     ROOT::Math::RandomRanLux* fRng;
     TH1D*                     fHistPDF;			// PDF distribution
     int                       fDebug;
-    int                       fFixed;                   // =0 by default
+    int                       fFixed;                   // = 0 by default
 // -----------------------------------------------------------------------------
 // functions
 //-----------------------------------------------------------------------------

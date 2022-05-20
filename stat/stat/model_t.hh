@@ -67,16 +67,9 @@ namespace stntuple {
     
     void    AddParameter(parameter_t* Par  ) { fListOfParameters->Add(Par); }
     
-    // set parameter values for the next event (pseudoexperiment)
-    int     InitParameters();
-    
-    int     GeneratePDF();
+    channel_t*   FindChannel  (const char* Name) { return (channel_t*) fListOfChannels->FindObject(Name) ; }
 
-    //    int     GenerateSBPDF();
-
-    int     SaveHist(const char* Filename);
-
-    parameter_t* GetParameter(const char* Name) {
+    parameter_t* FindParameter(const char* Name) {
       return (parameter_t*) fListOfParameters->FindObject(Name);
     }
 
@@ -84,11 +77,15 @@ namespace stntuple {
 
     channel_t*   GetChannel  (int I) { return (channel_t*) fListOfChannels->At(I)    ; }
 
+    int     GeneratePDF();
+					// set parameter values for the next pseudoexperiment
+    int     InitParameters();
+    
+    int     SaveHist(const char* Filename);
 //-----------------------------------------------------------------------------
 // overloaded functions of TObject
 //-----------------------------------------------------------------------------
     void Print(const Option_t* Opt = "") const ;
-    
   };
 }
 #endif

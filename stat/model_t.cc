@@ -115,7 +115,7 @@ namespace stntuple {
 
       // in the calculation of the s1b value, sig and background are fluctuated in GetValue()
       // with parameters defining the signal also fluctuated
-      double s1      = sig->GetValue();     // this is a fluctuated mean value
+      double s1    = sig->GetValue();       // this is a fluctuated mean value
       double x_s1  = fRng->Poisson(s1);     // use that mean for sampling a Poisson distribution
       double x_s1b = x_null+x_s1;
       fHistS1BPDF->Fill(x_s1b);

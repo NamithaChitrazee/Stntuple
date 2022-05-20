@@ -21,6 +21,8 @@ namespace stntuple {
   }
 
   void parameter_t::InitValue() {
+    fValue = fMean;
+    if (fDebug > 0) fHistPDF->Fill(fValue);
   }
 
   double parameter_t::XMin() {

@@ -28,6 +28,7 @@ public:
     TH1D*    fCumBsProb;
     TH1D*    fProb;                     // the same as fBsProb, but shifted by half-bin
     TH2D*    fBelt;
+    TGraph*  fCoverage;
   } fHist;
 
   struct Belt_t {
@@ -44,7 +45,9 @@ public:
   struct DebugLevel_t {
     int    fAll;
     int    fConstructBelt;
+    int    fConstructInterval;
     int    fUpperLimit;
+    int    fTestCoverage;
   } fDebugLevel;
   
   double   fCL;
@@ -85,17 +88,15 @@ public:
 		   int         DebugLevel = 0);
   
   ~TFeldmanCousinsB();
-
+//-----------------------------------------------------------------------------
+// setters
+//-----------------------------------------------------------------------------
   void   SetCL          (double CL);
 
   void   SetNExp        (long int N) { fNExp = N; };
   
   void   SetDebugLevel  (int Level ) { fDebugLevel.fAll = Level; };
   
-  void   Init           (double Bgr, double Sig);
-
-  void   InitPoissonDist(double Mean, double* Prob, double* CumProb, int N);
-
   int    ConstructInterval(double Bgr, double Sig);
 
   int    ConstructInterval(model_t* Model);
@@ -103,12 +104,6 @@ public:
   int    ConstructBelt    (double Bgr, double SMin, double SMax, int NPoints);
 
   double Factorial(int Ix) { return fFactorial[Ix]; }
-
-
-  void   MakeBeltHistogram();
-
-  void   PrintData(const char* Title, char DataType, void* Data, int MaxInd);
-  void   PrintProbs(int N);
 
   // plot discovery probability for a given background and signal range
   // calling makes sense only if CL=-1
@@ -121,19 +116,32 @@ public:
   // discovery corresponds to NSig = 5
   // output: arrays of MuS and NSig, NPoints in size each
   // if NPoints=1, calculate NSig only for SMin
+  
   void   DiscoveryProbMean(double   MuB  , double SMin, double SMax, int NPoints, double* MuS, double* NSig);
   void   DiscoveryProbMean(model_t* Model, double SMin, double SMax, int NPoints, double* MuS, double* NSig);
 
-					// MuS : signal corresponding to 50% prob
-					// Prob: probability corresponding to the signal (should be close to 50%)
+  // MuS : signal corresponding to 50% prob
+  // Prob: probability corresponding to the signal
+  // (should be close to 50%)
   
   void   DiscoveryMedian  (double   MuB  , double SMin, double SMax, double* MuS, double* Prob) ;
   void   DiscoveryMedian  (model_t* Model, double SMin, double SMax, double* MuS, double* Prob) ;
+
+  void   Init           (double Bgr, double Sig);
+
+  void   InitPoissonDist(double Mean, double* Prob, double* CumProb, int N);
+
+  void   MakeBeltHistogram();
+
+  void   PrintData(const char* Title, char DataType, void* Data, int MaxInd);
+  void   PrintProbs(int N);
 
   void   PlotDiscoveryProbMean(double MuB, double Mu2);
 
   int    SolveFor(double Val, const double* X, const double* Y, int NPoints, double* XVal);
 
+  int    TestCoverage(double MuB, double SMin, double SMax, int NPoints);
+    
   void   UpperLimit(double   MuB  , double SMin, double SMax, int NPoints, double* S, double* Prob);
 
   int    UpperLimit(double   MuB  , double SMin, double SMax, double* S, double* Prob);
