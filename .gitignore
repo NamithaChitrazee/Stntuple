@@ -3,4 +3,6 @@
 *.so
 *.d
 *dict_rdict.pcm
+*C_ACLiC*
+*.save
 *#*

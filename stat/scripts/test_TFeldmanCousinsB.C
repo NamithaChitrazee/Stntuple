@@ -23,8 +23,6 @@
 
 using namespace stntuple;
 
-TFeldmanCousinsB* gfc;
-
 class test_fc {
 public:
 
@@ -61,9 +59,6 @@ public:
   void test_013(double CL);
 					// plot "median 90%CL" excluded 
   void test_014();
-					// build and display a FC CL belt for given MuB and a range of
-					// signals
-  void test_015(double CL, double MuB, double SMin, double SMax, int NPoints);
 
 					// plot 90% CL "exclusion" 
   void test_016(double CL);
@@ -73,24 +68,31 @@ public:
 //-----------------------------------------------------------------------------
 // test_001: construct interval for a given (MuS,MuB)
 //-----------------------------------------------------------------------------
-TFeldmanCousinsB* fc_test_001(double MuB, double MuS, double CL) {
+TFeldmanCousinsB* test_fc_001(double MuB, double MuS, double CL=0.9, const char* Name = "test_fc_001") {
   TFeldmanCousinsB* fc(nullptr);
 
-  if (fc == nullptr) fc = new TFeldmanCousinsB("fc_test_001",CL);
+  if (fc == nullptr) fc = new TFeldmanCousinsB(Name,CL);
   else               fc->SetCL(CL);
 
   fc->fDebugLevel.fConstructInterval = 1;
   fc->ConstructInterval(MuB,MuS);
+  fc->MakeProbHist();
   fc->PrintProbs(10);
   
-  fc->fHist.fProb->Draw("text+hist");
-
   TH1D* h1 = (TH1D*) fc->fHist.fProb->Clone("h1");
   int nx = h1->GetNbinsX();
   
   for (int i=0; i<nx; i++) {
-    if ((i<fc->fIMin) or (i>fc->fIMax)) h1->SetBinContent(i+1,0);
+    if ((i<fc->fIxMin) or (i>fc->fIxMax)) h1->SetBinContent(i+1,0);
   }
+
+  char cname[100];
+  sprintf(cname,"c_%s",Name);
+  TCanvas* c = (TCanvas*) gROOT->GetListOfCanvases()->FindObject(cname);
+  if (c == nullptr) c = new TCanvas(cname,Name,1200,800);
+  else              c->cd();
+
+  fc->fHist.fProb->Draw("text+hist");
 
   h1->SetFillStyle(3005);
   h1->SetFillColor(kRed+2);
@@ -102,19 +104,52 @@ TFeldmanCousinsB* fc_test_001(double MuB, double MuS, double CL) {
 //-----------------------------------------------------------------------------
 // fc_test_002: construct belt for a given (MuS,MuB)
 //-----------------------------------------------------------------------------
-TFeldmanCousinsB* fc_test_002(double MuB, double CL) {
+TFeldmanCousinsB* test_fc_002(double MuB, double CL, const char* Name = "test_fc_002") {
   TFeldmanCousinsB* fc(nullptr);
 
-  if (fc == nullptr) fc = new TFeldmanCousinsB("test_002",CL);
+  if (fc == nullptr) fc = new TFeldmanCousinsB(Name,CL);
   else               fc->SetCL(CL);
 
-  fc->ConstructBelt(MuB,0,20,TFeldmanCousinsB::MaxNy);
-  fc->MakeBeltHistogram();
+  fc->fDebugLevel.fConstructBelt = 2;
+  
+  fc->ConstructBelt(MuB,0,35,35001);
+  fc->MakeBeltHist();
 
-  fc->fHist.fBelt->SetFillColor(kRed+2);
-  fc->fHist.fBelt->SetFillStyle(3001);
-  fc->fHist.fBelt->SetStats(0);
-  fc->fHist.fBelt->Draw("box");
+  char cname[100];
+  sprintf(cname,"c_%s",Name);
+
+  TCanvas* c = (TCanvas*) gROOT->GetListOfCanvases()->FindObject(cname);
+  if (c == nullptr) c = new TCanvas(cname,Name,1200,800);
+  else              c->cd();
+
+  fc->fHist.fBelt->Draw();
+
+  return fc;
+}
+
+//-----------------------------------------------------------------------------
+// fc_test_003: construct BIASED belt for a given (MuS,MuB)
+// interesting, mostly, for small signals
+//-----------------------------------------------------------------------------
+TFeldmanCousinsB* test_fc_003(double MuB, double CL, const char* Name = "test_fc_003") {
+  TFeldmanCousinsB* fc(nullptr);
+
+  if (fc == nullptr) fc = new TFeldmanCousinsB(Name,CL);
+  else               fc->SetCL(CL);
+
+  fc->SetType(1);                       // biased by observations
+  
+  fc->ConstructBelt(MuB,0,20,20001);
+  fc->MakeBeltHist();
+
+  char cname[100];
+  sprintf(cname,"c_%s",Name);
+
+  TCanvas* c = (TCanvas*) gROOT->GetListOfCanvases()->FindObject(cname);
+  if (c == nullptr) c = new TCanvas(cname,Name,1200,800);
+  else              c->cd();
+
+  fc->fHist.fBelt->Draw();
 
   return fc;
 }
@@ -251,7 +286,7 @@ void test_fc::test_011(double CL) {
     double mub = 0.001*(i+0.5);
     fc->ConstructInterval(mub,0);
     x[i] = mub;
-    y[i] = fc->fIMax;
+    y[i] = fc->fIxMax;
   }
 
   if (fHist.fNEvents != nullptr) delete fHist.fNEvents;
@@ -400,45 +435,6 @@ void test_fc::test_014() {
 
   fHist.fS90Med->Draw();
 }
-//-----------------------------------------------------------------------------
-// plot FC belt for given CL, MuB 
-//-----------------------------------------------------------------------------
-void test_fc::test_015(double CL, double MuB, double SMin, double SMax, int NPoints) {
-  char name[100] = "fc_015";
-  
-  TFeldmanCousinsB* fc = new TFeldmanCousinsB(name,CL);
-
-  char cname[100];
-  sprintf(cname,"c_%s",name);
-  
-  TCanvas* c = (TCanvas*) gROOT->GetListOfCanvases()->FindObject(name);
-  if (c == nullptr) {
-    c = new TCanvas(name,name,1200,800);
-  }
-
-  double step = (NPoints > 1) ? (SMax-SMin)/(NPoints-1) : 1;
-
-  const int nx = TFeldmanCousinsB::MaxNx;
-
-  fc->ConstructBelt(MuB,SMin,SMax,NPoints);
-
-  if (fHist.fBelt != nullptr) delete fHist.fBelt;
-  
-  fHist.fBelt = new TH2D(Form("h_belt_%s",name),"FC belt",
-			 nx,0,nx,
-   			 NPoints,SMin-step/2,SMax-step/2);
-
-  for (int ix=0; ix<nx; ix++) {
-    for (int iy=0; iy<NPoints; iy++) {
-      fHist.fBelt->SetBinContent(ix+1,iy+1,fc->fBelt.fCont[iy][ix]);
-    }
-  }
-
-  fHist.fBelt->SetTitle(Form("Belt vs N, #mu_{B} = %8.4f",MuB));
-  fHist.fBelt->SetFillColor(kBlue+2);
-  fHist.fBelt->SetFillStyle(3001);
-  fHist.fBelt->Draw("box");
-}
 
 
 //-----------------------------------------------------------------------------
@@ -503,26 +499,28 @@ void test_fc::test_016(double CL) {
 // fc_test_017: test 90% coverage
 // fc17 = fc_test_017(0., 0., 10,1000,0.9,100000)
 //-----------------------------------------------------------------------------
-TFeldmanCousinsB* fc_test_017(double MuB, double SMin, double SMax, int NPoints, double CL = 0.9, int NExp = -1) {
+TFeldmanCousinsB* test_fc_017(double MuB, double SMin, double SMax, int NPoints,
+                              double CL        = 0.9,
+                              int    NExp      = -1,
+                              const char* Name = "test_fc_017",
+                              int DebugLevel   = -1) {
 
-  char name[100] = "fc_test_016";
-
-  TFeldmanCousinsB* fc = new TFeldmanCousinsB(name,CL);
+  TFeldmanCousinsB* fc = new TFeldmanCousinsB(Name,CL);
 
   if (NExp > 0) fc->SetNExp(NExp);
                                         // test itself
-  // fc->fDebugLevel.fTestCoverage = 1;
+  if (DebugLevel > 0) fc->fDebugLevel.fTestCoverage = DebugLevel;
 
   fc->TestCoverage(MuB,SMin,SMax,NPoints);
 
                                         // make histograms
   char cname[100];
-  sprintf(cname,"c_%s",name);
+  sprintf(cname,"c_%s",Name);
   
-  TCanvas* c = (TCanvas*) gROOT->GetListOfCanvases()->FindObject(name);
-  if (c == nullptr) {
-    c = new TCanvas(name,name,1200,800);
-  }
+  TCanvas* c = (TCanvas*) gROOT->GetListOfCanvases()->FindObject(Name);
+
+  if (c == nullptr) c = new TCanvas(cname,Name,1200,800);
+  else              c->cd();
 
   fc->fHist.fCoverage->Draw("alp");
   

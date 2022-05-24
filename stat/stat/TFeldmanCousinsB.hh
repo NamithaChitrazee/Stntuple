@@ -7,6 +7,7 @@
 #include "TRandom3.h"
 #include "TH1.h"
 #include "TH2.h"
+#include "THStack.h"
 #include "TMath.h"
 #include "TNamed.h"
 #include  "TGraph.h"
@@ -24,10 +25,12 @@ public:
   struct Hist_t {
     TH1D*    fBgProb;
     TH1D*    fBsProb;
-    TH1D*    fCumBgProb;
-    TH1D*    fCumBsProb;
+    // TH1D*    fCumBgProb;
+    // TH1D*    fCumBsProb;
     TH1D*    fProb;                     // the same as fBsProb, but shifted by half-bin
-    TH2D*    fBelt;
+    THStack* fBelt;
+    TH1D*    fBeltLo;
+    TH1D*    fBeltHi;
     TGraph*  fCoverage;
   } fHist;
 
@@ -37,9 +40,7 @@ public:
     double fSMin;
     double fSMax;
     double fDy;
-    int    fCont[MaxNy][MaxNx];  // either 0 or 1 assume 10000 to be large enough for MaxNy
     double fSign[MaxNx][2];      // fSBelt[ix][0] = SMin[ix], fSBelt[ix][1] = SMax[ix]
-    int    fIndx[MaxNx][2];      // iymin, iymax
   } fBelt;
 
   struct DebugLevel_t {
@@ -52,8 +53,8 @@ public:
   
   double   fCL;
   double   fLog1mCL;			// log(1-fCL)
-  double   fMeanBgr;
-  double   fMeanSig;
+  double   fMuB;
+  double   fMuS;
   
   TRandom3 fRn;
 
@@ -66,8 +67,8 @@ public:
   double   fBgProb   [MaxNx];		//
   double   fBsProb   [MaxNx];
 
-  double   fCumBgProb[MaxNx];           // fCumBgProb[i]: P(X<=i) for BGR-only hyp
-  double   fCumBsProb[MaxNx];
+  // double   fCumBgProb[MaxNx];           // fCumBgProb[i]: P(X<=i) for BGR-only hyp
+  // double   fCumBsProb[MaxNx];
 
   double   fFactorial[MaxNx];	        // precalculate to speed things up
   
@@ -76,10 +77,12 @@ public:
   
   long int fNExp;	      // N(pseudo experiments) to throw
 
-  int      fIMin;
-  int      fIMax;
+  int      fIxMin;
+  int      fIxMax;
   int      fNSummed;          // likely, fIMax-fIMin+1
   double   fProb;
+
+  int      fType;             // by default: 0 (1: biased observations)
 //-----------------------------------------------------------------------------
 // functions
 //-----------------------------------------------------------------------------
@@ -93,7 +96,8 @@ public:
 //-----------------------------------------------------------------------------
   void   SetCL          (double CL);
 
-  void   SetNExp        (long int N) { fNExp = N; };
+  void   SetNExp        (long int N) { fNExp =    N; };
+  void   SetType        (int   Type) { fType = Type; };
   
   void   SetDebugLevel  (int Level ) { fDebugLevel.fAll = Level; };
   
@@ -127,11 +131,12 @@ public:
   void   DiscoveryMedian  (double   MuB  , double SMin, double SMax, double* MuS, double* Prob) ;
   void   DiscoveryMedian  (model_t* Model, double SMin, double SMax, double* MuS, double* Prob) ;
 
-  void   Init           (double Bgr, double Sig);
+  // void   Init           (double Bgr, double Sig);
 
-  void   InitPoissonDist(double Mean, double* Prob, double* CumProb, int N);
+  void   InitPoissonDist(double MuB, double MuS, double* Prob, int NObs = -1);
 
-  void   MakeBeltHistogram();
+  void   MakeBeltHist();
+  void   MakeProbHist();
 
   void   PrintData(const char* Title, char DataType, void* Data, int MaxInd);
   void   PrintProbs(int N);
