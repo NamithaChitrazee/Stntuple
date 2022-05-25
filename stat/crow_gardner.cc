@@ -16,7 +16,11 @@ namespace stntuple {
 //-----------------------------------------------------------------------------
 crow_gardner::crow_gardner(const char* Name, double Mu, double CL, int Type) : TNamed(Name,Name) {
 
-  fCL   = CL;
+  double alpha = 1-TMath::Erf(5./sqrt(2));
+  
+  if (CL > 0) fCL = CL;
+  else        fCL = 1-alpha/2; // always one-sided: 5.7330314e-07/2 = 2.8665157e-07
+
   fType = Type;
 
   fIxMin = MaxNx;
@@ -29,11 +33,14 @@ crow_gardner::crow_gardner(const char* Name, double Mu, double CL, int Type) : T
   fHist.fBeltHi     = nullptr;
   fHist.fCoverage   = nullptr;
 
-  fDebugLevel.fConstructBelt = 0;
-  fDebugLevel.fTestCoverage  = 0;
+  fDebug.fConstructBelt = 0;
+  fDebug.fTestCoverage  = 0;
+  fDebug.fUpperLimit    = 0;
+                                        // no printout by default
+  fDebug.fMuMin         = 1.;
+  fDebug.fMuMax         = 0.;
 
   fNExp  = 100000;
-
 //-----------------------------------------------------------------------------
 // calculate factorials, do that only once
 // assume MaxNx to be large enough, so having N! values up to MaxNx-1 included is enough
@@ -267,23 +274,22 @@ int crow_gardner::construct_belt(double MuB, double SMin, double SMax, int NPoin
   for (int iy=0; iy<NPoints; iy++) {
     double mus = SMin+iy*fBelt.fDy;
 
-    if ((mus >= 4.175) and (mus <= 4.185)) fDebugLevel.fConstructBelt = 2;
-    else                                   fDebugLevel.fConstructBelt = 0;
-    
     int rc     = construct_interval(MuB,mus);
     if (rc == 0) {
       for (int ix=fIxMin; ix<=fIxMax; ix++) {
         if (mus > fBelt.fSign[ix][1]) fBelt.fSign[ix][1] = mus+fBelt.fDy/2;
         if (mus < fBelt.fSign[ix][0]) fBelt.fSign[ix][0] = mus-fBelt.fDy/2;
 
-        if (fDebugLevel.fConstructBelt == 2) {
-          printf("crow_gardner::construct_belt: iy = %5i ix:%3i mus=%8.4f MuB=%5.3f IxMin:%3i IxMax:%3i fSign[ix][0]:%8.4f fSign[ix][1]:%8.4f\n",
-                 iy,ix,mus,MuB,fIxMin,fIxMax,fBelt.fSign[ix][0],fBelt.fSign[ix][0]);
+        if (fDebug.fConstructBelt == 2) {
+          if ((mus >= fDebug.fMuMin) and (mus <= fDebug.fMuMax)) {
+            printf("crow_gardner::construct_belt: iy = %5i ix:%3i mus=%8.4f MuB=%5.3f IxMin:%3i IxMax:%3i fSign[ix][0]:%8.4f fSign[ix][1]:%8.4f\n",
+                   iy,ix,mus,MuB,fIxMin,fIxMax,fBelt.fSign[ix][0],fBelt.fSign[ix][0]);
+          }
         }
       }
     }
     else {
-      if (fDebugLevel.fConstructBelt > 0) {
+      if (fDebug.fConstructBelt > 0) {
 	printf("TFeldmanCousinsB::ConstructBelt: ERROR: mus=%10.3f MuB=%10.3f iy = %3i interval not defined\n",
 	       mus,MuB,iy);
       }
@@ -296,7 +302,7 @@ int crow_gardner::construct_belt(double MuB, double SMin, double SMax, int NPoin
     if (fBelt.fSign[ix][1] <  0   ) fBelt.fSign[ix][1] = 0;
   }
 
-  if (fDebugLevel.fConstructBelt > 0) {
+  if (fDebug.fConstructBelt > 0) {
     for (int ix=0; ix<MaxNx; ix++) {
       printf("%32s %3i %12.5f %12.5f\n","",ix,fBelt.fSign[ix][0],fBelt.fSign[ix][1]);
     }
@@ -408,12 +414,12 @@ int crow_gardner::test_coverage(double MuB, double SMin, double SMax, int NPoint
       if ((s < smin) or (s > smax)) {
         nmissed += 1;
                                         // print only missed ones
-        if (fDebugLevel.fTestCoverage == 2) {
+        if (fDebug.fTestCoverage == 2) {
           printf("k, s, MuB, nobs, mus, smin, smax, nmissed : %10i %10.5f %10.3f %3i %10.3f %10.3f %10.3f %10i\n",
                  k, s, MuB, nobs, mus, smin, smax, nmissed);
         }
       }
-      if (fDebugLevel.fTestCoverage == 1) {
+      if (fDebug.fTestCoverage == 1) {
         printf("k, s, MuB, nobs, mus, smin, smax, nmissed : %10i %10.5f %10.3f %3i %10.3f %10.3f %10.3f %10i\n",
                k, s, MuB, nobs, mus, smin, smax, nmissed);
       }

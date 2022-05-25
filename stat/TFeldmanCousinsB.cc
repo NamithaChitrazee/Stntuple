@@ -1,8 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 // my implementation of the Feldman-Cousins algorithm
-// fDebuglevel.fTestCoverage   = 1: print all
-// fDebuglevel.fTestCoverage   = 2: print missed
-// fDebuglevel.fConstructBelt >= 2: print within the range
+// fDebug.fTestCoverage   = 1: print all
+// fDebug.fTestCoverage   = 2: print missed
+// fDebug.fConstructBelt >= 2: print within the range
 ///////////////////////////////////////////////////////////////////////////////
 #include "Stntuple/stat/TFeldmanCousinsB.hh"
 #include "TCanvas.h"
@@ -26,11 +26,11 @@ TFeldmanCousinsB::TFeldmanCousinsB(const char* Name, double CL, int DebugLevel):
   SetCL(CL);
 
   fType                          = 0;             // unbiased
-  fDebugLevel.fAll               = DebugLevel;
-  fDebugLevel.fConstructBelt     = 0;
-  fDebugLevel.fConstructInterval = 0;
-  fDebugLevel.fUpperLimit        = 0;
-  fDebugLevel.fTestCoverage      = 0;
+  fDebug.fAll               = DebugLevel;
+  fDebug.fConstructBelt     = 0;
+  fDebug.fConstructInterval = 0;
+  fDebug.fUpperLimit        = 0;
+  fDebug.fTestCoverage      = 0;
 //-----------------------------------------------------------------------------
 // calculate factorials - just once
 //-----------------------------------------------------------------------------
@@ -133,7 +133,7 @@ int TFeldmanCousinsB::ConstructInterval(double MuB, double MuS) {
 
   double prob[MaxNx], best_prob[MaxNx];
 
-  if (fDebugLevel.fAll > 10) {
+  if (fDebug.fAll > 10) {
     printf("TFeldmanCousinsB::ConstructInterval: MuB = %10.3f MuS = %10.3f\n",MuB,MuS);
   }
   
@@ -165,7 +165,7 @@ int TFeldmanCousinsB::ConstructInterval(double MuB, double MuS) {
     }
   }
   
-  if (fDebugLevel.fAll > 10) {
+  if (fDebug.fAll > 10) {
     PrintData("BestProb" ,'d',fBestProb     ,18);
     PrintData("BestSig"  ,'d',fBestSig      ,18);
     PrintData("LhRatio"  ,'d',fLhRatio      ,18);
@@ -187,14 +187,14 @@ int TFeldmanCousinsB::ConstructInterval(double MuB, double MuS) {
 	fRank[i1] = fRank[i2];
 	fRank[i2] = i;
       }
-      if (fDebugLevel.fConstructInterval > 0) {
+      if (fDebug.fConstructInterval > 0) {
         printf(" ----------- i1, i2: %3i %3i\n",i1,i2);
         PrintData("LhRatio" ,'d',fLhRatio  ,18);
         PrintData("Rank"    ,'i',fRank     ,18);
       }
     }
   }
-  if (fDebugLevel.fAll > 10) {
+  if (fDebug.fAll > 10) {
     PrintData("Rank   " ,'i',fRank     ,18);
   }
 //-----------------------------------------------------------------------------
@@ -206,7 +206,7 @@ int TFeldmanCousinsB::ConstructInterval(double MuB, double MuS) {
   int covered = 0;
   fProb       = 0;
   
-  if (fDebugLevel.fAll > 10) {
+  if (fDebug.fAll > 10) {
     printf(" ix fRank[ix] fBsProb[ind] fBestProb[ind] LhRatio[ind]   fProb     1-fProb  fIxMin fIxMax\n");
     printf(" --------------------------------------------------------------------------------------\n");
   }
@@ -216,7 +216,7 @@ int TFeldmanCousinsB::ConstructInterval(double MuB, double MuS) {
     if (ind < fIxMin) fIxMin = ind;
     if (ind > fIxMax) fIxMax = ind;
 
-    if (fDebugLevel.fAll > 10) {
+    if (fDebug.fAll > 10) {
       printf("%3i %8i   %10.3e     %10.3e  %10.3e  %10.3e %10.3e %5i %5i\n",
 	     ix,ind,fBsProb[ind],fBestProb[ind],fLhRatio[ind],fProb,1-fProb,fIxMin,fIxMax);
     }
@@ -228,14 +228,14 @@ int TFeldmanCousinsB::ConstructInterval(double MuB, double MuS) {
   }
 
   if (covered == 0) {
-    if (fDebugLevel.fAll > 0) {
+    if (fDebug.fAll > 0) {
       printf("TFeldmanCousinsB::ConstructInterval:TROUBLE: MuB, MuS: %12.5e %12.5e ",MuB,MuS);
       printf("prob = %12.5e fIxMin:%3i, fIxMax:%3i, 1-CL = %12.5e\n",fProb,fIxMin,fIxMax,1-fCL);
     }
     rc = -1;
   }
   else {
-    if (fDebugLevel.fAll > 0) {
+    if (fDebug.fAll > 0) {
       printf("TFeldmanCousinsB::ConstructInterval:success: MuB, MuS: %12.5e %12.5e ",MuB,MuS);
       printf("prob = %12.5e fIxMin:%3i, fIxMax:%3i, 1-CL = %12.5e\n",fProb,fIxMin,fIxMax,1-fCL);
     }
@@ -286,14 +286,14 @@ int TFeldmanCousinsB::ConstructInterval(model_t* Model) {
 	fRank[i1] = fRank[i2];
 	fRank[i2] = i;
       }
-      if (fDebugLevel.fConstructInterval > 0) {
+      if (fDebug.fConstructInterval > 0) {
         printf(" ----------- i1, i2: %3i %3i\n",i1,i2);
         PrintData("LhRatio" ,'d',fLhRatio  ,18);
         PrintData("Rank"    ,'i',fRank     ,18);
       }
     }
 
-    if (fDebugLevel.fAll > 0) {
+    if (fDebug.fAll > 0) {
       PrintData("Rank   " ,'i',fRank     ,18);
     }
   }
@@ -312,7 +312,7 @@ int TFeldmanCousinsB::ConstructInterval(model_t* Model) {
     if (ind < fIxMin) fIxMin = ind;
     if (ind > fIxMax) fIxMax = ind;
 
-    if (fDebugLevel.fAll > 0) {
+    if (fDebug.fAll > 0) {
       printf(" ix ind=fRank[ix] fBsProb[ind] fProb, 1-fProb fIxMin fIxMax :%3i %3i %10.3e %10.3e %10.3e %3i %3i\n",
 	     ix,ind,fBsProb[ind],fProb,1-fProb,fIxMin,fIxMax);
     }
@@ -354,22 +354,22 @@ int TFeldmanCousinsB::ConstructBelt(double MuB, double SMin, double SMax, int NP
   for (int iy=0; iy<NPoints; iy++) {
     double mus = SMin+iy*fBelt.fDy;
 
-    if ((mus >= 0.3) and (mus <= 0.4)) fDebugLevel.fConstructBelt = 2;
-    else                               fDebugLevel.fConstructBelt = 0;
+    if ((mus >= 0.3) and (mus <= 0.4)) fDebug.fConstructBelt = 2;
+    else                               fDebug.fConstructBelt = 0;
 
     int rc     = ConstructInterval(MuB,mus);
     if (rc == 0) {
       for (int ix=fIxMin; ix<=fIxMax; ix++) {
         if (mus > fBelt.fSign[ix][1]) fBelt.fSign[ix][1] = mus+fBelt.fDy/2;
         if (mus < fBelt.fSign[ix][0]) fBelt.fSign[ix][0] = mus-fBelt.fDy/2;
-        if (fDebugLevel.fConstructBelt >= 2) {
+        if (fDebug.fConstructBelt >= 2) {
           printf("TFeldmanCousinsB::ConstructBelt: iy = %5i ix:%3i mus=%8.4f MuB=%5.3f IxMin:%3i IxMax:%3i fSign[ix][0]:%8.4f fSign[ix][1]:%8.4f\n",
                  iy,ix,mus,MuB,fIxMin,fIxMax,fBelt.fSign[ix][0],fBelt.fSign[ix][0]);
         }
       }
     }
     else {
-      if (fDebugLevel.fConstructBelt > 0) {
+      if (fDebug.fConstructBelt > 0) {
 	printf("TFeldmanCousinsB::ConstructBelt: ERROR: MuB=%10.4f mus=%10.4f IY = %3i interval not defined\n",
 	       MuB, mus,iy);
       }
@@ -382,7 +382,7 @@ int TFeldmanCousinsB::ConstructBelt(double MuB, double SMin, double SMax, int NP
     if (fBelt.fSign[ix][1] <  0   ) fBelt.fSign[ix][1] = 0;
   }
 
-  if (fDebugLevel.fConstructBelt > 0) {
+  if (fDebug.fConstructBelt > 0) {
     for (int ix=0; ix<MaxNx; ix++) {
       printf("%32s %3i %12.5f %12.5f\n","",ix,fBelt.fSign[ix][0],fBelt.fSign[ix][1]);
     }
@@ -455,14 +455,14 @@ void TFeldmanCousinsB::DiscoveryProbMean(double MuB, double SMin, double SMax, i
 
       sum      += sig;
       sumn     += 1;
-      if (fDebugLevel.fAll > 0) {
+      if (fDebug.fAll > 0) {
 	printf("i, tot, rn, p, sig, sum : %3i %10.4f %3i %15.8e %12.5e %12.5e\n",i,tot,rn, p,sig, sum);
       }
     }
     
     Prob[ix]  = sum/sumn; // ROOT::Math::gaussian_quantile(pp,1);
 
-    if (fDebugLevel.fAll > 0) {
+    if (fDebug.fAll > 0) {
       printf("ix, sum, sumn, MuS[ix], Prob[ix] : %3i %12.5e %10.3e %12.5e %12.5e\n",
 	     ix,sum,sumn,MuS[ix],Prob[ix]);
     }
@@ -736,14 +736,14 @@ void TFeldmanCousinsB::DiscoveryProbMean(model_t* Model, double SMin, double SMa
       double sig = ROOT::Math::gaussian_quantile_c(p,1);
 
       sum      += sig;
-      if (fDebugLevel.fAll > 0) {
+      if (fDebug.fAll > 0) {
 	printf("i, tot, nobs, p, sig, sum : %3li %10.4f %3i %15.8e %12.5e %12.5e\n",i,tot,nobs, p,sig, sum);
       }
     }
     
     NSig[ix]  = sum/fNExp; // ROOT::Math::gaussian_quantile(pp,1);
 
-    if (fDebugLevel.fAll > 0) {
+    if (fDebug.fAll > 0) {
       printf("ix, sum, fNExp, MuS[ix], NSig[ix] : %3i %12.5e %12li %12.5e %12.5e\n",
 	     ix,sum,fNExp,MuS[ix],NSig[ix]);
     }
@@ -818,7 +818,7 @@ void TFeldmanCousinsB::PlotDiscoveryProbMean(double MuB, double MuS) {
 // ndisc: number of "discovery experiments", pseudoexperiments in which NULL
 // hypothesis is excluded at (1-fCL) level
 //-----------------------------------------------------------------------------
-  if (fDebugLevel.fAll > 0) {
+  if (fDebug.fAll > 0) {
     printf("  i  rn cum_prob[rn]        p          sig          sum       \n");
     printf("--------------------------------------------------------------\n");
   }
@@ -899,7 +899,7 @@ int TFeldmanCousinsB::SolveFor(double Val, const double* X, const double* Y, int
 //-----------------------------------------------------------------------------
   int i0 = -1;
   for (int i=0; i< NPoints; i++) {
-    if (fDebugLevel.fAll > 0) {
+    if (fDebug.fAll > 0) {
       printf("i, X[i], Y[i] : %2i %10.3e %12.5e\n",i,X[i],Y[i]);
     }
     if (Y[i] < Val) continue;
@@ -939,7 +939,7 @@ int TFeldmanCousinsB::SolveFor(double Val, const double* X, const double* Y, int
   if (a < 0) *XVal = -b/(2*a) - sqrt(b*b/(4*a*a)-(c-Val)/a);
   else       *XVal = -b/(2*a) + sqrt(b*b/(4*a*a)-(c-Val)/a);
 
-  if (fDebugLevel.fAll > 0) {
+  if (fDebug.fAll > 0) {
     printf ("a,b,c,x = %12.5e %12.5e %12.5e %12.5e \n",a,b,c,*XVal);
   }
   return 0;
@@ -976,13 +976,13 @@ int TFeldmanCousinsB::TestCoverage(double MuB, double SMin, double SMax, int NPo
       if ((s < smin) or (s > smax)) {
         nmissed += 1;
                                         // print only missed ones
-        if (fDebugLevel.fTestCoverage == 2) {
+        if (fDebug.fTestCoverage == 2) {
           printf("k, s, MuB, nobs, mus, smin, smax, nmissed : %10i %10.5f %10.3f %3i %10.3f %10.3f %10.3f %10i\n",
                  k, s, MuB, nobs, mus, smin, smax, nmissed);
         }
       }
 
-      if (fDebugLevel.fTestCoverage == 1) {
+      if (fDebug.fTestCoverage == 1) {
         printf("k, s, MuB, nobs, mus, smin, smax, nmissed : %10i %10.5f %10.3f %3i %10.3f %10.3f %10.3f %10i\n",
                k, s, MuB, nobs, mus, smin, smax, nmissed);
       }
@@ -1026,7 +1026,7 @@ void TFeldmanCousinsB::UpperLimit(double MuB, double SMin, double SMax, int NPoi
     for (int i=0; i<fNExp; i++) {
       int nobs = fRn.Poisson(MuB);
       if (S[is] > fBelt.fSign[nobs][1]) nexcl++;
-      if (fDebugLevel.fUpperLimit > 0) {
+      if (fDebug.fUpperLimit > 0) {
 	printf("[TFeldmanCousinsB::UpperLimit] MuB, nobs S[is] fBelt.fSign[nobs][1] : %12.5e %3i %12.5e %12.5e\n",
 	       MuB, nobs, S[is], fBelt.fSign[nobs][1]);
       }
@@ -1153,7 +1153,7 @@ int TFeldmanCousinsB::UpperLimit(model_t* Model, double SMin, double SMax, doubl
       mub = Model->GetNullValue();
 					//
 
-      if (fDebugLevel.fUpperLimit > 0) {
+      if (fDebug.fUpperLimit > 0) {
 	printf("i, mub : %10i %12.5f\n",i,mub);
       }
       

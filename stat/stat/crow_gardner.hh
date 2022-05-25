@@ -25,12 +25,13 @@ public:
     double fSign[MaxNx][2];      // fBelt.Sign[ix][0] = SMin[ix], fBelt.fSign[ix][1] = SMax[ix]
   } fBelt;
 
-  struct DebugLevel_t {
-    int    fAll;
+  struct Debug_t {
     int    fConstructBelt;
     int    fUpperLimit;
     int    fTestCoverage;
-  } fDebugLevel;
+    double fMuMin;
+    double fMuMax;
+  } fDebug;
   
   struct Hist_t {
     TH1D*    fProb;

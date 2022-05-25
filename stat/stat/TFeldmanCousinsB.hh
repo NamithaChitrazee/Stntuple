@@ -25,8 +25,6 @@ public:
   struct Hist_t {
     TH1D*    fBgProb;
     TH1D*    fBsProb;
-    // TH1D*    fCumBgProb;
-    // TH1D*    fCumBsProb;
     TH1D*    fProb;                     // the same as fBsProb, but shifted by half-bin
     THStack* fBelt;
     TH1D*    fBeltLo;
@@ -49,7 +47,7 @@ public:
     int    fConstructInterval;
     int    fUpperLimit;
     int    fTestCoverage;
-  } fDebugLevel;
+  } fDebug;
   
   double   fCL;
   double   fLog1mCL;			// log(1-fCL)
@@ -99,7 +97,7 @@ public:
   void   SetNExp        (long int N) { fNExp =    N; };
   void   SetType        (int   Type) { fType = Type; };
   
-  void   SetDebugLevel  (int Level ) { fDebugLevel.fAll = Level; };
+  void   SetDebugLevel  (int Level ) { fDebug.fAll = Level; };
   
   int    ConstructInterval(double Bgr, double Sig);
 

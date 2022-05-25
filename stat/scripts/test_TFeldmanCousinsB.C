@@ -74,7 +74,7 @@ TFeldmanCousinsB* test_fc_001(double MuB, double MuS, double CL=0.9, const char*
   if (fc == nullptr) fc = new TFeldmanCousinsB(Name,CL);
   else               fc->SetCL(CL);
 
-  fc->fDebugLevel.fConstructInterval = 1;
+  fc->fDebug.fConstructInterval = 1;
   fc->ConstructInterval(MuB,MuS);
   fc->MakeProbHist();
   fc->PrintProbs(10);
@@ -110,7 +110,7 @@ TFeldmanCousinsB* test_fc_002(double MuB, double CL, const char* Name = "test_fc
   if (fc == nullptr) fc = new TFeldmanCousinsB(Name,CL);
   else               fc->SetCL(CL);
 
-  fc->fDebugLevel.fConstructBelt = 2;
+  // fc->fDebug.fConstructBelt = 2;
   
   fc->ConstructBelt(MuB,0,35,35001);
   fc->MakeBeltHist();
@@ -509,7 +509,7 @@ TFeldmanCousinsB* test_fc_017(double MuB, double SMin, double SMax, int NPoints,
 
   if (NExp > 0) fc->SetNExp(NExp);
                                         // test itself
-  if (DebugLevel > 0) fc->fDebugLevel.fTestCoverage = DebugLevel;
+  if (DebugLevel > 0) fc->fDebug.fTestCoverage = DebugLevel;
 
   fc->TestCoverage(MuB,SMin,SMax,NPoints);
 

@@ -67,7 +67,7 @@ crow_gardner* test_cg_003(double MuB, double SMin, double SMax, int NPoints, dou
   crow_gardner* cg = new crow_gardner(Name,SMin,CL);
 
   cg->SetNExp(1000);
-  cg->fDebugLevel.fTestCoverage = 1;
+  cg->fDebug.fTestCoverage = 1;
                                         // test itself
   
   cg->test_coverage(MuB,SMin,SMax,NPoints);
