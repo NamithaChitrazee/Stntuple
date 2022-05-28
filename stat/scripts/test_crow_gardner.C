@@ -13,11 +13,11 @@ using namespace stntuple ;
 //-----------------------------------------------------------------------------
 // tests
 //-----------------------------------------------------------------------------
-crow_gardner* test_cg_001(double MuB, double MuS = 1, double CL = 0.9, const char* Name = "test_cg_001") {
+crow_gardner* test_cg_001(double MuB, double MuS = 1, double CL = 0.9, int NObs = -1, const char* Name = "test_cg_001") {
 
   crow_gardner* cg = new crow_gardner(Name,MuS,CL);
 
-  cg->construct_interval(MuB,MuS);
+  cg->construct_interval(MuB,MuS,NObs);
                                         // make histograms
   cg->make_prob_hist();
 
@@ -39,12 +39,12 @@ crow_gardner* test_cg_001(double MuB, double MuS = 1, double CL = 0.9, const cha
 //-----------------------------------------------------------------------------
 // construct belt
 //-----------------------------------------------------------------------------
-crow_gardner* test_cg_002(double MuB = 0, double CL = 0.9, const char* Name = "test_cg_002") {
+crow_gardner* test_cg_002(double MuB = 0, double CL = 0.9, int NObs = -1, const char* Name = "test_cg_002") {
 
   crow_gardner* cg = new crow_gardner(Name,1,CL);
 
                                         // make histograms
-  cg->construct_belt(MuB,0,35,35001);
+  cg->construct_belt(MuB,0,35,35001,NObs);
   cg->make_belt_hist();
 
   char cname[100];

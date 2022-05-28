@@ -41,13 +41,17 @@ crow_gardner::crow_gardner(const char* Name, double Mu, double CL, int Type) : T
   fDebug.fMuMax         = 0.;
 
   fNExp  = 100000;
+  fNObs  = -1;
+
+  fBelt.fFillColor      = kRed+2;
+  fBelt.fFillStyle      = 3005;
 //-----------------------------------------------------------------------------
 // calculate factorials, do that only once
 // assume MaxNx to be large enough, so having N! values up to MaxNx-1 included is enough
 //-----------------------------------------------------------------------------
   fFactorial[0] = 1; for (int i=1; i<MaxNx; i++) { fFactorial[i] = fFactorial[i-1]*i; }
 
-  init_poisson_dist(0,Mu);
+  init_poisson_dist(0,Mu,fNObs);
 }
 
 //-----------------------------------------------------------------------------
@@ -63,18 +67,25 @@ int crow_gardner::init_poisson_dist(double MuB, double MuS, int NObs) {
 // the length of 'Prob' should be at least N
 // CumProb[N]: probability, for a given Mean, to have rn <= N
 //-----------------------------------------------------------------------------
-  fMean = MuB+MuS;
-  fMuS  = MuS;
-  fMuB  = MuB;
+  fMean  = MuB+MuS;
+  fMuS   = MuS;
+  fMuB   = MuB;
   
-  fProb[0] = TMath::Exp(-fMean);
-
   if (NObs < 0) {
 //-----------------------------------------------------------------------------
 // standard Poisson distribution
 //-----------------------------------------------------------------------------
+    fProb[0] = TMath::Exp(-fMean);
+
+    double pmax = fProb[0];
+    fIPMax      = 0;
+
     for (int i=1; i<MaxNx; i++) {
       fProb[i] = fProb[i-1]*fMean/i;
+      if (fProb[i] > pmax) {
+	pmax   = fProb[i];
+	fIPMax = i;
+      }
     }
   }
   else {
@@ -89,14 +100,23 @@ int crow_gardner::init_poisson_dist(double MuB, double MuS, int NObs) {
       else           pb[i] = 0;
     }
 					// 'i' - bin in the constrained Poisson distribution
+    double exp_mus = TMath::Exp(-MuS);
+
+    double pmax = -1;
+    fIPMax      = -1;
     for (int i=0; i<MaxNx; i++) {
+					// experiment observed Nobs events, use pb[k]
       double pi = 0;
-					// an experiment observed N events, use pb[k]
       for (int k=0; k<=i; k++) {
-	double ps = TMath::Exp(-MuS)*pow(MuS,i-k)/fFactorial[i-k];
+	double ps = exp_mus*pow(MuS,i-k)/fFactorial[i-k];
 	pi        = pi + pb[k]*ps;
       }
       fProb[i] = pi;
+
+      if (fProb[i] > pmax) {
+	pmax   = fProb[i];
+	fIPMax = i;
+      }
     }
   }
 
@@ -106,36 +126,26 @@ int crow_gardner::init_poisson_dist(double MuB, double MuS, int NObs) {
 //-----------------------------------------------------------------------------
 // two parameters for uniformity of the interface
 //-----------------------------------------------------------------------------
-int crow_gardner::construct_interval(double MuB, double MuS) {
+int crow_gardner::construct_interval(double MuB, double MuS, int NObs) {
   int rc(0);
 					// find max bin
-  init_poisson_dist(MuB,MuS,-1);
+  init_poisson_dist(MuB,MuS,NObs);
 
   if (fMean > MaxNx-5) {
     printf("fMean = %12.5e is TOO MUCH. EXIT.\n",fMean);
     return -1;
   }
                                         // find bin with P(max), fMean = MuB+MuS
-  int imin = std::max(fMean-2,0.);
-  int imax = std::min(fMean+2,double(MaxNx));
-  
-  int    imx  = -1;
-  double pmax = -1;
-
-  for (int i=imin; i<imax; i++) {
-    if (fProb[i] > pmax) {
-      pmax = fProb[i];
-      imx  = i;
-    }
-  }
+  int    imx  = fIPMax;
+  double pmax = fProb[imx];
                                         // max bin found;
   double sp = pmax;
                                         // set both to the bin with max 
   int i1 = imx-1;
   int i2 = imx+1;
 
-  imin   = imx;
-  imax   = imx;
+  int imin   = imx;
+  int imax   = imx;
 
   if (sp < fCL) {
     while (1) {
@@ -258,7 +268,7 @@ int crow_gardner::construct_interval(double MuB, double MuS) {
 // fBelt is the FC belt histogram
 // avoid multiple useless re-initializations
 //-----------------------------------------------------------------------------
-int crow_gardner::construct_belt(double MuB, double SMin, double SMax, int NPoints) {
+int crow_gardner::construct_belt(double MuB, double SMin, double SMax, int NPoints, int NObs) {
 
   fMuB = MuB;
   
@@ -274,7 +284,7 @@ int crow_gardner::construct_belt(double MuB, double SMin, double SMax, int NPoin
   for (int iy=0; iy<NPoints; iy++) {
     double mus = SMin+iy*fBelt.fDy;
 
-    int rc     = construct_interval(MuB,mus);
+    int rc     = construct_interval(MuB,mus,NObs);
     if (rc == 0) {
       for (int ix=fIxMin; ix<=fIxMax; ix++) {
         if (mus > fBelt.fSign[ix][1]) fBelt.fSign[ix][1] = mus+fBelt.fDy/2;
@@ -319,13 +329,13 @@ int crow_gardner::make_prob_hist() {
   // fHist.fProb     = new  TH1D("h_prob","prob"    ,MaxNx,-0.5,MaxNx-.5);
   // fHist.fInterval = new  TH1D("h_intr","interval",MaxNx,-0.5,MaxNx-.5);
 
-  TString title = Form("prob vs N, muB:%5.2f muS:%7.4f CL:%5.3f",fMuB,fMuS,fCL);
+  TString title = Form("prob vs N, muB:%5.2f muS:%7.4f CL:%5.3f Nobs:%3i",fMuB,fMuS,fCL,fNObs);
   fHist.fProb     = new  TH1D(Form("h_prob_%s",GetName()),title.Data(),MaxNx,-0.5,MaxNx-0.5);
 
-  title = Form("Interval muB:%5.2f muS:%7.4f CL:%5.3f",fMuB,fMuS,fCL);
+  title = Form("Interval muB:%5.2f muS:%7.4f CL:%5.3f Nobs:%3i",fMuB,fMuS,fCL,fNObs);
   fHist.fInterval = new  TH1D(Form("h_intr_%s",GetName()),title.Data(),MaxNx,-0.5,MaxNx-0.5);
 
-  title = Form("log(Prob) muB:%5.2f muS:%7.4f CL:%5.3f",fMuB,fMuS,fCL);
+  title = Form("log(Prob) muB:%5.2f muS:%7.4f CL:%5.3f Nobs:%3i",fMuB,fMuS,fCL,fNObs);
   fHist.fLh       = new  TH1D(Form("h_llh_%s" ,GetName()),"log(Prob)",5000,-10,40);
   
   fHist.fInterval->SetFillStyle(3004);
@@ -357,11 +367,11 @@ void crow_gardner::make_belt_hist() {
   }
   
   fHist.fBeltLo   = new TH1D(Form("h_belt_lo_%s",GetName()),
-                             Form("Crow-Gardner belt MuB = %10.3f CL = %5.2f",fMuB,fCL),
+                             Form("Crow-Gardner belt MuB = %10.3f CL = %5.2f Nobs:%3i",fMuB,fCL,fNObs),
                              MaxNx,-0.5,MaxNx-0.5);
 
   fHist.fBeltHi   = new TH1D(Form("h_belt_hi_%s",GetName()),
-                             Form("Crow-Gardner belt MuB = %10.3f CL = %5.2f",fMuB,fCL),
+                             Form("Crow-Gardner belt MuB = %10.3f CL = %5.2f Nobs:%3i",fMuB,fCL,fNObs),
                              MaxNx,-0.5,MaxNx-0.5);
 
   for (int ix=0; ix<MaxNx; ix++) {
@@ -372,11 +382,11 @@ void crow_gardner::make_belt_hist() {
     }
   }
   
-  fHist.fBeltLo->SetLineColor(kRed+2);
+  fHist.fBeltLo->SetLineColor(fBelt.fFillColor);
 
-  fHist.fBeltHi->SetFillStyle(3005);
-  fHist.fBeltHi->SetFillColor(kRed+2);
-  fHist.fBeltHi->SetLineColor(kRed+2);
+  fHist.fBeltHi->SetFillStyle(fBelt.fFillStyle);
+  fHist.fBeltHi->SetFillColor(fBelt.fFillColor);
+  fHist.fBeltHi->SetLineColor(fBelt.fFillColor);
 
   fHist.fBelt = new THStack(Form("hs_%s",GetName()),fHist.fBeltHi->GetTitle());
   fHist.fBelt->Add(fHist.fBeltLo);

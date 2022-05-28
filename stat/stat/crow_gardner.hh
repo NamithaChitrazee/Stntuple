@@ -23,6 +23,8 @@ public:
     double fSMax;
     double fDy;
     double fSign[MaxNx][2];      // fBelt.Sign[ix][0] = SMin[ix], fBelt.fSign[ix][1] = SMax[ix]
+    int    fFillColor;
+    int    fFillStyle;
   } fBelt;
 
   struct Debug_t {
@@ -53,6 +55,8 @@ public:
   double fMean;
   double fMuB;
   double fMuS;
+
+  int    fNObs;
   
   int    fIxMin;
   int    fIxMax;
@@ -61,6 +65,7 @@ public:
 
   TRandom3 fRn;
 
+  int    fIPMax;                    // index corresponding max(fProb);
   double fProb     [MaxNx];
   double fCProb    [MaxNx];
   double fFactorial[MaxNx];
@@ -75,8 +80,8 @@ public:
   
                                         // in presence of background, mu = mus+mub
   
-  int construct_interval(double MuB, double MuS);
-  int construct_belt    (double MuB, double SMin, double SMax, int NPoints);
+  int construct_interval(double MuB, double MuS, int NObs = -1);
+  int construct_belt    (double MuB, double SMin, double SMax, int NPoints, int NObs = -1);
 
   int  make_prob_hist();
   void make_belt_hist();
