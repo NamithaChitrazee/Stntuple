@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
-#ifndef __Stntuple_stat_crow_gardner__
-#define __Stntuple_stat_crow_gardner__
+#ifndef __Stntuple_stat_upper_limit__
+#define __Stntuple_stat_upper_limit__
 
 #include "TNamed.h"
 #include "TH1D.h"
@@ -11,7 +11,7 @@
 
 namespace stntuple {
 //-----------------------------------------------------------------------------
-class crow_gardner: public TNamed {
+class upper_limit: public TNamed {
 public:
 
   enum {
@@ -73,7 +73,7 @@ public:
 
   void SetNExp(long int NExp) { fNExp = NExp; }
 
-  crow_gardner(const char* Name, double CL = -1, int TYpe = 0);
+  upper_limit(const char* Name, double CL = -1, int TYpe = 0);
 
                                         // 'N' - number of measured events
   
@@ -89,7 +89,7 @@ public:
 
   int test_coverage(double MuB, double SMin, double SMax, int NPoints);
 
-  ClassDef(crow_gardner,0)
+  ClassDef(upper_limit,0)
 };
 
 }

@@ -8,13 +8,13 @@
 #include "TCanvas.h"
 #include "TROOT.h"
 
-#include "Stntuple/stat/crow_gardner.hh"
+#include "Stntuple/stat/upper_limit.hh"
 
-ClassImp(stntuple::crow_gardner)
+ClassImp(stntuple::upper_limit)
 
 namespace stntuple {
 //-----------------------------------------------------------------------------
-crow_gardner::crow_gardner(const char* Name, double CL, int Type) : TNamed(Name,Name) {
+upper_limit::upper_limit(const char* Name, double CL, int Type) : TNamed(Name,Name) {
 
   double alpha = 1-TMath::Erf(5./sqrt(2));
   
@@ -63,7 +63,7 @@ crow_gardner::crow_gardner(const char* Name, double CL, int Type) : TNamed(Name,
 // declare NObs as double to be able to scan
 // 'nature': given by MuB+Mus - sampled distribution
 //-----------------------------------------------------------------------------
-int crow_gardner::init_poisson_dist(double MuB, double MuS, int NObs) {
+int upper_limit::init_poisson_dist(double MuB, double MuS, int NObs) {
 //-----------------------------------------------------------------------------
 // the length of 'Prob' should be at least N
 // CumProb[N]: probability, for a given Mean, to have rn <= N
@@ -128,141 +128,29 @@ int crow_gardner::init_poisson_dist(double MuB, double MuS, int NObs) {
 //-----------------------------------------------------------------------------
 // two parameters for uniformity of the interface
 //-----------------------------------------------------------------------------
-int crow_gardner::construct_interval(double MuB, double MuS, int NObs) {
+int upper_limit::construct_interval(double MuB, double MuS, int NObs) {
   int rc(0);
 					// find max bin
   init_poisson_dist(MuB,MuS,NObs);
 
-  if (fMean > MaxNx-5) {
-    printf("fMean = %12.5e is TOO MUCH. EXIT.\n",fMean);
-    return -1;
-  }
-                                        // find bin with P(max), fMean = MuB+MuS
-  int    imx  = fIPMax;
-  double pmax = fProb[imx];
-                                        // max bin found;
-  double sp = pmax;
-                                        // set both to the bin with max 
-  int i1 = imx-1;
-  int i2 = imx+1;
+  fIxMin = 0;
+  fIxMax = MaxNx-1;
+  double p = 0;
 
-  int imin   = imx;
-  int imax   = imx;
-
-  if (sp < fCL) {
-    while (1) {
-    
-      if ((i1 >= 0) and (i2 < MaxNx)) {
-        if (fProb[i1] > fProb[i2]) {
-
-          double sp1 = sp + fProb[i1];
-          if (sp1 >= fCL) {
-            sp   = sp1;
-            imin = i1;
-            break;
-          }
-          else {
-            sp   = sp1;
-            imin = i1;
-            i1   = i1-1;
-          }
-        }
-        else {
-          // fProb[i2] is the largest
-          double sp2 = sp + fProb[i2];
-          if (sp2 >= fCL) {
-            sp   = sp2;
-            imax = i2;
-            break;
-          }
-          else {
-            // below the threshold
-            imax = i2;
-            i2   = i2+1;
-            sp   = sp2;
-          }
-        }
-      }
-      else if (i1 < 0) {
-        //-----------------------------------------------------------------------------
-        // consider only upper part, look at i2
-        //-----------------------------------------------------------------------------
-        if (i2 < MaxNx) {
-          // fProb[i2] is the largest
-          sp   = sp + fProb[i2];
-          imax = i2;
-          if (sp >= fCL) {
-            // done
-            break;
-          }
-          else {
-            // continue
-            i2    = i2+1;
-          }
-        }
-        else {
-          // i2 = MaxNx
-          printf("[crow_gardner::construct_interval] ERROR:  MuB:%10.3f MuS:%10.3f",MuB,MuS);
-          printf(" sp = %12.5e , i2 =  %3i BREAK\n",sp,i2);
-	  rc = -2;
-          break;
-        }
-      }
-      else if (i2 >= MaxNx) {
-        //-----------------------------------------------------------------------------
-        // consider only lower part , i1
-        //-----------------------------------------------------------------------------
-        if (i1 >= 0) {
-          sp   = sp + fProb[i1];
-          imin = i1;
-          if (sp >= fCL) {
-            // done
-            break;
-          }
-          else {
-            // continue
-            i1 = i1-1;
-          }
-        }
-        else {
-          // i1 = 0
-          printf("[crow_gardner::construct_interval] ERROR:  MuB:%10.3f MuS:%10.3f",MuB,MuS);
-	  printf(" didnt converge, i1 = %3i, sp = %12.5e , BREAK\n",i1,sp);
-	  rc = -3;
-          break;
-        }
-      }
-    }
+  int imin = 0;
+  while ((p + fProb[imin] < 1-fCL) and (imin < MaxNx)) {
+    p    += fProb[imin];
+    imin += 1;
   }
 
-  if (rc < 0) {
-    fIxMin = imin;
-    fIxMax = imax;
-    fSump  = sp;
-    return rc;
-  }
-//-----------------------------------------------------------------------------
-// see, if can move to the left
-//-----------------------------------------------------------------------------
-  while (imax < MaxNx) {
-    double sp1 = sp + fProb[imax+1]-fProb[imin];
-    if (sp1 > fCL) {
-      sp   = sp1;
-      imin = imin+1;
-      imax = imax+1;
-    }
-    else {
-      break;
-    }
-  }
-//-----------------------------------------------------------------------------
-// IMin and IMax - the lower and the higher bin of the interval, could be the same
-//-----------------------------------------------------------------------------
   fIxMin = imin;
-  fIxMax = imax;
-  fSump  = sp;
+  fSump  = 1-p;
+  if (imin == MaxNx-1) {
+    printf("[upper_limit::construct_interval] ERROR:  MuB:%10.3f MuS:%10.3f",MuB,MuS);
+    rc = -1;
+  }
 
-  return 0;
+  return rc;
 }
 
 //-----------------------------------------------------------------------------
@@ -270,7 +158,7 @@ int crow_gardner::construct_interval(double MuB, double MuS, int NObs) {
 // fBelt is the FC belt histogram
 // avoid multiple useless re-initializations
 //-----------------------------------------------------------------------------
-int crow_gardner::construct_belt(double MuB, double SMin, double SMax, int NPoints, int NObs) {
+int upper_limit::construct_belt(double MuB, double SMin, double SMax, int NPoints, int NObs) {
 
   fMuB = MuB;
   
@@ -294,7 +182,7 @@ int crow_gardner::construct_belt(double MuB, double SMin, double SMax, int NPoin
 
         if (fDebug.fConstructBelt == 2) {
           if ((mus >= fDebug.fMuMin) and (mus <= fDebug.fMuMax)) {
-            printf("crow_gardner::construct_belt: iy = %5i ix:%3i mus=%8.4f MuB=%5.3f IxMin:%3i IxMax:%3i fSign[ix][0]:%8.4f fSign[ix][1]:%8.4f\n",
+            printf("upper_limit::construct_belt: iy = %5i ix:%3i mus=%8.4f MuB=%5.3f IxMin:%3i IxMax:%3i fSign[ix][0]:%8.4f fSign[ix][1]:%8.4f\n",
                    iy,ix,mus,MuB,fIxMin,fIxMax,fBelt.fSign[ix][0],fBelt.fSign[ix][0]);
           }
         }
@@ -323,7 +211,7 @@ int crow_gardner::construct_belt(double MuB, double SMin, double SMax, int NPoin
 }
 
 //-----------------------------------------------------------------------------
-int crow_gardner::make_prob_hist() {
+int upper_limit::make_prob_hist() {
 
   if (fHist.fProb    ) delete fHist.fProb;
   if (fHist.fInterval) delete fHist.fInterval;
@@ -361,7 +249,7 @@ int crow_gardner::make_prob_hist() {
 }
 
 //-----------------------------------------------------------------------------
-void crow_gardner::make_belt_hist() {
+void upper_limit::make_belt_hist() {
   if (fHist.fBelt) {
     delete fHist.fBelt;
     delete fHist.fBeltLo;
@@ -406,7 +294,7 @@ void crow_gardner::make_belt_hist() {
 //-----------------------------------------------------------------------------
 // assume S in 
 //-----------------------------------------------------------------------------
-int crow_gardner::test_coverage(double MuB, double SMin, double SMax, int NPoints) {
+int upper_limit::test_coverage(double MuB, double SMin, double SMax, int NPoints) {
   
   int rc(0);
   rc = construct_belt(MuB,0,35,35001);

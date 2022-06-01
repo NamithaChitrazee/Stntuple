@@ -25,12 +25,14 @@ TFeldmanCousinsB::TFeldmanCousinsB(const char* Name, double CL, int DebugLevel):
 {
   SetCL(CL);
 
-  fType                          = 0;             // unbiased
+  fType                     = 0;        // unbiased
   fDebug.fAll               = DebugLevel;
   fDebug.fConstructBelt     = 0;
   fDebug.fConstructInterval = 0;
   fDebug.fUpperLimit        = 0;
   fDebug.fTestCoverage      = 0;
+  fDebug.fMuMin             = 0.;       // nothind printed by default
+  fDebug.fMuMax             = -1.;
 //-----------------------------------------------------------------------------
 // calculate factorials - just once
 //-----------------------------------------------------------------------------
@@ -52,6 +54,9 @@ TFeldmanCousinsB::TFeldmanCousinsB(const char* Name, double CL, int DebugLevel):
   fHist.fBeltHi    = nullptr;
   fHist.fCoverage  = nullptr;
 
+  fBelt.fFillColor = kBlue+2;
+  fBelt.fFillStyle = 3004;
+  
   fNExp            = 10000000;
 					// make sure uninitialzied values don't make sense
   fBelt.fNy        = -1;
@@ -124,7 +129,7 @@ void TFeldmanCousinsB::InitPoissonDist(double MuB, double MuS, double* Prob, int
 // }
 
 //-----------------------------------------------------------------------------
-int TFeldmanCousinsB::ConstructInterval(double MuB, double MuS) {
+  int TFeldmanCousinsB::ConstructInterval(double MuB, double MuS, int NObs) {
 //-----------------------------------------------------------------------------
 // output: [fIxMin,fIxMax] : a CL interval constructed using FC ordering for given 
 //         MuB and MuS
@@ -139,9 +144,10 @@ int TFeldmanCousinsB::ConstructInterval(double MuB, double MuS) {
   
   fMuB = MuB;
   fMuS = MuS;
+  fNObs = NObs;
                                         // init poisson doesn't redefine MuB and MuS
-  InitPoissonDist(fMuB,   0, fBgProb, -1);
-  InitPoissonDist(fMuB,fMuS, fBsProb, -1);
+  InitPoissonDist(fMuB,   0, fBgProb, NObs);
+  InitPoissonDist(fMuB,fMuS, fBsProb, NObs);
   
   for (int ix=0; ix<MaxNx; ix++) {
                                         // 'ix' : N(observed events)
@@ -154,12 +160,14 @@ int TFeldmanCousinsB::ConstructInterval(double MuB, double MuS) {
     fBestProb[ix] = TMath::Power(sb,ix)*TMath::Exp(-sb)/fFactorial[ix];
     fBestSig [ix] = sbest;
 
-    if (fType == 0) fLhRatio [ix] = fBsProb[ix]/fBestProb[ix];
+    if (NObs == -1) {
+      fLhRatio [ix] = fBsProb[ix]/fBestProb[ix];
+    }
     else {
                                         // biased
       
-      InitPoissonDist(fMuB,fMuS , prob     , ix);
-      InitPoissonDist(fMuB,sbest, best_prob, ix);
+      InitPoissonDist(fMuB,fMuS , prob     , NObs);
+      InitPoissonDist(fMuB,sbest, best_prob, NObs);
 
       fLhRatio [ix] = prob[ix]/best_prob[ix];
     }
@@ -243,7 +251,6 @@ int TFeldmanCousinsB::ConstructInterval(double MuB, double MuS) {
 
   return rc;
 }
-
 
 //-----------------------------------------------------------------------------
 int TFeldmanCousinsB::ConstructInterval(model_t* Model) {
@@ -335,14 +342,16 @@ int TFeldmanCousinsB::ConstructInterval(model_t* Model) {
 // fBelt is the FC belt histogram
 // avoid multiple useless re-initializations
 //-----------------------------------------------------------------------------
-int TFeldmanCousinsB::ConstructBelt(double MuB, double SMin, double SMax, int NPoints) {
+  int TFeldmanCousinsB::ConstructBelt(double MuB, double SMin, double SMax, int NPoints, int NObs) {
 
-  if ((fBelt.fBgr == MuB) and (fBelt.fNy == NPoints) and (fBelt.fSMin == SMin) and (fBelt.fSMax == SMax)) return 0;
+    if ((fBelt.fBgr == MuB) and (fBelt.fNy == NPoints) and (fBelt.fSMin == SMin) and (fBelt.fSMax == SMax)
+        and (fBelt.fNObs == NObs)) return 0;
 
   fBelt.fBgr  = MuB;
   fBelt.fSMin = SMin;
   fBelt.fSMax = SMax;
   fBelt.fNy   = NPoints;
+  fBelt.fNObs = NObs;
   
   fBelt.fDy   = (NPoints > 1) ? (SMax-SMin)/(NPoints-1) : 1;
 
@@ -354,17 +363,16 @@ int TFeldmanCousinsB::ConstructBelt(double MuB, double SMin, double SMax, int NP
   for (int iy=0; iy<NPoints; iy++) {
     double mus = SMin+iy*fBelt.fDy;
 
-    if ((mus >= 0.3) and (mus <= 0.4)) fDebug.fConstructBelt = 2;
-    else                               fDebug.fConstructBelt = 0;
-
-    int rc     = ConstructInterval(MuB,mus);
+    int rc     = ConstructInterval(MuB,mus,NObs);
     if (rc == 0) {
       for (int ix=fIxMin; ix<=fIxMax; ix++) {
         if (mus > fBelt.fSign[ix][1]) fBelt.fSign[ix][1] = mus+fBelt.fDy/2;
         if (mus < fBelt.fSign[ix][0]) fBelt.fSign[ix][0] = mus-fBelt.fDy/2;
         if (fDebug.fConstructBelt >= 2) {
-          printf("TFeldmanCousinsB::ConstructBelt: iy = %5i ix:%3i mus=%8.4f MuB=%5.3f IxMin:%3i IxMax:%3i fSign[ix][0]:%8.4f fSign[ix][1]:%8.4f\n",
-                 iy,ix,mus,MuB,fIxMin,fIxMax,fBelt.fSign[ix][0],fBelt.fSign[ix][0]);
+          if ((mus >= fDebug.fMuMin) and (mus <= fDebug.fMuMax)) {
+            printf("TFeldmanCousinsB::ConstructBelt: iy = %5i ix:%3i mus=%8.4f MuB=%5.3f IxMin:%3i IxMax:%3i fSign[ix][0]:%8.4f fSign[ix][1]:%8.4f\n",
+                   iy,ix,mus,MuB,fIxMin,fIxMax,fBelt.fSign[ix][0],fBelt.fSign[ix][0]);
+          }
         }
       }
     }
@@ -383,8 +391,10 @@ int TFeldmanCousinsB::ConstructBelt(double MuB, double SMin, double SMax, int NP
   }
 
   if (fDebug.fConstructBelt > 0) {
+    printf("       N(obs)      S(min)      S(max) \n");
+    printf("------------------------------------- \n");
     for (int ix=0; ix<MaxNx; ix++) {
-      printf("%32s %3i %12.5f %12.5f\n","",ix,fBelt.fSign[ix][0],fBelt.fSign[ix][1]);
+      printf("%10i %12.5f %12.5f\n",ix,fBelt.fSign[ix][0],fBelt.fSign[ix][1]);
     }
   }
 
@@ -796,11 +806,11 @@ void TFeldmanCousinsB::MakeBeltHist() {
     }
   }
 
-  fHist.fBeltLo->SetLineColor(kBlue+2);
+  fHist.fBeltLo->SetLineColor(fBelt.fFillColor);
 
-  fHist.fBeltHi->SetFillStyle(3004);
-  fHist.fBeltHi->SetFillColor(kBlue+2);
-  fHist.fBeltHi->SetLineColor(kBlue+2);
+  fHist.fBeltHi->SetFillStyle(fBelt.fFillStyle);
+  fHist.fBeltHi->SetFillColor(fBelt.fFillColor);
+  fHist.fBeltHi->SetLineColor(fBelt.fFillColor);
 
   fHist.fBelt = new THStack(Form("hs_%s",GetName()),fHist.fBeltHi->GetTitle());
   fHist.fBelt->Add(fHist.fBeltLo);

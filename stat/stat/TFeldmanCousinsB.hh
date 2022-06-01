@@ -34,11 +34,14 @@ public:
 
   struct Belt_t {
     int    fNy;                   // use not to reinitialize
+    int    fNObs;
     double fBgr;
     double fSMin;
     double fSMax;
     double fDy;
     double fSign[MaxNx][2];      // fSBelt[ix][0] = SMin[ix], fSBelt[ix][1] = SMax[ix]
+    int    fFillColor;           // for belt histogram
+    int    fFillStyle;
   } fBelt;
 
   struct DebugLevel_t {
@@ -47,12 +50,15 @@ public:
     int    fConstructInterval;
     int    fUpperLimit;
     int    fTestCoverage;
+    double fMuMin;
+    double fMuMax;
   } fDebug;
   
   double   fCL;
   double   fLog1mCL;			// log(1-fCL)
   double   fMuB;
   double   fMuS;
+  int      fNObs;
   
   TRandom3 fRn;
 
@@ -99,11 +105,11 @@ public:
   
   void   SetDebugLevel  (int Level ) { fDebug.fAll = Level; };
   
-  int    ConstructInterval(double Bgr, double Sig);
+  int    ConstructInterval(double Bgr, double Sig, int NObs = -1);
 
   int    ConstructInterval(model_t* Model);
   
-  int    ConstructBelt    (double Bgr, double SMin, double SMax, int NPoints);
+  int    ConstructBelt    (double Bgr, double SMin, double SMax, int NPoints, int NObs = -1);
 
   double Factorial(int Ix) { return fFactorial[Ix]; }
 

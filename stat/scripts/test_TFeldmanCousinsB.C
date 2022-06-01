@@ -68,22 +68,24 @@ public:
 //-----------------------------------------------------------------------------
 // test_001: construct interval for a given (MuS,MuB)
 //-----------------------------------------------------------------------------
-TFeldmanCousinsB* test_fc_001(double MuB, double MuS, double CL=0.9, const char* Name = "test_fc_001") {
+TFeldmanCousinsB* test_fc_001(double MuB, double MuS, double CL=0.9, int NObs = -1, const char* Name = "test_fc_001") {
   TFeldmanCousinsB* fc(nullptr);
 
   if (fc == nullptr) fc = new TFeldmanCousinsB(Name,CL);
   else               fc->SetCL(CL);
 
   fc->fDebug.fConstructInterval = 1;
-  fc->ConstructInterval(MuB,MuS);
+  fc->ConstructInterval(MuB,MuS,NObs);
   fc->MakeProbHist();
   fc->PrintProbs(10);
   
-  TH1D* h1 = (TH1D*) fc->fHist.fProb->Clone("h1");
+  TH1D* h1 = (TH1D*) fc->fHist.fProb->Clone(Form("h1_interval_%s",fc->GetName()));;
+  h1->Reset();
+  h1->SetTitle("h1_interval");
   int nx = h1->GetNbinsX();
   
   for (int i=0; i<nx; i++) {
-    if ((i<fc->fIxMin) or (i>fc->fIxMax)) h1->SetBinContent(i+1,0);
+    if ((i>=fc->fIxMin) and (i<=fc->fIxMax)) h1->SetBinContent(i+1,fc->fHist.fProb->GetBinContent(i+1));
   }
 
   char cname[100];
@@ -92,6 +94,11 @@ TFeldmanCousinsB* test_fc_001(double MuB, double MuS, double CL=0.9, const char*
   if (c == nullptr) c = new TCanvas(cname,Name,1200,800);
   else              c->cd();
 
+  double xmax = 4*(MuB+MuS);
+  int i  = xmax / 5; 
+  fc->fHist.fProb->GetXaxis()->SetRangeUser(0,i*5);
+  fc->fHist.fProb->GetXaxis()->SetTitle("N(observed)");
+  fc->fHist.fProb->SetTitle(Form("FC interval CL=%3.2f #mu_{B} = %4.3f #mu_S = %4.3f NObs=%2i",CL,MuB,MuS,NObs));
   fc->fHist.fProb->Draw("text+hist");
 
   h1->SetFillStyle(3005);
@@ -104,7 +111,7 @@ TFeldmanCousinsB* test_fc_001(double MuB, double MuS, double CL=0.9, const char*
 //-----------------------------------------------------------------------------
 // fc_test_002: construct belt for a given (MuS,MuB)
 //-----------------------------------------------------------------------------
-TFeldmanCousinsB* test_fc_002(double MuB, double CL, const char* Name = "test_fc_002") {
+TFeldmanCousinsB* test_fc_002(double MuB, double CL, int NObs = -1, const char* Name = "test_fc_002") {
   TFeldmanCousinsB* fc(nullptr);
 
   if (fc == nullptr) fc = new TFeldmanCousinsB(Name,CL);
@@ -112,43 +119,18 @@ TFeldmanCousinsB* test_fc_002(double MuB, double CL, const char* Name = "test_fc
 
   // fc->fDebug.fConstructBelt = 2;
   
-  fc->ConstructBelt(MuB,0,35,35001);
+  //  fc->ConstructBelt(MuB,0,35,3501/*001*/,NObs);
+  fc->ConstructBelt(MuB,0,20,20001/*001*/,NObs);
   fc->MakeBeltHist();
 
   char cname[100];
   sprintf(cname,"c_%s",Name);
 
   TCanvas* c = (TCanvas*) gROOT->GetListOfCanvases()->FindObject(cname);
-  if (c == nullptr) c = new TCanvas(cname,Name,1200,800);
+  if (c == nullptr) c = new TCanvas(cname,Name,850,800);
   else              c->cd();
 
-  fc->fHist.fBelt->Draw();
-
-  return fc;
-}
-
-//-----------------------------------------------------------------------------
-// fc_test_003: construct BIASED belt for a given (MuS,MuB)
-// interesting, mostly, for small signals
-//-----------------------------------------------------------------------------
-TFeldmanCousinsB* test_fc_003(double MuB, double CL, const char* Name = "test_fc_003") {
-  TFeldmanCousinsB* fc(nullptr);
-
-  if (fc == nullptr) fc = new TFeldmanCousinsB(Name,CL);
-  else               fc->SetCL(CL);
-
-  fc->SetType(1);                       // biased by observations
-  
-  fc->ConstructBelt(MuB,0,20,20001);
-  fc->MakeBeltHist();
-
-  char cname[100];
-  sprintf(cname,"c_%s",Name);
-
-  TCanvas* c = (TCanvas*) gROOT->GetListOfCanvases()->FindObject(cname);
-  if (c == nullptr) c = new TCanvas(cname,Name,1200,800);
-  else              c->cd();
-
+  fc->fHist.fBelt->SetTitle(Form("FC belt CL=%3.2f #mu_{B}=%4.3f NObs=%2i",CL,MuB,NObs));
   fc->fHist.fBelt->Draw();
 
   return fc;
