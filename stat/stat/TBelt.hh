@@ -1,6 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////////
-#ifndef __Stntuple_stat_crow_gardner__
-#define __Stntuple_stat_crow_gardner__
+// base class for confidence interval / confidence belt studies
+///////////////////////////////////////////////////////////////////////////////
+#ifndef __Stntuple_stat_TBelt__
+#define __Stntuple_stat_TBelt__
 
 #include "TNamed.h"
 #include "TH1D.h"
@@ -11,7 +13,7 @@
 
 namespace stntuple {
 //-----------------------------------------------------------------------------
-class crow_gardner: public TNamed {
+class TBelt: public TNamed {
 public:
 
   enum {
@@ -19,17 +21,19 @@ public:
   };
 
   struct Belt_t {
-    double fSMin;
-    double fSMax;
-    double fDy;
-    double fSign[MaxNx][2];      // fBelt.Sign[ix][0] = SMin[ix], fBelt.fSign[ix][1] = SMax[ix]
+    double  fSMin;
+    double  fSMax;
+    double  fDy;
+    double  fSign[MaxNx][2];      // fBelt.Sign[ix][0] = SMin[ix], fBelt.fSign[ix][1] = SMax[ix]
     
-    int    fFillColor;
-    int    fFillStyle;
-    double fXMin;
-    double fXMax;
-    double fYMin;
-    double fYMax;
+    int     fFillColor;
+    int     fFillStyle;
+    double  fXMin;
+    double  fXMax;
+    double  fYMin;
+    double  fYMax;
+    double* fLlhInterval;
+    int     fLlhNPoints;
   } fBelt;
 
   struct Debug_t {
@@ -72,6 +76,7 @@ public:
   TRandom3 fRn;
 
   int    fIPMax;                    // index corresponding max(fProb);
+  int    fRank     [MaxNx];
   double fProb     [MaxNx];
   double fCProb    [MaxNx];
   double fFactorial[MaxNx];
@@ -81,23 +86,23 @@ public:
   void set_belt_xmax(double XMax) { fBelt.fXMax = XMax; }
   void set_belt_ymax(double YMax) { fBelt.fYMax = YMax; }
 
-  crow_gardner(const char* Name, double CL = -1, int TYpe = 0);
+  TBelt(const char* Name, double CL = -1, int TYpe = 0);
 
                                         // 'N' - number of measured events
   
-  int init_poisson_dist(double MuB, double MuS, int NObs = -1);
+  virtual int  init_poisson_dist(double MuB, double MuS, int NObs = -1);
   
                                         // in presence of background, mu = mus+mub
   
-  int construct_interval(double MuB, double MuS, int NObs = -1);
-  int construct_belt    (double MuB, double SMin, double SMax, int NPoints, int NObs = -1);
+  virtual int  construct_interval(double MuB, double MuS, int NObs = -1);
+  virtual int  construct_belt    (double MuB, double SMin, double SMax, int NPoints, int NObs = -1);
 
-  int  make_prob_hist();
-  void make_belt_hist();
+  virtual int  make_prob_hist();
+  virtual void make_belt_hist();
 
-  int test_coverage(double MuB, double SMin, double SMax, int NPoints);
+  virtual int  test_coverage(double MuB, double SMin, double SMax, int NPoints);
 
-  ClassDef(crow_gardner,0)
+  ClassDef(TBelt,0)
 };
 
 }
