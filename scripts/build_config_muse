@@ -4,9 +4,9 @@
 #------------------------------------------------------------------------------
 base=$MUSE_WORK_DIR/build
 
-echo Stntuple::build_config_muse:000: MU2E_VERBOSE:.$MU2E_VERBOSE.
+echo Stntuple::build_config_muse:000: MUSE_VERBOSE:.$MUSE_VERBOSE.
 
-if [ ".$MU2E_VERBOSE" != ".0" ] ; then echo Stntuple::build_config_muse:001: $\0:$0 : \$PWD=$PWD  \$base=$base ; fi
+if [ ".$MUSE_VERBOSE" != ".0" ] ; then echo Stntuple::build_config_muse:001: $\0:$0 : \$PWD=$PWD  \$base=$base ; fi
 
 # pkg=`pwd | awk -F / '{print $(NF-1)}'`
 pkg=`echo $0 | awk -F / '{print $(NF-2)}'`
@@ -21,7 +21,7 @@ list_of_subpackages="alg ana base geom gui loop mod obj print val"
 # package and its subpackages
 #------------------------------------------------------------------------------
 if [ ! -d $pkg_include_dir ] ; then
-    if [ $MU2E_VERBOSE != 0 ] ; then echo Stntuple::build_config_muse: pwd=$pwd ; creating $base/include/$pkg ; fi
+    if [ $MUSE_VERBOSE != 0 ] ; then echo Stntuple::build_config_muse: pwd=$pwd ; creating $base/include/$pkg ; fi
     mkdir -p $pkg_include_dir
 fi
 #------------------------------------------------------------------------------
@@ -30,7 +30,7 @@ fi
 for d in $list_of_subpackages ; do
     if [[ -e $base/include/$pkg ]] && [[ ! -e $base/include/$pkg/$d ]] ; then 
 	cmd="ln -s ../../../$pkg/$d/$d $pkg_include_dir/$d"
-	if [ $MU2E_VERBOSE != 0 ] ; then echo `pwd`$0 : executing: $cmd ; fi
+	if [ $MUSE_VERBOSE != 0 ] ; then echo `pwd`$0 : executing: $cmd ; fi
 	$cmd
     fi
 done
