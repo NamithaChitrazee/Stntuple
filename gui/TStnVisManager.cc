@@ -26,6 +26,7 @@
 #include "Stntuple/gui/TStnFrame.hh"
 #include "Stntuple/gui/TStnVisManager.hh"
 
+#include <boost/lexical_cast/lexical_cast_old.hpp>
 
 ClassImp(TStnVisManager)
 
