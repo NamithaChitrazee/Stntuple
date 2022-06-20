@@ -33,26 +33,21 @@ def stntuple_gen_rootcint(source, target, env, for_signature):
     #------------------------------------------------------------------------------
     # building in a satellite release requires both env vars 
     #------------------------------------------------------------------------------
-    base_dir = os.environ.get('BUILD_BASE');
-    dir      = os.environ.get('MU2E_SATELLITE_RELEASE');
-    if (dir):
-        includes = '-I'+dir+'/include';
-        includes = includes+' -I'+base_dir+'/include';
-    else:
-        includes = '-I'+base_dir+'/include';
+    base_dir = os.environ.get('MUSE_WORK_DIR');
 
-    includes = includes + " -I"+os.environ['BUILD_BASE'  ];
-    includes = includes + " -I"+os.environ['ART_INC'     ];
-    includes = includes + " -I"+os.environ['ART_ROOT_IO_INC'];
-    includes = includes + " -I"+os.environ['BTRK_INC'    ];
-    includes = includes + " -I"+os.environ['CETLIB_INC'  ];
-    includes = includes + " -I"+os.environ['CETLIB_EXCEPT_INC'];
-    includes = includes + " -I"+os.environ['CANVAS_INC'  ];
-    includes = includes + " -I"+os.environ['FHICLCPP_INC'];
-    includes = includes + " -I"+os.environ.get('HEP_CONCURRENCY_INC');
-    includes = includes + " -I"+os.environ['CLHEP_INC'   ];
-    includes = includes + " -I"+os.environ['BOOST_INC'   ];
-    includes = includes + " -I"+os.environ.get('TBB_INC');
+    includes = '-I'+base_dir+'/include';
+    includes = includes + ' -I'+os.environ['MUSE_BUILD_BASE'  ];
+    includes = includes + ' -I'+os.environ['ART_INC'     ];
+    includes = includes + ' -I'+os.environ['ART_ROOT_IO_INC'];
+    includes = includes + ' -I'+os.environ['BTRK_INC'    ];
+    includes = includes + ' -I'+os.environ['CETLIB_INC'  ];
+    includes = includes + ' -I'+os.environ['CETLIB_EXCEPT_INC'];
+    includes = includes + ' -I'+os.environ['CANVAS_INC'  ];
+    includes = includes + ' -I'+os.environ['FHICLCPP_INC'];
+    includes = includes + ' -I'+os.environ.get('HEP_CONCURRENCY_INC');
+    includes = includes + ' -I'+os.environ['CLHEP_INC'   ];
+    includes = includes + ' -I'+os.environ['BOOST_INC'   ];
+    includes = includes + ' -I'+os.environ.get('TBB_INC');
 
     dict     = str(target[0]);
     tmp_lib_dir = os.path.dirname(dict);
@@ -64,8 +59,7 @@ def stntuple_gen_rootcint(source, target, env, for_signature):
     # if building a satellite release, BUILD_BASE points to a remote directory
     # need to use MU2E_SATELLITE_RELEASE
     #------------------------------------------------------------------------------
-    dir = os.environ.get('MU2E_SATELLITE_RELEASE');
-    if (dir == None): dir = os.environ.get('BUILD_BASE');
+    dir = os.environ.get('MUSE_BUILD_BASE');
 
     lib_dir = dir+"/lib";
     cmd     = 'if [ ! -d '+tmp_lib_dir+' ] ; then mkdir -p '+tmp_lib_dir+'; fi;';

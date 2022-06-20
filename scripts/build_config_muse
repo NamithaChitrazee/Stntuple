@@ -2,7 +2,7 @@
 #------------------------------------------------------------------------------
 # BUILD_BASE doesn't replace the SATELLITE_RELEASE, need both
 #------------------------------------------------------------------------------
-base=$MUSE_WORK_DIR/build
+base=$MUSE_WORK_DIR
 
 echo Stntuple::build_config_muse:000: MUSE_VERBOSE:.$MUSE_VERBOSE.
 
@@ -29,7 +29,7 @@ fi
 #------------------------------------------------------------------------------
 for d in $list_of_subpackages ; do
     if [[ -e $base/include/$pkg ]] && [[ ! -e $base/include/$pkg/$d ]] ; then 
-	cmd="ln -s ../../../$pkg/$d/$d $pkg_include_dir/$d"
+	cmd="ln -s ../../$pkg/$d/$d $pkg_include_dir/$d"
 	if [ $MUSE_VERBOSE != 0 ] ; then echo `pwd`$0 : executing: $cmd ; fi
 	$cmd
     fi
