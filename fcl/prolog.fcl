@@ -189,6 +189,7 @@ MuHitDisplay: { module_type:MuHitDisplay                 # the class name;
 #------------------------------------------------------------------------------
 Stntuple : {
     producers : {}  # empty table
+    filters   : {}  # empty table
 #------------------------------------------------------------------------------
 # STNTUPLE modules become analyzers - need to deal with the trigger intormation
 #------------------------------------------------------------------------------
@@ -197,7 +198,7 @@ Stntuple : {
 	    @table::StntupleModuleFclDefaults                   # defaults of the base class
 	    module_name       : InitStntuple
 	    histFileName      : "default.stn"
-	    splitLevel        : 0
+	    splitLevel        : 1
 	}
 
 	FillStntuple : { module_type:FillStntuple
@@ -249,9 +250,6 @@ Stntuple : {
 	    pidBlockName            : [ "PidBlockDep"              ] 
 	    pidCollTag              : [ "AvikPIDNewDep"            ]
 	}
-    }
-
-    filters : {
 #------------------------------------------------------------------------------
 # downstream proton reco
 #------------------------------------------------------------------------------
@@ -703,7 +701,7 @@ Stntuple : {
     }
 }
 #------------------------------------------------------------------------------
-# sequences
+# sequences, all of them go to end_path
 #------------------------------------------------------------------------------
 Stntuple.stnmaker         : [ InitStntuple, StntupleMaker   ,                   FillStntuple ]
 Stntuple.stnmaker_cpr     : [ InitStntuple, StntupleMakerCpr,                   FillStntuple ]

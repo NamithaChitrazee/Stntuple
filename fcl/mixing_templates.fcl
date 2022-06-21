@@ -253,7 +253,7 @@ Primary: {
 	SelectEvents   : [ @sequence::TRIGGER_PATHS ]
 	fileName       : @nil
 	# drop StepPoints from calorimeter
-	outputCommands : @local::DigiCompression.OutputCommands
+	# outputCommands : @local::DigiCompression.OutputCommands
     }
 
     EndPath  : [ genCountLogger, digiCompressionCheck, Output ]
@@ -266,7 +266,7 @@ Primary.TriggerPath : [ @sequence::Primary.GenAndG4,
 			@sequence::CommonMC.DigiSim,
 			@sequence::TrackerMC.DigiSim,
 			StrawDigiMCFilter,
-			@sequence::CaloDigiMC.DigiSim,
+			# @sequence::CaloDigiMC.DigiSim,
 			@sequence::CrvDAQPackage.CrvResponseSequence,
 			compressDigiMCs ]
 
@@ -392,19 +392,19 @@ Mixing : { @table::Mixing
 	}
 	                                                # tracker digis for primary selection
 	# digi compression - this seems to inpude primary
-	compressDigiMCs  : { @table::DigiCompression.Mixing
+	compressDigiMCs  : { @table::Digitize.producers.compressDigiMCs
 	    simParticleTags    : [ "g4run", @sequence::Mixing.TrkCalMixSequence ] # , @sequence::Mixing.CRVMixSequence ]
 	    caloShowerStepTags : [ "CaloShowerStepFromStepPt:calorimeter" , @sequence::Mixing.caloMixerTags     ]
 	}
 
-	CaloShowerStepFromStepPtPrimary: { @table::CaloShowerStepFromStepPt }
+#	CaloShowerStepFromStepPtPrimary: { @table::CaloShowerStepFromStepPt }
 
-	CaloShowerStepROFromShowerStepPrimary: { @table::CaloShowerStepROFromShowerStep
-	    caloCrystalShowerInputs : [ "CaloShowerStepFromStepPtPrimary:calorimeter" ]
-	    TimeOffsets             : {
-		inputs : [ @sequence::CommonMC.TimeMapsPrimary ]
-	    }
-	}
+#	CaloShowerStepROFromShowerStepPrimary: { @table::CaloShowerStepROFromShowerStep
+#	    caloCrystalShowerInputs : [ "CaloShowerStepFromStepPtPrimary:calorimeter" ]
+#	    TimeOffsets             : {
+#		inputs : [ @sequence::CommonMC.TimeMapsPrimary ]
+#	    }
+#	}
 
 	# CaloDigiFromShowerPrimary: { @table::CaloDigiFromShower
 	#     caloShowerModuleLabel : CaloShowerStepROFromShowerStepPrimary
@@ -455,7 +455,7 @@ Mixing : { @table::Mixing
     Output  : { module_type : RootOutput
 	SelectEvents   : [ @sequence::TRIGGER_PATHS ]
 	fileName       : @nil
-	outputCommands : @local::DigiCompression.OutputCommands
+	# outputCommands : @local::DigiCompression.OutputCommands
     }
 
     # drops for reading primaries as input to mixing.  TrkDigis are kept to allow filtering
@@ -498,7 +498,7 @@ Mixing.pbi_mix_digi_nocrv  : [ protonBunchIntensity               ,
 			       @sequence::Mixing.TrkCalMixSequence,
 			       @sequence::CommonMC.TimeMaps       ,
 			       @sequence::TrackerMC.DigiSim       ,
-			       @sequence::CaloDigiMC.DigiSim
+			       # @sequence::CaloDigiMC.DigiSim
 			      ]
 
 Mixing.pbi_mix_digi_crv    : [ protonBunchIntensity               ,
@@ -506,7 +506,7 @@ Mixing.pbi_mix_digi_crv    : [ protonBunchIntensity               ,
 			       @sequence::Mixing.CRVMixSequence   ,
 			       @sequence::CommonMC.TimeMaps       ,
 			       @sequence::TrackerMC.DigiSim       ,
-			       @sequence::CaloDigiMC.DigiSim      ,
+			       # @sequence::CaloDigiMC.DigiSim      ,
 			       @sequence::CrvDAQPackage.CrvResponseSequence 
 			      ]
 
@@ -520,7 +520,7 @@ Mixing.pbi_digi_nocrv      : [ protonBunchIntensity               ,
 			       EWMProducer                        , 
 			       @sequence::CommonMC.TimeMaps       ,
 			       @sequence::TrackerMC.DigiSim       ,
-			       @sequence::CaloDigiMC.DigiSim
+			       # @sequence::CaloDigiMC.DigiSim
 			      ]
 
 Mixing.pbi_mix_digi_all    : [ protonBunchIntensity               ,
@@ -531,7 +531,7 @@ Mixing.pbi_mix_digi_all    : [ protonBunchIntensity               ,
 			       @sequence::CommonMC.TimeMaps       ,
 			       # -----
 			       @sequence::TrackerMC.DigiSim       ,
-			       @sequence::CaloDigiMC.DigiSim      ,
+			       # @sequence::CaloDigiMC.DigiSim      ,
 			       @sequence::CrvDAQPackage.CrvResponseSequence 
 			      ]
 #------------------------------------------------------------------------------
@@ -557,7 +557,7 @@ Mixing.signal_nocrv         : [ # -- @sequence::Mixing.CreatePrimarySequence,
 				@sequence::CommonMC.TimeMaps       ,
 				# --
 				makeSGS, makeSD ,                           # this is @sequence::TrackerMC.DigiSim       ,
-				@sequence::CaloDigiMC.DigiSim      ,
+				# @sequence::CaloDigiMC.DigiSim      ,
 				# ---
 				compressDigiMCs
 			       ]

@@ -17,7 +17,8 @@
 BEGIN_PROLOG
   bgHitFiles          : @nil
   INPUT_MODULE        : EmptyEvent
-  TRIGGER_PATH        : stntuple_p1
+  TRIGGER_PATH        : []
+  OUTPUT_PATH         : [ stntuple_p0 ]
   PROCESS_NAME        : Stnmaker
   BLIND_TIME          : 500                                  # default
   STN_VDHITS_COLL_TAG : "compressDigiMCs:virtualdetector"
@@ -25,21 +26,23 @@ BEGIN_PROLOG
   GEN_ID              : "unknown"                            #    ignore GEN_ID check
 END_PROLOG
 
-#include "fcl/minimalMessageService.fcl"
-#include "fcl/standardProducers.fcl"
-#include "fcl/standardServices.fcl"
+#include "Offline/fcl/minimalMessageService.fcl"
+#include "Offline/fcl/standardProducers.fcl"
+#include "Offline/fcl/standardServices.fcl"
 
-#include "JobConfig/reco/prolog.fcl"
-#include "TrkDiag/fcl/prolog.fcl"
+#include "Production/JobConfig/reco/prolog.fcl"
+#include "Offline/TrkDiag/fcl/prolog.fcl"
 
-#include "TrkPatRec/fcl/prolog_trigger.fcl"
-#include "CalPatRec/fcl/prolog_trigger.fcl"
-#include "CaloReco/fcl/prolog_trigger.fcl"
-#include "CaloCluster/fcl/prolog_trigger.fcl"
-#include "TrkHitReco/fcl/prolog_trigger.fcl"
-#include "TrkReco/fcl/prolog_trigger.fcl"
-#include "TrkFilters/fcl/prolog_trigger.fcl"
-#include "CaloFilters/fcl/prolog_trigger.fcl"
+#include "Offline/TrkPatRec/fcl/prolog_trigger.fcl"
+#include "Offline/CalPatRec/fcl/prolog_trigger.fcl"
+#include "Offline/CaloReco/fcl/prolog_trigger.fcl"
+#include "Offline/CaloCluster/fcl/prolog_trigger.fcl"
+#include "Offline/TrkHitReco/fcl/prolog_trigger.fcl"
+#include "Offline/TrkReco/fcl/prolog_trigger.fcl"
+#include "Offline/TrkFilters/fcl/prolog_trigger.fcl"
+#include "Offline/CaloFilters/fcl/prolog_trigger.fcl"
+
+#include "Offline/ProditionsService/fcl/prolog.fcl"
 
 #include "Stntuple/fcl/prolog.fcl"
 
@@ -48,12 +51,16 @@ END_PROLOG
 # define table and sequence templates combining information from multiples packages
 # services are initialized in Stntuple/fcl/stntuple_templates.fcl
 #------------------------------------------------------------------------------
+Services.SimAndReco.SeedService.baseSeed          :  8
+Services.SimAndReco.SeedService.maxUniqueEngines  :  100
+
+
 #include "Stntuple/fcl/trigger_templates.fcl"
-#include "Stntuple/fcl/mixing_templates.fcl"
+# # onclude "Stntuple/fcl/mixing_templates.fcl"
 #include "Stntuple/fcl/production_templates.fcl"
 #include "Stntuple/fcl/stntuple_templates.fcl"
 
-Stntuple.outputs      : { @table::su2020.outputs   }
+Stntuple.outputs      : { @table::production.outputs   }
 
 Stntuple.physics : {
     producers: { @table::Stntuple.producers }
@@ -62,15 +69,14 @@ Stntuple.physics : {
 #------------------------------------------------------------------------------
 # add trigger paths 
 #------------------------------------------------------------------------------
- #   @table::su2020.paths
     @table::Stntuple.paths
 #------------------------------------------------------------------------------
 # final part
 #------------------------------------------------------------------------------
     trigger_paths : [ @sequence::TRIGGER_PATHS ]
 
-    output_path   : [             ]
-    end_paths     : [ output_path ]
+    output_path   : [ @sequence::OUTPUT_PATH   ]
+    end_paths     : [ output_path              ]
 }
 #------------------------------------------------------------------------------
 # output file names 

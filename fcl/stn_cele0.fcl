@@ -1,19 +1,17 @@
 # -*- mode: tcl -*-
 #------------------------------------------------------------------------------
-# S8: remaking ntuples, with "cosmics reco path"
-# conversion electrons: read digi file, reconstruct, stntuple 
+# conversion electrons: read mcs file, stntuple 
 # by default: do not write reconstructed output (DST), set physics.output_path to [] 
-# includes tuned calorimeter timing resolution
 #------------------------------------------------------------------------------
 BEGIN_PROLOG
   INPUT_MODULE  @protect_ignore: RootInput      # EmptyEvent/RootInput
   TRIGGER_PATHS @protect_ignore: [ ]
-  TRIGGER_PATHS @protect_ignore: [ stntuple_p0 ]
+  OUTPUT_PATHS  @protect_ignore: [ stntuple_p0 ]
 
   PROCESS_NAME  @protect_ignore: RecoStn
   GEN_ID        @protect_ignore: "CeLeadingLog"
   PDG_ID        @protect_ignore: 11
-  TIME_MAPS     @protect_ignore: [ "compressDigiMCs:protonTimeMap", "compressDigiMCs:muonTimeMap", "compressDigiMCs:cosmicTimeMap" ]
+  TIME_MAPS     @protect_ignore: [ ]
 END_PROLOG
 
 #include "Stntuple/fcl/stntuple.fcl"
@@ -24,12 +22,12 @@ physics                                   : { @table::Stntuple.physics }  # note
 #------------------------------------------------------------------------------
 # paths
 #------------------------------------------------------------------------------
-#include "gen/fcl/Trigger/offline/allTrig/allPaths.fcl"
+# # onclude "Offline/gen/fcl/Trigger/OnSpillTrigMenu/?????.fcl"
 
-physics.output_path                       : [                           ] # [ defaultOutput ]
-outputs.defaultOutput.SelectEvents        : [ @sequence::TRIGGER_PATHS  ]
+physics.output_path                         : [                           ] # [ defaultOutput ]
+outputs.defaultOutput.SelectEvents          : [ @sequence::TRIGGER_PATHS  ]
 #------------------------------------------------------------------------------
-services.GeometryService.inputFile        : "su2020/common/geom_baseline.txt"
-services.TFileService.fileName            : "nts._USER_.cele0s81b0.su2020.001000_00000000.root"
+services.GeometryService.inputFile          : "su2020/common/geom_baseline.txt"
+services.TFileService.fileName              : "nts._USER_.cele0s81b0.su2020.001000_00000000.root"
 physics.analyzers.InitStntuple.histFileName : "nts._USER_.cele0s81b2.su2020.001000_00000000.stn"
-outputs.defaultOutput.fileName            : "mcs._USER_.cele0s81b2.su2020.001000_00000000.art"
+outputs.defaultOutput.fileName              : "mcs._USER_.cele0s81b2.su2020.001000_00000000.art"
