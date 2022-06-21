@@ -20,8 +20,8 @@ stntuple_env.Append(BUILDERS = {'StntupleCodegen'  : stntuple_codegen })
 stntuple_env.Append(BUILDERS = {'StntupleRootCint' : stntuple_rootcint})
 
 stntuple_env['CPPPATH' ].append(os.environ['MUSE_WORK_DIR']+'/include');
-# stntuple_env['CCFLAGS'].append(' -I'+os.environ['MUSE_WORK_DIR']+'/include');
-stntuple_env.Append(FORTRANFLAGS = [' -I'+os.environ['MUSE_WORK_DIR']+'/include']);
+
+stntuple_env.Append(FORTRANPATH = [os.environ['MUSE_WORK_DIR']+'/include']);
 
 # print(stntuple_env.Dump())
 
