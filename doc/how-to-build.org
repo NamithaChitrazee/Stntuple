@@ -1,4 +1,4 @@
-# 
+#+startup:fold
 * _Building Stntuple libraries under muse_                                   
 
 - assuming muse area is set up, and $MUSE_WORK_DIR is the working directory.
@@ -20,7 +20,7 @@ cd ..
 muse build [-j 2]  # for example..
 #+end_src
 
-* _Building Stntuple libraries in a full test release_                       
+* _Building Stntuple libraries in a full test release_ (su2020)              
 
 - check out Mu2e Offline into dev directory
 
