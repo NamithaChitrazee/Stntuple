@@ -5,7 +5,7 @@
 BEGIN_PROLOG
   TIME_MAPS        @protect_ignore: [ ]
   TIME_OFFSET_MAPS @protect_ignore: { inputs : @local::TIME_MAPS }
-  TRIGGER_PATHS    @protect_ignore: [ stntuple_p0 ]
+  END_PATHS        @protect_ignore: [ stntuple_p0 ]
 END_PROLOG
 
 #include "Stntuple/fcl/stntuple.fcl"
@@ -15,7 +15,7 @@ process_name : S4Stnmaker
 source       : { module_type : RootInput fileNames : ["undefined", "undefined"] }
 
 outputs      : { @table::Stntuple.outputs   }
-analyzers      : { @table::Stntuple.analyzers   }
+analyzers    : { @table::Stntuple.analyzers }
 
 physics : { @table::Stntuple.physics 
     
@@ -42,7 +42,7 @@ physics : { @table::Stntuple.physics
 
     out           : [ ]                   # [defaultOutput]/[]
 #    end_paths     : [ gcl, out ]
-    end_paths     : [ out ]
+    end_paths     : [ @sequence::END_PATHS , out ]
 }
 
 #------------------------------------------------------------------------------
@@ -51,6 +51,11 @@ physics : { @table::Stntuple.physics
 # physics.out                               : [ detectorOutput ]
 # outputs.detectorOutput.SelectEvents       : [ path_gen_digi_reco_stn_dem_dmm ]
 
+services.DbService : @local::DbEmpty
+services.SeedService : { @table::automaticSeeds
+    baseSeed          :  8
+    maxUniqueEngines  :  100
+}
 services.TFileService.fileName            : "nts.user.s4_stn.project.sequencer.hist"
 physics.analyzers.InitStntuple.histFileName : "nts.user.s4_stn.project.sequencer.stn"
 outputs.detectorOutput.fileName           : "sim.user.s4_stn.project.sequencer.art"

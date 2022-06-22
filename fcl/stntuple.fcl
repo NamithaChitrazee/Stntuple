@@ -17,8 +17,9 @@
 BEGIN_PROLOG
   bgHitFiles          : @nil
   INPUT_MODULE        : EmptyEvent
-  TRIGGER_PATH        : []
-  OUTPUT_PATH         : [ stntuple_p0 ]
+  TRIGGER_PATHS       : []
+  OUTPUT_PATH         : []
+  END_PATHS           : []
   PROCESS_NAME        : Stnmaker
   BLIND_TIME          : 500                                  # default
   STN_VDHITS_COLL_TAG : "compressDigiMCs:virtualdetector"
@@ -45,7 +46,6 @@ END_PROLOG
 #include "Offline/ProditionsService/fcl/prolog.fcl"
 
 #include "Stntuple/fcl/prolog.fcl"
-
 #------------------------------------------------------------------------------
 # templates: do not include prologs, 
 # define table and sequence templates combining information from multiples packages
@@ -76,7 +76,7 @@ Stntuple.physics : {
     trigger_paths : [ @sequence::TRIGGER_PATHS ]
 
     output_path   : [ @sequence::OUTPUT_PATH   ]
-    end_paths     : [ output_path              ]
+#    end_paths     : [ @sequence::END_PATHS     ]
 }
 #------------------------------------------------------------------------------
 # output file names 
