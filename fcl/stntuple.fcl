@@ -51,9 +51,9 @@ END_PROLOG
 # define table and sequence templates combining information from multiples packages
 # services are initialized in Stntuple/fcl/stntuple_templates.fcl
 #------------------------------------------------------------------------------
-Services.SimAndReco.SeedService.baseSeed          :  8
-Services.SimAndReco.SeedService.maxUniqueEngines  :  100
+services : { @table::Services.SimAndReco } 
 
+# services.DbService : @local::DbEmpty
 
 #include "Stntuple/fcl/trigger_templates.fcl"
 # # onclude "Stntuple/fcl/mixing_templates.fcl"
@@ -81,6 +81,7 @@ Stntuple.physics : {
 #------------------------------------------------------------------------------
 # output file names 
 #------------------------------------------------------------------------------
+services.SeedService.baseSeed             : 8
 services.TFileService.fileName            : "nts..stnmaker.xxx.000000_00000000.root"
 outputs.defaultOutput.fileName            : "sim._USER_.stnmaker.xxx.000001.art"
 #------------------------------------------------------------------------------

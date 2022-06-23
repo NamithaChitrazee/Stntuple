@@ -198,7 +198,7 @@ Stntuple : {
 	    @table::StntupleModuleFclDefaults                   # defaults of the base class
 	    module_name       : InitStntuple
 	    histFileName      : "default.stn"
-	    splitLevel        : 1
+	    splitLevel        : 99
 	}
 
 	FillStntuple : { module_type:FillStntuple
