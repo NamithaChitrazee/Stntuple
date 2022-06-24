@@ -10,17 +10,17 @@ Stntuple : {
     @table::Stntuple             # defined in Stntuple/fcl/prolog.fcl
 
     producers : { 
-	@table::production.producers
+	@table::Reconstruction.producers
 	@table::Stntuple.producers
     }
 
     filters : { 
-	@table::production.filters
+	@table::Reconstruction.filters
 	@table::Stntuple.filters
     }
 
     analyzers : { 
-	@table::production.analyzers
+	@table::Reconstruction.analyzers
 	@table::Stntuple.analyzers
     }
 }
