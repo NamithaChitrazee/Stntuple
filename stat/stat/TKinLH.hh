@@ -80,6 +80,8 @@ public:
 
   int    save_hist(const char* Filename, const char* Opt = "append");
 
+  virtual void Print(const char* Option_t) const;
+
   ClassDef(TKinLH,0)
 };
 }

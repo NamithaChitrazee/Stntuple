@@ -57,6 +57,8 @@ int TKinLH::init() {
 
   fHist.prob_bgr->Reset();
 
+  double bin = fHist.prob_sig->GetBinWidth(1);
+
   int nx   = fHist.prob_sig->GetNbinsX();
   for (int i=0; i<nx; i++) {
     double x = fHist.prob_sig->GetBinCenter(i+1);
@@ -71,13 +73,18 @@ int TKinLH::init() {
   }
 
   double sws = fHist.prob_sig->Integral();
-  fHist.prob_sig->Scale(1./sws/(pmax-pmin));
+  fHist.prob_sig->Scale(1./sws/bin);
 
   double swb = fHist.prob_bgr->Integral();
-  fHist.prob_bgr->Scale(1./swb/(pmax-pmin));
+  fHist.prob_bgr->Scale(1./swb/bin);
 
-  fSig = new TF1("f_sig",TKinLH::f_sig,103.6,104.9,0);
-  fSig->SetNpx(10000);
+  fSig = new TF1("f_sig",TKinLH::f_sig,pmin,pmax,1);
+  fSig->SetParameter(0,1.);
+  double scale = fSig->Integral(pmin,pmax);
+  fSig->SetParameter(0,1./scale);
+
+    
+  fSig->SetNpx(30000);
   fSig->SetLineColor(kBlue+2);
 
   return 0;
@@ -105,7 +112,18 @@ double TKinLH::lh_bgr(double P) {
   return x;
 }
 
+//-----------------------------------------------------------------------------
+// normalized to the integral (not sum over the bins !)  = 1
+//-----------------------------------------------------------------------------
+double TKinLH::lh_sig(double P) {
 
+  double p = fSig->Eval(P);
+  return p;
+}
+
+
+//-----------------------------------------------------------------------------
+// P[0] - overall scale
 //-----------------------------------------------------------------------------
 double TKinLH::f_sig(double* X, double * P) {
   double f(0);
@@ -162,21 +180,9 @@ double TKinLH::f_sig(double* X, double * P) {
     // no overlap
     f = par[ir][0] + par[ir][1]*dp + par[ir][2]*dp*dp + par[ir][3]*dp*dp*dp;
   }
-    
-  return f;
+
+  return f*P[0];
 }
-
-
-
-//-----------------------------------------------------------------------------
-// normalized to the integral (not sum over the bins !)  = 1
-//-----------------------------------------------------------------------------
-double TKinLH::lh_sig(double P) {
-
-  double p = fSig->Eval(P);
-  return p;
-}
-
 
 //-----------------------------------------------------------------------------
 int TKinLH::run(int NObs, int NPe) {
@@ -280,4 +286,10 @@ int TKinLH::save_hist(const char* Filename, const char* Option) {
   
   return 0;
 }
+  
+//-----------------------------------------------------------------------------
+void TKinLH::Print(const char* Option) const {
+  printf("%-20s: mode:%i PMin: %10.3f PMax:%10.3f\n",GetName(), fMode,pmin, pmax);
+}
+
 }
