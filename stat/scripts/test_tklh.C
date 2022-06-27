@@ -2,29 +2,31 @@
 // tests of the TKinLH class
 ///////////////////////////////////////////////////////////////////////////////
 #include "Stntuple/stat/TKinLH.hh"
-
+using namespace stntuple;
 //-----------------------------------------------------------------------------
 // plot normalised reduced likelihood
 //-----------------------------------------------------------------------------
-TH1D* test_tklh_001(int NObs = 1, int NPExp = 1000000, const char* Name = "test_mllh_001", double PMin=103.6) {
-  TString   name, title;
-
-  int mode;
+TH1D* test_tklh_001(const char* Name = "test_mllh_001", double CL=0.9, int Mode = 0,
+                    int NObs = 1, int NPExp = 1000000, 
+                    double PMin=103.6, double PMax=104.9) {
   
-  TKinLH* x1 = new TKinLH(mode=0,Name,PMin);
+  TString   title;
+
+  TKinLH* x1 = new TKinLH(Name,CL,Mode=0,PMin,PMax);
   x1->run(NObs,NPExp);
+  
   // make probability histogram
 
   TString hname = Form("h_%s_prob",Name);
 
   TH1D* h_prob = new TH1D(hname.Data(),Form("P(bgr) for N(obs):%i",NObs),20000,-20,0);
 
-  double tot =  x1->h_llhrR->Integral();
+  double tot =  x1->fHist.log_lhrR[NObs]->Integral();
 
-  int nx = x1->h_llhrR->GetNbinsX();
+  int nx = x1->fHist.log_lhrR[NObs]->GetNbinsX();
 
   for (int i=0; i<nx; i++) {
-    double p    = x1->h_llhrR->GetBinContent(i+1)/tot;
+    double p    = x1->fHist.log_lhrR[NObs]->GetBinContent(i+1)/tot;
     double logp = log(p);
     
     h_prob->Fill(logp,p);
@@ -34,35 +36,28 @@ TH1D* test_tklh_001(int NObs = 1, int NPExp = 1000000, const char* Name = "test_
 }
 
 //-----------------------------------------------------------------------------
-// generate distributions in LLHR for different number of events and store them
+// generate distributions in LLHR for a range of Nobs and store them
 //-----------------------------------------------------------------------------
-int test_tklh_002(double PMin = 103.6) {
+int test_tklh_002(const char* Name = "test_thlh_002", double CL=0.9, int Mode = 0, 
+                  double PMin = 102.0, double PMax = 105.0, 
+                  int NMax = TKinLH::MaxNx, long int NPe = 100000) {
 
-  int mode;
-  
-  TKinLH* x1 = new TKinLH(mode=0,"x1",PMin);
-  TKinLH* x2 = new TKinLH(mode=1,"x2",PMin);
+  TKinLH* x1 = new TKinLH(Name,CL,Mode,PMin,PMax);
+  //  TKinLH* x2 = new TKinLH(mode=1,"x2",PMin);
 
-  long int npe = 10000000; // 0;
-
-  for (int nev=1; nev<11; nev++) {
-    x1->run(nev,npe);
-    x2->run(nev,npe);
+  for (int nobs=0; nobs<NMax; nobs++) {
+    x1->run(nobs,NPe);
+    //    x2->run(nobs,npe);
   }
 //-----------------------------------------------------------------------------
 // save all histograms once in the end
 //-----------------------------------------------------------------------------
-  TString fn = "tklh_pmin_1036.root";
+  TString fn = Form("tklh_%0.f_%.0f.root",PMin*10,PMax*10);
   
   TFile* f;
 
-  f = TFile::Open(fn.Data(),"recreate");
-  f->Write();
-  f->Close();
-  delete f;
-  
-  x1->save_hist(fn.Data(),"update");
-  x2->save_hist(fn.Data(),"update");
+  x1->save_hist(fn.Data(),"recreate");
+  //  x2->save_hist(fn.Data(),"update");
 
   return 0;
 }
@@ -71,56 +66,56 @@ int test_tklh_002(double PMin = 103.6) {
 TH1D* h_bgr_llhr;
 TH1D* h_sig_llhr;
 //-----------------------------------------------------------------------------
-// read histogram file and make expected distributions in LLHR
-// assume PMin, PMax have only two digits after the decimal point 
+// read histogram file and construct a confidence interval
+// kinematic histograms do not know anything about CL, but do know about the object name...
 //-----------------------------------------------------------------------------
-int test_tklh_003(double MuB=0.1, double MuS=4.5, double PMin = 103.6, double PMax=104.9) {
+int test_tklh_003(const char* Name, double CL, int Mode = 0,
+                  double MuB=0.1, double MuS=4.5,
+                  double PMin = 103.6, double PMax=104.9) {
 
-  // TKinLH* x1 = new TKinLH(1,PMin,"x1");
-  // TKinLH* x2 = new TKinLH(2,PMin,"x2");
+  TKinLH* x1 = new TKinLH(Name,CL,Mode,PMin,PMax);
 
-  //  long int npe = 100000; // 000;
 
-  int ipmin = (int) (PMin*100);
-  int ipmax = (int) (PMax*100);
-  
-  TString fn = Form("tklh_%i_%i.root",;
-  
-  TFile* f;
+  TString fn = Form("tklh_%.0f_%.0f.root",PMin*10,PMax*10);
 
-  f = TFile::Open(fn.Data());
+  x1->read_hist(fn.Data());
 
-  h_bgr_llhr = (TH1D*) f->Get("x1_m1_h_llhr_1")->Clone("h_bgr_llht");
-  h_bgr_llhr->Reset();
+  x1->construct_interval(MuB,MuS,CL);
 
-  h_sig_llhr = (TH1D*) h_bgr_llhr->Clone("h_sig_llhr");
-
-  double     prob_bgr[100];
-  double     prob_sig[100];
-  
-  prob_bgr[0] = exp(-MuB);
-  prob_sig[0] = exp(-MuS);
-
-  for (int i=1; i<11; i++) {
-    prob_bgr[i] = prob_bgr[i-1]*MuB/i;
-    prob_sig[i] = prob_sig[i-1]*MuS/i;
+  x1->fHist.sum_log_lhrR_1->Draw("");
     
-    TString hname = Form("x1_m1_h_llhr_%i",i);
-    TH1D* h1 = (TH1D*) f->Get(hname.Data());
-    h_bgr_llhr->Add(h1,prob_bgr[i]/h1->Integral());
+  return 0;
+}
 
-    hname = Form("x2_m2_h_llhr_%i",i);
-    TH1D* h2 = (TH1D*) f->Get(hname.Data());
-    h_sig_llhr->Add(h2,prob_sig[i]/h2->Integral());
-  }
+//-----------------------------------------------------------------------------
+// read histogram file and construct a confidence interval
+// plot belt
+//-----------------------------------------------------------------------------
+int test_tklh_004(const char* Name, double CL, int Mode = 0,
+                  double PMin = 103.6, double PMax=104.9,
+                  double MuB=0.1, double SMin=1, double SMax=5,
+                  int NPoints = 10, int NObs = 0)
+{
+  TKinLH* x1 = new TKinLH(Name,CL,Mode,PMin,PMax);
 
-  h_sig_llhr->SetLineColor(kRed+2);
-  h_sig_llhr->Draw();
+  TString fn = Form("tklh_%.0f_%.0f.root",PMin*10,PMax*10);
 
-  h_bgr_llhr->Draw("sames");
+  x1->read_hist(fn.Data());
 
-  // f->Close();
-  // delete f;
+  x1->construct_belt(MuB,SMin,SMax,NPoints,NObs);
+  x1->make_belt_hist();
 
+  char cname[100];
+  sprintf(cname,"c_%s",Name);
+  
+  TCanvas* c = (TCanvas*) gROOT->GetListOfCanvases()->FindObject(cname);
+  if (c == nullptr) c = new TCanvas(cname,Name,1200,800);
+  else              c->cd();
+
+  x1->fHist.fBeltHi->GetYaxis()->SetRangeUser(0,5);
+  x1->fHist.fBeltHi->Draw();
+  // llh->fHist.fBeltHi->Draw("same");
+  // x1->fHist.fBeltNO1->Draw("same");
+    
   return 0;
 }

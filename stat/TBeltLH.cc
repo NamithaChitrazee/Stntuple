@@ -14,7 +14,7 @@ ClassImp(stntuple::TBeltLH)
 
 namespace stntuple {
 //-----------------------------------------------------------------------------
-TBeltLH::TBeltLH(const char* Name, double CL, int Type) : TBelt(Name,CL,Type) {
+TBeltLH::TBeltLH(const char* Name, double CL) : TBelt(Name,CL) {
   fHist.fProb       = nullptr;
   fHist.fLlh        = nullptr;
   fHist.fInterval   = nullptr;
@@ -28,8 +28,10 @@ TBeltLH::TBeltLH(const char* Name, double CL, int Type) : TBelt(Name,CL,Type) {
 //-----------------------------------------------------------------------------
 int TBeltLH::init_poisson_dist(double MuB, double MuS, int NObs) {
   int rc = TBelt::init_poisson_dist(MuB, MuS, NObs);
-  // now rank the bins of the Poisson distribution assuming it is falling on both sides
-  // from the amximum
+  // in addition to initializing the Poisson distribution, rank its bins assuming the distribution
+  // is falling on both sides from the maximum
+  // ranking is unique for both sides
+  // fIPMax - bin in N-space where the probability density reaches its maximum
 
   fRank[0] = fIPMax;
 
@@ -90,6 +92,8 @@ int TBeltLH::construct_interval(double MuB, double MuS, int NObs) {
   if (rc < 0) return rc;
 //-----------------------------------------------------------------------------
 // Crow-Gardner: see, if can move to the right to minimize the overcoverage
+// fSump : covered by the interval
+// fIxMin and IxMax: two ends of the interval in the N-space
 //-----------------------------------------------------------------------------
   while (fIxMax < MaxNx) {
     double sp = fSump+ fProb[fIxMax+1]-fProb[fIxMin];

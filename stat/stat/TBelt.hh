@@ -58,7 +58,6 @@ public:
 
   Hist_t fHist;
 
-  int    fType;                      // default:0 if=1, try to force monotonic left edge
   double fCL;
   double fSump;
 
@@ -86,7 +85,7 @@ public:
   void set_belt_xmax(double XMax) { fBelt.fXMax = XMax; }
   void set_belt_ymax(double YMax) { fBelt.fYMax = YMax; }
 
-  TBelt(const char* Name, double CL = -1, int TYpe = 0);
+  TBelt(const char* Name, double CL = -1);
 
                                         // 'N' - number of measured events
   

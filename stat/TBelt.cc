@@ -14,14 +14,14 @@ ClassImp(stntuple::TBelt)
 
 namespace stntuple {
 //-----------------------------------------------------------------------------
-TBelt::TBelt(const char* Name, double CL, int Type) : TNamed(Name,Name) {
+TBelt::TBelt(const char* Name, double CL) : TNamed(Name,Name) {
 
   double alpha = 1-TMath::Erf(5./sqrt(2));
   
   if (CL > 0) fCL = CL;
   else        fCL = 1-alpha/2; // always one-sided: 5.7330314e-07/2 = 2.8665157e-07
 
-  fType = Type;
+  //  fType = Type;
 
   fIxMin = MaxNx;
   fIxMax = -1;

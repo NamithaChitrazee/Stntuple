@@ -34,7 +34,7 @@ public:
 //-----------------------------------------------------------------------------
 //  functions
 //-----------------------------------------------------------------------------
-  TBeltLH(const char* Name, double CL = -1, int TYpe = 0);
+  TBeltLH(const char* Name, double CL = -1);
 
   virtual int   init_poisson_dist(double MuB, double MuS, int NObs = -1);
 
