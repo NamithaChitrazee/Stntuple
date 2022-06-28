@@ -432,19 +432,19 @@ int TKinLH::construct_interval(double MuB, double MuS, int NObs) {
 //-----------------------------------------------------------------------------
 // now, create uniformly normalized distributions, 2-sided
 //-----------------------------------------------------------------------------
-  for (int n=0; n<MaxNx; n++) {
-    double p0 = fProb[n];
+  for (int nev=0; nev<MaxNx; nev++) {
+    double p0 = fProb[nev];
 //-----------------------------------------------------------------------------    
 // h1 is supposed to be normalized to an integral (sum of contens of all bins) of 1
 //-----------------------------------------------------------------------------
-    TH1D*  h1 = fHist.log_lhrR[n];
+    TH1D*  h1 = fHist.log_lhrR[nev];
 
     for (int ib=0; ib<nx; ib++) { 
       double p     = p0*(h1->GetBinContent(ib+1)/pmax);
       double log_p = -log(p);
       double wt    = p0*h1->GetBinContent(ib+1);
-      if (NObs < (MuB+MuS)) log_p = -log_p;
-      fHist.log_lhrR_1[n]->Fill(log_p,wt);
+      if (nev < (MuB+MuS)) log_p = -log_p;
+      fHist.log_lhrR_1[nev]->Fill(log_p,wt);
     }
   }
 //-----------------------------------------------------------------------------
@@ -452,19 +452,24 @@ int TKinLH::construct_interval(double MuB, double MuS, int NObs) {
 // they can be generated once and saved 
 // at this point, only need to add all of them up
 //-----------------------------------------------------------------------------
-  for (int n=0; n<MaxNx; n++) {
-    fHist.sum_log_lhrR_1->Add(fHist.log_lhrR_1[n]);
+  for (int nev=0; nev<MaxNx; nev++) {
+    fHist.sum_log_lhrR_1->Add(fHist.log_lhrR_1[nev]);
   }
 //-----------------------------------------------------------------------------
-// last step: define the interval in the likelihod_ratio space
+// last step: define the interval in the likelihod_ratio space. remember - it is two-sided
+// everything starts from bin nx/2+1
 //-----------------------------------------------------------------------------
-  double sump = 0;
-  for (int i=nx; i>0; i--) {
-    double p = fHist.sum_log_lhrR_1->GetBinContent(i);
-    sump += p;
+  int ipmax   = nx/2+1;
+  double sump = fHist.sum_log_lhrR_1->GetBinContent(nx/2+1);
+  
+                                        // bins symmetric wrt zero correspond to the same probability density
+  for (int i=1; i<nx/2; i++) {
+    double p1 = fHist.sum_log_lhrR_1->GetBinContent(ipmax+i);
+    double p2 = fHist.sum_log_lhrR_1->GetBinContent(ipmax-i);
+    sump = sump+p1+p2;
     if (sump >= fCL) {
                                         // done
-      fInterval.fLlhrMin = fHist.sum_log_lhrR_1->GetBinCenter(i);
+      fInterval.fLlhrMin = fHist.sum_log_lhrR_1->GetBinCenter(ipmax+i);  // interval bound
       fInterval.fLlhrMax = 0;
       fInterval.fProbTot = sump;
       break;
