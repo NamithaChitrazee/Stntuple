@@ -170,7 +170,7 @@ int TKinLH::init() {
     name  = Form("h_%s_log_lhrR_1_n%02i",GetName(),ix);
     title = Form("%s_log_lhrR_1_n%02i",GetName(),ix);
     
-    fHist.fLogLhrR_1[ix] = new TH1D(name,title,nbins_llhrR,-50,50);
+    fHist.fLogLhrR_1[ix] = new TH1D(name,title,nbins_llhrR,llhrR_min,llhrR_max);
 
     name  = Form("h_%s_log_lhrR_2_n%02i",GetName(),ix);
     title = Form("%s_log_lhrR_2_n%02i",GetName(),ix);
@@ -340,7 +340,7 @@ int TKinLH::construct_interval(double MuB, double MuS, int NObs) {
     }
   }
 //-----------------------------------------------------------------------------
-// next: construct 2-sided likelihood hist.. nobs=0 is a special case, keep int in mind
+// next: construct 2-sided likelihood hist. nobs=0 is a special case, keep int in mind
 // find max bin, assume it corresponds to ix=1
 // start from finding a bin with the max probability density - it has to be done here,
 // as the result depends on MuB and MuS
@@ -514,27 +514,30 @@ void TKinLH::make_belt_hist() {
 int TKinLH::read_hist(const char* Filename) {
 
   TFile* f = TFile::Open(Filename);
-
-                                        // current directory is still //
+  gROOT->cd();
+                                        // current directory is gROOT
+  
   for (int nobs=0; nobs<MaxNx; nobs++) {
-    f->cd(Form("//%05i",nobs));
 
     TObjArray* as  = fHist.fLogLhs [nobs];
     TObjArray* ab  = fHist.fLogLhb [nobs];
     TObjArray* ar  = fHist.fLogLhr [nobs];
     TObjArray* arR = fHist.fLogLhrR[nobs];
 
-    as ->Read(Form("llhs_%02i" ,nobs));
-    ab ->Read(Form("llhb_%02i" ,nobs));
-    ar ->Read(Form("llhr_%02i" ,nobs));
-    arR->Read(Form("llhrR_%02i",nobs));
+    for (int nb=0; nb<=nobs; nb++) {
+      int ns = nobs-nb;
+      (*as) [nb] = (TH1D*) f->Get(Form("//%05i/h_%s_llhs_%02i_%02i" ,nobs,GetName(),nb,ns));
+      (*ab) [nb] = (TH1D*) f->Get(Form("//%05i/h_%s_llhb_%02i_%02i" ,nobs,GetName(),nb,ns));
+      (*ar) [nb] = (TH1D*) f->Get(Form("//%05i/h_%s_llhr_%02i_%02i" ,nobs,GetName(),nb,ns));
+      (*arR)[nb] = (TH1D*) f->Get(Form("//%05i/h_%s_llhrR_%02i_%02i",nobs,GetName(),nb,ns));
+    }
 
     // fHist.fLogLhrR_1[nobs]->Read(Form("h_llhrR1_%02i" ,nobs));
     // fHist.fLogLhrR_2[nobs]->Read(Form("h_llhrR2_%02i" ,nobs));
   }
 
-  fHist.prob_sig->Write();
-  fHist.prob_bgr->Write();
+  fHist.prob_sig = (TH1F*) f->Get(Form("h_%s_prob_sig",GetName()));
+  fHist.prob_bgr = (TH1F*) f->Get(Form("h_%s_prob_bgr",GetName()));
 
   // fHist.fSumLogLhrR_2->Read(Form("h_sum_llhrR2_%02i" ,nobs));
 
@@ -716,6 +719,8 @@ int TKinLH::save_hist(const char* Filename, const char* Option) {
     // fHist.fLogLhrR_1[nobs]->Write(Form("h_llhrR1_%02i",nobs));
     // fHist.fLogLhrR_2[nobs]->Write(Form("h_llhrR2_%02i",nobs));
   }
+
+  f->cd("//");
 
   fHist.prob_sig->Write();
   fHist.prob_bgr->Write();

@@ -77,7 +77,7 @@ TH1D* h_sig_llhr;
 // read histogram file and construct a confidence interval
 // kinematic histograms do not know anything about CL, but do know about the object name...
 //-----------------------------------------------------------------------------
-TKinLH* test_tklh_003(const char* Name        ,
+TKinLH* test_tklh_003(const char* Name    ,
                   double      CL          ,
                   double      PMin = 103.6,
                   double      PMax = 104.9,
