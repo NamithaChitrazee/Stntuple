@@ -18,6 +18,7 @@
 #include "TH1F.h"
 #include "TH2D.h"
 #include "TF1.h"
+#include "THStack.h"
 
 #include "TNamed.h"
 #include "TFile.h"
@@ -41,34 +42,39 @@ public:
     TH1D*    fLlh;
     TH1D*    fLlhInterval;
     TH1D*    fInterval;
+    THStack* fBelt;
     TH1D*    fBeltLo;
     TH1D*    fBeltHi;
-    TH1D*    fBeltNO;
-    TH1D*    fBeltUL;
-    TH1D*    fBeltNO1;
-    // TH1D*    fSign[2];
+    TH1D*    fBeltSp;
     TGraph*  fCoverage;
 
     TH1F*    prob_sig;
     TH1F*    prob_bgr;
+//-----------------------------------------------------------------------------
+// fLoglhs[N][nb] is a histogram for N = Nb(bgr)+Ns(sig)
+//-----------------------------------------------------------------------------
+    TObjArray*      fLogLhs   [MaxNx];
+    TObjArray*      fLogLhb   [MaxNx];
+    TObjArray*      fLogLhr   [MaxNx];        // log(LHR) for given Nb and Ns (Nb+Ns=Ntot, Ntot fixed)
+    TObjArray*      fLogLhrR  [MaxNx];        // log(LHR) / Ntot
     
-    TH1D*    log_lhs [MaxNx];
-    TH1D*    log_lhb [MaxNx];
-    TH1D*    log_lhr [MaxNx];
-    TH1D*    log_lhrR[MaxNx];
-    
-    TH1D*    log_lhrR_1[MaxNx];         // uniformly normalized, 2-sided distributions
-    TH1D*    sum_log_lhrR_1;            // sum of all .
+    TH1D*           fLogLhrR_1[MaxNx];        // fLogLhrR summed over nb
 
-                                        // these are not used and are filled only in debug mode
-    TH1D*    gen_pbgr;               // generated momentum, background
-    TH1D*    gen_psig;               // generated momentum, signal
+    TH1D*           fLogLhrR_2[MaxNx];        // uniformly normalized, 2-sided distributions
+                                              // sum of all for a given Ntot
+    
+    TH1D*           fSumLogLhrR_2;            // sum of all - for fiven MuB and MuS.
+
+                                              // these are not used and are filled only in debug mode
+    TH1D*    gen_pbgr;                        // generated momentum, background
+    TH1D*    gen_psig;                        // generated momentum, signal
   };
 
   struct Interval_t {
     double fLlhrMin;
     double fLlhrMax;
     double fProbTot;
+    double fPMax;
   } fInterval;
 
   Hist_t   fHist;
@@ -79,8 +85,6 @@ public:
 
   double   fMinLLHR;
   double   fMaxLLHR;
-  
-  int      fMode;                       // 0: background, 1:signal
   
   TRandom3 fRng;
                                         // signal and background kinematic probability distributions
@@ -94,7 +98,7 @@ public:
 //-----------------------------------------------------------------------------
 // functions
 //-----------------------------------------------------------------------------
-  TKinLH(const char* Name, double CL = 0.9, int Mode = 0, double PMin=103.6, double PMax = 104.9, int Debug = 0);
+  TKinLH(const char* Name, double CL = 0.9, double PMin=103.6, double PMax = 104.9, int Debug = 0);
   ~TKinLH();
 
   int    init();

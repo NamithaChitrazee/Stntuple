@@ -4,12 +4,16 @@
 #include "Stntuple/stat/TKinLH.hh"
 using namespace stntuple;
 //-----------------------------------------------------------------------------
-// plot normalised reduced likelihood
+// plot normalized reduced likelihood
 //-----------------------------------------------------------------------------
-TH1D* test_tklh_001(const char* Name = "test_mllh_001", double CL=0.9, int Mode = 0,
-                    int NObs = 1, int NPExp = 1000000, 
-                    double PMin=103.6, double PMax=104.9) {
-  
+TH1D* test_tklh_001(const char* Name  = "test_mllh_001",
+                    double      CL    = 0.9,
+                    int         Mode  = 0,
+                    int         NObs  = 1,
+                    int         NPExp = 1000000, 
+                    double      PMin  = 103.6,
+                    double      PMax  = 104.9) {
+ 
   TString   title;
 
   TKinLH* x1 = new TKinLH(Name,CL,Mode=0,PMin,PMax);
@@ -21,16 +25,18 @@ TH1D* test_tklh_001(const char* Name = "test_mllh_001", double CL=0.9, int Mode 
 
   TH1D* h_prob = new TH1D(hname.Data(),Form("P(bgr) for N(obs):%i",NObs),20000,-20,0);
 
-  double tot =  x1->fHist.log_lhrR[NObs]->Integral();
+  // double tot =  x1->fHist.log_lhrR[NObs]->Integral();
 
-  int nx = x1->fHist.log_lhrR[NObs]->GetNbinsX();
+  // int nx = ((TH1D*) x1->fHist.fLogLhrR[NObs]->At(0))->GetNbinsX();
 
-  for (int i=0; i<nx; i++) {
-    double p    = x1->fHist.log_lhrR[NObs]->GetBinContent(i+1)/tot;
-    double logp = log(p);
+  // for (int nb=0; nb<=NObs; nb++) {
+  //   for (int i=0; i<nx; i++) {
+  //     double p    = x1->fHist.log_lhrR[NObs]->GetBinContent(i+1)/tot;
+  //     double logp = log(p);
     
-    h_prob->Fill(logp,p);
-  }
+  //     h_prob->Fill(logp,p);
+  //   }
+  // }
 
   return h_prob;
 }
@@ -38,16 +44,19 @@ TH1D* test_tklh_001(const char* Name = "test_mllh_001", double CL=0.9, int Mode 
 //-----------------------------------------------------------------------------
 // generate distributions in LLHR for a range of Nobs and store them
 //-----------------------------------------------------------------------------
-int test_tklh_002(const char* Name = "test_thlh_002", double CL=0.9, int Mode = 0, 
+TKinLH* test_tklh_002(const char* Name = "test_thlh_002", double CL=0.9,  
                   double PMin = 102.0, double PMax = 105.0, 
-                  long int NPe = 100000, int NMax = TKinLH::MaxNx) {
+                  long int NExp = 100000, int NMax = TKinLH::MaxNx-1) {
 
-  TKinLH* x1 = new TKinLH(Name,CL,Mode,PMin,PMax);
-  //  TKinLH* x2 = new TKinLH(mode=1,"x2",PMin);
+  TStopwatch t;
+  TKinLH* x1 = new TKinLH(Name,CL,PMin,PMax);
 
-  for (int nobs=0; nobs<NMax; nobs++) {
-    x1->run(nobs,NPe);
-    //    x2->run(nobs,npe);
+  for (int nobs=0; nobs<=NMax; nobs++) {
+    t.Start();
+    x1->run(nobs,NExp);
+    t.Stop();
+    printf("nobs = %2i ",nobs);
+    t.Print();
   }
 //-----------------------------------------------------------------------------
 // save all histograms once in the end
@@ -57,9 +66,8 @@ int test_tklh_002(const char* Name = "test_thlh_002", double CL=0.9, int Mode = 
   TFile* f;
 
   x1->save_hist(fn.Data(),"recreate");
-  //  x2->save_hist(fn.Data(),"update");
 
-  return 0;
+  return x1;
 }
 
 
@@ -71,21 +79,20 @@ TH1D* h_sig_llhr;
 //-----------------------------------------------------------------------------
 TKinLH* test_tklh_003(const char* Name        ,
                   double      CL          ,
-                  int         Mode =     0,
                   double      PMin = 103.6,
                   double      PMax = 104.9,
                   double      MuB  =   0.1,
                   double      MuS  =   4.5) {
 
-  TKinLH* x1 = new TKinLH(Name,CL,Mode,PMin,PMax);
+  TKinLH* x1 = new TKinLH(Name,CL,PMin,PMax);
 
-  TString fn = Form("tklh_%.0f_%.0f.root",PMin*10,PMax*10);
+  TString fn = Form("/projects/mu2e/hist/stntuple_stat/tklh_%.0f_%.0f.root",PMin*10,PMax*10);
 
   x1->read_hist(fn.Data());
 
   x1->construct_interval(MuB,MuS,CL);
 
-  x1->fHist.sum_log_lhrR_1->Draw("");
+  x1->fHist.fSumLogLhrR_2->Draw("");
     
   return x1;
 }
@@ -96,7 +103,6 @@ TKinLH* test_tklh_003(const char* Name        ,
 //-----------------------------------------------------------------------------
 TKinLH* test_tklh_004(const char* Name,
                       double      CL,
-                      int         Mode = 0,
                       double      PMin = 103.6,
                       double      PMax=104.9,
                       double      MuB=0.1,
@@ -105,9 +111,9 @@ TKinLH* test_tklh_004(const char* Name,
                       int         NPoints = 10,
                       int         NObs = 0)
 {
-  TKinLH* x1 = new TKinLH(Name,CL,Mode,PMin,PMax);
+  TKinLH* x1 = new TKinLH(Name,CL,PMin,PMax);
 
-  TString fn = Form("tklh_%.0f_%.0f.root",PMin*10,PMax*10);
+  TString fn = Form("/projects/mu2e/hist/stntuple_stat/tklh_%.0f_%.0f.root",PMin*10,PMax*10);
 
   x1->read_hist(fn.Data());
 
@@ -122,7 +128,7 @@ TKinLH* test_tklh_004(const char* Name,
   else              c->cd();
 
   // x1->fHist.fBeltHi->GetYaxis()->SetRangeUser(0,5);
-  x1->fHist.fBeltHi->Draw();
+  x1->fHist.fBelt->Draw();
   // llh->fHist.fBeltHi->Draw("same");
   // x1->fHist.fBeltNO1->Draw("same");
     

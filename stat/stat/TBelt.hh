@@ -89,7 +89,8 @@ public:
 
                                         // 'N' - number of measured events
   
-  virtual int  init_poisson_dist(double MuB, double MuS, int NObs = -1);
+  int          init_truncated_poisson_dist(double MuB, int   NObs, double* Prob    );
+  virtual int  init_poisson_dist          (double MuB, double MuS, int    NObs = -1);
   
                                         // in presence of background, mu = mus+mub
   

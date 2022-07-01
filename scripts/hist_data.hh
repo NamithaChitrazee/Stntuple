@@ -58,6 +58,7 @@ public:
   float         fLegendYMin;
   float         fLegendXMax;
   float         fLegendYMax;
+  float         fLegendFontSize;
   TString       fCanvasName;
   int           fCanvasSizeX;
   int           fCanvasSizeY;
@@ -165,6 +166,7 @@ public:
     fLegendYMin  = 0.15;
     fLegendXMax  = 0.90;
     fLegendYMax  = 0.40;
+    fLegendFontSize = -1;
   }
 
 //-----------------------------------------------------------------------------

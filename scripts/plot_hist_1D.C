@@ -670,6 +670,8 @@ int plot_hist_1d(plot_data_t* Plot, int Print = 0, const char* Format = "eps") {
     leg->AddEntry(hpx1,Hist1->fLabel.Data(),lopt.Data());
     leg->SetBorderSize(0);
     leg->SetFillStyle(0);
+
+    if (Plot->fLegendTextSize > 0) leg->SetTextSize(Plot->fLegendTextSize);
   }
 //-----------------------------------------------------------------------------
 // at this point deal with the rest histograms if they are present

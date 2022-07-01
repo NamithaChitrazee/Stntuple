@@ -64,6 +64,32 @@ TBelt::TBelt(const char* Name, double CL) : TNamed(Name,Name) {
 }
 
 //-----------------------------------------------------------------------------
+int TBelt::init_truncated_poisson_dist(double MuB, int NObs, double* Prob) {
+
+  double exp_mub  = TMath::Exp(-MuB);
+
+  Prob[0]         = exp_mub;
+  double sum_prob = Prob[0];
+                                        // calculate normalization coefficient
+  for (int k=1; k<=MaxNx; k++) {
+    if (k <= NObs) {
+      Prob[k]   = Prob[k-1]*MuB/k;
+      sum_prob += Prob[k];
+    }
+    else {
+      Prob[k] = 0;
+    }
+  }
+                                        // do normalization
+  for (int i=0; i<NObs; i++) {
+    Prob[i] = Prob[i]/sum_prob;
+  }
+  
+  return 0;
+}
+
+
+//-----------------------------------------------------------------------------
 // mu = MuB+MuS
 // 'NObs' is the number of observed events - it constrains the background fluctuations
 // NObs<0 means no prior knowledge 
@@ -97,13 +123,16 @@ int TBelt::init_poisson_dist(double MuB, double MuS, int NObs) {
 //-----------------------------------------------------------------------------
 // background probability constrained by the measurement of N events (Zech'1989)
 //-----------------------------------------------------------------------------
-    double pbn = 0; for (int k=0; k<=NObs; k++) { pbn += TMath::Exp(-MuB)*pow(MuB,k)/fFactorial[k]; }
-    
     double pb[MaxNx];
-    for (int i=0; i<MaxNx; i++) {
-      if (i <= NObs) pb[i] = TMath::Exp(-MuB)*pow(MuB,i)/fFactorial[i]/pbn;
-      else           pb[i] = 0;
-    }
+
+    // double pbn = 0; for (int k=0; k<=NObs; k++) { pbn += TMath::Exp(-MuB)*pow(MuB,k)/fFactorial[k]; }
+    
+    // for (int i=0; i<MaxNx; i++) {
+    //   if (i <= NObs) pb[i] = TMath::Exp(-MuB)*pow(MuB,i)/fFactorial[i]/pbn;
+    //   else           pb[i] = 0;
+    // }
+
+    init_truncated_poisson_dist(MuB,NObs,pb);
 					// 'i' - bin in the constrained Poisson distribution
     double exp_mus = TMath::Exp(-MuS);
 
