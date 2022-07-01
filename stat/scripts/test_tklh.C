@@ -44,7 +44,7 @@ TH1D* test_tklh_001(const char* Name  = "test_mllh_001",
 //-----------------------------------------------------------------------------
 // generate distributions in LLHR for a range of Nobs and store them
 //-----------------------------------------------------------------------------
-TKinLH* test_tklh_002(const char* Name = "test_thlh_002", double CL=0.9,  
+TKinLH* test_tklh_002(const char* Name = "t2", double CL=0.9,  
                   double PMin = 102.0, double PMax = 105.0, 
                   long int NExp = 100000, int NMax = TKinLH::MaxNx) {
 
@@ -61,7 +61,7 @@ TKinLH* test_tklh_002(const char* Name = "test_thlh_002", double CL=0.9,
 //-----------------------------------------------------------------------------
 // save all histograms once in the end
 //-----------------------------------------------------------------------------
-  TString fn = Form("tklh_%0.f_%.0f.root",PMin*10,PMax*10);
+  TString fn = Form("tklh_%s_%0.f_%.0f.root",x1->GetName(),PMin*10,PMax*10);
   
   TFile* f;
 
@@ -78,11 +78,12 @@ TH1D* h_sig_llhr;
 // kinematic histograms do not know anything about CL, but do know about the object name...
 //-----------------------------------------------------------------------------
 TKinLH* test_tklh_003(const char* Name    ,
-                  double      CL          ,
-                  double      PMin = 103.6,
-                  double      PMax = 104.9,
-                  double      MuB  =   0.1,
-                  double      MuS  =   4.5) {
+                      double      CL          ,
+                      double      PMin = 103.6,
+                      double      PMax = 104.9,
+                      double      MuB  =   0.1,
+                      double      MuS  =   4.5,
+                      int         NObs =     0) {
 
   TKinLH* x1 = new TKinLH(Name,CL,PMin,PMax);
 
@@ -90,7 +91,9 @@ TKinLH* test_tklh_003(const char* Name    ,
 
   x1->read_hist(fn.Data());
 
-  x1->construct_interval(MuB,MuS,CL);
+  // x1->fDebug.fConstructInterval = 1;
+  
+  x1->construct_interval(MuB,MuS,NObs);
 
   x1->fHist.fSumLogLhrR_2->Draw("");
     

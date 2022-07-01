@@ -31,6 +31,7 @@ class TKinLH : public TBelt {
 public:
   struct Debug_t {
     int      fRun;
+    int      fConstructInterval;
     int      fConstructBelt;
     int      fTestCoverage;
     double   fMuMin;
@@ -82,6 +83,8 @@ public:
 
   double   pmin;
   double   pmax;
+
+  int      fInitialized;                // 1: histograms read in, 0: otherwise
 
   double   fMinLLHR;
   double   fMaxLLHR;

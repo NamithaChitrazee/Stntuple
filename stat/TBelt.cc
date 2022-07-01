@@ -81,7 +81,7 @@ int TBelt::init_truncated_poisson_dist(double MuB, int NObs, double* Prob) {
     }
   }
                                         // do normalization
-  for (int i=0; i<NObs; i++) {
+  for (int i=0; i<=NObs; i++) {
     Prob[i] = Prob[i]/sum_prob;
   }
   

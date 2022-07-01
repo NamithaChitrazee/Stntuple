@@ -11,14 +11,17 @@ namespace stntuple {
 //-----------------------------------------------------------------------------
 TKinLH::TKinLH(const char* Name, double CL, double PMin, double PMax, int Debug) : TBelt(Name, CL) {
 
-  fDebug.fRun           = 0;
-  fDebug.fConstructBelt = 0;
-  fDebug.fTestCoverage  = 0;
-  fDebug.fMuMin         = 0;
-  fDebug.fMuMax         = -1;
-  pmin                  = PMin;
-  pmax                  = PMax;
-  fColor                = kBlue+2;
+  fInitialized              = 0;
+  
+  fDebug.fRun               = 0;
+  fDebug.fConstructInterval = 0;
+  fDebug.fConstructBelt     = 0;
+  fDebug.fTestCoverage      = 0;
+  fDebug.fMuMin             = 0;
+  fDebug.fMuMax             = -1;
+  pmin                      = PMin;
+  pmax                      = PMax;
+  fColor                    = kBlue+2;
   
   fHist.fProb       = nullptr;
   fHist.fLlh        = nullptr;
@@ -316,6 +319,17 @@ int TKinLH::construct_interval(double MuB, double MuS, int NObs) {
   double pb[MaxNx];
 
   int rc = init_truncated_poisson_dist(MuB,NObs,pb);
+  if (fDebug.fConstructInterval) {
+    printf("TKinLH::construct_interval 001:\n");
+                                        // assume MaxNx % 10 = 0
+    for (int i=0; i<MaxNx; i++) {
+      printf(" %12.5e",pb[i]);
+      if (((i+1) % 10) == 0) {
+        printf("\n");
+      }
+    }
+    
+  }
   if (rc < 0) return rc;
 //-----------------------------------------------------------------------------
 // next: for given MuB and MuS, construct LogLhrR_N histograms 
@@ -334,6 +348,10 @@ int TKinLH::construct_interval(double MuB, double MuS, int NObs) {
                                         // this is the absolute normalization of the corresponding histogram
       double wt = pb[nb]*ps;
       TH1D* h   = (TH1D*) arR->At(nb);
+                                        // kludge: make sure the hist is normalized, should've been already done
+      double total = h->Integral();
+      h->Scale(1./total);
+
                                         // logLhrR_N is normalized to the Poisson probability P(MuB,MuS,NObs)
                                         // just summing over all hists with the same NObs
       fHist.fLogLhrR_1[nt]->Add(h,wt);
@@ -366,21 +384,22 @@ int TKinLH::construct_interval(double MuB, double MuS, int NObs) {
 // now, create uniformly normalized distributions, 2-sided
 //-----------------------------------------------------------------------------
   for (int nt=0; nt<MaxNx; nt++) {
-    double p0 = fProb[nt];
+    fHist.fLogLhrR_2[nt]->Reset();
 //-----------------------------------------------------------------------------    
 // h1 is supposed to be normalized to an integral (sum of contens of all bins) of 1
 //-----------------------------------------------------------------------------
     TH1D*  h1 = fHist.fLogLhrR_1[nt];
 
     for (int ib=0; ib<nx; ib++) { 
-      double p     = p0*(h1->GetBinContent(ib+1)/pmax);
+      double p     =  h1->GetBinContent(ib+1)/pmax;
       double log_p = -log(p);
-      double wt    = p0*h1->GetBinContent(ib+1);
+      double wt    =  h1->GetBinContent(ib+1);
       if (nt < (MuB+MuS)) log_p = -log_p;
       fHist.fLogLhrR_2[nt]->Fill(log_p,wt);
     }
   }
 
+  fHist.fSumLogLhrR_2->Reset();
   for (int nt=0; nt<MaxNx; nt++) {
     fHist.fSumLogLhrR_2->Add(fHist.fLogLhrR_2[nt]);
   }
@@ -513,6 +532,11 @@ void TKinLH::make_belt_hist() {
 //-----------------------------------------------------------------------------
 int TKinLH::read_hist(const char* Filename) {
 
+  if (fInitialized) {
+    printf("TKinLH::read_hist: re-initialization attempt, BAIL OUT\n");
+    return -1;
+  }
+  
   TFile* f = TFile::Open(Filename);
   gROOT->cd();
                                         // current directory is gROOT
@@ -526,9 +550,13 @@ int TKinLH::read_hist(const char* Filename) {
 
     for (int nb=0; nb<=nobs; nb++) {
       int ns = nobs-nb;
+      (*as) [nb]->Delete();
       (*as) [nb] = (TH1D*) f->Get(Form("//%05i/h_%s_llhs_%02i_%02i" ,nobs,GetName(),nb,ns));
+      (*ab) [nb]->Delete();
       (*ab) [nb] = (TH1D*) f->Get(Form("//%05i/h_%s_llhb_%02i_%02i" ,nobs,GetName(),nb,ns));
+      (*ar) [nb]->Delete();
       (*ar) [nb] = (TH1D*) f->Get(Form("//%05i/h_%s_llhr_%02i_%02i" ,nobs,GetName(),nb,ns));
+      (*arR)[nb]->Delete();
       (*arR)[nb] = (TH1D*) f->Get(Form("//%05i/h_%s_llhrR_%02i_%02i",nobs,GetName(),nb,ns));
     }
 
@@ -536,7 +564,9 @@ int TKinLH::read_hist(const char* Filename) {
     // fHist.fLogLhrR_2[nobs]->Read(Form("h_llhrR2_%02i" ,nobs));
   }
 
+  delete fHist.prob_sig;
   fHist.prob_sig = (TH1F*) f->Get(Form("h_%s_prob_sig",GetName()));
+  delete fHist.prob_bgr;
   fHist.prob_bgr = (TH1F*) f->Get(Form("h_%s_prob_bgr",GetName()));
 
   // fHist.fSumLogLhrR_2->Read(Form("h_sum_llhrR2_%02i" ,nobs));
@@ -544,6 +574,8 @@ int TKinLH::read_hist(const char* Filename) {
   // f->Close();
   
   // delete f;
+
+  fInitialized = 1;
   
   return 0;
 }
@@ -610,6 +642,8 @@ int TKinLH::run(int NObs, int NPe) {
         h1->SetBinError  (ib+1,0);
       }
     }
+    double total = h1->Integral();
+    h1->Scale(1./total);
   }
   else {
 //-----------------------------------------------------------------------------
