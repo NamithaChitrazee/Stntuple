@@ -46,12 +46,12 @@ TH1D* test_tklh_001(const char* Name  = "test_mllh_001",
 //-----------------------------------------------------------------------------
 TKinLH* test_tklh_002(const char* Name = "test_thlh_002", double CL=0.9,  
                   double PMin = 102.0, double PMax = 105.0, 
-                  long int NExp = 100000, int NMax = TKinLH::MaxNx-1) {
+                  long int NExp = 100000, int NMax = TKinLH::MaxNx) {
 
   TStopwatch t;
   TKinLH* x1 = new TKinLH(Name,CL,PMin,PMax);
 
-  for (int nobs=0; nobs<=NMax; nobs++) {
+  for (int nobs=0; nobs<NMax; nobs++) {
     t.Start();
     x1->run(nobs,NExp);
     t.Stop();
