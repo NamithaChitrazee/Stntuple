@@ -29,6 +29,12 @@
 namespace stntuple {
 class TKinLH : public TBelt {
 public:
+                                        // "experimental data"
+  struct Data_t {
+    int    fNEvents;
+    double fP[100];                      // for the moment, assume 100 events is OK
+  } fData;
+  
   struct Debug_t {
     int      fRun;
     int      fConstructInterval;
@@ -59,7 +65,7 @@ public:
     TObjArray*      fLogLhr   [MaxNx];        // log(LHR) for given Nb and Ns (Nb+Ns=Ntot, Ntot fixed)
     TObjArray*      fLogLhrR  [MaxNx];        // log(LHR) / Ntot
     
-    TH1D*           fLogLhrR_1[MaxNx];        // fLogLhrR summed over nb
+    TH1D*           fLogLhrR_1[MaxNx];        // fLogLhrR for fiven ntot, summed over nb
 
     TH1D*           fLogLhrR_2[MaxNx];        // uniformly normalized, 2-sided distributions
                                               // sum of all for a given Ntot
@@ -110,8 +116,9 @@ public:
   double static f_sig(double* X, double * P);
   double static f_bgr(double* X, double * P);
   
-  double lh_bgr(double P);
-  double lh_sig(double P);
+  double lh_bgr (double P);
+  double lh_sig (double P);
+  double lh_data(double MuB, double MuS, Data_t* Data);
 
   double bgr_mom();
   double sig_mom();

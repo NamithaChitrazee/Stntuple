@@ -32,6 +32,8 @@ TKinLH::TKinLH(const char* Name, double CL, double PMin, double PMax, int Debug)
   fHist.fBeltSp     = nullptr;
   fHist.fCoverage   = nullptr;
 
+  fData.fNEvents    = 0;
+
   init();
 }
 
@@ -173,7 +175,7 @@ int TKinLH::init() {
     name  = Form("h_%s_log_lhrR_1_n%02i",GetName(),ix);
     title = Form("%s_log_lhrR_1_n%02i",GetName(),ix);
     
-    fHist.fLogLhrR_1[ix] = new TH1D(name,title,nbins_llhrR,llhrR_min,llhrR_max);
+    fHist.fLogLhrR_1[ix] = new TH1D(name,title,nbins_llhrR,-50,50);
 
     name  = Form("h_%s_log_lhrR_2_n%02i",GetName(),ix);
     title = Form("%s_log_lhrR_2_n%02i",GetName(),ix);
@@ -235,6 +237,43 @@ double TKinLH::lh_bgr(double P) {
 double TKinLH::lh_sig(double P) {
   double p = fSig->Eval(P);
   return p;
+}
+
+
+//-----------------------------------------------------------------------------
+// normalized to the integral (not sum over the bins !)  = 1
+//-----------------------------------------------------------------------------
+double TKinLH::lh_data(double MuB, double MuS,  Data_t* Data) {
+  
+  double pb[MaxNx];
+
+  int nobs = Data->fNEvents;
+  int rc   = init_truncated_poisson_dist(MuB,nobs,pb);
+  if (rc < 0) return rc;
+//-----------------------------------------------------------------------------
+// step 1: calculate kinematic part of the likelihood
+//-----------------------------------------------------------------------------
+  double tot_lhr = 1;
+  for (int i=0; i<nobs; i++) {
+    double p    = Data->fP[i];
+    double lhr  = lh_bgr(p)/lh_sig(p);
+    tot_lhr    *= lhr;
+  }
+
+  double llhrR  = log(tot_lhr)/nobs;
+//-----------------------------------------------------------------------------
+// step 2: calculate global likelihood, for given MuB and MuS
+//-----------------------------------------------------------------------------
+  double exp_mus = TMath::Exp(-MuS);
+  double p_nobs  = 0;
+  for (int nb=0; nb<=nobs; nb++) {
+    int ns    = nobs-nb;
+    double ps = exp_mus*pow(MuS,ns)/fFactorial[ns];
+    p_nobs   += pb[nb]*ps;
+  }
+
+  double llhrG = llhrR+log(p_nobs);
+  return llhrG;
 }
 
 
@@ -319,6 +358,7 @@ int TKinLH::construct_interval(double MuB, double MuS, int NObs) {
   double pb[MaxNx];
 
   int rc = init_truncated_poisson_dist(MuB,NObs,pb);
+  
   if (fDebug.fConstructInterval) {
     printf("TKinLH::construct_interval 001:\n");
                                         // assume MaxNx % 10 = 0
@@ -332,29 +372,54 @@ int TKinLH::construct_interval(double MuB, double MuS, int NObs) {
   }
   if (rc < 0) return rc;
 //-----------------------------------------------------------------------------
-// next: for given MuB and MuS, construct LogLhrR_N histograms 
+// next: for given MuB and MuS, construct LogLhrR_N histograms
+// LogLhrR_1: distribution in llhrR for a given ntot, summed over all nb with
+//            proper weights (assuming known MuB abd MuS)
+// LogLhrR_2: 
 //-----------------------------------------------------------------------------
   double exp_mus = TMath::Exp(-MuS);
+                                        // calculate P(NObs), assume MaxNx to be large enough
+  double p_nobs = 0;
+  for (int nb=0; nb<=NObs; nb++) {
+    int    ns = NObs-nb;
+    p_nobs += pb[nb]*exp_mus*pow(MuS,ns)/fFactorial[ns];
+  }
+  
+  if (fDebug.fConstructInterval) {
+    printf("TKinLH::construct_interval 002: p_nobs = %12.5e\n",p_nobs);
+  }
+  
   TH1D*  h0      = (TH1D*) fHist.fLogLhrR[0]->At(0);
   int    nx      = h0->GetNbinsX();
-  
+
   for (int nt=0; nt<MaxNx; nt++) {
     TObjArray* arR = fHist.fLogLhrR[nt];
     fHist.fLogLhrR_1[nt]->Reset();
+    
     for (int nb=0; nb<=nt; nb++) {
       int    ns = nt-nb;
       double ps = exp_mus*pow(MuS,ns)/fFactorial[ns];
       
                                         // this is the absolute normalization of the corresponding histogram
-      double wt = pb[nb]*ps;
-      TH1D* h   = (TH1D*) arR->At(nb);
+      double pns = pb[nb]*ps;
+      
+      TH1D* h     = (TH1D*) arR->At(nb);
                                         // kludge: make sure the hist is normalized, should've been already done
       double total = h->Integral();
       h->Scale(1./total);
 
+      for (int ix=0; ix<nx; ix++) {
+        double llhrR = h->GetBinCenter (ix+1);
+//-----------------------------------------------------------------------------
+// global llhR : can only assign observables - correct by 'p_nobs', not 'pns'
+// the probability, however is defined by 'pns'
+//-----------------------------------------------------------------------------
+        double llhrG = llhrR+log(p_nobs);
+        double wt    = h->GetBinContent(ix+1)*pns;
                                         // logLhrR_N is normalized to the Poisson probability P(MuB,MuS,NObs)
                                         // just summing over all hists with the same NObs
-      fHist.fLogLhrR_1[nt]->Add(h,wt);
+        fHist.fLogLhrR_1[nt]->Fill(llhrG,wt);
+      }
     }
   }
 //-----------------------------------------------------------------------------
@@ -363,23 +428,24 @@ int TKinLH::construct_interval(double MuB, double MuS, int NObs) {
 // start from finding a bin with the max probability density - it has to be done here,
 // as the result depends on MuB and MuS
 //-----------------------------------------------------------------------------
-  double pmax  = -1;
-  
-  for (int nt=0; nt<MaxNx; nt++) {
-                                        // for n=0 all bins are filled with a constant
-                                        // such that the sum would equal to 1
-    TH1D* h1 = fHist.fLogLhrR_1[nt];
+  // double pmax  = -1;
+
+  // for (int nt=0; nt<MaxNx; nt++) {
+  //                                       // for n=0 all bins are filled with a constant
+  //                                       // such that the sum would equal to 1
+  //   TH1D* h1 = fHist.fLogLhrR_1[nt];
     
-    for (int ix=0; ix<nx; ix++) {
-      double p = h1->GetBinContent(ix+1);
-      if (p > pmax) {
-        pmax  = p;
-      }
-    }
-  }
+  //   for (int ix=0; ix<nx; ix++) {
+  //     double p = h1->GetBinContent(ix+1);
+  //     if (p > pmax) {
+  //       pmax  = p;
+  //     }
+  //   }
+  // }
   
-  printf("TKinLH::construct_interval: MuB, MuS, NObs, pmax = %12.5e %12.5e %3i %12.5e\n",
-         MuB,MuS,NObs,pmax); 
+  // printf("TKinLH::construct_interval: MuB, MuS, NObs, pmax = %12.5e %12.5e %3i %12.5e\n",
+  //        MuB,MuS,NObs,pmax); 
+
 //-----------------------------------------------------------------------------
 // now, create uniformly normalized distributions, 2-sided
 //-----------------------------------------------------------------------------
@@ -391,14 +457,15 @@ int TKinLH::construct_interval(double MuB, double MuS, int NObs) {
     TH1D*  h1 = fHist.fLogLhrR_1[nt];
 
     for (int ib=0; ib<nx; ib++) { 
-      double p     =  h1->GetBinContent(ib+1)/pmax;
-      double log_p = -log(p);
-      double wt    =  h1->GetBinContent(ib+1);
-      if (nt < (MuB+MuS)) log_p = -log_p;
-      fHist.fLogLhrR_2[nt]->Fill(log_p,wt);
+      double wt    =  h1->GetBinContent(ib+1); // /pmax;
+      double llhrG =  h1->GetBinCenter (ib+1);
+      if (nt >= (MuB+MuS)) llhrG = -llhrG;
+      fHist.fLogLhrR_2[nt]->Fill(llhrG,wt);
     }
   }
-
+//-----------------------------------------------------------------------------
+// as a cross-check, fHist.fSumLogLhrR_2 should be normalized to unity
+//-----------------------------------------------------------------------------
   fHist.fSumLogLhrR_2->Reset();
   for (int nt=0; nt<MaxNx; nt++) {
     fHist.fSumLogLhrR_2->Add(fHist.fLogLhrR_2[nt]);
@@ -438,7 +505,8 @@ int TKinLH::construct_interval(double MuB, double MuS, int NObs) {
 //-----------------------------------------------------------------------------
 int TKinLH::construct_belt(double MuB, double SMin, double SMax, int NPoints, int NObs) {
 
-  fMuB = MuB;
+  fMuB  = MuB;
+  fNObs = NObs;
   
   fBelt.fSMin = SMin;
   fBelt.fSMax = SMax;
@@ -457,13 +525,8 @@ int TKinLH::construct_belt(double MuB, double SMin, double SMax, int NPoints, in
     double mus   = SMin+i*fBelt.fDy;
 
     int rc       = construct_interval(MuB,mus,NObs);
-    // double lhmax = fInterval.fLlhrMax;
-    // double lhmin = fInterval.fLlhrMin;
 
     if (rc == 0) {
-      // double llh_lo = lhmin;
-      // double llh_hi = lhmax;
-      
       fBelt.fLlhInterval[5*i  ] = fInterval.fLlhrMin;
       fBelt.fLlhInterval[5*i+1] = fInterval.fLlhrMax;
       fBelt.fLlhInterval[5*i+2] = fInterval.fProbTot;

@@ -65,7 +65,7 @@ public:
   double fMuB;
   double fMuS;
 
-  int    fNObs;
+  int    fNObs;                         // N(observed events)
   
   int    fIxMin;
   int    fIxMax;

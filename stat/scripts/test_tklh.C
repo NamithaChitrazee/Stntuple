@@ -101,8 +101,7 @@ TKinLH* test_tklh_003(const char* Name    ,
 }
 
 //-----------------------------------------------------------------------------
-// read histogram file and construct a confidence interval
-// plot belt
+// read histogram file and construct a confidence interval, plot belt
 //-----------------------------------------------------------------------------
 TKinLH* test_tklh_004(const char* Name,
                       double      CL,
