@@ -95,35 +95,8 @@ TKinLH* test_tklh_003(const char* Name    ,
   
   x1->construct_interval(MuB,MuS,NObs);
 
-  x1->fHist.fSumLogLhrR_2->Draw("");
+  x1->plot_interval();
 
-  TH1D* h1 = (TH1D*) x1->fHist.fSumLogLhrR_2->Clone("h1");
-  h1->Reset();
-
-  int nx = x1->fInterval.fIMax;
-  
-  printf("nx: %i\n",nx);
-
-  for (int i=0; i<nx; i++) {
-    int    bin  = x1->fSortData[i].bin;
-    double data = x1->fSortData[i].x;
-
-    printf("bin, data: %5i %12.5e\n",bin,data);
-    
-    h1->SetBinContent(bin,data);
-    h1->SetBinError  (bin,0);
-  }
-
-  h1->SetLineColor  (kRed+2);
-  h1->SetMarkerColor(kRed+2);
-  h1->SetFillStyle(3004);
-  h1->SetFillColor(kRed+2);
-  h1->Draw("sames");
-
-  TLine* line = new TLine(-50,x1->fInterval.fPMax,50,x1->fInterval.fPMax);
-  line->SetLineColor(kRed+2);
-  line->Draw();
-    
   return x1;
 }
 
@@ -140,13 +113,15 @@ TKinLH* test_tklh_004(const char* Name,
                       int         NPoints = 10,
                       int         NObs = 0)
 {
+  double p[] = {103.,104., 103, 104, 103.3};
+  
   TKinLH* x1 = new TKinLH(Name,CL,PMin,PMax);
 
   TString fn = Form("/projects/mu2e/hist/stntuple_stat/tklh_%.0f_%.0f.root",PMin*10,PMax*10);
 
   x1->read_hist(fn.Data());
 
-  x1->construct_belt(MuB,SMin,SMax,NPoints,NObs);
+  x1->construct_belt(MuB,SMin,SMax,NPoints,NObs,p);
   x1->make_belt_hist();
 
   char cname[100];
@@ -166,21 +141,25 @@ TKinLH* test_tklh_004(const char* Name,
 
 
 //-----------------------------------------------------------------------------
-// read histogram file and construct a confidence interval, plot belt
+// assume belt is constructed, calculate LH
 //-----------------------------------------------------------------------------
-int test_tklh_005(TKinLH*     X, double      MuB=0.1,double      MuS=1) {
+int test_tklh_005(TKinLH* X, double MuB=0.1, double MuS=1, int NObs = 0) {
 
-  TKinLH::Data_t dt = {2,{103.,104.}};
+  double p[] = {103.,104., 103, 104, 103.3};
 
-  double lh = X->lh_data(MuB,MuS,&dt);
+  double lh = X->lh_data(MuB,MuS,NObs,p);
   
-  printf("data: %10.3f %10.3f lh= %12.5e\n",dt.fP[0],dt.fP[1],lh);
+  TLine* line = new TLine(lh,1.e-2,lh,1.e-10);
+  line->SetLineColor(kRed+2);
+  line->Draw();
+
+  printf("data: %i lh = %10.3f\n",NObs,lh);
   return 0;
 }
 
 
 //-----------------------------------------------------------------------------
-// test sorting
+// test quick sort
 //-----------------------------------------------------------------------------
 void test_tklh_006(int NCalls = -1) {
 

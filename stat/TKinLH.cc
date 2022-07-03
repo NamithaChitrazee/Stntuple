@@ -1,6 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
 ///////////////////////////////////////////////////////////////////////////////
+#include "TLine.h"
 
 #include "Stntuple/stat/TKinLH.hh"
 
@@ -31,7 +32,8 @@ TKinLH::TKinLH(const char* Name, double CL, double PMin, double PMax, int Debug)
   fHist.fBelt       = nullptr;
   fHist.fBeltLo     = nullptr;
   fHist.fBeltHi     = nullptr;
-  fHist.fBeltSp     = nullptr;
+  fHist.fBeltProb   = nullptr;
+  fHist.fBeltLhdt   = nullptr;
   fHist.fCoverage   = nullptr;
 
   fData.fNEvents    = 0;
@@ -247,37 +249,39 @@ double TKinLH::lh_sig(double P) {
 
 //-----------------------------------------------------------------------------
 // normalized to the integral (not sum over the bins !)  = 1
+// NObs : number of observed events, P - array of the track momenta
 //-----------------------------------------------------------------------------
-double TKinLH::lh_data(double MuB, double MuS,  Data_t* Data) {
+  double TKinLH::lh_data(double MuB, double MuS,  int NObs, double* P) {
   
   double pb[MaxNx];
 
-  int nobs = Data->fNEvents;
-  int rc   = init_truncated_poisson_dist(MuB,nobs,pb);
+  int rc   = init_truncated_poisson_dist(MuB,NObs,pb);
   if (rc < 0) return rc;
 //-----------------------------------------------------------------------------
 // step 1: calculate kinematic part of the likelihood
 //-----------------------------------------------------------------------------
   double tot_lhr = 1;
-  for (int i=0; i<nobs; i++) {
-    double p    = Data->fP[i];
+  for (int i=0; i<NObs; i++) {
+    double p    = P[i];
     double lhr  = lh_bgr(p)/lh_sig(p);
     tot_lhr    *= lhr;
   }
 
-  double llhrR  = log(tot_lhr)/nobs;
+  double llhrR  = log(tot_lhr)/NObs;
 //-----------------------------------------------------------------------------
 // step 2: calculate global likelihood, for given MuB and MuS
 //-----------------------------------------------------------------------------
   double exp_mus = TMath::Exp(-MuS);
   double p_nobs  = 0;
-  for (int nb=0; nb<=nobs; nb++) {
-    int ns    = nobs-nb;
+  for (int nb=0; nb<=NObs; nb++) {
+    int ns    = NObs-nb;
     double ps = exp_mus*pow(MuS,ns)/fFactorial[ns];
     p_nobs   += pb[nb]*ps;
   }
 
   double llhrG = llhrR+log(p_nobs);
+
+  if (NObs > MuB+MuS) llhrG = -llhrG;
   return llhrG;
 }
 
@@ -568,7 +572,7 @@ int TKinLH::construct_interval(double MuB, double MuS, int NObs) {
 // fBelt is the FC belt histogram
 // avoid multiple useless re-initializations
 //-----------------------------------------------------------------------------
-int TKinLH::construct_belt(double MuB, double SMin, double SMax, int NPoints, int NObs) {
+  int TKinLH::construct_belt(double MuB, double SMin, double SMax, int NPoints, int NObs, double* P) {
 
   fMuB  = MuB;
   fNObs = NObs;
@@ -596,14 +600,23 @@ int TKinLH::construct_belt(double MuB, double SMin, double SMax, int NPoints, in
       fBelt.fLlhInterval[5*i+1] = fInterval.fLlhrMax;
       fBelt.fLlhInterval[5*i+2] = fInterval.fProbTot;
       fBelt.fLlhInterval[5*i+3] = fInterval.fPMax;
-      fBelt.fLlhInterval[5*i+4] = -1;
+//-----------------------------------------------------------------------------
+// if data defined, also store the data line
+//-----------------------------------------------------------------------------
+      double wt = -1;
+      if (P) {
+        double lhdt = lh_data(MuB,mus,NObs,P);
+        int    bin  = fHist.fSumLogLhrR_2->FindBin(lhdt);
+        wt          = fHist.fSumLogLhrR_2->GetBinContent(bin);
+      }
+      fBelt.fLlhInterval[5*i+4] = -log(wt);
     }
-  }
 
-  if (fDebug.fConstructBelt > 0) {
-    for (int i=0; i<NPoints; i++) {
-      printf("i,fBelt.fLlhInterval[5*i  ],fBelt.fLlhInterval[5*i+1]: %12.5f %12.5f %12.5f\n",
-             fBelt.fLlhInterval[5*i  ],fBelt.fLlhInterval[5*i+1], fBelt.fLlhInterval[5*i+2]);
+    if (fDebug.fConstructBelt > 0) {
+      for (int i=0; i<NPoints; i++) {
+        printf("i,fBelt.fLlhInterval[5*i  ],fBelt.fLlhInterval[5*i+1]: %12.5f %12.5f %12.5f\n",
+               fBelt.fLlhInterval[5*i  ],fBelt.fLlhInterval[5*i+1], fBelt.fLlhInterval[5*i+2]);
+      }
     }
   }
   return 0;
@@ -618,7 +631,7 @@ void TKinLH::make_belt_hist() {
     delete fHist.fBelt;
     delete fHist.fBeltLo;
     delete fHist.fBeltHi;
-    delete fHist.fBeltSp;
+    delete fHist.fBeltProb;
   }
   
   fHist.fBeltLo   = new TH1D(Form("h_belt_lo_%s",GetName()),
@@ -629,33 +642,72 @@ void TKinLH::make_belt_hist() {
                              Form("TBeltLH HI MuB = %10.3f CL = %5.2f Nobs:%3i",fMuB,fCL,fNObs),
                              fBelt.fLlhNPoints,fBelt.fSMin,fBelt.fSMax);
 
-  fHist.fBeltSp = new TH1D(Form("h_belt_sp_%s",GetName()),
-                             Form("TBeltLH NO MuB = %10.3f CL = %5.2f Nobs:%3i",fMuB,fCL,fNObs),
+  fHist.fBeltProb = new TH1D(Form("h_belt_prob_%s",GetName()),
+                             Form("TBeltLH Prob MuB = %10.3f CL = %5.2f Nobs:%3i",fMuB,fCL,fNObs),
+                             fBelt.fLlhNPoints,fBelt.fSMin,fBelt.fSMax);
+
+  fHist.fBeltLhdt = new TH1D(Form("h_belt_lhdt_%s",GetName()),
+                             Form("TBeltLH lhdt MuB = %10.3f CL = %5.2f Nobs:%3i",fMuB,fCL,fNObs),
                              fBelt.fLlhNPoints,fBelt.fSMin,fBelt.fSMax);
 
   for (int ix=0; ix<fBelt.fLlhNPoints; ix++) {
-    fHist.fBeltLo ->SetBinContent(ix+1,fBelt.fLlhInterval[5*ix  ]);
-    fHist.fBeltHi ->SetBinContent(ix+1,fBelt.fLlhInterval[5*ix+1]);
-    fHist.fBeltSp ->SetBinContent(ix+1,fBelt.fLlhInterval[5*ix+2]);
+    double llhmax = -log(fBelt.fLlhInterval[5*ix+3]);
+    double prob   = fBelt.fLlhInterval[5*ix+2];
+    double lhdt   = fBelt.fLlhInterval[5*ix+4];
+
+    fHist.fBeltLo  ->SetBinContent(ix+1,fBelt.fLlhInterval[5*ix  ]);
+    fHist.fBeltHi  ->SetBinContent(ix+1,llhmax);
+    fHist.fBeltProb->SetBinContent(ix+1,prob);
+    fHist.fBeltLhdt->SetBinContent(ix+1,lhdt);
   }
 
   fHist.fBeltLo->GetXaxis()->SetTitle("#mu_{S}");
   fHist.fBeltLo->GetYaxis()->SetTitle("LLH");
   
-  // fHist.fBeltLo->SetFillStyle(fBelt.fFillStyle);
-  // fHist.fBeltLo->SetFillColor(fBelt.fFillColor);
   fHist.fBeltLo->SetLineColor(fBelt.fFillColor);
 
   fHist.fBeltHi->SetFillStyle(fBelt.fFillStyle);
   fHist.fBeltHi->SetFillColor(fBelt.fFillColor);
   fHist.fBeltHi->SetLineColor(fBelt.fFillColor);
 
-  fHist.fBeltSp->SetMarkerStyle(20);
+  fHist.fBeltProb->SetMarkerStyle(20);
+  fHist.fBeltLhdt->SetMarkerStyle(20);
 
   fHist.fBelt = new THStack(Form("hs_%s",GetName()),fHist.fBeltHi->GetTitle());
   fHist.fBelt->Add(fHist.fBeltLo);
   fHist.fBelt->Add(fHist.fBeltHi);
 }
+
+//-----------------------------------------------------------------------------
+void TKinLH::plot_interval() {
+  fHist.fSumLogLhrR_2->Draw("");
+
+  TH1D* h1 = (TH1D*) fHist.fSumLogLhrR_2->Clone("h1");
+  h1->Reset();
+
+  int nx = fInterval.fIMax;
+  
+  for (int i=0; i<nx; i++) {
+    int    bin  = fSortData[i].bin;
+    double data = fSortData[i].x;
+
+    // printf("bin, data: %5i %12.5e\n",bin,data);
+    
+    h1->SetBinContent(bin,data);
+    h1->SetBinError  (bin,0);
+  }
+
+  h1->SetLineColor  (kRed+2);
+  h1->SetMarkerColor(kRed+2);
+  h1->SetFillStyle(3004);
+  h1->SetFillColor(kRed+2);
+  h1->Draw("sames");
+
+  TLine* line = new TLine(-50,fInterval.fPMax,50,fInterval.fPMax);
+  line->SetLineColor(kRed+2);
+  line->Draw();
+}
+
 
 //-----------------------------------------------------------------------------
 int TKinLH::read_hist(const char* Filename) {

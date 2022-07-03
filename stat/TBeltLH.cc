@@ -114,7 +114,7 @@ int TBeltLH::construct_interval(double MuB, double MuS, int NObs) {
 // fBelt is the FC belt histogram
 // avoid multiple useless re-initializations
 //-----------------------------------------------------------------------------
-int TBeltLH::construct_belt(double MuB, double SMin, double SMax, int NPoints, int NObs) {
+  int TBeltLH::construct_belt(double MuB, double SMin, double SMax, int NPoints, int NObs, double* P) {
 
   fMuB = MuB;
   

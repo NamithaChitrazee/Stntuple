@@ -59,7 +59,8 @@ public:
     THStack* fBelt;
     TH1D*    fBeltLo;
     TH1D*    fBeltHi;
-    TH1D*    fBeltSp;
+    TH1D*    fBeltProb;
+    TH1D*    fBeltLhdt;
     TGraph*  fCoverage;
 
     TH1F*    prob_sig;
@@ -128,14 +129,15 @@ public:
   
   double lh_bgr (double P);
   double lh_sig (double P);
-  double lh_data(double MuB, double MuS, Data_t* Data);
+  double lh_data(double MuB, double MuS, int NObs, double* P);
 
   double bgr_mom();
   double sig_mom();
 
   virtual int  construct_interval(double MuB, double MuS, int NObs = -1);
-  virtual int  construct_belt    (double MuB, double SMin, double SMax, int NPoints, int NObs = -1);
-  virtual int  test_coverage(double MuB, double SMin, double SMax, int NPoints);
+  
+  virtual int  construct_belt    (double MuB, double SMin, double SMax, int NPoints, int NObs = -1, double* P = nullptr);
+  virtual int  test_coverage     (double MuB, double SMin, double SMax, int NPoints);
 
   static int   partition(sdata arr[], int low , int high, double pivot);
   static void  quickSort(sdata arr[], int low , int high);
@@ -149,6 +151,7 @@ public:
   int    save_hist(const char* Filename, const char* Opt = "append");
   int    read_hist(const char* Filename);
   
+  void   plot_interval();
   void   make_belt_hist();
 
   virtual void Print(const char* Option_t) const;
