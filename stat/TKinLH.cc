@@ -8,6 +8,8 @@ ClassImp(stntuple::TKinLH)
 
 namespace stntuple {
 
+int TKinLH::fDebug_QuickSort(0);
+
 //-----------------------------------------------------------------------------
 TKinLH::TKinLH(const char* Name, double CL, double PMin, double PMax, int Debug) : TBelt(Name, CL) {
 
@@ -39,6 +41,7 @@ TKinLH::TKinLH(const char* Name, double CL, double PMin, double PMax, int Debug)
 
 //-----------------------------------------------------------------------------
 TKinLH::~TKinLH() {
+  delete fSortData;
 }
 
 //-----------------------------------------------------------------------------
@@ -187,6 +190,8 @@ int TKinLH::init() {
   title = Form("%s_sum_log_lhrR_1",GetName());
   
   fHist.fSumLogLhrR_2 = new TH1D(name,title,nbins_llhrR,-50,50);
+
+  fSortData = new sdata[nbins_llhrR];
 //-----------------------------------------------------------------------------
 // all histograms booked, determine the LLHR range (for one event),
 // scan the range with a small step,
@@ -344,6 +349,68 @@ double TKinLH::f_sig(double* X, double * P) {
   return f/P[0];
 }
 
+//-----------------------------------------------------------------------------
+int TKinLH::partition(sdata a[], int low, int high, double pivot) {
+
+                                        // assume pivot = a[imax]
+  int imax  = low;
+  int i     = imax+1;
+
+  while( i <= high){
+    if (a[i].x <= pivot) {
+      i++;
+    }
+    else{
+      sdata temp;
+      temp    = a[i];
+      a[i]    = a[imax];
+      a[imax] = temp;
+      imax++;
+      i++;
+    }
+  }
+  
+  return imax;
+}
+
+//-----------------------------------------------------------------------------
+void  TKinLH::quickSort(sdata a[], int low, int high) {
+  static int ncalls(0), l_low, l_high;
+  
+  if (low < high) {
+    if (fDebug_QuickSort) {
+      if (ncalls == 0) {
+        l_low  = low;
+        l_high = high;
+      }
+  
+      printf("quickSort: ncalls: %i low, high: %5i %5i\n",ncalls, low,high);
+      printf("TKinLH::quickSort 001: low:%2i high:%2i \n",low,high);
+      int max_per_line(10), n_per_line(0);
+    
+      for (int i=l_low; i<=l_high; i++) {
+        if (n_per_line == 0) printf("%5i:",i);
+        printf(" (%2i,%9.2e)",a[i].bin,a[i].x);
+        n_per_line++;
+        if (n_per_line == max_per_line) {
+          printf("\n");
+          n_per_line = 0;
+        }
+      }
+      if (n_per_line > 0) printf("\n");
+      printf("TKinLH::quickSort 002: low:%2i high:%2i pivot:%9.2e\n",low,high,a[low].x);
+    }
+    
+    int pos      = partition(a, low, high, a[low].x);
+    
+    ncalls++;
+    
+    if ((fDebug_QuickSort > 0) and (ncalls > fDebug_QuickSort)) return;
+    
+    quickSort(a,low  , pos-1);
+    quickSort(a,pos+1, high );
+  }
+}
 
 //-----------------------------------------------------------------------------
 // three parameters, to maintain uniform interface
@@ -379,16 +446,7 @@ int TKinLH::construct_interval(double MuB, double MuS, int NObs) {
 //-----------------------------------------------------------------------------
   double exp_mus = TMath::Exp(-MuS);
                                         // calculate P(NObs), assume MaxNx to be large enough
-  double p_nobs = 0;
-  for (int nb=0; nb<=NObs; nb++) {
-    int    ns = NObs-nb;
-    p_nobs += pb[nb]*exp_mus*pow(MuS,ns)/fFactorial[ns];
-  }
-  
-  if (fDebug.fConstructInterval) {
-    printf("TKinLH::construct_interval 002: p_nobs = %12.5e\n",p_nobs);
-  }
-  
+
   TH1D*  h0      = (TH1D*) fHist.fLogLhrR[0]->At(0);
   int    nx      = h0->GetNbinsX();
 
@@ -396,6 +454,16 @@ int TKinLH::construct_interval(double MuB, double MuS, int NObs) {
     TObjArray* arR = fHist.fLogLhrR[nt];
     fHist.fLogLhrR_1[nt]->Reset();
     
+    double p_nt = 0;
+    for (int nb=0; nb<=nt; nb++) {
+      int    ns = nt-nb;
+      p_nt += pb[nb]*exp_mus*pow(MuS,ns)/fFactorial[ns];
+    }
+  
+    if (fDebug.fConstructInterval) {
+      printf("TKinLH::construct_interval 002: nt = %3i p_nobs = %12.5e\n",nt,p_nt);
+    }
+  
     for (int nb=0; nb<=nt; nb++) {
       int    ns = nt-nb;
       double ps = exp_mus*pow(MuS,ns)/fFactorial[ns];
@@ -414,7 +482,7 @@ int TKinLH::construct_interval(double MuB, double MuS, int NObs) {
 // global llhR : can only assign observables - correct by 'p_nobs', not 'pns'
 // the probability, however is defined by 'pns'
 //-----------------------------------------------------------------------------
-        double llhrG = llhrR+log(p_nobs);
+        double llhrG = llhrR+log(p_nt);
         double wt    = h->GetBinContent(ix+1)*pns;
                                         // logLhrR_N is normalized to the Poisson probability P(MuB,MuS,NObs)
                                         // just summing over all hists with the same NObs
@@ -422,30 +490,6 @@ int TKinLH::construct_interval(double MuB, double MuS, int NObs) {
       }
     }
   }
-//-----------------------------------------------------------------------------
-// next: construct 2-sided likelihood hist. nobs=0 is a special case, keep int in mind
-// find max bin, assume it corresponds to ix=1
-// start from finding a bin with the max probability density - it has to be done here,
-// as the result depends on MuB and MuS
-//-----------------------------------------------------------------------------
-  // double pmax  = -1;
-
-  // for (int nt=0; nt<MaxNx; nt++) {
-  //                                       // for n=0 all bins are filled with a constant
-  //                                       // such that the sum would equal to 1
-  //   TH1D* h1 = fHist.fLogLhrR_1[nt];
-    
-  //   for (int ix=0; ix<nx; ix++) {
-  //     double p = h1->GetBinContent(ix+1);
-  //     if (p > pmax) {
-  //       pmax  = p;
-  //     }
-  //   }
-  // }
-  
-  // printf("TKinLH::construct_interval: MuB, MuS, NObs, pmax = %12.5e %12.5e %3i %12.5e\n",
-  //        MuB,MuS,NObs,pmax); 
-
 //-----------------------------------------------------------------------------
 // now, create uniformly normalized distributions, 2-sided
 //-----------------------------------------------------------------------------
@@ -466,35 +510,56 @@ int TKinLH::construct_interval(double MuB, double MuS, int NObs) {
 //-----------------------------------------------------------------------------
 // as a cross-check, fHist.fSumLogLhrR_2 should be normalized to unity
 //-----------------------------------------------------------------------------
-  fHist.fSumLogLhrR_2->Reset();
+  TH1D* h_sum = fHist.fSumLogLhrR_2;
+  nx          = h_sum->GetNbinsX();
+  h_sum->Reset();
+  
   for (int nt=0; nt<MaxNx; nt++) {
-    fHist.fSumLogLhrR_2->Add(fHist.fLogLhrR_2[nt]);
+    h_sum->Add(fHist.fLogLhrR_2[nt]);
+  }
+                                        // set errors to 0
+  for (int ib=0; ib<nx; ib++) {
+    h_sum->SetBinError(ib+1,0);
   }
 //-----------------------------------------------------------------------------
 // last step: define the interval in the likelihod_ratio space. remember - it is two-sided
 // everything starts from bin nx/2+1
 // assume nb is an even number
 //-----------------------------------------------------------------------------
-  int ipmax   = nx/2+1;
-  TH1D* h_sum = fHist.fSumLogLhrR_2;
+  for (int ib=0; ib<nx; ib++) {
+    fSortData[ib].bin = ib+1;
+    fSortData[ib].x   = h_sum->GetBinContent(ib+1);
+  }
 
-  double sump = h_sum->GetBinContent(ipmax);
+  if (fDebug.fConstructInterval) {
+    printf("TKinLH::construct_interval 003: before sorting, nx = %i\n",nx);
+  }
   
-                                        // bins symmetric wrt zero correspond to the same probability density
-  for (int i=1; i<ipmax-1; i++) {
-    double p1 = h_sum->GetBinContent(ipmax+i);
-    double p2 = h_sum->GetBinContent(ipmax-i);
-    sump = sump+p1+p2;
+  quickSort(fSortData,0,nx-1);
+
+  if (fDebug.fConstructInterval) {
+    printf("TKinLH::construct_interval 004: done sorting\n");
+  }
+                                        // defined the interval
+  double sump=0;
+  for (int i=0; i<nx; i++) {
+    int bin   = fSortData[i].bin;
+    double p1 = fSortData[i].x;
+    sump = sump+p1;
     if (sump >= fCL) {
                                         // done
       fInterval.fLlhrMin = 0;
-      fInterval.fLlhrMax = h_sum->GetBinCenter(ipmax+i);  // interval bound - always positive
+      fInterval.fLlhrMax = h_sum->GetBinCenter(bin);  // interval bound - always positive
       fInterval.fProbTot = sump;
-      fInterval.fPMax    = pmax;
+      fInterval.fPMax    = p1;
+      fInterval.fIMax    = i;            // bins included into the region
       break;
     }
   }
   
+  if (fDebug.fConstructInterval) {
+    printf("TKinLH::construct_interval 005: END\n");
+  }
   return 0;
 }
   

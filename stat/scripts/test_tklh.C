@@ -91,11 +91,38 @@ TKinLH* test_tklh_003(const char* Name    ,
 
   x1->read_hist(fn.Data());
 
-  // x1->fDebug.fConstructInterval = 1;
+  x1->fDebug.fConstructInterval = 1;
   
   x1->construct_interval(MuB,MuS,NObs);
 
   x1->fHist.fSumLogLhrR_2->Draw("");
+
+  TH1D* h1 = (TH1D*) x1->fHist.fSumLogLhrR_2->Clone("h1");
+  h1->Reset();
+
+  int nx = x1->fInterval.fIMax;
+  
+  printf("nx: %i\n",nx);
+
+  for (int i=0; i<nx; i++) {
+    int    bin  = x1->fSortData[i].bin;
+    double data = x1->fSortData[i].x;
+
+    printf("bin, data: %5i %12.5e\n",bin,data);
+    
+    h1->SetBinContent(bin,data);
+    h1->SetBinError  (bin,0);
+  }
+
+  h1->SetLineColor  (kRed+2);
+  h1->SetMarkerColor(kRed+2);
+  h1->SetFillStyle(3004);
+  h1->SetFillColor(kRed+2);
+  h1->Draw("sames");
+
+  TLine* line = new TLine(-50,x1->fInterval.fPMax,50,x1->fInterval.fPMax);
+  line->SetLineColor(kRed+2);
+  line->Draw();
     
   return x1;
 }
@@ -135,4 +162,36 @@ TKinLH* test_tklh_004(const char* Name,
   // x1->fHist.fBeltNO1->Draw("same");
     
   return x1;
+}
+
+
+//-----------------------------------------------------------------------------
+// read histogram file and construct a confidence interval, plot belt
+//-----------------------------------------------------------------------------
+int test_tklh_005(TKinLH*     X, double      MuB=0.1,double      MuS=1) {
+
+  TKinLH::Data_t dt = {2,{103.,104.}};
+
+  double lh = X->lh_data(MuB,MuS,&dt);
+  
+  printf("data: %10.3f %10.3f lh= %12.5e\n",dt.fP[0],dt.fP[1],lh);
+  return 0;
+}
+
+
+//-----------------------------------------------------------------------------
+// test sorting
+//-----------------------------------------------------------------------------
+void test_tklh_006(int NCalls = -1) {
+
+  int npt = 6;
+  TKinLH::sdata dt[] = {{2,-5.},{3,-5.},{1,2.},{0,4.},{2,-1.},{17,0}};
+
+  TKinLH::fDebug_QuickSort = NCalls;
+  
+  TKinLH::quickSort(dt,0,npt-1);
+
+  for (int i=0; i<npt; i++) {
+    printf("i: %2i dt[i].bin: %2i dt[i].x: %10.3f\n",i,dt[i].bin,dt[i].x);
+  }
 }

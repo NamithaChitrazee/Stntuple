@@ -29,6 +29,11 @@
 namespace stntuple {
 class TKinLH : public TBelt {
 public:
+                                        // Åxtracted histogram
+  struct sdata {
+    int    bin;
+    double x;
+  };
                                         // "experimental data"
   struct Data_t {
     int    fNEvents;
@@ -43,6 +48,8 @@ public:
     double   fMuMin;
     double   fMuMax;
   } fDebug;
+
+  static int fDebug_QuickSort;
 
   struct Hist_t {
     TH1D*    fProb;
@@ -82,10 +89,13 @@ public:
     double fLlhrMax;
     double fProbTot;
     double fPMax;
+    int    fIMax;
   } fInterval;
 
   Hist_t   fHist;
   int      fColor;
+
+  sdata*   fSortData;
 
   double   pmin;
   double   pmax;
@@ -126,8 +136,11 @@ public:
   virtual int  construct_interval(double MuB, double MuS, int NObs = -1);
   virtual int  construct_belt    (double MuB, double SMin, double SMax, int NPoints, int NObs = -1);
   virtual int  test_coverage(double MuB, double SMin, double SMax, int NPoints);
-  
-                                        // with the kinematic distributions in, NObs = -1 simply doesn't make sense
+
+  static int   partition(sdata arr[], int low , int high, double pivot);
+  static void  quickSort(sdata arr[], int low , int high);
+
+     // with the kinematic distributions in, NObs = -1 simply doesn't make sense
   
   int    run(int NObs, int NPe = 1000000);
 
