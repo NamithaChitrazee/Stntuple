@@ -115,6 +115,10 @@ public:
   TF1*     fBgr;
 
   void*    fTestHist;
+                                        // momenta for testing calculations
+  double   fTestMom1[10];
+  double   fTestMom2[10];
+  double   fTestMom3[10];
 //-----------------------------------------------------------------------------
 // functions
 //-----------------------------------------------------------------------------
@@ -129,7 +133,7 @@ public:
   
   double lh_bgr (double P);
   double lh_sig (double P);
-  double lh_data(double MuB, double MuS, int NObs, double* P);
+  double wt_data(double MuB, double MuS, int NObs, double* P, double* LlhrR);
 
   double bgr_mom();
   double sig_mom();

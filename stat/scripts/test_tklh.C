@@ -6,17 +6,16 @@ using namespace stntuple;
 //-----------------------------------------------------------------------------
 // plot normalized reduced likelihood
 //-----------------------------------------------------------------------------
-TH1D* test_tklh_001(const char* Name  = "test_mllh_001",
-                    double      CL    = 0.9,
-                    int         Mode  = 0,
-                    int         NObs  = 1,
-                    int         NPExp = 1000000, 
-                    double      PMin  = 103.6,
-                    double      PMax  = 104.9) {
+TKinLH* test_tklh_001(const char* Name  = "test_mllh_001",
+                      double      CL    = 0.9,
+                      double      PMin  = 102,
+                      double      PMax  = 105, 
+                      int         NPExp = 1000000, 
+                      int         NObs  = 1      ) {
  
   TString   title;
 
-  TKinLH* x1 = new TKinLH(Name,CL,Mode=0,PMin,PMax);
+  TKinLH* x1 = new TKinLH(Name,CL,PMin,PMax);
   x1->run(NObs,NPExp);
   
   // make probability histogram
@@ -38,26 +37,31 @@ TH1D* test_tklh_001(const char* Name  = "test_mllh_001",
   //   }
   // }
 
-  return h_prob;
+  return x1;
 }
 
 //-----------------------------------------------------------------------------
 // generate distributions in LLHR for a range of Nobs and store them
 //-----------------------------------------------------------------------------
-TKinLH* test_tklh_002(const char* Name = "t2", double CL=0.9,  
-                  double PMin = 102.0, double PMax = 105.0, 
-                  long int NExp = 100000, int NMax = TKinLH::MaxNx) {
-
+TKinLH* test_tklh_002(const char* Name = "t2",
+                      double      CL   = 0.9,  
+                      double      PMin = 102.0,
+                      double      PMax = 105.0, 
+                      long int    NExp = 100000,
+                      int         NMax = TKinLH::MaxNx) {
   TStopwatch t;
   TKinLH* x1 = new TKinLH(Name,CL,PMin,PMax);
 
+  t.Start();
+  
   for (int nobs=0; nobs<NMax; nobs++) {
-    t.Start();
     x1->run(nobs,NExp);
     t.Stop();
-    printf("nobs = %2i ",nobs);
-    t.Print();
+    printf("nobs = %2i real_time:%10.3f cpu_time: %10.3f\n",nobs,t.RealTime(),t.CpuTime());
+    // t.Print();
+    t.Continue();
   }
+  t.Stop();
 //-----------------------------------------------------------------------------
 // save all histograms once in the end
 //-----------------------------------------------------------------------------
@@ -87,11 +91,11 @@ TKinLH* test_tklh_003(const char* Name    ,
 
   TKinLH* x1 = new TKinLH(Name,CL,PMin,PMax);
 
-  TString fn = Form("/projects/mu2e/hist/stntuple_stat/tklh_%.0f_%.0f.root",PMin*10,PMax*10);
+  TString fn = Form("/projects/mu2e/hist/stntuple_stat/tklh_%s_%.0f_%.0f.root",Name,PMin*10,PMax*10);
 
   x1->read_hist(fn.Data());
 
-  x1->fDebug.fConstructInterval = 1;
+  //  x1->fDebug.fConstructInterval = 1;
   
   x1->construct_interval(MuB,MuS,NObs);
 
@@ -113,11 +117,11 @@ TKinLH* test_tklh_004(const char* Name,
                       int         NPoints = 10,
                       int         NObs = 0)
 {
-  double p[] = {103.,104., 103, 104, 103.3};
+  double p[] = {103., 104., 103, 104, 103., 104};
   
   TKinLH* x1 = new TKinLH(Name,CL,PMin,PMax);
 
-  TString fn = Form("/projects/mu2e/hist/stntuple_stat/tklh_%.0f_%.0f.root",PMin*10,PMax*10);
+  TString fn = Form("/projects/mu2e/hist/stntuple_stat/tklh_%s_%.0f_%.0f.root",Name,PMin*10,PMax*10);
 
   x1->read_hist(fn.Data());
 
@@ -145,15 +149,22 @@ TKinLH* test_tklh_004(const char* Name,
 //-----------------------------------------------------------------------------
 int test_tklh_005(TKinLH* X, double MuB=0.1, double MuS=1, int NObs = 0) {
 
-  double p[] = {103.,104., 103, 104, 103.3};
+  double p[] = {103.,104., 103, 104, 103., 104., 103., 104., 103., 104.};
 
-  double lh = X->lh_data(MuB,MuS,NObs,p);
+  double llhrR;
   
-  TLine* line = new TLine(lh,1.e-2,lh,1.e-10);
+  X->construct_interval(MuB,MuS,NObs);
+
+  double wt = X->wt_data(MuB,MuS,NObs,p,&llhrR);
+
+  double nlog_wt = -log(wt);
+  
+  TLine* line = new TLine(wt,1.e-2,wt,1.e-10);
+
   line->SetLineColor(kRed+2);
   line->Draw();
 
-  printf("data: %i lh = %10.3f\n",NObs,lh);
+  printf("data: nobs, llhrR, wt, -log_wt : %i %10.3f %9.3e %9.3e\n",NObs,llhrR, wt, nlog_wt);
   return 0;
 }
 

@@ -64,6 +64,8 @@ TBelt::TBelt(const char* Name, double CL) : TNamed(Name,Name) {
 }
 
 //-----------------------------------------------------------------------------
+// Zech version
+//-----------------------------------------------------------------------------
 int TBelt::init_truncated_poisson_dist(double MuB, int NObs, double* Prob) {
 
   double exp_mub  = TMath::Exp(-MuB);
@@ -81,6 +83,34 @@ int TBelt::init_truncated_poisson_dist(double MuB, int NObs, double* Prob) {
     }
   }
                                         // do normalization
+  for (int i=0; i<=NObs; i++) {
+    Prob[i] = Prob[i]/sum_prob;
+  }
+  
+  return 0;
+}
+
+
+//-----------------------------------------------------------------------------
+// Murat version
+//-----------------------------------------------------------------------------
+int TBelt::init_truncated_poisson_dist(double MuB, double MuS, int NObs, double* Prob) {
+
+  double exp_mub  = TMath::Exp(-MuB);
+  double exp_mus  = TMath::Exp(-MuS);
+
+  double sum_prob = 0;
+                                        // calculate normalization coefficients
+  for (int k=0; k<=MaxNx; k++) {
+    if (k <= NObs) {
+      Prob[k]   = exp_mub*pow(MuB,k)/fFactorial(k) * (exp_mus*pow(MuS,NObs-k)/fFactorial(NObs-k));
+      sum_prob += Prob[k];
+    }
+    else {
+      Prob[k] = 0;
+    }
+  }
+                                        // do the normalization
   for (int i=0; i<=NObs; i++) {
     Prob[i] = Prob[i]/sum_prob;
   }

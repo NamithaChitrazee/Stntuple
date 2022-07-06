@@ -38,6 +38,14 @@ TKinLH::TKinLH(const char* Name, double CL, double PMin, double PMax, int Debug)
 
   fData.fNEvents    = 0;
 
+  double tm3[] = {103., 104., 103., 104, 103., 104, 103., 104., 103., 104.};
+  
+  for (int i=0; i<10; i++) {
+    fTestMom1[i] = 104.5;     // "signal-like"
+    fTestMom2[i] = 102.0;     // "background-like"
+    fTestMom3[i] = tm3[i];
+  }
+
   init();
 }
 
@@ -123,16 +131,15 @@ int TKinLH::init() {
   TString name, title;
   
   title = Form("Generated P(bgr) name:%s pmin=%5.1f",GetName(),pmin);
-  fHist.gen_pbgr = new TH1D(Form("h_%s_gen_pbgr",GetName()),title,200,100,110);
+  fHist.gen_pbgr = new TH1D("h_gen_pbgr",title,200,100,110);
     
   title = Form("Generated P(sig) name:%s pmin=%5.1f",GetName(),pmin);
-  fHist.gen_psig = new TH1D(Form("h_%s_gen_psig",GetName()),title,200,100,110);
+  fHist.gen_psig = new TH1D("h_gen_psig",title,200,100,110);
   
   int     nbins_llh(20000), nbins_llhr(20000), nbins_llhrR(10000);
   
   double  llh_min  (-100), llh_max  (100);
   double  llhr_min (-100), llhr_max (100);
-  double  llhrR_min(  -2), llhrR_max(  3);
 
   for (int ntot=0; ntot<MaxNx; ntot++) {
                                         // nb varies from 0 to ntot
@@ -147,28 +154,28 @@ int TKinLH::init() {
       int ns = ntot-nb;
     
       title  = Form("Log(Lhs) name:%s nb:%02i ns:%02i",GetName(),nb,ns);
-      h      = new TH1D(Form("h_%s_llhs_%02i_%02i",GetName(),nb,ns),title.Data(),nbins_llh,llh_min,llh_max);
+      h      = new TH1D(Form("h_llhs_%02i_%02i",nb,ns),title.Data(),nbins_llh,llh_min,llh_max);
       h->SetMarkerStyle(6);
       h->SetMarkerColor(fColor);
       h->SetLineColor  (fColor);
       fHist.fLogLhs[ntot]->Add(h);
 
       title  = Form("Log(Lhb) name:%s nb:%02i ns:%02i",GetName(),nb,ns);
-      h      = new TH1D(Form("h_%s_llhb_%02i_%02i",GetName(),nb,ns),title.Data(),nbins_llh,llh_min,llh_max);
+      h      = new TH1D(Form("h_llhb_%02i_%02i",nb,ns),title.Data(),nbins_llh,llh_min,llh_max);
       h->SetMarkerStyle(6);
       h->SetMarkerColor(fColor);
       h->SetLineColor  (fColor);
       fHist.fLogLhb[ntot]->Add(h);
 
       title  = Form("Log(Lhr) name:%s nb:%02i ns:%02i",GetName(),nb,ns);
-      h      = new TH1D(Form("h_%s_llhr_%02i_%02i",GetName(),nb,ns),title.Data(),nbins_llhr,llhr_min,llhr_max);
+      h      = new TH1D(Form("h_llhr_%02i_%02i",nb,ns),title.Data(),nbins_llhr,llhr_min,llhr_max);
       h->SetMarkerStyle(6);
       h->SetMarkerColor(fColor);
       h->SetLineColor  (fColor);
       fHist.fLogLhr[ntot]->Add(h);
 
       title  = Form("Log(LhrR) name:%s nb:%02i ns:%02i",GetName(),nb,ns);
-      h      = new TH1D(Form("h_%s_llhrR_%02i_%02i",GetName(),nb,ns),title.Data(),nbins_llhrR,llhrR_min,llhrR_max);
+      h      = new TH1D(Form("h_llhrR_%02i_%02i",nb,ns),title.Data(),nbins_llhrR,0,1);
       h->SetMarkerStyle(6);
       h->SetMarkerColor(fColor);
       h->SetLineColor  (fColor);
@@ -177,21 +184,21 @@ int TKinLH::init() {
   }
 
   for (int ix=0; ix<MaxNx; ix++) {
-    name  = Form("h_%s_log_lhrR_1_n%02i",GetName(),ix);
-    title = Form("%s_log_lhrR_1_n%02i",GetName(),ix);
+    name  = Form("h_log_lhrR_1_n%02i",ix);
+    title = Form("%s_log_lhrR_1_n%02i"  ,GetName(),ix);
     
-    fHist.fLogLhrR_1[ix] = new TH1D(name,title,nbins_llhrR,-50,50);
+    fHist.fLogLhrR_1[ix] = new TH1D(name,title,nbins_llhrR,0,50);
 
-    name  = Form("h_%s_log_lhrR_2_n%02i",GetName(),ix);
-    title = Form("%s_log_lhrR_2_n%02i",GetName(),ix);
+    name  = Form("h_log_lhrR_2_n%02i",ix);
+    title = Form("%s_log_lhrR_2_n%02i"  ,GetName(),ix);
     
-    fHist.fLogLhrR_2[ix] = new TH1D(name,title,nbins_llhrR,-50,50);
+    fHist.fLogLhrR_2[ix] = new TH1D(name,title,nbins_llhrR,0,50);
   }
 
-  name  = Form("h_%s_sum_log_lhrR_1",GetName());
-  title = Form("%s_sum_log_lhrR_1",GetName());
+  name  = Form("h_sum_log_lhrR_1");
+  title = Form("%s_sum_log_lhrR_1"  ,GetName());
   
-  fHist.fSumLogLhrR_2 = new TH1D(name,title,nbins_llhrR,-50,50);
+  fHist.fSumLogLhrR_2 = new TH1D(name,title,nbins_llhrR,0,50);
 
   fSortData = new sdata[nbins_llhrR];
 //-----------------------------------------------------------------------------
@@ -251,25 +258,39 @@ double TKinLH::lh_sig(double P) {
 // normalized to the integral (not sum over the bins !)  = 1
 // NObs : number of observed events, P - array of the track momenta
 //-----------------------------------------------------------------------------
-  double TKinLH::lh_data(double MuB, double MuS,  int NObs, double* P) {
+  double TKinLH::wt_data(double MuB, double MuS,  int NObs, double* P, double* LlhrR) {
   
   double pb[MaxNx];
 
   int rc   = init_truncated_poisson_dist(MuB,NObs,pb);
   if (rc < 0) return rc;
 //-----------------------------------------------------------------------------
-// step 1: calculate kinematic part of the likelihood
+// step 1: calculate reduced kinematic likelihood
 //-----------------------------------------------------------------------------
   double tot_lhr = 1;
-  for (int i=0; i<NObs; i++) {
-    double p    = P[i];
-    double lhr  = lh_bgr(p)/lh_sig(p);
-    tot_lhr    *= lhr;
-  }
+  if (NObs > 0) {
+    for (int i=0; i<NObs; i++) {
+      double p    = P[i];
+      double lhr  = lh_bgr(p)/lh_sig(p);
+      tot_lhr    *= lhr;
+    }
 
-  double llhrR  = log(tot_lhr)/NObs;
+    *LlhrR  = (log(tot_lhr)/NObs-fMinLLHR)/(fMaxLLHR-fMinLLHR);
+  }
+  else {
+                                        // use the 1st bin of the uniform LogLhrR distribution for N=0
+    *LlhrR = 0;
+  }
 //-----------------------------------------------------------------------------
-// step 2: calculate global likelihood, for given MuB and MuS
+// step 2: calculate probability of reduced kinematic likelihood
+//         (assume the interval has just been constructed and fHist.fLogLhrR_1 filled)
+//-----------------------------------------------------------------------------
+  TH1D*  h   = fHist.fLogLhrR_1[NObs];
+  int    bin = h->FindBin(NObs+*LlhrR);
+                                        // 'wt' is the (binned) dP/d(llhrR) 
+  double wt  = h->GetBinContent(bin);
+//-----------------------------------------------------------------------------
+// step 3: calculate global probability, for given MuB and MuS
 //-----------------------------------------------------------------------------
   double exp_mus = TMath::Exp(-MuS);
   double p_nobs  = 0;
@@ -279,10 +300,9 @@ double TKinLH::lh_sig(double P) {
     p_nobs   += pb[nb]*ps;
   }
 
-  double llhrG = llhrR+log(p_nobs);
+  double prob = wt*p_nobs;
 
-  if (NObs > MuB+MuS) llhrG = -llhrG;
-  return llhrG;
+  return prob;
 }
 
 
@@ -453,7 +473,9 @@ int TKinLH::construct_interval(double MuB, double MuS, int NObs) {
 
   TH1D*  h0      = (TH1D*) fHist.fLogLhrR[0]->At(0);
   int    nx      = h0->GetNbinsX();
-
+//-----------------------------------------------------------------------------
+// for given MuB and MuS, this loop coul dbe executed just once
+//-----------------------------------------------------------------------------
   for (int nt=0; nt<MaxNx; nt++) {
     TObjArray* arR = fHist.fLogLhrR[nt];
     fHist.fLogLhrR_1[nt]->Reset();
@@ -486,7 +508,7 @@ int TKinLH::construct_interval(double MuB, double MuS, int NObs) {
 // global llhR : can only assign observables - correct by 'p_nobs', not 'pns'
 // the probability, however is defined by 'pns'
 //-----------------------------------------------------------------------------
-        double llhrG = llhrR+log(p_nt);
+        double llhrG = llhrR+nt;
         double wt    = h->GetBinContent(ix+1)*pns;
                                         // logLhrR_N is normalized to the Poisson probability P(MuB,MuS,NObs)
                                         // just summing over all hists with the same NObs
@@ -507,7 +529,7 @@ int TKinLH::construct_interval(double MuB, double MuS, int NObs) {
     for (int ib=0; ib<nx; ib++) { 
       double wt    =  h1->GetBinContent(ib+1); // /pmax;
       double llhrG =  h1->GetBinCenter (ib+1);
-      if (nt >= (MuB+MuS)) llhrG = -llhrG;
+      // if (nt >= (MuB+MuS)) llhrG = -llhrG;
       fHist.fLogLhrR_2[nt]->Fill(llhrG,wt);
     }
   }
@@ -545,19 +567,51 @@ int TKinLH::construct_interval(double MuB, double MuS, int NObs) {
     printf("TKinLH::construct_interval 004: done sorting\n");
   }
                                         // defined the interval
-  double sump=0;
+  double sump         = 0;
+  int    overcoverage = 0;
+  double pmin         = 1.e6;
+  
   for (int i=0; i<nx; i++) {
-    int bin   = fSortData[i].bin;
-    double p1 = fSortData[i].x;
-    sump = sump+p1;
+    int    bin = fSortData[i].bin;
+    double p   = fSortData[i].x;
+    sump       = sump+p;
     if (sump >= fCL) {
-                                        // done
-      fInterval.fLlhrMin = 0;
-      fInterval.fLlhrMax = h_sum->GetBinCenter(bin);  // interval bound - always positive
-      fInterval.fProbTot = sump;
-      fInterval.fPMax    = p1;
-      fInterval.fIMax    = i;            // bins included into the region
-      break;
+      if (overcoverage == 0) {
+	if (i > 0) pmin = fSortData[i-1].x;
+	if (p < pmin) {
+					// the probability density is lower then in the previous bin
+					// done, this bin needs to be included
+	  fInterval.fLlhrMin = 0;
+	  fInterval.fLlhrMax = h_sum->GetBinCenter(bin);  // interval bound - always positive
+	  fInterval.fProbTot = sump;
+	  fInterval.fPMax    = p;
+	  fInterval.fIMax    = i+1;       // bins included into the region
+	  break;
+	} 
+	else {
+					// in the previous bin, the probability density was the same
+					// this bin needs to be included , as the others with the same 
+					// probability density, but we're overcovering
+	  overcoverage = 1;
+	}
+      }
+      else {
+					// in the "overcoverage" mode continue till the first bin with 
+					// lower prob
+	if (p < fSortData[i-1].x) {
+					// the probability density is lower then in the previous bin
+					// done, this bin doesn't need to be included
+	    fInterval.fLlhrMin = 0;
+	    int    bin = fSortData[i-1].bin;
+	    fInterval.fLlhrMax = h_sum->GetBinCenter(bin);  // interval bound - always positive
+	    fInterval.fProbTot = sump-p;
+	    fInterval.fPMax    = pmin;
+	    fInterval.fIMax    = i;     // bin doesn't need to be included into the region
+	    break;
+	  } 
+      }
+                                        // otherwise, just redefined pmin
+      pmin = p;
     }
   }
   
@@ -605,9 +659,8 @@ int TKinLH::construct_interval(double MuB, double MuS, int NObs) {
 //-----------------------------------------------------------------------------
       double wt = -1;
       if (P) {
-        double lhdt = lh_data(MuB,mus,NObs,P);
-        int    bin  = fHist.fSumLogLhrR_2->FindBin(lhdt);
-        wt          = fHist.fSumLogLhrR_2->GetBinContent(bin);
+        double llhrR;
+        wt  = wt_data(MuB,mus,NObs,P,&llhrR);
       }
       fBelt.fLlhInterval[5*i+4] = -log(wt);
     }
@@ -634,19 +687,19 @@ void TKinLH::make_belt_hist() {
     delete fHist.fBeltProb;
   }
   
-  fHist.fBeltLo   = new TH1D(Form("h_belt_lo_%s",GetName()),
+  fHist.fBeltLo   = new TH1D("h_belt_lo",
                              Form("TBeltLH LO MuB = %10.3f CL = %5.2f Nobs:%3i",fMuB,fCL,fNObs),
                              fBelt.fLlhNPoints,fBelt.fSMin,fBelt.fSMax);
 
-  fHist.fBeltHi   = new TH1D(Form("h_belt_hi_%s",GetName()),
+  fHist.fBeltHi   = new TH1D("h_belt_hi_%s",
                              Form("TBeltLH HI MuB = %10.3f CL = %5.2f Nobs:%3i",fMuB,fCL,fNObs),
                              fBelt.fLlhNPoints,fBelt.fSMin,fBelt.fSMax);
 
-  fHist.fBeltProb = new TH1D(Form("h_belt_prob_%s",GetName()),
+  fHist.fBeltProb = new TH1D("h_belt_prob",
                              Form("TBeltLH Prob MuB = %10.3f CL = %5.2f Nobs:%3i",fMuB,fCL,fNObs),
                              fBelt.fLlhNPoints,fBelt.fSMin,fBelt.fSMax);
 
-  fHist.fBeltLhdt = new TH1D(Form("h_belt_lhdt_%s",GetName()),
+  fHist.fBeltLhdt = new TH1D("h_belt_lhdt_%s",
                              Form("TBeltLH lhdt MuB = %10.3f CL = %5.2f Nobs:%3i",fMuB,fCL,fNObs),
                              fBelt.fLlhNPoints,fBelt.fSMin,fBelt.fSMax);
 
@@ -731,13 +784,13 @@ int TKinLH::read_hist(const char* Filename) {
     for (int nb=0; nb<=nobs; nb++) {
       int ns = nobs-nb;
       (*as) [nb]->Delete();
-      (*as) [nb] = (TH1D*) f->Get(Form("//%05i/h_%s_llhs_%02i_%02i" ,nobs,GetName(),nb,ns));
+      (*as) [nb] = (TH1D*) f->Get(Form("//%05i/h_llhs_%02i_%02i" ,nobs,nb,ns));
       (*ab) [nb]->Delete();
-      (*ab) [nb] = (TH1D*) f->Get(Form("//%05i/h_%s_llhb_%02i_%02i" ,nobs,GetName(),nb,ns));
+      (*ab) [nb] = (TH1D*) f->Get(Form("//%05i/h_llhb_%02i_%02i" ,nobs,nb,ns));
       (*ar) [nb]->Delete();
-      (*ar) [nb] = (TH1D*) f->Get(Form("//%05i/h_%s_llhr_%02i_%02i" ,nobs,GetName(),nb,ns));
+      (*ar) [nb] = (TH1D*) f->Get(Form("//%05i/h_llhr_%02i_%02i" ,nobs,nb,ns));
       (*arR)[nb]->Delete();
-      (*arR)[nb] = (TH1D*) f->Get(Form("//%05i/h_%s_llhrR_%02i_%02i",nobs,GetName(),nb,ns));
+      (*arR)[nb] = (TH1D*) f->Get(Form("//%05i/h_llhrR_%02i_%02i",nobs,nb,ns));
     }
 
     // fHist.fLogLhrR_1[nobs]->Read(Form("h_llhrR1_%02i" ,nobs));
@@ -745,9 +798,9 @@ int TKinLH::read_hist(const char* Filename) {
   }
 
   delete fHist.prob_sig;
-  fHist.prob_sig = (TH1F*) f->Get(Form("h_%s_prob_sig",GetName()));
+  fHist.prob_sig = (TH1F*) f->Get("h_prob_sig");
   delete fHist.prob_bgr;
-  fHist.prob_bgr = (TH1F*) f->Get(Form("h_%s_prob_bgr",GetName()));
+  fHist.prob_bgr = (TH1F*) f->Get("h_prob_bgr");
 
   // fHist.fSumLogLhrR_2->Read(Form("h_sum_llhrR2_%02i" ,nobs));
 
@@ -885,8 +938,9 @@ int TKinLH::run(int NObs, int NPe) {
         hs->Fill(llhs);
         hb->Fill(llhb);
         hr->Fill(llhr);
-                                        // reduces likelihood
-        double llhrR = llhr/NObs;
+                                        // reduced likelihood - [0,1]
+        
+        double llhrR = ((llhr/NObs)-fMinLLHR)/(fMaxLLHR-fMinLLHR);
     
         hrR->Fill(llhrR);
         // if (fDebug.fRun > 0) {
@@ -929,17 +983,12 @@ int TKinLH::save_hist(const char* Filename, const char* Option) {
     ab ->Write(); //Form("llhb_%02i" ,nobs));
     ar ->Write(); //Form("llhr_%02i" ,nobs));
     arR->Write(); //Form("llhrR_%02i",nobs));
-
-    // fHist.fLogLhrR_1[nobs]->Write(Form("h_llhrR1_%02i",nobs));
-    // fHist.fLogLhrR_2[nobs]->Write(Form("h_llhrR2_%02i",nobs));
   }
 
   f->cd("//");
 
   fHist.prob_sig->Write();
   fHist.prob_bgr->Write();
-
-  // fHist.fSumLogLhrR_N->Write(Form("h_sum_llhrR_%02i",nobs));
 
   //  f->Write();
   f->Close();

@@ -88,8 +88,12 @@ public:
   TBelt(const char* Name, double CL = -1);
 
                                         // 'N' - number of measured events
-  
+                                        // 1. Zech
   int          init_truncated_poisson_dist(double MuB, int   NObs, double* Prob    );
+
+                                        // 2. Mur
+  int          init_truncated_poisson_dist(double MuB, double MuS, int NObs, double* Prob);
+
   virtual int  init_poisson_dist          (double MuB, double MuS, int    NObs = -1);
   
                                         // in presence of background, mu = mus+mub
