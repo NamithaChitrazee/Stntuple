@@ -96,6 +96,9 @@ int TBelt::init_truncated_poisson_dist(double MuB, int NObs, double* Prob) {
 //-----------------------------------------------------------------------------
 int TBelt::init_truncated_poisson_dist(double MuB, double MuS, int NObs, double* Prob) {
 
+  printf("  TBelt::init_truncated_poisson_dist You don't want to be using this version!\n");
+  return 0;
+ 
   double exp_mub  = TMath::Exp(-MuB);
   double exp_mus  = TMath::Exp(-MuS);
 
@@ -103,7 +106,7 @@ int TBelt::init_truncated_poisson_dist(double MuB, double MuS, int NObs, double*
                                         // calculate normalization coefficients
   for (int k=0; k<=MaxNx; k++) {
     if (k <= NObs) {
-      Prob[k]   = exp_mub*pow(MuB,k)/fFactorial(k) * (exp_mus*pow(MuS,NObs-k)/fFactorial(NObs-k));
+      Prob[k]   = exp_mub*pow(MuB,k)/fFactorial[k] * (exp_mus*pow(MuS,NObs-k)/fFactorial[NObs-k]);
       sum_prob += Prob[k];
     }
     else {

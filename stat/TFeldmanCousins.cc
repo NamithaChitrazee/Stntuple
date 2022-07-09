@@ -97,11 +97,19 @@ void TFeldmanCousins::InitPoissonDist(double MuB, double MuS, double* Prob, int 
 //-----------------------------------------------------------------------------
 // NObs > 0 biases the probability distribution
 //-----------------------------------------------------------------------------
-    double pbn = 0; for (int k=0; k<=NObs; k++) { pbn += TMath::Exp(-MuB)*pow(MuB,k)/fFactorial[k]; }
-    
     double pb[MaxNx];
+
+    double pbn = 0;
+    for (int k=0; k<=NObs; k++) {
+      double pbb = TMath::Exp(-MuB)*pow(MuB,k)/fFactorial[k];
+      double pbs = TMath::Exp(-MuS)*pow(MuS,NObs-k)/fFactorial[NObs-k];
+
+      pb[k]      = pbb*pbs;
+      pbn       += pb[k];
+    }
+    
     for (int i=0; i<MaxNx; i++) {
-      if (i <= NObs) pb[i] = TMath::Exp(-MuB)*pow(MuB,i)/fFactorial[i]/pbn;
+      if (i <= NObs) pb[i] = pb[i]/pbn;
       else           pb[i] = 0;
     }
 					// 'i' - bin in the constrained Poisson distribution

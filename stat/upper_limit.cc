@@ -14,6 +14,21 @@ ClassImp(stntuple::upper_limit)
 
 namespace stntuple {
 //-----------------------------------------------------------------------------
+upper_limit::Belt_t::Belt_t() {
+  fFillColor = kRed+2;
+  fFillStyle = 3005;
+
+  fXMin      = 0;
+  fXMax      = -1;
+  fYMin      = 0;
+  fYMax      = -1;
+
+  fStack     = nullptr;
+  fLo        = nullptr;
+  fHi        = nullptr;
+}
+
+//-----------------------------------------------------------------------------
 upper_limit::upper_limit(const char* Name, double CL, int Type) : TNamed(Name,Name) {
 
   double alpha = 1-TMath::Erf(5./sqrt(2));
@@ -28,10 +43,10 @@ upper_limit::upper_limit(const char* Name, double CL, int Type) : TNamed(Name,Na
   
   fHist.fProb       = nullptr;
   fHist.fInterval   = nullptr;
-  fHist.fBelt       = nullptr;
-  fHist.fBeltLo     = nullptr;
-  fHist.fBeltZr     = nullptr;
-  fHist.fBeltHi     = nullptr;
+  // fHist.fBelt       = nullptr;
+  // fHist.fBeltLo     = nullptr;
+  // fHist.fBeltZr     = nullptr;
+  // fHist.fBeltHi     = nullptr;
   fHist.fCoverage   = nullptr;
 
   fDebug.fConstructBelt = 0;
@@ -44,8 +59,8 @@ upper_limit::upper_limit(const char* Name, double CL, int Type) : TNamed(Name,Na
   fNExp  = 100000;
   fNObs  = -1;
 
-  fBelt.fFillColor      = kRed+2;
-  fBelt.fFillStyle      = 3005;
+  // fBelt.fFillColor      = kRed+2;
+  // fBelt.fFillStyle      = 3005;
 //-----------------------------------------------------------------------------
 // calculate factorials, do that only once
 // assume MaxNx to be large enough, so having N! values up to MaxNx-1 included is enough
@@ -158,53 +173,55 @@ int upper_limit::construct_interval(double MuB, double MuS, int NObs) {
 // fBelt is the FC belt histogram
 // avoid multiple useless re-initializations
 //-----------------------------------------------------------------------------
-int upper_limit::construct_belt(double MuB, double SMin, double SMax, int NPoints, int NObs) {
+  int upper_limit::construct_belt(double MuB, double SMin, double SMax, int NPoints, int NObs) {
 
   fMuB = MuB;
   
-  fBelt.fSMin = SMin;
-  fBelt.fSMax = SMax;
-  fBelt.fDy   = (NPoints > 1) ? (SMax-SMin)/(NPoints-1) : 1;
+  Belt_t* b = belt(NObs);
+
+  b->fSMin = SMin;
+  b->fSMax = SMax;
+  b->fDy   = (NPoints > 1) ? (SMax-SMin)/(NPoints-1) : 1;
 
   for (int ix=0; ix<MaxNx; ix++) {
-    fBelt.fSign[ix][0] = 1.e6;
-    fBelt.fSign[ix][1] = -1;
+    b->fSign[ix][0] = 1.e6;
+    b->fSign[ix][1] = -1;
   }
 
   for (int iy=0; iy<NPoints; iy++) {
-    double mus = SMin+iy*fBelt.fDy;
+    double mus = SMin+iy*b->fDy;
 
     int rc     = construct_interval(MuB,mus,NObs);
     if (rc == 0) {
       for (int ix=fIxMin; ix<=fIxMax; ix++) {
-        if (mus > fBelt.fSign[ix][1]) fBelt.fSign[ix][1] = mus+fBelt.fDy/2;
-        if (mus < fBelt.fSign[ix][0]) fBelt.fSign[ix][0] = mus-fBelt.fDy/2;
+        if (mus > b->fSign[ix][1]) b->fSign[ix][1] = mus+b->fDy/2;
+        if (mus < b->fSign[ix][0]) b->fSign[ix][0] = mus-b->fDy/2;
 
         if (fDebug.fConstructBelt == 2) {
           if ((mus >= fDebug.fMuMin) and (mus <= fDebug.fMuMax)) {
             printf("upper_limit::construct_belt: iy = %5i ix:%3i mus=%8.4f MuB=%5.3f IxMin:%3i IxMax:%3i fSign[ix][0]:%8.4f fSign[ix][1]:%8.4f\n",
-                   iy,ix,mus,MuB,fIxMin,fIxMax,fBelt.fSign[ix][0],fBelt.fSign[ix][0]);
+                   iy,ix,mus,MuB,fIxMin,fIxMax,b->fSign[ix][0],b->fSign[ix][0]);
           }
         }
       }
     }
     else {
       if (fDebug.fConstructBelt > 0) {
-	printf("TFeldmanCousinsB::ConstructBelt: ERROR: mus=%10.3f MuB=%10.3f iy = %3i interval not defined\n",
+	printf("TFeldmanCousinsB::Constructbelt: ERROR: mus=%10.3f MuB=%10.3f iy = %3i interval not defined\n",
 	       mus,MuB,iy);
       }
     }
   }
 
   for (int ix=0; ix<MaxNx; ix++) {
-    if (fBelt.fSign[ix][0] == 1.e6) fBelt.fSign[ix][0] = 0;
-    if (fBelt.fSign[ix][0] <  0   ) fBelt.fSign[ix][0] = 0;
-    if (fBelt.fSign[ix][1] <  0   ) fBelt.fSign[ix][1] = 0;
+    if (b->fSign[ix][0] == 1.e6) b->fSign[ix][0] = 0;
+    if (b->fSign[ix][0] <  0   ) b->fSign[ix][0] = 0;
+    if (b->fSign[ix][1] <  0   ) b->fSign[ix][1] = 0;
   }
 
   if (fDebug.fConstructBelt > 0) {
     for (int ix=0; ix<MaxNx; ix++) {
-      printf("%32s %3i %12.5f %12.5f\n","",ix,fBelt.fSign[ix][0],fBelt.fSign[ix][1]);
+      printf("%32s %3i %12.5f %12.5f\n","",ix,b->fSign[ix][0],b->fSign[ix][1]);
     }
   }
   return 0;
@@ -249,45 +266,41 @@ int upper_limit::make_prob_hist() {
 }
 
 //-----------------------------------------------------------------------------
-void upper_limit::make_belt_hist() {
-  if (fHist.fBelt) {
-    delete fHist.fBelt;
-    delete fHist.fBeltLo;
-    delete fHist.fBeltHi;
+void upper_limit::make_belt_hist(int NObs) {
+
+  Belt_t* b = belt(NObs);
+  
+  if (b->fStack) {
+    delete b->fStack;
+    delete b->fLo;
+    delete b->fHi;
   }
   
-  fHist.fBeltLo   = new TH1D(Form("h_belt_lo_%s",GetName()),
-                             Form("Crow-Gardner belt MuB = %10.3f CL = %5.2f Nobs:%3i",fMuB,fCL,fNObs),
-                             MaxNx,-0.5,MaxNx-0.5);
+  b->fLo   = new TH1D(Form("h_belt_lo_%s_%02i",GetName(),NObs),
+                      Form("Upper-limit belt MuB = %10.3f CL = %5.2f Nobs:%3i",fMuB,fCL,fNObs),
+                      MaxNx,-0.5,MaxNx-0.5);
 
-  fHist.fBeltZr   = new TH1D(Form("h_belt_mi_%s",GetName()),
-                             Form("Crow-Gardner belt MuB = %10.3f CL = %5.2f Nobs:%3i",fMuB,fCL,fNObs),
-                             MaxNx,-0.5,MaxNx-0.5);
-
-  fHist.fBeltHi   = new TH1D(Form("h_belt_hi_%s",GetName()),
-                             Form("Crow-Gardner belt MuB = %10.3f CL = %5.2f Nobs:%3i",fMuB,fCL,fNObs),
-                             MaxNx,-0.5,MaxNx-0.5);
+  b->fHi   = new TH1D(Form("h_belt_hi_%s_%02i",GetName(),NObs),
+                      Form("Upper-limit belt MuB = %10.3f CL = %5.2f Nobs:%3i",fMuB,fCL,fNObs),
+                      MaxNx,-0.5,MaxNx-0.5);
 
   for (int ix=0; ix<MaxNx; ix++) {
-    double dx = fBelt.fSign[ix][1]-fBelt.fSign[ix][0];
-    if (fBelt.fSign[ix][1] > 0) {    
-      fHist.fBeltLo->SetBinContent(ix+1,fBelt.fSign[ix][0]);
-      fHist.fBeltZr->SetBinContent(ix+1,0);
-      fHist.fBeltHi->SetBinContent(ix+1,dx);
+    double dx = b->fSign[ix][1]-b->fSign[ix][0];
+    if (b->fSign[ix][1] > 0) {    
+      b->fLo->SetBinContent(ix+1,b->fSign[ix][0]);
+      b->fHi->SetBinContent(ix+1,dx);
     }
   }
   
-  fHist.fBeltLo->SetLineColor(fBelt.fFillColor);
-  fHist.fBeltZr->SetLineColor(fBelt.fFillColor);
+  b->fLo->SetLineColor(b->fFillColor);
 
-  fHist.fBeltHi->SetFillStyle(fBelt.fFillStyle);
-  fHist.fBeltHi->SetFillColor(fBelt.fFillColor);
-  fHist.fBeltHi->SetLineColor(fBelt.fFillColor);
+  b->fHi->SetFillStyle(b->fFillStyle);
+  b->fHi->SetFillColor(b->fFillColor);
+  b->fHi->SetLineColor(b->fFillColor);
 
-  fHist.fBelt = new THStack(Form("hs_%s",GetName()),fHist.fBeltHi->GetTitle());
-  fHist.fBelt->Add(fHist.fBeltLo);
-  fHist.fBelt->Add(fHist.fBeltZr);
-  fHist.fBelt->Add(fHist.fBeltHi);
+  b->fStack = new THStack(Form("hs_%s",GetName()),b->fHi->GetTitle());
+  b->fStack->Add(b->fLo);
+  b->fStack->Add(b->fHi);
 }
 
 
@@ -297,8 +310,11 @@ void upper_limit::make_belt_hist() {
 int upper_limit::test_coverage(double MuB, double SMin, double SMax, int NPoints) {
   
   int rc(0);
-  rc = construct_belt(MuB,0,35,35001);
-  if (rc < 0) return rc;
+
+  for (int nobs=0; nobs<20; nobs++) {
+    rc = construct_belt(MuB,0,30,30001,nobs);
+    if (rc < 0) return rc;
+  }
 
   float x[NPoints+2], y[NPoints+2];
 
@@ -313,10 +329,11 @@ int upper_limit::test_coverage(double MuB, double SMin, double SMax, int NPoints
     for (int k=0; k<fNExp; k++) {
       int nobs = fRn.Poisson(s+MuB);
                                         // assume SMin and SMax define a confidence interval
-      double mus = nobs;
+      double mus  = nobs;
                                         // determine SMin and SMax;
-      double smin = fBelt.fSign[nobs][0];
-      double smax = fBelt.fSign[nobs][1];
+      Belt_t* bb  = belt(nobs);
+      double smin = bb->fSign[nobs][0];
+      double smax = bb->fSign[nobs][1];
 
       if ((s < smin) or (s > smax)) {
         nmissed += 1;
