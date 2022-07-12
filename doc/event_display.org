@@ -6,4 +6,11 @@
 
 ** straw hit colors : see [[file:../gui/TEvdComboHit.cc::69]] (around line 69)
 
+   - red              : electrons (large dots: P>20 MeV/c, small dots: P<20 MeV/c)
+   - blue             : positrons
+   - dark blue, larger: protons
+   - green            : muons
+   - magenta          : everything else
+           
+
 
