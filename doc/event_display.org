@@ -1,7 +1,10 @@
 #
 
 * STNTUPLE event display 
-
+** how to run:
+#+begin_src
+mu2e -c Stntuple/fcl/display.fcl -s dig.mu2e.CeEndpointDigiTriggered.MDC2020n_10pc.001210_00000000.art 
+#+end_src
 ** event display module: [[file:../mod/MuHitDisplay_module.cc]] 
 
 ** straw hit colors : see [[file:../gui/TEvdComboHit.cc::69]] (around line 69)
