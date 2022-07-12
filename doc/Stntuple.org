@@ -33,7 +33,8 @@
 * [[file:how-to-make-first-stntuple.org][how to make first Stntuple]] 
 * [[file:stnana.org][stnana]] - STNTUPLE analysis framework                                       
 * [[file:stntuple-datasets.org][STNTUPLE datasets]]
-* STNTUPLE [[file:how-tos.org][how-to's]]                                                                    
+* STNTUPLE [[file:how-tos.org][how-to's]]    
+* [[file:event_display.org][STNTUPLE event display]]                                                     
 * ------------------------------------------------------------------------------
 * more technical details
 * ------------------------------------------------------------------------------

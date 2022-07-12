@@ -1,0 +1,9 @@
+#
+
+* STNTUPLE event display 
+
+  module: file:../mod/MuHitDisplay_module.cc
+
+** straw hit colors : file:../gui/TEvdComboHit.cc::69
+
+
