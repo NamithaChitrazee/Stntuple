@@ -11,6 +11,11 @@
    - dark blue, larger: protons
    - green            : muons
    - magenta          : everything else
+
+** commands:
+
+  - process next event: type ".q" at the ROOT prompt
+  - exit: type .qqqqqq at the ROOT prompt
            
 
 

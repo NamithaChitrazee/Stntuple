@@ -21,7 +21,10 @@ analyzers    : { @table::Stntuple.analyzers }
 paths        : { @table::Stntuple.paths     }
 
 physics : {
-    producers  : { @table::producers }
+    producers  : { 
+	@table::production.producers
+	@table::producers 
+    }
     
     filters    : { @table::filters   }
     analyzers  : { @table::analyzers }
@@ -29,7 +32,11 @@ physics : {
     @table::paths
 
 
-    p1 : [ @sequence::TrkHitReco.PrepareHits ]
+    p1 : [ @sequence::CaloReco.Reco,
+	   @sequence::CaloCluster.Reco,
+	   @sequence::TrkHitReco.PrepareHits
+	   # , @sequence::production.trk_reco_de
+	  ]
 
     end_p1 : [ 
 #		     @sequence::Stntuple.gen_g4_time_map,
