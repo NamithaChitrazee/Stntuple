@@ -2,7 +2,7 @@
 
 * STNTUPLE event display 
 
-  module: file:../mod/MuHitDisplay_module.cc
+**  event display module: [[file:../mod/MuHitDisplay_module.cc]] 
 
 ** straw hit colors : see [[file:../gui/TEvdComboHit.cc]] around line 69
 
