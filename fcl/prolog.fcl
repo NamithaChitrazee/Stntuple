@@ -78,6 +78,7 @@ StntupleMakerTemplate : { module_type:StntupleMaker
 # are stored in SpmcBlockVDet block, so all three have to be consistent
 #------------------------------------------------------------------------------
     simpCollTag          : "compressDigiMCs"                     # was "g4run" before
+    primaryParticleTag   : "compressDigiMCs"                     # this is new, to be passed to InitSimpBlock
     triggerResultsTag    : "TriggerResults"                      # assume TriggerResults produced at digi step
     vdHitsCollTag        : @local::STN_VDHITS_COLL_TAG           # was "g4run" before
     simpMinEnergy        : 5.0                                   # MeV , simpMinEnergy < 0: store all

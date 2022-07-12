@@ -119,6 +119,7 @@ protected:
   string                   fCrvCoincidenceCollTag;          //
   string                   fCrvCoincidenceClusterCollTag;   //
 
+  string                   fPrimaryParticleTag;
   string                   fTriggerResultsTag;
 
   string                   fVDHitsCollTag;                  // hits on virtual detectors (StepPointMCCollection)
@@ -250,6 +251,7 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
   , fCrvCoincidenceCollTag       (PSet.get<string>    ("crvCoincidenceCollTag"       ))
   , fCrvCoincidenceClusterCollTag(PSet.get<string>    ("crvCoincidenceClusterCollTag"))
 
+  , fPrimaryParticleTag      (PSet.get<string>        ("primaryParticleTag"  ))
   , fTriggerResultsTag       (PSet.get<string>        ("triggerResultsTag"   ))
 
   , fVDHitsCollTag           (PSet.get<string>        ("vdHitsCollTag"       ))
@@ -565,6 +567,7 @@ void StntupleMaker::beginJob() {
     fInitSimpBlock->SetStrawHitCollTag(fStrawHitCollTag);
     fInitSimpBlock->SetStrawDigiMCCollTag(fStrawDigiMCCollTag);
     fInitSimpBlock->SetVDHitsCollTag(fVDHitsCollTag);
+    fInitSimpBlock->SetPrimaryParticleTag(fPrimaryParticleTag);
     fInitSimpBlock->SetMinSimpEnergy(fSimpMinEnergy);
     fInitSimpBlock->SetMaxZ         (fSimpMaxZ);
     fInitSimpBlock->SetGenProcessID (fGenId.id());

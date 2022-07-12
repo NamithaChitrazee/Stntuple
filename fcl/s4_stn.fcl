@@ -5,6 +5,7 @@
 BEGIN_PROLOG
   TIME_MAPS        @protect_ignore: [ ]
   TIME_OFFSET_MAPS @protect_ignore: { inputs : @local::TIME_MAPS }
+  TRIGGER_PATHS                   : [ p1 ]
   END_PATHS        @protect_ignore: [ stntuple_p0 ]
 END_PROLOG
 
@@ -15,7 +16,10 @@ process_name : S4Stnmaker
 source       : { module_type : RootInput fileNames : ["undefined", "undefined"] }
 
 outputs      : { @table::Stntuple.outputs   }
+producers    : { @table::Stntuple.producers }
+filters      : { @table::Stntuple.filters   }
 analyzers    : { @table::Stntuple.analyzers }
+paths        : { @table::Stntuple.paths     }
 
 physics : { @table::Stntuple.physics 
     
@@ -32,7 +36,7 @@ physics : { @table::Stntuple.physics
 	    makeTracks       : 0
 	    makeTrigger      : 0
 
-	    simpCollTag      : "g4run"
+	    simpCollTag      : "compressDigiMCs"
 
 	    spmcBlockName    : [ "SpmcBlock"     , "VDetBlock"             , "IPABlock"             ]
 	    spmcCollTag      : [ "g4run:tracker" , "g4run:virtualdetector" , "g4run:protonabsorber" ]
@@ -40,6 +44,11 @@ physics : { @table::Stntuple.physics
 	}
     }
 
+    @table::paths
+    p1 : [ @sequence::TrkHitReco.PrepareHits ]
+    
+
+    trigger_paths : [ p1 ]
     out           : [ ]                   # [defaultOutput]/[]
     end_paths     : [ @sequence::END_PATHS , out ]
 }

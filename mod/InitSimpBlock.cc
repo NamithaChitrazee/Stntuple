@@ -22,6 +22,7 @@
 #include "Offline/MCDataProducts/inc/SimParticle.hh"
 #include "Offline/MCDataProducts/inc/StepPointMC.hh"
 #include "Offline/MCDataProducts/inc/StrawDigiMC.hh"
+#include "Offline/MCDataProducts/inc/PrimaryParticle.hh"
 
 #include "Offline/RecoDataProducts/inc/StrawHit.hh"
 
@@ -57,7 +58,7 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
   const mu2e::StrawDigiMCCollection*       mcdigis(nullptr);
 
   double        px, py, pz, energy;
-  int           id, parent_id, generator_id, n_straw_hits(0), nhits;
+  int           id, parent_id, process_id, n_straw_hits(0), nhits;
   int           pdg_code, start_vol_id, end_vol_id, creation_code, termination_code;
   TSimParticle* simp;
 
@@ -143,13 +144,30 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
       }
     }
   }
+//-----------------------------------------------------------------------------
+// figure out the primary particle
+//-----------------------------------------------------------------------------
+  art::Handle<mu2e::PrimaryParticle> pp_handle;
+  const mu2e::PrimaryParticle*       pp(nullptr);
+  const mu2e::SimParticle*           primary(nullptr);
+
+  if (! fPrimaryParticleTag.empty()) {
+    AnEvent->getByLabel(fPrimaryParticleTag,pp_handle);
+
+    if (pp_handle.isValid()) {
+      pp            = pp_handle.product();
+      primary       = pp->primarySimParticles().front().get();
+      fGenProcessID = primary->creationCode();
+      fPdgID        = primary->pdgId();
+    }
+  }
 
   if (simp_handle.isValid()) {
     simp_coll = simp_handle.product();
 
     for (mu2e::SimParticleCollection::const_iterator ip = simp_coll->begin(); ip != simp_coll->end(); ip++) {
       sim      = &ip->second;
-      const mu2e::GenParticle* genp;
+      //      const mu2e::GenParticle* genp;
 
       id        = sim->id().asInt();
       parent_id = -1;
@@ -166,22 +184,25 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
       }
 //-----------------------------------------------------------------------------
 // a semi-kludge: store e+ and e- from an external photon conversion
+// it is possible that will need to lop over the primary particles
 //-----------------------------------------------------------------------------
-      if (sim->parent()) { 
-	parent_id = sim->parent()->id().asInt();
-	genp      = sim->parent()->genParticle().get();
-      }
-      else {
-	genp      = sim->genParticle().get();
-      }
+      // if (sim->parent()) { 
+      // 	parent_id = sim->parent()->id().asInt();
+      // 	genp      = sim->parent()->genParticle().get();
+      // }
+      // else {
+      // 	genp      = sim->genParticle().get();
+      // }
 
       pdg_code         = (int) sim->pdgId();
+      process_id       = sim->creationCode();
 
-      if (genp) generator_id = genp->generatorId().id();   // ID of the MC generator
-      else      generator_id = -1;
+      // if (genp) generator_id = genp->generatorId().id();   // ID of the MC generator
+      // else      generator_id = -1;
 
-      if ((fGenProcessID > 0) && (generator_id != fGenProcessID)) continue;
-      if ((fPdgID       != 0) && (pdg_code     != fPdgID       )) continue;
+      if ((primary != nullptr) and (primary != sim)) continue;
+      // if ((fGenProcessID > 0) && (process_id != fGenProcessID)) continue;
+      // if ((fPdgID       != 0) && (pdg_code   != fPdgID       )) continue;
       
       creation_code    = sim->creationCode();
       termination_code = sim->stoppingCode();
@@ -205,7 +226,7 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
       simp   = simp_block->NewParticle(id, parent_id, pdg_code, 
 				       creation_code, termination_code,
 				       start_vol_id, end_vol_id,
-				       generator_id);
+				       process_id);
       simp->SetStartMom(px, py, pz, energy);
       simp->SetStartPos(sp.x(),sp.y(),sp.z(),sim->startGlobalTime());
       simp->SetEndMom  (sim->endMomentum().x(),
