@@ -9,11 +9,18 @@ mu2e -c Stntuple/fcl/display.fcl -s dig.mu2e.CeEndpointDigiTriggered.MDC2020n_10
 
 ** straw hit colors : see [[file:../gui/TEvdComboHit.cc::69]] (around line 69)
 
-   - red              : electrons (large dots: P>20 MeV/c, small dots: P<20 MeV/c)
-   - blue             : positrons
-   - dark blue, larger: protons
-   - green            : muons
-   - magenta          : everything else
+|-----------+------------+-----------------|
+| color     | point size | meaning         |
+|-----------+------------+-----------------|
+| red       |            | e-              |
+|           |        0.8 | e- P>20 MeV/c   |
+|           |        0.4 | e- P<20 MeV/c   |
+|-----------+------------+-----------------|
+| blue      |        0.8 | positrons       |
+| dark blue |        1.0 | protons         |
+| green     |            | muons           |
+| magenta   |            | everything else |
+|-----------+------------+-----------------|
 
 ** commands:
 
