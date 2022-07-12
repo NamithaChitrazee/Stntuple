@@ -200,7 +200,16 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
       // if (genp) generator_id = genp->generatorId().id();   // ID of the MC generator
       // else      generator_id = -1;
 
-      if ((primary != nullptr) and (primary != sim)) continue;
+      int found = 0;
+      if (pp_handle.isValid()) {
+	for (auto pr : pp->primarySimParticles()) {
+	  if (pr.get() == sim) {
+	    found = 1;
+	    break;
+	  }
+	}
+	if (found == 0)                                     continue;
+      }
       // if ((fGenProcessID > 0) && (process_id != fGenProcessID)) continue;
       // if ((fPdgID       != 0) && (pdg_code   != fPdgID       )) continue;
       
