@@ -30,10 +30,41 @@ END_PROLOG
 #include "Offline/fcl/minimalMessageService.fcl"
 #include "Offline/fcl/standardProducers.fcl"
 #include "Offline/fcl/standardServices.fcl"
-
-#include "Production/JobConfig/reco/prolog.fcl"
+#include "Offline/fcl/TrkCaloDt.fcl"
+#------------------------------------------------------------------------------
+# simulation prologs
+#------------------------------------------------------------------------------
+#include "Offline/Mu2eG4/fcl/prolog.fcl"
+#include "Offline/CommonMC/fcl/prolog.fcl"
+#include "Offline/TrackerMC/fcl/prolog.fcl"
+#include "Offline/CaloMC/fcl/prolog.fcl"
+#include "Offline/CRVResponse/fcl/prolog.fcl"
+#include "Offline/Filters/fcl/prolog.fcl"
+#include "Offline/Compression/fcl/prolog.fcl"
+#------------------------------------------------------------------------------
+# reconstruction prologs
+#------------------------------------------------------------------------------
 #include "Offline/TrkDiag/fcl/prolog.fcl"
-
+#include "Offline/TrackCaloMatching/fcl/prolog.fcl"
+#include "Offline/ParticleID/fcl/prolog.fcl"
+#include "Offline/TrkHitReco/fcl/prolog.fcl"
+#include "Offline/TrkReco/fcl/prolog.fcl"
+#include "Offline/TrkPatRec/fcl/prolog.fcl"
+#include "Offline/Mu2eKinKal/fcl/prolog.fcl"
+#include "Offline/CaloReco/fcl/prolog.fcl"
+#include "Offline/CaloCluster/fcl/prolog.fcl"
+#include "Offline/CalPatRec/fcl/prolog.fcl"
+#include "Offline/Trigger/fcl/prolog_trigger.fcl"
+#------------------------------------------------------------------------------
+#  include-less clones on Production fcls
+#------------------------------------------------------------------------------
+#include "Stntuple/fcl/production_jobconfig_common_prolog.fcl" 
+#include "Stntuple/fcl/production_jobconfig_digitize_prolog.fcl" 
+#include "Stntuple/fcl/production_jobconfig_primary_prolog.fcl"
+#include "Stntuple/fcl/production_jobconfig_reco_prolog.fcl"   
+#------------------------------------------------------------------------------
+# trigger prologs
+#------------------------------------------------------------------------------
 #include "Offline/TrkPatRec/fcl/prolog_trigger.fcl"
 #include "Offline/CalPatRec/fcl/prolog_trigger.fcl"
 #include "Offline/CaloReco/fcl/prolog_trigger.fcl"
@@ -46,20 +77,43 @@ END_PROLOG
 #include "Offline/ProditionsService/fcl/prolog.fcl"
 
 #include "Stntuple/fcl/prolog.fcl"
+#include "pbar2m/fcl/prolog.fcl"
 #------------------------------------------------------------------------------
 # templates: do not include prologs, 
 # define table and sequence templates combining information from multiples packages
 # services are initialized in Stntuple/fcl/stntuple_templates.fcl
+# (1): services section (Services.SimAndReco and Services.Sim today are the same)
+#       add time tracker template
 #------------------------------------------------------------------------------
-services : { @table::Services.SimAndReco } 
+services : { @table::Services.SimAndReco 
+    TimeTracker : {
+	printSummary : true
+	dbOutput : {
+	    filename  : ""
+	    overwrite : false
+	}
+    }
+   message: @local::default_message
+} 
 
+services.SeedService.baseSeed         : 8
+services.SeedService.maxUniqueEngines : 100
+services.scheduler.wantSummary        : true
+services.TFileService.fileName        : "nts._USER_._DATASET_._DSCONF_.sequencer.root" 
+
+# Limit the amount of "Begin processing the ... record" messages
+services.message.destinations.log.categories.ArtReport.reportEvery : 1
+services.message.destinations.log.categories.ArtReport.limit       : 10000
+services.message.destinations.log.categories.ArtReport.timespan    : 300
 # services.DbService : @local::DbEmpty
 
-#include "Stntuple/fcl/trigger_templates.fcl"
+# # include "Stntuple/fcl/trigger_templates.fcl"
 # # onclude "Stntuple/fcl/mixing_templates.fcl"
 #include "Stntuple/fcl/production_templates.fcl"
 #include "Stntuple/fcl/stntuple_templates.fcl"
-
+#------------------------------------------------------------------------------
+# end templates
+#------------------------------------------------------------------------------
 Stntuple.outputs      : { @table::production.outputs   }
 
 Stntuple.physics : {
@@ -81,7 +135,6 @@ Stntuple.physics : {
 #------------------------------------------------------------------------------
 # output file names 
 #------------------------------------------------------------------------------
-services.SeedService.baseSeed             : 8
 services.TFileService.fileName            : "nts..stnmaker.xxx.000000_00000000.root"
 outputs.defaultOutput.fileName            : "sim._USER_.stnmaker.xxx.000001.art"
 #------------------------------------------------------------------------------

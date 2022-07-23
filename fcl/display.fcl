@@ -15,21 +15,18 @@ process_name : Display
 source       : { module_type : RootInput   }
 
 outputs      : { @table::Stntuple.outputs   }
-producers    : { @table::Stntuple.producers }
-filters      : { @table::Stntuple.filters   }
-analyzers    : { @table::Stntuple.analyzers }
-paths        : { @table::Stntuple.paths     }
 
 physics : {
     producers  : { 
-	@table::production.producers
-	@table::producers 
+	@table::Reconstruction.producers
+	@table::Stntuple.producers 
     }
     
-    filters    : { @table::filters   }
-    analyzers  : { @table::analyzers }
+    filters    : { @table::Stntuple.filters   }
 
-    @table::paths
+    analyzers  : { @table::Stntuple.analyzers }
+
+    @table::Stntuple.paths
 
 
     p1 : [ @sequence::CaloReco.Reco,

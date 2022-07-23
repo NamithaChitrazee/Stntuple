@@ -210,9 +210,10 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
 	}
 	if (found == 0)                                     continue;
       }
-      // if ((fGenProcessID > 0) && (process_id != fGenProcessID)) continue;
-      // if ((fPdgID       != 0) && (pdg_code   != fPdgID       )) continue;
-      
+//-----------------------------------------------------------------------------
+// if primary particle is not defined, or defined incorrectly (!) 
+// store all particles
+//-----------------------------------------------------------------------------
       creation_code    = sim->creationCode();
       termination_code = sim->stoppingCode();
 

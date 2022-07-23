@@ -65,9 +65,13 @@ int TComboHitVisNode::InitEvent() {
 
   const art::Event* event = vm->Event();
 
+  int nhits = (*fHitColl)->size();
+//-----------------------------------------------------------------------------
+// the rest makes sense only if nhits > 0
+//-----------------------------------------------------------------------------
+  if (nhits == 0) return 0;
   const mu2e::ComboHit* hit0 = &(*fHitColl)->at(0);
 
-  int nhits = (*fHitColl)->size();
   for (int ihit=0; ihit<nhits; ihit++ ) {
     const mu2e::ComboHit* hit = &(*fHitColl)->at(ihit);
     size_t ish  = hit-hit0;

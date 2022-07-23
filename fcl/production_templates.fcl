@@ -15,27 +15,6 @@
 #------------------------------------------------------------------------------
 # no more prologs beyond this point
 # 
-# (1): services section (Services.SimAndReco and Services.Sim today are the same)
-#       add time tracker template
-#------------------------------------------------------------------------------
-services : { @table::Services.SimAndReco
-    TimeTracker : {
-	printSummary : true
-	dbOutput : {
-	    filename  : ""
-	    overwrite : false
-	}
-    }
-   message: @local::default_message
-}
-
-services.scheduler.wantSummary        : true
-services.TFileService.fileName        : "nts._USER_._DATASET_._DSCONF_.sequencer.root" 
-
-# Limit the amount of "Begin processing the ... record" messages
-services.message.destinations.log.categories.ArtReport.reportEvery : 1
-services.message.destinations.log.categories.ArtReport.limit       : 10000
-services.message.destinations.log.categories.ArtReport.timespan    : 300
 #------------------------------------------------------------------------------
 # (2): definition of the input module - can redefine in the top-level prolog
 #------------------------------------------------------------------------------
@@ -64,7 +43,7 @@ production : {
 	@table::CommonMC.producers        # FIXME
 	@table::Mu2eG4.producers          # defined in Mu2eG4/fcl
 	@table::CaloMC.producers          # defined in CaloMC
-#	@table::CaloMC.producersMC    # defined in CaloDigiMC
+#	@table::CaloMC.producersMC        # defined in CaloDigiMC
 #	@table::CaloCluster.producersMC   # defined in CaloCluster
 	@table::CrvDAQPackage.producers   # 
 	@table::TrackerMC.producers       # defined in TrackerMC
