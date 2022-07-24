@@ -25,6 +25,8 @@
 #include "Offline/TrackerGeom/inc/Straw.hh"
 //#include "TrackerConditions/inc/Types.hh"
 
+#include "Stntuple/print/TAnaDump.hh"
+
 #include "Stntuple/gui/TEvdStraw.hh"
 #include "Stntuple/gui/TEvdStrawHit.hh"
 #include "Stntuple/gui/TStnVisManager.hh"
@@ -41,12 +43,12 @@ TEvdStrawHit::TEvdStrawHit(const mu2e::ComboHit*    Hit,
 			   TEvdStraw*               Straw,
 			   const mu2e::StrawDigiMC* StrawDigiMC,
 			   double X, double Y, double Z, 
-			   double                Wx,
-			   double                Wy,
-			   double                SigW,
-			   double                SigR,
-			   int                   Mask, 
-			   int                   Color): 
+			   double                   Wx,
+			   double                   Wy,
+			   double                   SigW,
+			   double                   SigR,
+			   int                      Mask, 
+			   int                      Color): 
   TObject(),
   fHit(Hit),
   fStrawDigiMC(StrawDigiMC),
@@ -60,6 +62,9 @@ TEvdStrawHit::TEvdStrawHit(const mu2e::ComboHit*    Hit,
   fSigW  = SigW;
   fSigR  = SigR;
   fMask  = Mask;
+//-----------------------------------------------------------------------------
+// style and color
+//-----------------------------------------------------------------------------
   fColor = Color;
 //-----------------------------------------------------------------------------
 // define lines
@@ -165,6 +170,21 @@ Int_t TEvdStrawHit::DistancetoPrimitiveRZ(Int_t px, Int_t py) {
 
 //-----------------------------------------------------------------------------
 void TEvdStrawHit::Print(Option_t* Option) const {
+
+  TAnaDump* ad = TAnaDump::Instance();
+
+  const mu2e::StrawGasStep* step(nullptr);
+
+  if (fStrawDigiMC->wireEndTime(mu2e::StrawEnd::cal) < fStrawDigiMC->wireEndTime(mu2e::StrawEnd::hv)) {
+    step = fStrawDigiMC->strawGasStep(mu2e::StrawEnd::cal).get();
+  }
+  else {
+    step = fStrawDigiMC->strawGasStep(mu2e::StrawEnd::hv ).get();
+  }
+
+  int flags = *((int*) &fHit->flag());
+
+  ad->printComboHit(fHit, step, "banner+data", -1, flags);
 }
 
 }

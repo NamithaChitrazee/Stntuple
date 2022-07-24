@@ -2111,9 +2111,9 @@ void TAnaDump::printComboHit(const mu2e::ComboHit* Hit, const mu2e::StrawGasStep
       mc_mom_z      = Step->momvec().z();
     }
     
-    if ((opt == "") || (opt == "data")) {
+    if ((opt == "") || (opt.Index("data") >= 0)) {
       if (IHit  >= 0) printf("%5i " ,IHit);
-      else            printf("    ");
+      else            printf("      ");
 
       printf("%3i ",Hit->nStrawHits());
 
@@ -2265,7 +2265,7 @@ void TAnaDump::printStrawHit(const mu2e::StrawHit* Hit, const mu2e::StrawGasStep
     mc_mom        = Step->momvec().mag();
   }
     
-  if ((opt == "") || (opt == "data")) {
+  if ((opt == "") || (opt.Index("data") >= 0)) {
     if (IHit  >= 0) printf("%5i " ,IHit);
     else            printf("    ");
     

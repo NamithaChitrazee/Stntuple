@@ -106,7 +106,7 @@ int TComboHitVisNode::InitEvent() {
 //-----------------------------------------------------------------------------
 // store TEvdComboHit
 //-----------------------------------------------------------------------------
-    fListOfHits->Add(new stntuple::TEvdComboHit(hit,sim,mother_pdg_id,mc_mom,mc_mom_z));
+    fListOfHits->Add(new stntuple::TEvdComboHit(hit,sim,step,mother_pdg_id,mc_mom,mc_mom_z));
   }
 
   return 0;

@@ -1,13 +1,12 @@
 #
 
 * STNTUPLE event display 
-** how to run:
+** how to run:                                                                
 #+begin_src
 mu2e -c Stntuple/fcl/display.fcl -s dig.mu2e.CeEndpointDigiTriggered.MDC2020n_10pc.001210_00000000.art 
 #+end_src
-** event display module: [[file:../mod/MuHitDisplay_module.cc]] 
-
-** straw hit colors : see [[file:../gui/TEvdComboHit.cc::69]] (around line 69)
+** event display module: [[file:../mod/MuHitDisplay_module.cc]]                   
+** straw hit colors : see [[file:../gui/TEvdComboHit.cc::69]] (around line 69)    
 
 |-----------+------------+-----------------|
 | color     | point size | meaning         |
@@ -25,7 +24,12 @@ mu2e -c Stntuple/fcl/display.fcl -s dig.mu2e.CeEndpointDigiTriggered.MDC2020n_10
 ** commands:
 
   - process next event: type ".q" at the ROOT prompt
+
   - exit: type .qqqqqq at the ROOT prompt
            
+  - right-click on an object pops-up the object's context-sensitive menu
 
+  - Left, Right, Up, and Down arrow keys move the scene
+
+  - mouse weel (Up, and Down) changes the scale
 

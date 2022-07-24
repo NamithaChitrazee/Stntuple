@@ -172,6 +172,8 @@ int TTrkVisNode::InitEvent() {
      	isFromConversion = true;
       }
     }
+    int   pdg_id = sim->pdgId();
+    float mc_mom = step->momvec().mag();
 //-----------------------------------------------------------------------------
 // old default, draw semi-random errors
 //-----------------------------------------------------------------------------
@@ -180,11 +182,18 @@ int TTrkVisNode::InitEvent() {
 	
     intime = fabs(hit->time()-fEventTime) < fTimeWindow;
 	
-    if ( isFromConversion ) {
-      if (intime) color = kRed;
-      else        color = kBlue;
+    if      (pdg_id == 11) {
+      if    (mc_mom > 20  ) { 
+	if (intime) color = kRed;
+	else        color = kBlue;
+      }
+      else                   { color = kRed+2;  }
     }
-    else          color = kBlack;
+    else if (pdg_id ==  -11) { color = kBlue;   } 
+    else if (pdg_id ==   13) { color = kGreen+2;} 
+    else if (pdg_id ==  -13) { color = kGreen-2;} 
+    else if (pdg_id == 2212) { color = kBlue+2; } 
+    else                     { color = kBlack;  } 
 //-----------------------------------------------------------------------------
 // add a pointer to the hit to the straw 
 //-----------------------------------------------------------------------------

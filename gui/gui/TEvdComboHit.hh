@@ -39,6 +39,7 @@ protected:
 					// backward pointers to the reconstruction objects
   const mu2e::ComboHit*      fHit;
   const mu2e::SimParticle*   fSim;      // 
+  const mu2e::StrawGasStep*  fStep;
   TVector3                   fPos;	// position in 3D, Z=zwire
   TVector2                   fDir;      // direction of the straw
   double                     fSigW;     // error in the wire direction
@@ -59,11 +60,12 @@ public:
 //-----------------------------------------------------------------------------
   TEvdComboHit();
 
-  TEvdComboHit(const mu2e::ComboHit*    Hit,
-	       const mu2e::SimParticle* Sim,
-	       int                      MotherPdgID,
-	       float                    P,
-	       float                    Pz);
+  TEvdComboHit(const mu2e::ComboHit*     Hit,
+	       const mu2e::SimParticle*  Sim,
+	       const mu2e::StrawGasStep* Step,
+	       int                       MotherPdgID,
+	       float                     P,
+	       float                     Pz);
 
   virtual ~TEvdComboHit();
 //-----------------------------------------------------------------------------

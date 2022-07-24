@@ -27,6 +27,8 @@
 
 #include "Offline/RecoDataProducts/inc/ComboHit.hh"
 
+#include "Stntuple/print/TAnaDump.hh"
+
 #include "Stntuple/gui/TEvdComboHit.hh"
 #include "Stntuple/gui/TStnVisManager.hh"
 
@@ -41,6 +43,7 @@ TEvdComboHit::TEvdComboHit() {
 //-----------------------------------------------------------------------------
 TEvdComboHit::TEvdComboHit(const mu2e::ComboHit*      Hit,
 			   const mu2e::SimParticle*   Sim,
+			   const mu2e::StrawGasStep*  Step,
 			   int                        MotherPdgID,
 			   float                      P,
 			   float                      Pz):
@@ -50,6 +53,7 @@ TEvdComboHit::TEvdComboHit(const mu2e::ComboHit*      Hit,
   fDir(Hit->wdir().x(),Hit->wdir().y())
 {
   fSim         = Sim;
+  fStep        = Step;
   fSimID       = Sim->id().asInt();
   fPdgID       = Sim->pdgId();
   fMotherPdgID = MotherPdgID;
@@ -157,16 +161,15 @@ void TEvdComboHit::PaintTZ(Option_t* Option) {
 //_____________________________________________________________________________
 void TEvdComboHit::Print(Option_t* Option) const {
 
-  printf("TEvdComboHit::Print simID=%6i pdg=%10i motherPdgID=%10i time=%10.3f Z=%10.3f edep=%10.6f P=%10.3f Pz=%10.3f\n",
-	 fSimID,fPdgID,fMotherPdgID,fHit->time(),fPos.Z(),fHit->energyDep(),fP,fPz);
-}
+  TAnaDump* ad = TAnaDump::Instance();
 
-// //-----------------------------------------------------------------------------
-// void TEvdComboHit::PaintRZ(Option_t* Option) {
-//   fEllipse.SetFillColor(kBlue+2);
-//   fEllipse.SetFillStyle(3001);
-//   fEllipse.Paint(Option);
-// }
+  int flags = *((int*) &fHit->flag());
+
+  ad->printComboHit(fHit, fStep, "banner+data", -1, flags);
+
+  // printf("TEvdComboHit::Print simID=%6i pdg=%10i motherPdgID=%10i time=%10.3f Z=%10.3f edep=%10.6f P=%10.3f Pz=%10.3f\n",
+  // 	 fSimID,fPdgID,fMotherPdgID,fHit->time(),fPos.Z(),fHit->energyDep(),fP,fPz);
+}
 
 // //-----------------------------------------------------------------------------
 // void TEvdComboHit::PaintCal(Option_t* option) {
