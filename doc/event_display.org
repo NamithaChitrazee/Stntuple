@@ -33,3 +33,16 @@ mu2e -c Stntuple/fcl/display.fcl -s dig.mu2e.CeEndpointDigiTriggered.MDC2020n_10
 
   - mouse weel (Up, and Down) changes the scale
 
+** quick notes about internals 
+
+  - Several views : derived from TStnView - XYView, RZView, TZView....
+  - each view displays geometry and several nodes 
+  - a node controls interactive cbehavior - DistanceToPrimitive
+  - each note "knows" how to paint itself in each view PaintXY, PaintRZ, etc 
+
+
+  - 3D views: need a simplified geometry, work in progress 
+* ------------------------------------------------------------------------------
+* [0/1] TODO's                                                               
+** TODO add a SimParticle node ? or just add a list of SimParticles to XY view ?
+* ------------------------------------------------------------------------------

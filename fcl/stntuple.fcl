@@ -20,7 +20,7 @@ BEGIN_PROLOG
   TRIGGER_PATHS       : []
   OUTPUT_PATH         : []
   END_PATHS           : []
-  PROCESS_NAME        : Stnmaker
+  PROCESS_NAME        : nil
   BLIND_TIME          : 500                                  # default
   STN_VDHITS_COLL_TAG : "compressDigiMCs:virtualdetector"
   PDG_ID              : 0                                    # 0: ignore PDG_ID
@@ -54,7 +54,10 @@ END_PROLOG
 #include "Offline/CaloReco/fcl/prolog.fcl"
 #include "Offline/CaloCluster/fcl/prolog.fcl"
 #include "Offline/CalPatRec/fcl/prolog.fcl"
-#include "Offline/Trigger/fcl/prolog_trigger.fcl"
+#\\\include "Offline/Trigger/fcl/prolog_trigger.fcl"
+
+#include "Stntuple/fcl/prolog.fcl"
+#include "pbar2m/fcl/prolog.fcl"
 #------------------------------------------------------------------------------
 #  include-less clones on Production fcls
 #------------------------------------------------------------------------------
@@ -65,19 +68,17 @@ END_PROLOG
 #------------------------------------------------------------------------------
 # trigger prologs
 #------------------------------------------------------------------------------
-#include "Offline/TrkPatRec/fcl/prolog_trigger.fcl"
-#include "Offline/CalPatRec/fcl/prolog_trigger.fcl"
-#include "Offline/CaloReco/fcl/prolog_trigger.fcl"
-#include "Offline/CaloCluster/fcl/prolog_trigger.fcl"
-#include "Offline/TrkHitReco/fcl/prolog_trigger.fcl"
-#include "Offline/TrkReco/fcl/prolog_trigger.fcl"
-#include "Offline/TrkFilters/fcl/prolog_trigger.fcl"
-#include "Offline/CaloFilters/fcl/prolog_trigger.fcl"
+# #include "Offline/TrkPatRec/fcl/prolog_trigger.fcl"
+# #include "Offline/CalPatRec/fcl/prolog_trigger.fcl"
+# #include "Offline/CaloReco/fcl/prolog_trigger.fcl"
+# #include "Offline/CaloCluster/fcl/prolog_trigger.fcl"
+# #include "Offline/TrkHitReco/fcl/prolog_trigger.fcl"
+# #include "Offline/TrkReco/fcl/prolog_trigger.fcl"
+# #include "Offline/TrkFilters/fcl/prolog_trigger.fcl"
+#\\\\ #include "Offline/CaloFilters/fcl/prolog_trigger.fcl"
 
 #include "Offline/ProditionsService/fcl/prolog.fcl"
 
-#include "Stntuple/fcl/prolog.fcl"
-#include "pbar2m/fcl/prolog.fcl"
 #------------------------------------------------------------------------------
 # templates: do not include prologs, 
 # define table and sequence templates combining information from multiples packages
@@ -107,23 +108,60 @@ services.message.destinations.log.categories.ArtReport.limit       : 10000
 services.message.destinations.log.categories.ArtReport.timespan    : 300
 # services.DbService : @local::DbEmpty
 
-# # include "Stntuple/fcl/trigger_templates.fcl"
+# include "Stntuple/fcl/trigger_templates.fcl"
 # # onclude "Stntuple/fcl/mixing_templates.fcl"
 #include "Stntuple/fcl/production_templates.fcl"
 #include "Stntuple/fcl/stntuple_templates.fcl"
 #------------------------------------------------------------------------------
 # end templates
+# (1): definition of the input module - can redefine in the top-level prolog
 #------------------------------------------------------------------------------
-Stntuple.outputs      : { @table::production.outputs   }
+source : { module_type : @local::INPUT_MODULE
+    firstRun      : 1000
+    # reportFrequency : 1
+    #    fileNames : ["/mu2e/data/tdr/beam/g4s4p5/tdr.beam.g4s4.conversion.1504a.15729672/good/00000/dsStopsToHitsConversion.root"]
+    #    maxEvents   : -1
+}
+#------------------------------------------------------------------------------
+# (2): definition of the output module
+#------------------------------------------------------------------------------
+outputs: {
+    defaultOutput      : { module_type : RootOutput
+	SelectEvents   : [ @sequence::TRIGGER_PATHS ]
+	outputCommands : [ "keep *_*_*_*" ]
+    }
+    #    FullOutput : { @table::Mixing.Output  outputCommands : [ "keep *_*_*_*"                  ] }
+    #    DetOutput  : { @table::Mixing.Output  outputCommands : [ @sequence::production.mixing_output ] }
+}
+#------------------------------------------------------------------------------
+# lower case 'stntuple' is for inclusion
+#------------------------------------------------------------------------------
+stntuple : {
+    producers: { 
+	@table::EventGenerator.producers
+	@table::Common.producers
+	@table::Primary.producers
+	@table::Digitize.producers
+	@table::Reconstruction.producers
+	@table::Stntuple.producers 
+    }
 
-Stntuple.physics : {
-    producers: { @table::Stntuple.producers }
-    filters  : { @table::Stntuple.filters   }
-    analyzers: { @table::Stntuple.analyzers }
+    filters  : { 
+	@table::Common.filters
+	@table::Primary.filters
+	@table::Reconstruction.filters
+	@table::Stntuple.filters   
+    }
+
+    analyzers: { 
+	@table::Common.analyzers
+	@table::Reconstruction.analyzers
+	@table::Stntuple.analyzers 
+    }
 #------------------------------------------------------------------------------
 # add trigger paths 
 #------------------------------------------------------------------------------
-    @table::Stntuple.paths
+    paths : { @table::Stntuple.paths }
 #------------------------------------------------------------------------------
 # final part
 #------------------------------------------------------------------------------

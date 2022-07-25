@@ -9,34 +9,25 @@
 #include "TH1.h"
 #include "TPad.h"
 #include "TArc.h"
+#include "TEllipse.h"
 
-#include "Stntuple/base/TVisNode.hh"
-
-#ifndef __CINT__
-#include "Offline/RecoDataProducts/inc/StrawHitCollection.hh"
-#include "Offline/RecoDataProducts/inc/StrawHitPositionCollection.hh"
-#include "Offline/RecoDataProducts/inc/StrawHitFlagCollection.hh"
-#include "Offline/MCDataProducts/inc/PtrStepPointMCVectorCollection.hh"
-#else
 namespace mu2e {
-  class StrawHitCollection;
-  class StrawHitPositionCollection;
-  class StrawHitFlagCollection;
-  class PtrStepPointMCVectorCollection;
+  class SimParticle;
 };
-#endif
 
+namespace stntuple {
 class TEvdSimParticle: public TObject {
 public:
-  
-protected:
+  int                       fNumber;
+  const mu2e::SimParticle*  fSimp;
 
-public:
+  TObjArray*                fListOfHits;
+  TEllipse*                 fEllipse;
 //-----------------------------------------------------------------------------
 // constructors and destructor
 //-----------------------------------------------------------------------------
-  TEvdSimParticle() {}
-  TEvdSimParticle(const char* Name); 
+  TEvdSimParticle();
+  TEvdSimParticle(int Number, const mu2e::SimParticle* Simp); 
 
   virtual ~TEvdSimParticle();
 //-----------------------------------------------------------------------------
@@ -45,21 +36,26 @@ public:
 //-----------------------------------------------------------------------------
 // modifiers
 //-----------------------------------------------------------------------------
+  virtual int DistancetoPrimitive   (int px, int py);
+  virtual int DistancetoPrimitiveXY (int px, int py);
+  virtual int DistancetoPrimitiveRZ (int px, int py);
 
-  //  virtual void  Draw    (Option_t* option = "");
+  //  virtual void  ExecuteEvent(Int_t event, Int_t px, Int_t py)
+//-----------------------------------------------------------------------------
+// drawing functions
+//-----------------------------------------------------------------------------
+  virtual void  PaintXY  (Option_t* option = "");
+  virtual void  PaintRZ  (Option_t* option = "");
+//-----------------------------------------------------------------------------
+// overloaded methods of TObject
+//-----------------------------------------------------------------------------
+  virtual void  Paint(Option_t* Opt = "");
+  virtual void  Clear(Option_t* Opt = "");
+  virtual void  Print(Option_t* Opt = "") const ; // **MENU**
 
-  virtual void  Paint   (Option_t* option = "");
-
-  //  virtual void  ExecuteEvent(Int_t event, Int_t px, Int_t py);
-
-  virtual Int_t DistancetoPrimitive  (Int_t px, Int_t py);
-  virtual Int_t DistancetoPrimitiveXY(Int_t px, Int_t py);
-  virtual Int_t DistancetoPrimitiveRZ(Int_t px, Int_t py);
-
-  //  virtual void   Print(const char* Opt = "") const ; // **MENU**
-
-  ClassDef(TEvdSimParticle,0)
+  ClassDef(stntuple::TEvdSimParticle,0)
 };
 
+}
 
 #endif

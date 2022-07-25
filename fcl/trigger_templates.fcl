@@ -6,7 +6,7 @@
 #------------------------------------------------------------------------------
 Trigger : {
     producers : {
-	@table::CaloFilters.producers
+#\\\\\	@table::CaloFilters.producers
 	@table::CaloHitRecoTrigger.producers
 	@table::CaloClusterTrigger.producers
 	@table::TrkHitRecoTrigger.producers
@@ -19,7 +19,7 @@ Trigger : {
 
     filters : {
 	@table::CprTrigger.filters
-	@table::CaloFilters.filters
+#\\\\	@table::CaloFilters.filters
 	@table::TrkFilters.filters
 
 	#used to select 1 event out of N
@@ -173,7 +173,7 @@ Trigger : {
     
     paths : {
 	#calorimeter based filters. It includes: CE, and calibrations
-	@table::CaloFilters.sequences
+#\\\	@table::CaloFilters.sequences
 	
 	#tracking filters. It includes: TrkPatRec, CalPatRec
 	@table::TrkFilters.sequences

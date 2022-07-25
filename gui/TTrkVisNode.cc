@@ -29,6 +29,7 @@
 #include "Stntuple/gui/TEvdPanel.hh"
 #include "Stntuple/gui/TEvdPlane.hh"
 #include "Stntuple/gui/TEvdStrawTracker.hh"
+#include "Stntuple/gui/TEvdSimParticle.hh"
 #include "Stntuple/gui/TStnVisManager.hh"
 
 #include "Offline/RecoDataProducts/inc/StrawHit.hh"
@@ -54,11 +55,12 @@ TTrkVisNode::TTrkVisNode(const char* name, const mu2e::Tracker* Tracker, TStnTra
   fEventTime  = 0;
   fTimeWindow = 1.e6;
 
-  fListOfStrawHits = new TObjArray();
+  fListOfStrawHits    = new TObjArray();
   fTimeCluster        = NULL;
-  fUseStereoHits   = 0;
+  fUseStereoHits      = 0;
 
-  fListOfTracks    = new TObjArray();
+  fListOfTracks       = new TObjArray();
+  fListOfSimParticles = new TObjArray();
 }
 
 //-----------------------------------------------------------------------------
@@ -69,6 +71,9 @@ TTrkVisNode::~TTrkVisNode() {
 
   fListOfTracks->Delete();
   delete fListOfTracks;
+
+  fListOfSimParticles->Delete();
+  delete fListOfSimParticles;
 }
 
 //-----------------------------------------------------------------------------
@@ -231,7 +236,7 @@ int TTrkVisNode::InitEvent() {
 //-----------------------------------------------------------------------------
 // now initialize tracks
 //-----------------------------------------------------------------------------
-  stntuple::TEvdTrack                *trk;
+  stntuple::TEvdTrack      *trk;
   const KalRep             *krep;  
   const mu2e::TrkStrawHit  *track_hit;
 
@@ -254,6 +259,30 @@ int TTrkVisNode::InitEvent() {
     }
 
     fListOfTracks->Add(trk);
+  }
+//-----------------------------------------------------------------------------
+// initialize SimParticles
+//-----------------------------------------------------------------------------
+  stntuple::TEvdSimParticle *esim;
+  const mu2e::SimParticle   *simp;
+
+  int ipp = 0;
+  for (mu2e::SimParticleCollection::const_iterator ip = (*fSimpColl)->begin(); ip != (*fSimpColl)->end(); ip++) {  
+    simp = &ip->second;
+    esim = new stntuple::TEvdSimParticle(ipp,simp);
+    ipp++;
+//-----------------------------------------------------------------------------
+// add hits later - they need to be determined....
+//-----------------------------------------------------------------------------
+//    const TrkHitVector* hits = &krep->hitVector();
+//    for (auto it=hits->begin(); it!=hits->end(); it++) {
+//      track_hit = dynamic_cast<mu2e::TrkStrawHit*> (*it);
+//      if (track_hit == nullptr) continue;
+//      stntuple::TEvdTrkStrawHit* h = new stntuple::TEvdTrkStrawHit(track_hit);
+//      trk->AddHit(h);
+//    }
+//
+    fListOfSimParticles->Add(esim);
   }
   
   return 0;

@@ -6,24 +6,7 @@
 #
 # reconstruction and analysis modules
 #------------------------------------------------------------------------------
-Stntuple : { 
-    @table::Stntuple             # defined in Stntuple/fcl/prolog.fcl
-
-    producers : { 
-	@table::Reconstruction.producers
-	@table::Stntuple.producers
-    }
-
-    filters : { 
-	@table::Reconstruction.filters
-	@table::Stntuple.filters
-    }
-
-    analyzers : { 
-	@table::Reconstruction.analyzers
-	@table::Stntuple.analyzers
-    }
-}
+Stntuple : { @table::Stntuple }             # defined in Stntuple/fcl/prolog.fcl
 
 #------------------------------------------------------------------------------
 # sequences: can't define recursively within one namespace
@@ -105,7 +88,7 @@ Stntuple.post_reco_dmu     : [ @sequence::Stntuple.post_reco_dmu_par,
 # paths
 #------------------------------------------------------------------------------
 Stntuple.paths : {
-    @table::production.paths
+#////    @table::production.paths
 
     stntuple_p0  : [ @sequence::Stntuple.stnmaker ]
 #------------------------------------------------------------------------------
@@ -346,6 +329,5 @@ Stntuple.paths : {
 #------------------------------------------------------------------------------
 # Stntuple event filter
 #------------------------------------------------------------------------------
-
-    event_filter  : [ EventFilter    ]   
+#    event_filter  : [ EventFilter    ]
 }

@@ -140,6 +140,7 @@ MuHitDisplay: { module_type:MuHitDisplay                 # the class name;
     
     genpCollTag                  : generate
     spmcCollTag                  : "compressDigiMCs" # was g4run
+    simpCollTag                  : "compressDigiMCs" # was g4run
     statuG4Tag                   : "g4run"           # 
     strawHitCollTag              : "makeSH"
     strawDigiMCCollTag           : "compressDigiMCs" #  was "makeSD"
@@ -706,8 +707,6 @@ Stntuple : {
 #------------------------------------------------------------------------------
 Stntuple.stnmaker         : [ InitStntuple, StntupleMaker   ,                   FillStntuple ]
 Stntuple.stnmaker_cpr     : [ InitStntuple, StntupleMakerCpr,                   FillStntuple ]
-# Stntuple.stnmaker_dem     : [ InitStntuple, StntupleMakerDem,                   FillStntuple ]
-# Stntuple.stnmaker_dep     : [ InitStntuple, StntupleMakerDep,                   FillStntuple ]
 Stntuple.stnmaker_dmm     : [ InitStntuple, StntupleMakerDmm,                   FillStntuple ]
 Stntuple.stnmaker_ump     : [ InitStntuple, StntupleMakerUmp,                   FillStntuple ]
 Stntuple.stnmaker_dpp     : [ InitStntuple, StntupleMakerDpp,                   FillStntuple ]

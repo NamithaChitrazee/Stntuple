@@ -13,6 +13,7 @@
 #include "Offline/RecoDataProducts/inc/ComboHit.hh"
 #include "Offline/RecoDataProducts/inc/TimeCluster.hh"
 #include "Offline/MCDataProducts/inc/StrawDigiMC.hh"
+#include "Offline/MCDataProducts/inc/SimParticle.hh"
 
 #else
 namespace mu2e {
@@ -47,23 +48,25 @@ protected:
   const mu2e::TimeClusterCollection**          fTimeClusterColl;  //
   const mu2e::StrawDigiMCCollection**          fStrawDigiMCColl; 
   const mu2e::KalRepPtrCollection**            fKalRepPtrColl;
+  const mu2e::SimParticleCollection**          fSimpColl;
 
-  TStnTrackBlock*   fTrackBlock;
-  Color_t           fTrackColor;
+  TStnTrackBlock*           fTrackBlock;
+  Color_t                   fTrackColor;
 
   stntuple::TEvdStrawTracker* fTracker;
 
   TArc*                     fArc;
   const mu2e::TimeCluster*  fTimeCluster;
 
-  Int_t         fDisplayBackgroundHits;
-  Int_t         fTimeWindow;
-  Int_t         fPickMode;
-  Int_t         fUseStereoHits;
-  double        fEventTime;
-
-  TObjArray*    fListOfStrawHits;
-  TObjArray*    fListOfTracks;
+  Int_t                     fDisplayBackgroundHits;
+  Int_t                     fTimeWindow;
+  Int_t                     fPickMode;
+  Int_t                     fUseStereoHits;
+  double                    fEventTime;
+		            
+  TObjArray*                fListOfStrawHits;
+  TObjArray*                fListOfTracks;
+  TObjArray*                fListOfSimParticles;
 
 public:
 //-----------------------------------------------------------------------------
@@ -114,6 +117,10 @@ public:
 
   void SetStrawDigiMCColl(const mu2e::StrawDigiMCCollection** Coll) { 
     fStrawDigiMCColl = Coll;
+  }
+
+  void SetSimParticleColl(const mu2e::SimParticleCollection** Coll) { 
+    fSimpColl = Coll;
   }
 
   void SetTimeClusterColl(const mu2e::TimeClusterCollection** Coll) { 

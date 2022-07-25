@@ -141,6 +141,7 @@ private:
   string        _strawHitFlagCollTag;
   
   string        fTrackCollTag;
+  string        _simpCollTag;
   string        fTimeClusterModuleLabel;
   string        fCrystalHitMaker;
   string        fTrkExtrapol;
@@ -193,6 +194,7 @@ private:
   const mu2e::CaloClusterCollection*    fListOfClusters;   //
   
   const mu2e::StepPointMCCollection*    _stepPointMCColl;  //
+  const mu2e::SimParticleCollection*    _simParticleColl;  //
 
   const mu2e::TimeClusterCollection*    fTimeClusterColl;  //
 
@@ -268,6 +270,7 @@ MuHitDisplay::MuHitDisplay(fhicl::ParameterSet const& pset) :
   _strawHitFlagCollTag     (pset.get<string>("strawHitFlagCollTag")),
   
   fTrackCollTag            (pset.get<string>("trackCollTag")),
+  _simpCollTag             (pset.get<string>("simpCollTag")),
   fTimeClusterModuleLabel  (pset.get<string>("timeClusterCollTag")),
   fCrystalHitMaker         (pset.get<string>("caloCrystalHitsCollTag")),
   fTrkExtrapol             (pset.get<string>("trkExtrapol")),
@@ -467,6 +470,7 @@ void MuHitDisplay::InitVisManager() {
   tnode->SetTimeClusterColl (&fTimeClusterColl );
   tnode->SetKalRepPtrColl   (&_kalRepPtrColl   );
   tnode->SetStrawDigiMCColl (&_strawDigiMCColl );
+  tnode->SetSimParticleColl (&_simParticleColl );
 //-----------------------------------------------------------------------------
 // XY view : tracker + calorimeter
 //-----------------------------------------------------------------------------
@@ -591,6 +595,14 @@ int MuHitDisplay::getData(const art::Event* Evt) {
 
       if (stepsHandle.isValid()) _stepPointMCColl = stepsHandle.product();
       else                       _stepPointMCColl = NULL;
+//-----------------------------------------------------------------------------
+// SimParticle's
+//-----------------------------------------------------------------------------
+      art::Handle<mu2e::SimParticleCollection> simpHandle;
+      Evt->getByLabel(_simpCollTag, simpHandle);
+
+      if (simpHandle.isValid()) _simParticleColl = simpHandle.product();
+      else                      _simParticleColl = NULL;
 //-----------------------------------------------------------------------------
 //  straw hit information
 //-----------------------------------------------------------------------------

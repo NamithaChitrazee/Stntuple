@@ -15,36 +15,16 @@
 #------------------------------------------------------------------------------
 # no more prologs beyond this point
 # 
-#------------------------------------------------------------------------------
-# (2): definition of the input module - can redefine in the top-level prolog
-#------------------------------------------------------------------------------
-source : { 
-    module_type : @local::INPUT_MODULE
-    #    fileNames : ["/mu2e/data/tdr/beam/g4s4p5/tdr.beam.g4s4.conversion.1504a.15729672/good/00000/dsStopsToHitsConversion.root"]
-    #    maxEvents   : 100
-    inputCommands : ['keep *_*_*_*'
-		     #		     , 'drop *_muonTimeMap_*_*'
-		     #		     , 'drop *_protonTimeMap_*_*'
-		     #		     , 'drop mu2eStrawDigis_*_*_*'
-		     #		     , 'drop mu2eStrawHits_*_*_*'
-		     #		     , 'drop *_CaloReadoutHitsMaker_*_*'
-		     #		     , 'drop *_CaloCrystalHitsMaker_*_*'
-		     # Uncomment the above lines to reduce file size.
-		    ]
-}
-
 production : {
     producers : { 
 #------------------------------------------------------------------------------
 # MC producers
 #------------------------------------------------------------------------------
-	@table::Trigger.producers
+#\\\\	@table::Trigger.producers
 	@table::EventGenerator.producers  # defined in EventGenerator
 	@table::CommonMC.producers        # FIXME
 	@table::Mu2eG4.producers          # defined in Mu2eG4/fcl
 	@table::CaloMC.producers          # defined in CaloMC
-#	@table::CaloMC.producersMC        # defined in CaloDigiMC
-#	@table::CaloCluster.producersMC   # defined in CaloCluster
 	@table::CrvDAQPackage.producers   # 
 	@table::TrackerMC.producers       # defined in TrackerMC
 
@@ -135,7 +115,7 @@ production : {
 #  filters
 #------------------------------------------------------------------------------
     filters : {
-	@table::Trigger.filters
+#\\\\	@table::Trigger.filters
 
 	g4status: { module_type: FilterStatusG4
 	    input            : "g4run"
@@ -175,7 +155,7 @@ production : {
     }
 
     analyzers : {
-	@table::Trigger.analyzers
+#\\\\	@table::Trigger.analyzers
         genCountLogger            : { module_type: GenEventCountReader } # defalt: 1 StepPointMC, 10 MeV
     }
 }
@@ -227,16 +207,6 @@ production.mixing_output : [ "drop *_*_*_*"                               ,
 			 "keep mu2e::CrvDigis_*_*_*"                  ,
 			 "keep art::TriggerResults_TriggerResults_*_*"
 			]
-
-production.outputs: {
-    defaultOutput : { module_type : RootOutput
-	SelectEvents  : [ @sequence::TRIGGER_PATHS ]
-	outputCommands: [ "keep *_*_*_*" ]
-    }
-#    FullOutput : { @table::Mixing.Output  outputCommands : [ "keep *_*_*_*"                  ] }
-#    DetOutput  : { @table::Mixing.Output  outputCommands : [ @sequence::production.mixing_output ] }
-}
-
 #------------------------------------------------------------------------------
 # module sequences - by functionality
 #------------------------------------------------------------------------------
@@ -375,28 +345,28 @@ production.reco_compression : [ FindMCPrimary,        # find the primary particl
 
 # trigger paths considered, include into digi datasets
 production.triggers         : [
-			   tprSeedDeM_trigger    , cprSeedDeM_trigger    , tprSeedDeP_trigger    , cprSeedDeP_trigger    , 
-			   cprLowPSeedDeM_trigger, cprLowPSeedDeP_trigger, tprLowPSeedDeM_trigger, tprLowPSeedDeP_trigger, 
-			   tprHelixIPADeM_trigger
-			  ]
+			       tprSeedDeM_trigger    , cprSeedDeM_trigger    , tprSeedDeP_trigger    , cprSeedDeP_trigger    , 
+			       cprLowPSeedDeM_trigger, cprLowPSeedDeP_trigger, tprLowPSeedDeM_trigger, tprLowPSeedDeP_trigger, 
+			       tprHelixIPADeM_trigger
+			      ]
 #------------------------------------------------------------------------------
 # PRODUCTION paths
 #------------------------------------------------------------------------------
-    production.paths : {
-	@table::Trigger.paths
+production.paths : {
+#\\\\	@table::Trigger.paths
 #------------------------------------------------------------------------------
 # start from including the trigger paths
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
 # gcl: an attempt to introduce a standard name for genCountLogger path
 #------------------------------------------------------------------------------
-	gcl        : [ genCountLogger ]
+    gcl        : [ genCountLogger ]
 #------------------------------------------------------------------------------
 # p1  : MC generation, G4, digitization
 # p12 : MC generation, G4, filter events with at least one step point in the tracker of the calorimeter
 # p14 : prepare inputs for mixing
 #------------------------------------------------------------------------------
-	production_p1 : [ @sequence::production.gen_g4_pbi,           # includes protonBunchIntensity
+    production_p1 : [ @sequence::production.gen_g4_pbi,           # includes protonBunchIntensity
 		      GammaFilter,                            # does nothing by default
 		      @sequence::CommonMC.DigiSim      ,      # adds TimeMaps, EWMProducer (name - confusing)
 		      @sequence::production.digis          ,
@@ -404,15 +374,15 @@ production.triggers         : [
 		     ]
 
 	# same as production_p1, but using a calo filter instead of straw digi filter
-	production_p1calo : [ @sequence::production.gen_g4_pbi     , 
+    production_p1calo : [ @sequence::production.gen_g4_pbi     , 
 			  GammaFilter                      ,  # does nothing by default
 			  @sequence::CommonMC.DigiSim      ,  # TimeMaps, EWMProducer
 			  @sequence::production.digisCaloFilter,
 			  compressDigiMCs
-
+			  
 			 ]
 
-	production_p10 : [ @sequence::production.gen_g4_pbi,          # includes ProtonBunchIntensity
+    production_p10 : [ @sequence::production.gen_g4_pbi,          # includes ProtonBunchIntensity
 		       filterStepPointMomentum ,
 		       GammaFilter,                           # does nothing by default
 		       @sequence::CommonMC.DigiSim       ,    # adds TimeMaps, EWMProducer (name - confusing)
@@ -420,49 +390,49 @@ production.triggers         : [
 		       compressDigiMCs
 		      ]
 
-	production_p11 : [ g4run, protonBunchIntensity,           # what's left of @sequence::production.gen_g4_time_map,
+    production_p11 : [ g4run, protonBunchIntensity,           # what's left of @sequence::production.gen_g4_time_map,
 		       @sequence::CommonMC.DigiSim, 
 		       GammaFilter                ,           # does nothing by default
 		       @sequence::production.digis    ,
 		       compressDigiMCs
 		     ]
 
-	production_p111 : [ @sequence::production.pbi_ewm   ,          # what's left of @sequence::production.gen_g4_time_map,
+    production_p111 : [ @sequence::production.pbi_ewm   ,          # what's left of @sequence::production.gen_g4_time_map,
 			@sequence::CommonMC.TimeMaps, 
 			GammaFilter                 ,          # does nothing by default
 			@sequence::production.digis_no_filter,
 			compressDigiMCs
 		       ]
 
-	production_p12 : [ @sequence::production.gen_g4_pbi,          # includes ProtonBunchIntensity
+    production_p12 : [ @sequence::production.gen_g4_pbi,          # includes ProtonBunchIntensity
 		       filterStepPointMomentum,               # 
 		       @sequence::CommonMC.DigiSim            # adds TimeMaps, EWMProducer (name - confusing)
 		      ]
 
 
-	production_p13 : [ g4run , 
+    production_p13 : [ g4run , 
 		       filterStepPointMomentum,               # 
 		       @sequence::CommonMC.DigiSim            # adds TimeMaps, EWMProducer (name - confusing)
 		      ]
 
-	production_p14_mustop : [ generate, genCounter, g4run, filterStepPointMomentum, 
+    production_p14_mustop : [ generate, genCounter, g4run, filterStepPointMomentum, 
 			      # protonTimeMap, muonTimeMap, 
 			      CaloShowerStepFromStepPt
 			     ]                                # path for producing mixing inputs from muon captures
 
-	production_p14_flash : [ g4run, filterStepPointMomentum
+    production_p14_flash : [ g4run, filterStepPointMomentum
 			     # protonTimeMap, 
 			     # CaloShowerStepFromStepPt
 			    ]                                 # path for producing the mixing input from beam flash 
 
-	production_p15_flash : [ protonTimeMap           , 
+    production_p15_flash : [ protonTimeMap           , 
 			     filterStepPointMomentum ,        # filter again, now - on time, need step points...
 			     CaloShowerStepFromStepPt
 			    ]                                 # path for producing the mixing input from beam flash 
 #------------------------------------------------------------------------------
 # p2: read digis, do reconstruction: run downstream electron and muon reco paths
 #------------------------------------------------------------------------------
-	production_p2 : [ @sequence::production.calo_reco,
+    production_p2 : [ @sequence::production.calo_reco,
 		      @sequence::production.trk_hit_reco,
 		      @sequence::production.trk_reco_de ,
 		      @sequence::production.trk_reco_dmu , 
@@ -473,7 +443,7 @@ production.triggers         : [
 #------------------------------------------------------------------------------
 # p21: read digis, do reconstruction: run downstream electron and muon reco paths
 #------------------------------------------------------------------------------
-	production_p21 : [ @sequence::production.calo_reco,
+    production_p21 : [ @sequence::production.calo_reco,
 		       @sequence::production.trk_hit_reco,
 		       @sequence::production.trk_reco_de ,
 		       @sequence::production.trk_reco_dmu
@@ -483,7 +453,7 @@ production.triggers         : [
 # p22: read digis, reconstruct helices - both directions, 
 #      2021-03-21: currently time clustering is currently not direction-symmetric
 #------------------------------------------------------------------------------
-	production_p22 : [ @sequence::production.calo_reco,
+    production_p22 : [ @sequence::production.calo_reco,
 		       @sequence::production.trk_hit_reco,
 		       @sequence::production.helix_reco_de,
 		       @sequence::production.helix_reco_ue
@@ -492,8 +462,8 @@ production.triggers         : [
 #------------------------------------------------------------------------------
 # p100: concatenation job, trigger path is empty
 #------------------------------------------------------------------------------
-	production_p100 : [ ]
-    }
+    production_p100 : [ ]
+}
 #------------------------------------------------------------------------------
 # upstream time clustering: turn off the ANN-based hit removal
 #------------------------------------------------------------------------------

@@ -14,19 +14,14 @@ process_name : Display
 
 source       : { module_type : RootInput   }
 
-outputs      : { @table::Stntuple.outputs   }
-
 physics : {
-    producers  : { 
-	@table::Reconstruction.producers
-	@table::Stntuple.producers 
-    }
+    producers  : { @table::stntuple.producers }
     
-    filters    : { @table::Stntuple.filters   }
+    filters    : { @table::stntuple.filters   }
 
-    analyzers  : { @table::Stntuple.analyzers }
+    analyzers  : { @table::stntuple.analyzers }
 
-    @table::Stntuple.paths
+    @table::stntuple.paths
 
 
     p1 : [ @sequence::CaloReco.Reco,
