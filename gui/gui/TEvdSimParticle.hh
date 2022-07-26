@@ -10,9 +10,11 @@
 #include "TPad.h"
 #include "TArc.h"
 #include "TEllipse.h"
+#include "TParticlePDG.h"
 
 namespace mu2e {
   class SimParticle;
+  class StepPointMC;
 };
 
 namespace stntuple {
@@ -20,14 +22,16 @@ class TEvdSimParticle: public TObject {
 public:
   int                       fNumber;
   const mu2e::SimParticle*  fSimp;
+  const mu2e::StepPointMC*  fStep;
 
   TObjArray*                fListOfHits;
   TEllipse*                 fEllipse;
+  TParticlePDG*             fParticlePDG;
 //-----------------------------------------------------------------------------
 // constructors and destructor
 //-----------------------------------------------------------------------------
   TEvdSimParticle();
-  TEvdSimParticle(int Number, const mu2e::SimParticle* Simp); 
+  TEvdSimParticle(int Number, const mu2e::SimParticle* Simp, const mu2e::StepPointMC* Step); 
 
   virtual ~TEvdSimParticle();
 //-----------------------------------------------------------------------------

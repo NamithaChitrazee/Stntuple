@@ -139,7 +139,7 @@ MuHitDisplay: { module_type:MuHitDisplay                 # the class name;
     showTracks                   : true
     
     genpCollTag                  : generate
-    spmcCollTag                  : "compressDigiMCs" # was g4run
+    spmcCollTag                  : "compressDigiMCs:virtualdetector" # was g4run
     simpCollTag                  : "compressDigiMCs" # was g4run
     statuG4Tag                   : "g4run"           # 
     strawHitCollTag              : "makeSH"

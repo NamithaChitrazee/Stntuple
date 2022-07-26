@@ -263,14 +263,30 @@ int TTrkVisNode::InitEvent() {
 //-----------------------------------------------------------------------------
 // initialize SimParticles
 //-----------------------------------------------------------------------------
+  fListOfSimParticles->Delete();
+
   stntuple::TEvdSimParticle *esim;
   const mu2e::SimParticle   *simp;
+
+  int nsteps = (*fSpmcColl)->size();
 
   int ipp = 0;
   for (mu2e::SimParticleCollection::const_iterator ip = (*fSimpColl)->begin(); ip != (*fSimpColl)->end(); ip++) {  
     simp = &ip->second;
-    esim = new stntuple::TEvdSimParticle(ipp,simp);
-    ipp++;
+//-----------------------------------------------------------------------------
+// figure out step point MC at the tracker front ... this could be a limitation
+// start from that anyway
+//-----------------------------------------------------------------------------
+    for (int is=0; is<nsteps; is++) {
+      const mu2e::StepPointMC* step = &(*fSpmcColl)->at(is);
+      if ((step->volumeId() == 13) and (step->simParticle().get() == simp)) {  // tracker front
+	esim = new stntuple::TEvdSimParticle(ipp,simp,step);
+	ipp++;
+	fListOfSimParticles->Add(esim);
+	break;
+      }
+    }
+
 //-----------------------------------------------------------------------------
 // add hits later - they need to be determined....
 //-----------------------------------------------------------------------------
@@ -282,7 +298,6 @@ int TTrkVisNode::InitEvent() {
 //      trk->AddHit(h);
 //    }
 //
-    fListOfSimParticles->Add(esim);
   }
   
   return 0;
@@ -353,6 +368,18 @@ void TTrkVisNode::PaintXY(Option_t* Option) {
   }
 
 //-----------------------------------------------------------------------------
+// SimParticle's
+//-----------------------------------------------------------------------------
+  stntuple::TEvdSimParticle* esim;
+  int nsim(0);
+
+  if ( (fListOfSimParticles) != 0 )  nsim = fListOfSimParticles->GetEntriesFast();
+
+  for (int i=0; i<nsim; i++ ) {
+    esim = (stntuple::TEvdSimParticle*) fListOfSimParticles->At(i);
+    esim->Paint(Option);
+  }
+//-----------------------------------------------------------------------------
 // seedfit, if requested - not implemented yet
 //-----------------------------------------------------------------------------
 //   TAnaDump::Instance()->printKalRep(0,"banner");
@@ -402,6 +429,18 @@ void TTrkVisNode::PaintRZ(Option_t* Option) {
     }
   }
 
+//-----------------------------------------------------------------------------
+// SimParticle's : pT at  the ST is too large, need to use parameters at the tracker entrance ?
+//-----------------------------------------------------------------------------
+  stntuple::TEvdSimParticle* esim;
+  int nsim(0);
+
+  if ( (fListOfSimParticles) != 0 )  nsim = fListOfSimParticles->GetEntriesFast();
+
+  for (int i=0; i<nsim; i++ ) {
+    esim = (stntuple::TEvdSimParticle*) fListOfSimParticles->At(i);
+    esim->PaintRZ(Option);
+  }
   gPad->Modified();
 }
 
@@ -445,6 +484,20 @@ int TTrkVisNode::DistancetoPrimitiveXY(Int_t px, Int_t py) {
     }
   }
 
+//-----------------------------------------------------------------------------
+// simparticles are represented by ellipses
+//-----------------------------------------------------------------------------
+  int nsim = fListOfSimParticles->GetEntries();
+  for (int i=0; i<nsim; i++) {
+    stntuple::TEvdSimParticle* sim = GetSimParticle(i);
+
+    dist = sim->DistancetoPrimitiveXY(px,py);
+
+    if (dist < min_dist) {
+      min_dist = dist;
+      closest  = sim;
+    }
+  }
   SetClosestObject(closest,min_dist);
 
   return min_dist;

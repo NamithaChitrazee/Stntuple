@@ -193,7 +193,7 @@ private:
   const mu2e::CaloHitCollection*        fListOfCrystalHits;//
   const mu2e::CaloClusterCollection*    fListOfClusters;   //
   
-  const mu2e::StepPointMCCollection*    _stepPointMCColl;  //
+  const mu2e::StepPointMCCollection*    _spmcColl;         // on virtual detectors
   const mu2e::SimParticleCollection*    _simParticleColl;  //
 
   const mu2e::TimeClusterCollection*    fTimeClusterColl;  //
@@ -454,9 +454,9 @@ void MuHitDisplay::InitVisManager() {
   
   cal_view = new TCalView(1);
   cal_node[1] = new TCalVisNode("CalVisNode#1", &dc->disk(1), 1);
-  cal_node[1]->SetListOfClusters(&fListOfClusters);
+  cal_node[1]->SetListOfClusters   (&fListOfClusters);
   cal_node[1]->SetListOfCrystalHits(&fListOfCrystalHits);
-  cal_node[1]->SetTimeClusterColl(&fTimeClusterColl);
+  cal_node[1]->SetTimeClusterColl  (&fTimeClusterColl);
   cal_view->AddNode(cal_node[1]);
   vm->AddView(cal_view);
 //-----------------------------------------------------------------------------
@@ -471,6 +471,7 @@ void MuHitDisplay::InitVisManager() {
   tnode->SetKalRepPtrColl   (&_kalRepPtrColl   );
   tnode->SetStrawDigiMCColl (&_strawDigiMCColl );
   tnode->SetSimParticleColl (&_simParticleColl );
+  tnode->SetSpmcColl        (&_spmcColl );
 //-----------------------------------------------------------------------------
 // XY view : tracker + calorimeter
 //-----------------------------------------------------------------------------
@@ -587,14 +588,14 @@ int MuHitDisplay::getData(const art::Event* Evt) {
 	       oname, _genpCollTag.data());
       }
 
-      art::Handle<StepPointMCCollection> stepsHandle;
-      art::Selector getTrackerSteps(art::ProductInstanceNameSelector(_trackerStepPoints) &&
-				    art::ProcessNameSelector(_processName) &&
-				    art::ModuleLabelSelector(_spmcCollTag));
-      Evt->get(getTrackerSteps, stepsHandle);
+//-----------------------------------------------------------------------------
+//  StepPointMCs - on virtual detectors
+//-----------------------------------------------------------------------------
+      art::Handle<StepPointMCCollection> vdStepsHandle;
+      Evt->getByLabel(_spmcCollTag, vdStepsHandle);
 
-      if (stepsHandle.isValid()) _stepPointMCColl = stepsHandle.product();
-      else                       _stepPointMCColl = NULL;
+      if (vdStepsHandle.isValid()) _spmcColl = vdStepsHandle.product();
+      else                         _spmcColl = NULL;
 //-----------------------------------------------------------------------------
 // SimParticle's
 //-----------------------------------------------------------------------------

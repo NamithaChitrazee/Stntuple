@@ -24,6 +24,7 @@
 #include "TEllipse.h"
 #include "TPolyLine.h"
 #include "TObjArray.h"
+#include "TDatabasePDG.h"
 
 
 #include "BTrk/KalmanTrack/KalRep.hh"
@@ -41,6 +42,9 @@
 
 #include "Offline/TrackerGeom/inc/Tracker.hh"
 
+#include "Offline/MCDataProducts/inc/SimParticle.hh"
+#include "Offline/MCDataProducts/inc/StepPointMC.hh"
+
 #include "Stntuple/gui/TEvdSimParticle.hh"
 #include "Stntuple/gui/TStnVisManager.hh"
 #include "Stntuple/gui/TEvdTrkStrawHit.hh"
@@ -54,24 +58,77 @@ namespace stntuple {
 
 //-----------------------------------------------------------------------------
 TEvdSimParticle::TEvdSimParticle(): TObject() {
-  fListOfHits = NULL;
-  fEllipse    = new TEllipse();
+  fListOfHits  = NULL;
+  fEllipse     = new TEllipse();
+  fParticlePDG = nullptr;
+  fStep        = nullptr;
+  fSimp        = nullptr;
 }
 
 //-----------------------------------------------------------------------------
 // pointer to track is just cached
+// Step - at the trackerffront
 //-----------------------------------------------------------------------------
-  TEvdSimParticle::TEvdSimParticle(int Number, const mu2e::SimParticle* Simp): TObject() {
+  TEvdSimParticle::TEvdSimParticle(int Number, const mu2e::SimParticle* Simp, const mu2e::StepPointMC* Step): TObject() {
   fNumber = Number;
   fSimp   = Simp;
+  fStep   = Step;
+
+  TDatabasePDG* pdb = TDatabasePDG::Instance();
+
+  fParticlePDG = pdb->GetParticle(fSimp->pdgId());
 
   fListOfHits = new TObjArray();
 
   fEllipse = new TEllipse();
 
+  double r, phi0, x0, y0, xc, yc, p, pt, q;
+
+  x0 = (fStep->position().x()+3904.); // in mm
+  y0 = fStep->position().y();
+
+  p  = fStep->momentum().mag();
+  pt = fStep->momentum().perp();
+  r  = pt/2.9979*10;                          //    10^10/c, in mm
+
+  phi0 =  fStep->momentum().phi();
+  q    = fParticlePDG->Charge()/3;	// returned is the charge in units of 1/3 
+
+    
+  xc   =  x0+r*q*sin(phi0);
+  yc   =  y0-r*q*cos(phi0);
+
+  // // printf("[MuHitDispla::printHelixParams] d0 = %5.3f r = %5.3f phi0 = %5.3f x0 = %5.3f y0 = %5.3f\n",
+  // // 	 d0, r, phi0, x0, y0);
+   
+  fEllipse->SetR1(r);
+  fEllipse->SetR2(r);
+  fEllipse->SetX1(xc);
+  fEllipse->SetY1(yc);
+  fEllipse->SetPhimin(0);
+  fEllipse->SetPhimax(2*M_PI*180);
+  fEllipse->SetTheta(0);
+
+  int pdg_id = fSimp->pdgId();
+
+  int color;
+
+  if      (pdg_id == 11) {
+    if    (p       > 20  ) { color = kRed;    }
+    else                   { color = kRed+2;  }
+  }
+  else if (pdg_id ==  -11) { color = kBlue;   } 
+  else if (pdg_id ==   13) { color = kGreen+2;} 
+  else if (pdg_id ==  -13) { color = kGreen-2;} 
+  else if (pdg_id == 2212) { color = kBlue+2; } 
+  else                     { color = kMagenta;} 
+
+  fEllipse->SetFillStyle(0);
+  fEllipse->SetFillColor(0);
+					// figure out the color
+  fEllipse->SetLineColor(color);
   // fEllipse->SetFillStyle(3001);		// make it transparent
     
-  fEllipse->SetLineColor(kBlue-7);
 }
 
 //-----------------------------------------------------------------------------
@@ -110,34 +167,8 @@ void TEvdSimParticle::Paint(Option_t* Option) {
 //-----------------------------------------------------------------------------
 void TEvdSimParticle::PaintXY(Option_t* Option) {
 
-  // double d0, om, r, phi0, x0, y0;
-  // 					// makeitcrash here
-  // HelixParams hel; // fKrep->helix(0);
-
-  // d0   = hel.d0();
-  // om   = hel.omega();
-  // r    = fabs(1./om);
-  // phi0 = hel.phi0();
-    
-  // x0   =  -(1/om+d0)*sin(phi0);
-  // y0   =   (1/om+d0)*cos(phi0);
-
-  // // printf("[MuHitDispla::printHelixParams] d0 = %5.3f r = %5.3f phi0 = %5.3f x0 = %5.3f y0 = %5.3f\n",
-  // // 	 d0, r, phi0, x0, y0);
-   
-  // fEllipse->SetR1(r);
-  // fEllipse->SetR2(r);
-  // fEllipse->SetX1(x0);
-  // fEllipse->SetY1(y0);
-  // fEllipse->SetPhimin(0);
-  // fEllipse->SetPhimax(2*M_PI*180);
-  // fEllipse->SetTheta(0);
-
-  // fEllipse->SetFillStyle(0);
-  // fEllipse->SetFillColor(0);
-  // fEllipse->SetLineColor(2);
   // fEllipse->PaintEllipse(x0,y0,r,r,0,2*M_PI*180,0);
-  //fEllipse->Paint();
+  fEllipse->Paint();
 }
 
 //-----------------------------------------------------------------------------

@@ -14,6 +14,7 @@
 #include "Offline/RecoDataProducts/inc/TimeCluster.hh"
 #include "Offline/MCDataProducts/inc/StrawDigiMC.hh"
 #include "Offline/MCDataProducts/inc/SimParticle.hh"
+#include "Offline/MCDataProducts/inc/StepPointMC.hh"
 
 #else
 namespace mu2e {
@@ -32,6 +33,7 @@ namespace stntuple {
   class TEvdStrawTracker;
   class TEvdStrawHit;
   class TEvdTrack;
+  class TEvdSimParticle;
 }
 
 class TTrkVisNode: public TStnVisNode {
@@ -49,6 +51,7 @@ protected:
   const mu2e::StrawDigiMCCollection**          fStrawDigiMCColl; 
   const mu2e::KalRepPtrCollection**            fKalRepPtrColl;
   const mu2e::SimParticleCollection**          fSimpColl;
+  const mu2e::StepPointMCCollection**          fSpmcColl;
 
   TStnTrackBlock*           fTrackBlock;
   Color_t                   fTrackColor;
@@ -88,6 +91,8 @@ public:
   stntuple::TEvdStrawHit* GetHit  (int I) { return (stntuple::TEvdStrawHit*) fListOfStrawHits->At(I); }
   stntuple::TEvdTrack*    GetTrack(int I) { return (stntuple::TEvdTrack*)    fListOfTracks->At(I); }
 
+  stntuple::TEvdSimParticle* GetSimParticle(int I) { return (stntuple::TEvdSimParticle*)  fListOfSimParticles->At(I); }
+
   const mu2e::ComboHitCollection* GetComboHitColl() { 
     return *fComboHitColl; 
   }
@@ -121,6 +126,10 @@ public:
 
   void SetSimParticleColl(const mu2e::SimParticleCollection** Coll) { 
     fSimpColl = Coll;
+  }
+
+  void SetSpmcColl(const mu2e::StepPointMCCollection** Coll) { 
+    fSpmcColl = Coll;
   }
 
   void SetTimeClusterColl(const mu2e::TimeClusterCollection** Coll) { 
