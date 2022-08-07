@@ -10,8 +10,9 @@ Root.Html.SourceDir:.:$(ROOTSYS)/src
 Rint.Logon:          $(PWD)/rootlogon.C
 Rint.Logoff:
 
-# Root.MemStat:  1
-Root.ObjectStat:  1
+# Root.MemStat : 1
+Root.ObjectStat: 1
+Browser.Name   : TRootBrowser
 #
 # Gui.IconPath:  $(PWD)/Stntuple/icons
 # Record session commands, set to "-" to turn off command recording
