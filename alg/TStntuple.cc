@@ -42,7 +42,7 @@ TStntuple::TStntuple() {
 //-----------------------------------------------------------------------------
   TTree tree("t1","t1");
 
-  tree.ReadFile("ConditionsService/data/czarnecki_Al.tbl","e/f:w/f");
+  tree.ReadFile("Offline/ConditionsService/data/czarnecki_Al.tbl","e/f:w/f");
   int n = tree.GetEntries();
 
   double emin = 0.05;
