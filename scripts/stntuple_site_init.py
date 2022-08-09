@@ -25,6 +25,9 @@ def stntuple_gen_rootcint(source, target, env, for_signature):
     # print(">>> source = ",len(source),str(source[0]), str(source[1]))
     # print(">>> target = ",len(target),str(target[0]))
 
+    pkg  = str(source[1]).split('/')[0];
+    # print(">>> pkg    = ",pkg)
+    
     class_include = str(source[1]);
     linkdef       = str(source[0]);
 
@@ -59,7 +62,7 @@ def stntuple_gen_rootcint(source, target, env, for_signature):
     # if building a satellite release, BUILD_BASE points to a remote directory
     # need to use MU2E_SATELLITE_RELEASE
     #------------------------------------------------------------------------------
-    dir = os.environ.get('MUSE_BUILD_DIR')+'/'+'Stntuple';
+    dir = os.environ.get('MUSE_BUILD_DIR')+'/'+pkg;
 
     lib_dir = dir+"/lib";
     cmd     = 'if [ ! -d '+tmp_lib_dir+' ] ; then mkdir -p '+tmp_lib_dir+'; fi;';
