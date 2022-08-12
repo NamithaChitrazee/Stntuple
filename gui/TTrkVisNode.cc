@@ -638,13 +638,13 @@ Int_t TTrkVisNode::DistancetoPrimitiveTZ(Int_t px, Int_t py) {
 //-----------------------------------------------------------------------------
   int nsim = fListOfSimParticles->GetEntries();
   for (int i=0; i<nsim; i++) {
-    stntuple::TEvdSimParticle* sim = GetSimParticle(i);
+    stntuple::TEvdSimParticle* esp = GetSimParticle(i);
 
-    dist = sim->DistancetoPrimitiveXY(px,py);
+    dist = esp->DistancetoPrimitiveTZ(px,py);
 
     if (dist < min_dist) {
       min_dist = dist;
-      closest  = sim;
+      closest  = esp;
     }
   }
 

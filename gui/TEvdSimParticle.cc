@@ -148,6 +148,7 @@ TEvdSimParticle::TEvdSimParticle(): TObject() {
   double t1    = t0+(z1-z0)/vz;
 
   fLineTZ      = new TLine(z0,t0,z1,t1);
+  fLineTZ->SetLineColor(color);
 }
 
 //-----------------------------------------------------------------------------
@@ -347,20 +348,22 @@ Int_t TEvdSimParticle::DistancetoPrimitiveRZ(Int_t px, Int_t py) {
 }
 
 //-----------------------------------------------------------------------------
+// X represents Z on this view
+//-----------------------------------------------------------------------------
 Int_t TEvdSimParticle::DistancetoPrimitiveTZ(Int_t px, Int_t py) {
 
   static TVector3 global;
 
   global.SetXYZ(gPad->AbsPixeltoX(px),gPad->AbsPixeltoY(py),0);
 
-  double z0    = fStep->position().z();
+  double z0    = fStep->position().z()-10171.;
   double t0    = fStep->time();
 
   double m     = fParticlePDG->Mass()*1e3;     // returned mass is in (GeV)
   double p     = fStep->momentum().mag();
   double vz    = fStep->momentum().z()/sqrt(p*p+m*m)*300.;  // vz in cm/ns
 
-  double tz    = t0+(global.x()-z0)*vz;
+  double tz    = t0+(global.x()-z0)/vz;
 
   double dt    = global.y()-tz;
 

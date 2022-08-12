@@ -489,9 +489,9 @@ void MuHitDisplay::InitVisManager() {
   TStnView* vrz = new TStnView(TStnView::kRZ,-1,"RZView","RZ View");
   vrz->AddNode(tnode);
   vm->AddView(vrz);
-// //-----------------------------------------------------------------------------
-// // TZ view : tracker only, so far
-// //-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+// TZ view : TTrkNode only, so far
+//-----------------------------------------------------------------------------
 //   TComboHitVisNode* chn = new TComboHitVisNode ();
 //   chn->SetComboHitHitColl(&fComboHitColl   );
 //   chn->SetStrawDigiMCColl(&_strawDigiMCColl);
