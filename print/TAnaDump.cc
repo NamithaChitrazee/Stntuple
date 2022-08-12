@@ -2523,7 +2523,7 @@ void TAnaDump::printSimParticle(const mu2e::SimParticle* P, const char* Opt, con
 
     TString opt = Opt;
 
-    if ((opt == "") || (opt == "banner")) {
+    if ((opt == "") || (opt.Index("banner") >= 0)) {
       printf("-----------------------------------------------------------------------------------------");
       printf("-----------------------------------------");
       printf("---------------------------------------------------------------------------------------\n");
@@ -2535,7 +2535,7 @@ void TAnaDump::printSimParticle(const mu2e::SimParticle* P, const char* Opt, con
       printf("---------------------------------------------------------------------------------------\n");
     }
  
-    if ((opt == "") || (opt == "data")) {
+    if ((opt == "") || (opt.Index("data") >= 0)) {
       int  id        = P->id().asInt();
       
       int  parent_id (-1);

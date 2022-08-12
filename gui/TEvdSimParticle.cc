@@ -378,13 +378,13 @@ void TEvdSimParticle::Clear(Option_t* Opt) {
 //-----------------------------------------------------------------------------
 void TEvdSimParticle::Print(Option_t* Option) const {
 
-  TAnaDump* ad = TAnaDump::Instance();
+  TAnaDump* tad = TAnaDump::Instance();
 
   TString opt = Option;
   opt.ToLower();
 
-  if (opt == "") ad->printSimParticle(fSimp, "banner+data", nullptr);
-  else           ad->printSimParticle(fSimp, Option       , nullptr);
+  if (opt == "") tad->printSimParticle(fSimp, "banner+data", nullptr);
+  else           tad->printSimParticle(fSimp, Option       , nullptr);
 
 }
 }
