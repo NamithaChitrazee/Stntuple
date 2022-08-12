@@ -352,9 +352,14 @@ Int_t TEvdSimParticle::DistancetoPrimitiveRZ(Int_t px, Int_t py) {
 //-----------------------------------------------------------------------------
 Int_t TEvdSimParticle::DistancetoPrimitiveTZ(Int_t px, Int_t py) {
 
-  static TVector3 global;
+  static TVector3 global, g2;
+
+  int dpy (10);
 
   global.SetXYZ(gPad->AbsPixeltoX(px),gPad->AbsPixeltoY(py),0);
+  g2.SetXYZ    (gPad->AbsPixeltoX(px),gPad->AbsPixeltoY(py+dpy),0);
+
+  double  dy   = g2.y()-global.y();
 
   double z0    = fStep->position().z()-10171.;
   double t0    = fStep->time();
@@ -367,7 +372,7 @@ Int_t TEvdSimParticle::DistancetoPrimitiveTZ(Int_t px, Int_t py) {
 
   double dt    = global.y()-tz;
 
-  int dist     = gPad->YtoAbsPixel(t0+dt)-py;
+  int dist     = (dt/dy)*dpy; // in pixels
   return abs(dist);
 }
 
