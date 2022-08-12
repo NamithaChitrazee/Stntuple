@@ -20,6 +20,7 @@
 #include "Offline/ConditionsService/inc/ConditionsHandle.hh"
 #include "Offline/TrackerConditions/inc/StrawResponse.hh"
 
+#include "Stntuple/gui/TEvdComboHit.hh"
 #include "Stntuple/gui/TEvdTrack.hh"
 #include "Stntuple/gui/TTrkVisNode.hh"
 #include "Stntuple/gui/TEvdStraw.hh"
@@ -56,11 +57,21 @@ TTrkVisNode::TTrkVisNode(const char* name, const mu2e::Tracker* Tracker, TStnTra
   fTimeWindow = 1.e6;
 
   fListOfStrawHits    = new TObjArray();
+  fListOfComboHits    = new TObjArray();
   fTimeCluster        = NULL;
   fUseStereoHits      = 0;
 
   fListOfTracks       = new TObjArray();
   fListOfSimParticles = new TObjArray();
+
+  fComboHitColl       = nullptr;
+  fStrawHitColl       = nullptr;
+  fTimeClusterColl    = nullptr;
+  fStrawDigiMCColl    = nullptr;
+  fKalRepPtrColl      = nullptr;
+  fSimpColl           = nullptr;
+  fSpmcColl           = nullptr;
+  
 }
 
 //-----------------------------------------------------------------------------
@@ -68,6 +79,7 @@ TTrkVisNode::~TTrkVisNode() {
   delete fArc;
   
   delete fListOfStrawHits;
+  delete fListOfComboHits;
 
   fListOfTracks->Delete();
   delete fListOfTracks;
@@ -84,12 +96,12 @@ int TTrkVisNode::InitEvent() {
   mu2e::GeomHandle<mu2e::Tracker> ttHandle;
   const mu2e::Tracker* tracker = ttHandle.get();
 
+  TStnVisManager* vm = TStnVisManager::Instance();
+
+  const art::Event* event = vm->Event();
+
   // Tracker calibration object.
   //  mu2e::ConditionsHandle<mu2e::StrawResponse> srep = mu2e::ConditionsHandle<mu2e::StrawResponse>("ignored");
-
-  fListOfStrawHits->Delete();
-
-  fListOfTracks->Delete();
 
   const mu2e::ComboHit              *hit;
   const mu2e::StrawDigiMC           *hit_digi_mc;
@@ -130,18 +142,18 @@ int TTrkVisNode::InitEvent() {
       }
     }
   }
-
-  fListOfTracks->Delete();
 //-----------------------------------------------------------------------------
 // display hits corresponding to a given time peak, or all hits, 
 // if the time peak is not found
 //-----------------------------------------------------------------------------
+  fListOfStrawHits->Delete();
+
   stntuple::TEvdStraw* evd_straw;
-  n_straw_hits = (*fComboHitColl)->size();
+  n_straw_hits = (*fStrawHitColl)->size();
 
   for (int ihit=0; ihit<n_straw_hits; ihit++ ) {
 
-    hit         = &(*fComboHitColl)->at(ihit);
+    hit         = &(*fStrawHitColl)->at(ihit);
 
     if ((*fStrawDigiMCColl)->size() > 0) hit_digi_mc = &(*fStrawDigiMCColl)->at(ihit);
     else                                 hit_digi_mc = NULL; // normally, should not be happening, but it does
@@ -226,8 +238,58 @@ int TTrkVisNode::InitEvent() {
 					       sigw,sigr,
 					       mask,color);
     evd_straw->AddHit(evd_straw_hit);
-
+//-----------------------------------------------------------------------------
+// so far, lists of straw hits and combo hits are the same, need to make them different
+//-----------------------------------------------------------------------------
     fListOfStrawHits->Add(evd_straw_hit);
+  }
+//-----------------------------------------------------------------------------
+// combo hits
+//-----------------------------------------------------------------------------
+  fListOfComboHits->Delete();
+  int nch = (*fComboHitColl)->size();
+//-----------------------------------------------------------------------------
+// the rest makes sense only if nhits > 0
+//-----------------------------------------------------------------------------
+  if (nch > 0) { 
+    const mu2e::ComboHit* hit0 = &(*fComboHitColl)->at(0);
+
+    for (int ihit=0; ihit<nch; ihit++ ) {
+      const mu2e::ComboHit* hit = &(*fComboHitColl)->at(ihit);
+      size_t ish  = hit-hit0;
+      std::vector<StrawDigiIndex> shids;
+      (*fComboHitColl)->fillStrawDigiIndices(*event,ish,shids);
+
+      const mu2e::StrawDigiMC* mcdigi = &(*fStrawDigiMCColl)->at(shids[0]);
+      const mu2e::StrawGasStep* step (nullptr);
+
+      if (mcdigi->wireEndTime(mu2e::StrawEnd::cal) < mcdigi->wireEndTime(mu2e::StrawEnd::hv)) {
+	step = mcdigi->strawGasStep(mu2e::StrawEnd::cal).get();
+      }
+      else {
+	step = mcdigi->strawGasStep(mu2e::StrawEnd::hv ).get();
+      }
+
+      const art::Ptr<mu2e::SimParticle>& simptr = step->simParticle(); 
+      const mu2e::SimParticle*           sim    = simptr.operator->();
+
+      art::Ptr<mu2e::SimParticle>        momptr = simptr;
+
+      while(momptr->hasParent()) momptr = momptr->parent();
+      const mu2e::SimParticle* mother   = momptr.operator->();
+
+      int mother_pdg_id = mother->pdgId();
+
+      // if (simptr->fromGenerator()) generator_id = simptr->genParticle()->generatorId().id();
+      // else                         generator_id = -1;
+
+      float mc_mom      = step->momvec().mag();
+      float mc_mom_z    = step->momvec().z();
+      //-----------------------------------------------------------------------------
+      // store TEvdComboHit
+      //-----------------------------------------------------------------------------
+      fListOfComboHits->Add(new stntuple::TEvdComboHit(hit,sim,step,mother_pdg_id,mc_mom,mc_mom_z));
+    }
   }
 //-----------------------------------------------------------------------------
 // hit MC truth unformation from StepPointMC's
@@ -240,6 +302,7 @@ int TTrkVisNode::InitEvent() {
   const KalRep             *krep;  
   const mu2e::TrkStrawHit  *track_hit;
 
+  fListOfTracks->Delete();
   int ntrk = 0;
 
   if ((*fKalRepPtrColl) != 0) ntrk = (*fKalRepPtrColl)->size();
@@ -304,7 +367,7 @@ int TTrkVisNode::InitEvent() {
 }
 
 //-----------------------------------------------------------------------------
-// draw reconstructed tracks and straw hits
+// draw reconstructed tracks and STRAW hits, may want to display COMBO hits instead
 //-----------------------------------------------------------------------------
 void TTrkVisNode::PaintXY(Option_t* Option) {
 
@@ -370,14 +433,13 @@ void TTrkVisNode::PaintXY(Option_t* Option) {
 //-----------------------------------------------------------------------------
 // SimParticle's
 //-----------------------------------------------------------------------------
-  stntuple::TEvdSimParticle* esim;
-  int nsim(0);
+  stntuple::TEvdSimParticle* esp;
 
-  if ( (fListOfSimParticles) != 0 )  nsim = fListOfSimParticles->GetEntriesFast();
+  int nsim = fListOfSimParticles->GetEntriesFast();
 
   for (int i=0; i<nsim; i++ ) {
-    esim = (stntuple::TEvdSimParticle*) fListOfSimParticles->At(i);
-    esim->Paint(Option);
+    esp = (stntuple::TEvdSimParticle*) fListOfSimParticles->At(i);
+    esp->Paint(Option);
   }
 //-----------------------------------------------------------------------------
 // seedfit, if requested - not implemented yet
@@ -393,6 +455,8 @@ void TTrkVisNode::PaintXY(Option_t* Option) {
   gPad->Modified();
 }
 
+//-----------------------------------------------------------------------------
+// in RZ view can display only straw hits, they are painted by fTracker
 //-----------------------------------------------------------------------------
 void TTrkVisNode::PaintRZ(Option_t* Option) {
   int             ntrk(0), nhits;
@@ -441,9 +505,43 @@ void TTrkVisNode::PaintRZ(Option_t* Option) {
     esim = (stntuple::TEvdSimParticle*) fListOfSimParticles->At(i);
     esim->PaintRZ(Option);
   }
+
   gPad->Modified();
 }
 
+
+//-----------------------------------------------------------------------------
+// TZ view is only for the pattern recognition / time cluster finding
+// display reconstructed tracks and combo hits 
+//-----------------------------------------------------------------------------
+void TTrkVisNode::PaintTZ(Option_t* Option) {
+
+  int nhits = fListOfComboHits->GetEntries();
+  for (int i=0; i<nhits; i++) {
+    stntuple::TEvdComboHit* hit = (stntuple::TEvdComboHit*) fListOfComboHits->At(i);
+
+    // float time  = hit->Time();
+
+    //    if ((time >= tmin) && (time <= tmax)) {
+    hit->PaintTZ(Option);
+    // }
+  }
+
+//-----------------------------------------------------------------------------
+// SimParticle's
+//-----------------------------------------------------------------------------
+  stntuple::TEvdSimParticle* esim;
+  int nsim(0);
+
+  if ( (fListOfSimParticles) != 0 )  nsim = fListOfSimParticles->GetEntriesFast();
+
+  for (int i=0; i<nsim; i++ ) {
+    esim = (stntuple::TEvdSimParticle*) fListOfSimParticles->At(i);
+    esim->PaintTZ(Option);
+  }
+
+  gPad->Modified();
+}
 
 //-----------------------------------------------------------------------------
 int TTrkVisNode::DistancetoPrimitiveXY(Int_t px, Int_t py) {
@@ -469,6 +567,7 @@ int TTrkVisNode::DistancetoPrimitiveXY(Int_t px, Int_t py) {
       closest  = hit;
     }
   }
+
 //-----------------------------------------------------------------------------
 // tracks are represented by ellipses
 //-----------------------------------------------------------------------------
@@ -507,3 +606,97 @@ int TTrkVisNode::DistancetoPrimitiveXY(Int_t px, Int_t py) {
 Int_t TTrkVisNode::DistancetoPrimitiveRZ(Int_t px, Int_t py) {
   return 9999;
 }
+
+
+//-----------------------------------------------------------------------------
+Int_t TTrkVisNode::DistancetoPrimitiveTZ(Int_t px, Int_t py) {
+
+  // static TVector3 global;
+  // global.SetXYZ(gPad->AbsPixeltoX(px),gPad->AbsPixeltoY(py),0);
+
+  TObject* closest(nullptr);
+
+  int  x1, y1, dx1, dy1, min_dist(9999), dist;
+
+  int nhits = fListOfComboHits->GetEntries();
+  for (int i=0; i<nhits; i++) {
+    stntuple::TEvdComboHit* hit = (stntuple::TEvdComboHit*) fListOfComboHits->At(i);
+    x1  = gPad->XtoAbsPixel(hit->Z());
+    y1  = gPad->YtoAbsPixel(hit->T());
+    dx1 = px-x1;
+    dy1 = py-y1;
+
+    dist  = (int) sqrt(dx1*dx1+dy1*dy1);
+    if (dist < min_dist) {
+      min_dist = dist;
+      closest  = hit;
+    }
+  }
+
+//-----------------------------------------------------------------------------
+// simparticles are represented by lines
+//-----------------------------------------------------------------------------
+  int nsim = fListOfSimParticles->GetEntries();
+  for (int i=0; i<nsim; i++) {
+    stntuple::TEvdSimParticle* sim = GetSimParticle(i);
+
+    dist = sim->DistancetoPrimitiveXY(px,py);
+
+    if (dist < min_dist) {
+      min_dist = dist;
+      closest  = sim;
+    }
+  }
+
+  SetClosestObject(closest,min_dist);
+
+  return min_dist;
+}
+
+
+//-----------------------------------------------------------------------------
+void TTrkVisNode::Clear(Option_t* Opt) {
+  printf(">>> name: %s TTrkVisNode::Clear is not implemented yet\n",GetName());
+}
+
+//-----------------------------------------------------------------------------
+void TTrkVisNode::Print(Option_t* Opt) const {
+  printf(" >>> name: %s TTrkVisNode::Print is not implemented yet\n",GetName());
+
+//-----------------------------------------------------------------------------
+// print SimParticles
+//-----------------------------------------------------------------------------
+  stntuple::TEvdSimParticle* sim;
+  int nsim(0);
+
+  if ( (fListOfSimParticles) != 0 )  nsim = fListOfSimParticles->GetEntriesFast();
+
+  printf("n(sim particles) = %i\n",nsim);
+  int banner_printed(0);
+  for (int i=0; i<nsim; i++ ) {
+    sim = (stntuple::TEvdSimParticle*) fListOfSimParticles->At(i);
+    if (banner_printed == 0) {
+      sim->Print("banner");
+      banner_printed = 1;
+    }
+    sim->Print("data");
+  }
+
+//-----------------------------------------------------------------------------
+// print ComboHits
+//-----------------------------------------------------------------------------
+  banner_printed = 0;
+  int nch = fListOfComboHits->GetEntries();
+  printf("n(combo hits) = %i\n",nch);
+
+  for (int i=0; i<nch; i++) {
+    stntuple::TEvdComboHit* hit = (stntuple::TEvdComboHit*) fListOfComboHits->At(i);
+    if (banner_printed == 0) {
+      hit->Print("banner");
+      banner_printed = 1;
+    }
+    hit->Print("data");
+  }
+
+}
+

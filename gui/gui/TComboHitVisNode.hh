@@ -26,6 +26,7 @@ public:
 protected:
   const mu2e::ComboHitCollection**    fHitColl ;
   const mu2e::StrawDigiMCCollection** fSdmcColl;
+  const mu2e::SimParticleCollection**          fSimpColl;
   TObjArray*                          fListOfHits;
 
 public:

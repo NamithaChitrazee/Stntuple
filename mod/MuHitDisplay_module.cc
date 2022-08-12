@@ -321,6 +321,8 @@ MuHitDisplay::MuHitDisplay(fhicl::ParameterSet const& pset) :
 
   fFolder->Add(fDarHandle);
   // fFolder->Add(fKalDiagHandle);
+
+  _kalRepPtrColl    = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -465,7 +467,8 @@ void MuHitDisplay::InitVisManager() {
 //-----------------------------------------------------------------------------
   TTrkVisNode* tnode = new TTrkVisNode ("TrkVisNode", fTracker, NULL);
 
-  tnode->SetComboHitColl    (&fShComboHitColl  );
+  tnode->SetStrawHitColl    (&fShComboHitColl  );
+  tnode->SetComboHitColl    (&fComboHitColl    );
   //  tnode->SetStrawHitFlagColl(&fStrawHitFlagColl);
   tnode->SetTimeClusterColl (&fTimeClusterColl );
   tnode->SetKalRepPtrColl   (&_kalRepPtrColl   );
@@ -486,15 +489,16 @@ void MuHitDisplay::InitVisManager() {
   TStnView* vrz = new TStnView(TStnView::kRZ,-1,"RZView","RZ View");
   vrz->AddNode(tnode);
   vm->AddView(vrz);
-//-----------------------------------------------------------------------------
-// TZ view : tracker only, so far
-//-----------------------------------------------------------------------------
-  TComboHitVisNode* chn = new TComboHitVisNode ();
-  chn->SetComboHitHitColl(&fComboHitColl   );
-  chn->SetStrawDigiMCColl(&_strawDigiMCColl);
+// //-----------------------------------------------------------------------------
+// // TZ view : tracker only, so far
+// //-----------------------------------------------------------------------------
+//   TComboHitVisNode* chn = new TComboHitVisNode ();
+//   chn->SetComboHitHitColl(&fComboHitColl   );
+//   chn->SetStrawDigiMCColl(&_strawDigiMCColl);
+//   chn->SetSimParticleColl(&_simParticleColl);
 
   TStnView* vtz = new TStnView(TStnView::kTZ,-1,"TZView","TZ View");
-  vtz->AddNode(chn);
+  vtz->AddNode(tnode);
   vm->AddView(vtz);
 //-----------------------------------------------------------------------------
 // upon startup, open a window with XY view
@@ -720,8 +724,8 @@ int MuHitDisplay::getData(const art::Event* Evt) {
       art::Handle<KalRepPtrCollection> krepHandle;
       Evt->getByLabel(fTrackCollTag.data(), "", krepHandle);
 
-      fNTracks[0] = 0;
-      _kalRepPtrColl = NULL;
+      fNTracks[0]    = 0;
+      _kalRepPtrColl = nullptr;
       if (krepHandle.isValid()) {
 	_kalRepPtrColl = krepHandle.product();
 	fNTracks[0] = _kalRepPtrColl->size();

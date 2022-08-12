@@ -46,7 +46,8 @@ public:
   
 protected:
 
-  const mu2e::ComboHitCollection**             fComboHitColl;
+  const mu2e::ComboHitCollection**             fComboHitColl;     // suspect this is a straw hit coll
+  const mu2e::ComboHitCollection**             fStrawHitColl;     // a combo hit coll
   const mu2e::TimeClusterCollection**          fTimeClusterColl;  //
   const mu2e::StrawDigiMCCollection**          fStrawDigiMCColl; 
   const mu2e::KalRepPtrCollection**            fKalRepPtrColl;
@@ -70,6 +71,7 @@ protected:
   TObjArray*                fListOfStrawHits;
   TObjArray*                fListOfTracks;
   TObjArray*                fListOfSimParticles;
+  TObjArray*                fListOfComboHits;
 
 public:
 //-----------------------------------------------------------------------------
@@ -116,6 +118,10 @@ public:
     fComboHitColl = Coll;
   }
 
+  void SetStrawHitColl(const mu2e::ComboHitCollection** Coll) { 
+    fStrawHitColl = Coll;
+  }
+
   // void SetStrawHitFlagColl(const mu2e::StrawHitFlagCollection** Coll) { 
   //   fStrawHitFlagColl = Coll;
   // }
@@ -148,12 +154,14 @@ public:
 //-----------------------------------------------------------------------------
   virtual void  PaintXY (Option_t* option = "");
   virtual void  PaintRZ (Option_t* option = "");
+  virtual void  PaintTZ (Option_t* option = "");
 
   virtual Int_t DistancetoPrimitiveXY(Int_t px, Int_t py);
   virtual Int_t DistancetoPrimitiveRZ(Int_t px, Int_t py);
+  virtual Int_t DistancetoPrimitiveTZ(Int_t px, Int_t py);
 
-  //  virtual void   Clear(const char* Opt = "")       ; // **MENU**
-  //  virtual void   Print(const char* Opt = "") const ; // **MENU**
+  virtual void   Clear(const char* Opt = "")       ; // **MENU**
+  virtual void   Print(const char* Opt = "") const ; // **MENU**
 
   ClassDef(TTrkVisNode,0)
 };

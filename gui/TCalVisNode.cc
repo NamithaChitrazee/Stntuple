@@ -407,6 +407,6 @@ void TCalVisNode::Clear(Option_t* Opt) {
 
 //-----------------------------------------------------------------------------
 void TCalVisNode::Print(Option_t* Opt) const {
-  printf(" >>> TCalVisNode::Print is not implemented yet\n");
+  printf(" >>> name: %s TCalVisNode::Print is not implemented yet\n",GetName());
 }
 

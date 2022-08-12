@@ -165,7 +165,10 @@ void TEvdComboHit::Print(Option_t* Option) const {
 
   int flags = *((int*) &fHit->flag());
 
-  ad->printComboHit(fHit, fStep, "banner+data", -1, flags);
+  TString opt = Option;
+  opt.ToLower();
+  if (opt == "") ad->printComboHit(fHit, fStep, "banner+data", -1, flags);
+  else           ad->printComboHit(fHit, fStep, Option       , -1, flags);
 
   // printf("TEvdComboHit::Print simID=%6i pdg=%10i motherPdgID=%10i time=%10.3f Z=%10.3f edep=%10.6f P=%10.3f Pz=%10.3f\n",
   // 	 fSimID,fPdgID,fMotherPdgID,fHit->time(),fPos.Z(),fHit->energyDep(),fP,fPz);

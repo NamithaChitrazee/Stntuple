@@ -184,7 +184,10 @@ void TEvdStrawHit::Print(Option_t* Option) const {
 
   int flags = *((int*) &fHit->flag());
 
-  ad->printComboHit(fHit, step, "banner+data", -1, flags);
+  TString opt = Option;
+  opt.ToLower();
+  if (opt == "") ad->printComboHit(fHit, step, "banner+data", -1, flags);
+  else           ad->printComboHit(fHit, step, Option       , -1, flags);
 }
 
 }

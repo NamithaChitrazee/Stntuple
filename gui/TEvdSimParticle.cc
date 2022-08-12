@@ -50,6 +50,8 @@
 #include "Stntuple/gui/TEvdTrkStrawHit.hh"
 #include "Stntuple/base/TObjHandle.hh"
 
+#include "Stntuple/print/TAnaDump.hh"
+
 #include "CLHEP/Vector/ThreeVector.h"
 
 ClassImp(stntuple::TEvdSimParticle)
@@ -67,7 +69,7 @@ TEvdSimParticle::TEvdSimParticle(): TObject() {
 
 //-----------------------------------------------------------------------------
 // pointer to track is just cached
-// Step - at the trackerffront
+// Step - at the trackerfront
 //-----------------------------------------------------------------------------
   TEvdSimParticle::TEvdSimParticle(int Number, const mu2e::SimParticle* Simp, const mu2e::StepPointMC* Step): TObject() {
   fNumber = Number;
@@ -77,6 +79,9 @@ TEvdSimParticle::TEvdSimParticle(): TObject() {
   TDatabasePDG* pdb = TDatabasePDG::Instance();
 
   fParticlePDG = pdb->GetParticle(fSimp->pdgId());
+
+  // mu2e::GeomHandle<mu2e::Tracker> ttHandle;
+  // const mu2e::Tracker* tracker = ttHandle.get();
 
   fListOfHits = new TObjArray();
 
@@ -128,12 +133,27 @@ TEvdSimParticle::TEvdSimParticle(): TObject() {
 					// figure out the color
   fEllipse->SetLineColor(color);
   // fEllipse->SetFillStyle(3001);		// make it transparent
-    
+//-----------------------------------------------------------------------------
+// TZ view, Z positons of StepPoints - in the global coord system, need to subtract 
+// the tracker origin
+//-----------------------------------------------------------------------------
+  double z0    = fStep->position().z()-10171.; // tracker->origin().z();
+  double z1    = fSimp->endPosition().z()-10171.; // tracker->origin().z();
+  double t0    = fStep->time();
+
+  double m     = fParticlePDG->Mass()*1e3;     // returned mass is in (GeV)
+  //  double p     = fStep->momentum().mag();
+  double vz    = fStep->momentum().z()/sqrt(p*p+m*m)*300.;  // vz in cm/ns
+
+  double t1    = t0+(z1-z0)/vz;
+
+  fLineTZ      = new TLine(z0,t0,z1,t1);
 }
 
 //-----------------------------------------------------------------------------
 TEvdSimParticle::~TEvdSimParticle() {
   delete fEllipse;
+  delete fLineTZ;
 
   if (fListOfHits) {
     fListOfHits->Delete();
@@ -166,9 +186,15 @@ void TEvdSimParticle::Paint(Option_t* Option) {
 // of the tracker, at s=0
 //-----------------------------------------------------------------------------
 void TEvdSimParticle::PaintXY(Option_t* Option) {
-
-  // fEllipse->PaintEllipse(x0,y0,r,r,0,2*M_PI*180,0);
   fEllipse->Paint();
+}
+
+//-----------------------------------------------------------------------------
+// to display the reconstructed track in XY, use its parameters in the middle 
+// of the tracker, at s=0
+//-----------------------------------------------------------------------------
+void TEvdSimParticle::PaintTZ(Option_t* Option) {
+  fLineTZ->Paint();
 }
 
 //-----------------------------------------------------------------------------
@@ -293,28 +319,53 @@ void TEvdSimParticle::PaintRZ(Option_t* Option) {
 }
 
 //_____________________________________________________________________________
-Int_t TEvdSimParticle::DistancetoPrimitive(Int_t px, Int_t py) {
+int TEvdSimParticle::DistancetoPrimitive(Int_t px, Int_t py) {
   return 9999;
 }
 
 //_____________________________________________________________________________
-Int_t TEvdSimParticle::DistancetoPrimitiveXY(Int_t px, Int_t py) {
+int TEvdSimParticle::DistancetoPrimitiveXY(Int_t px, Int_t py) {
 
-  Int_t dist = 9999;
+  int dist = 9999;
 
   static TVector3 global;
-//   static TVector3 local;
-
-//   Double_t    dx1, dx2, dy1, dy2, dx_min, dy_min, dr;
 
   global.SetXYZ(gPad->AbsPixeltoX(px),gPad->AbsPixeltoY(py),0);
 
-  return dist;
+  double dx = global.X()-fEllipse->GetX1();
+  double dy = global.Y()-fEllipse->GetY1();
+
+  double dr = sqrt(dx*dx+dy*dy)-fEllipse->GetR1();
+
+  dist = gPad->XtoAbsPixel(global.x()+dr)-px;
+  return abs(dist);
 }
 
-//_____________________________________________________________________________
+//-----------------------------------------------------------------------------
 Int_t TEvdSimParticle::DistancetoPrimitiveRZ(Int_t px, Int_t py) {
   return 9999;
+}
+
+//-----------------------------------------------------------------------------
+Int_t TEvdSimParticle::DistancetoPrimitiveTZ(Int_t px, Int_t py) {
+
+  static TVector3 global;
+
+  global.SetXYZ(gPad->AbsPixeltoX(px),gPad->AbsPixeltoY(py),0);
+
+  double z0    = fStep->position().z();
+  double t0    = fStep->time();
+
+  double m     = fParticlePDG->Mass()*1e3;     // returned mass is in (GeV)
+  double p     = fStep->momentum().mag();
+  double vz    = fStep->momentum().z()/sqrt(p*p+m*m)*300.;  // vz in cm/ns
+
+  double tz    = t0+(global.x()-z0)*vz;
+
+  double dt    = global.y()-tz;
+
+  int dist     = gPad->YtoAbsPixel(t0+dt)-py;
+  return abs(dist);
 }
 
 
@@ -325,28 +376,15 @@ void TEvdSimParticle::Clear(Option_t* Opt) {
 
 
 //-----------------------------------------------------------------------------
-void TEvdSimParticle::Print(Option_t* Opt) const {
+void TEvdSimParticle::Print(Option_t* Option) const {
 
-//   TObjHandle*                  h;
-//   const mu2e::CaloCrystalHit*  hit;
+  TAnaDump* ad = TAnaDump::Instance();
 
-//   printf (" X0 = %10.3f Y0 = %10.3f  E = %10.3f  njits = %5i\n",
-// 	  X0(),Y0(),fEnergy,fNHits);
+  TString opt = Option;
+  opt.ToLower();
 
-//   printf("----------------------------------------------------------------\n");
-//   printf("CrystalID      Time   Energy    EnergyTot  NRoids               \n");
-//   printf("----------------------------------------------------------------\n");
-//   for (int i=0; i<fNHits; i++) {
+  if (opt == "") ad->printSimParticle(fSimp, "banner+data", nullptr);
+  else           ad->printSimParticle(fSimp, Option       , nullptr);
 
-//     h   = (TObjHandle*) fListOfHits->At(i);
-//     hit = (const mu2e::CaloCrystalHit*) h->Object();
-
-//     printf("%7i  %10.3f %10.3f %10.3f %5i\n",
-// 	   hit->id(),
-// 	   hit->time(),
-// 	   hit->energyDep(),
-// 	   hit->energyDepTotal(),
-// 	   hit->numberOfROIdsUsed());
-//   }
 }
 }
