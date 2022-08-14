@@ -50,23 +50,23 @@ int StntupleInitStrawDataBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Ev
       shc   = shch.product();
       nhits = shc->size();
     }
+    else {
+      printf(" >>> ERROR in StntupleInitMu2eStrawDataBlock: no StrawHitCollection with tag: %s. BAIL OUT\n",fStrawHitCollTag.encode().data());
+      return -1;
+    }
   }
   
   if (! fStrawDigiMCCollTag.empty() != 0) {
     bool ok = Event->getByLabel(fStrawDigiMCCollTag,sdmcch);
     if (ok) sdmcc = sdmcch.product();
-  }
-  
-  if (shc == nullptr) {
-    printf(" >>> ERROR in StntupleInitMu2eStrawDataBlock: no StrawHitCollection with tag: %s. BAIL OUT\n",fStrawHitCollTag.encode().data());
-    return -1;
-  }
-  else if (sdmcc == nullptr) {
-    printf(" >>> ERROR in StntupleInitMu2eStrawDataBlock: no StrawDigiMCCollection with tag: %s. BAIL OUT\n",fStrawDigiMCCollTag.encode().data());
-    return -1;
+
+    if (sdmcc == nullptr) {
+      printf(" >>> ERROR in StntupleInitMu2eStrawDataBlock: no StrawDigiMCCollection with tag: %s. BAIL OUT\n",fStrawDigiMCCollTag.encode().data());
+      return -1;
+    }
   }
 //-----------------------------------------------------------------------------
-//
+// MC data may not be present ...
 //-----------------------------------------------------------------------------
   const mu2e::StrawGasStep* step (nullptr);
   const mu2e::SimParticle* sim;
@@ -75,7 +75,6 @@ int StntupleInitStrawDataBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Ev
 
   int   pdg_id, mother_pdg_id, sim_id, gen_index;
   float mc_mom;
-
 
   if (nhits > 0) {
 
@@ -89,13 +88,16 @@ int StntupleInitStrawDataBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Ev
       vector<StrawDigiIndex> shids;
       chc->fillStrawDigiIndices((const art::Event&)*Event,ih,shids);
 
-      const mu2e::StrawDigiMC* mcdigi = &sdmcc->at(shids[0]);
+      step = nullptr;
+      if (sdmcc) {  
+	const mu2e::StrawDigiMC* mcdigi = &sdmcc->at(shids[0]);
 
-      if (mcdigi->wireEndTime(mu2e::StrawEnd::cal) < mcdigi->wireEndTime(mu2e::StrawEnd::hv)) {
-	step = mcdigi->strawGasStep(mu2e::StrawEnd::cal).get();
-      }
-      else {
-	step = mcdigi->strawGasStep(mu2e::StrawEnd::hv ).get();
+	if (mcdigi->wireEndTime(mu2e::StrawEnd::cal) < mcdigi->wireEndTime(mu2e::StrawEnd::hv)) {
+	  step = mcdigi->strawGasStep(mu2e::StrawEnd::cal).get();
+	}
+	else {
+	  step = mcdigi->strawGasStep(mu2e::StrawEnd::hv ).get();
+	}
       }
 
       hit = data->NewHit();

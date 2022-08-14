@@ -1,0 +1,67 @@
+# -*- mode:tcl -*-
+#------------------------------------------------------------------------------
+# stntuple VST data
+# p1 : default reconstruction path
+#------------------------------------------------------------------------------
+BEGIN_PROLOG
+  TRIGGER_PATHS    @protect_ignore: [ p1 ]
+  END_PATHS        @protect_ignore: [ stntuple_p0 ]
+END_PROLOG
+
+#include "Stntuple/fcl/stntuple.fcl"
+
+process_name : VstStn
+
+source       : { module_type : RootInput fileNames : ["undefined", "undefined"] }
+
+physics : { 
+    producers  : { @table::stntuple.producers }
+    filters    : { @table::stntuple.filters   }
+    
+    analyzers  : { @table::stntuple.analyzers 
+	StntupleMaker: { @table::stntuple.analyzers.StntupleMaker
+#------------------------------------------------------------------------------
+# disable everything, enable StepPointMC's, VDET block is just yet another StepPointMC block
+# set strawDigiMCCollTag to empty
+#------------------------------------------------------------------------------
+	    makeClusters       : 0
+	    makeCrvClusters    : 0  # default: 1
+	    makePid            : 0
+	    makeGenp           : 0
+	    makeSimp           : 0
+	    makeStepPointMC    : 0
+	    makeTracks         : 0
+	    makeTrigger        : 0
+	    makeStrawData      : 1
+	    strawDigiMCCollTag : ""	
+	}
+    }
+
+    @table::stntuple.paths
+#------------------------------------------------------------------------------
+# just an example of a substitution in FCL
+#------------------------------------------------------------------------------
+    p1            : [    ]
+    trigger_paths : [ p1 ]
+    out           : [ ]                   # [defaultOutput]/[]
+    end_paths     : [ @sequence::END_PATHS , out ]
+}
+#------------------------------------------------------------------------------
+# configure STNTUPLE maker: just one StepPointMCBlock - tracker
+#------------------------------------------------------------------------------
+physics.analyzers.StntupleMaker.makeSimp                : 0
+physics.analyzers.StntupleMaker.makeStepPointMC         : 0
+physics.analyzers.StntupleMaker.makeStrawData           : 1
+physics.analyzers.StntupleMaker.makeTrigger             : 0
+physics.analyzers.StntupleMaker.makeCalData             : 0
+physics.analyzers.StntupleMaker.makeClusters            : 0
+physics.analyzers.StntupleMaker.makeTracks              : 0
+physics.analyzers.StntupleMaker.makeTrackSeeds          : 0
+physics.analyzers.StntupleMaker.makeTimeClusters        : 0
+physics.analyzers.StntupleMaker.makePid                 : 0
+#------------------------------------------------------------------------------
+# output file names
+#------------------------------------------------------------------------------
+services.TFileService.fileName              : "nts.user.read_straw_hits.project.sequencer.root"
+physics.analyzers.InitStntuple.histFileName : "nts.user.read_straw_hits.project.sequencer.stn"
+# outputs.detectorOutput.fileName            : "sim.user.read_straw_hits.project.sequencer.art"
