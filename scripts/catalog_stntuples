@@ -3,10 +3,16 @@
 #  usage: 
 #  ------
 #  Stntuple/scripts/catalog_stntuples -b book -d dataset -m mode -v verbose   \
+#                                   [-i install_directory]
 #                                   -u user -h host -D directory -p pattern 
 # 
 # starts from already created file-level catalog file and assigns fileset 
 # numbers. Then creates fileset-level catalog
+#
+# access modes: 
+# -------------
+#  'bluearc' : file in NFS  (default)
+#  'xrootd'  : file in PNFS
 #
 # N.B. it is assumed that stntuple files have '.stn' extension
 #
@@ -21,8 +27,8 @@ require 'find'
 require 'fileutils'
 require 'getoptlong'
 
-def usage
-  printf "usage: catalog_stntuples [-v] [-u user]"
+def help
+  printf "usage: catalog_stntuples [-v] [-u user] [-a access]"
   printf " -d dataset -H host -D directory [-b book]"
   printf " -p pattern [-m mode]\n"
   exit(0)
@@ -32,7 +38,6 @@ usage if ARGV.length < 1
 
 opts = GetoptLong.new(
   [ "--access"         , "-a",        GetoptLong::REQUIRED_ARGUMENT ],
-  [ "--bluearc"        , "-B",        GetoptLong::NO_ARGUMENT       ],
   [ "--book"           , "-b",        GetoptLong::REQUIRED_ARGUMENT ],
   [ "--cleanup"        , "-c",        GetoptLong::REQUIRED_ARGUMENT ],
   [ "--dataset"        , "-d",        GetoptLong::REQUIRED_ARGUMENT ],
@@ -49,8 +54,7 @@ opts = GetoptLong.new(
 )
 
 #----------------------------- defaults
-$access          = nil;
-$bluearc         = nil;
+$access          = 'bluearc';
 $cleanup         = 'yes'
 $user            = ENV["USER"]
 $host            = `hostname -f`.strip
@@ -74,15 +78,12 @@ $diskpool        = nil;
 opts.each do |opt, arg|
   if    (opt == "--access"         ) ; $access          = arg 
   elsif (opt == "--book"           ) ; $book            = arg 
-  elsif (opt == "--bluearc"        ) ; 
-    $bluearc         = 1
-    $access          = 'bluearc'
   elsif (opt == "--cleanup"        ) ; $cleanup         = arg 
   elsif (opt == "--dataset"        ) then # dataset name defines the default filename pattern
      $dataset        = arg 
     if ($pattern == nil) ; then $pattern = arg ; end
   elsif (opt == "--Directory"      ) ; $directory       = arg 
-  elsif (opt == "--help"           ) ; usage()    
+  elsif (opt == "--help"           ) ; help()    
   elsif (opt == "--host"           ) ; $host            = arg 
   elsif (opt == "--install"        ) then
     $install     = 1
