@@ -11,6 +11,7 @@ BEGIN_PROLOG
 #------------------------------------------------------------------------------
 StntupleModuleFclDefaults : {
     interactiveMode : 0
+    maxFileSize     : 2000   # in MBytes
 #------------------------------------------------------------------------------
 # unlike everywhere else, TAnaDump sets mcTruth to 1 by default
 #------------------------------------------------------------------------------

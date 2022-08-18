@@ -32,8 +32,8 @@ TEventDisplayModule::TEventDisplayModule(const char* Name, const char* Title):
   fGeoManager  = new TStnGeoManager("StnGeoManager",geom_gdml_file,0);
 
   // the next two lines look as if they were not doing anything... 
-  TGeoVolume*  topvol = gGeoManager->GetTopVolume();
-  gGeoManager->SetTopVolume(topvol);
+  // TGeoVolume*  topvol = gGeoManager->GetTopVolume();
+  // gGeoManager->SetTopVolume(topvol);
 
   fBField = new TMu2eBField();
 
