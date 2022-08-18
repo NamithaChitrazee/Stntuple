@@ -22,6 +22,7 @@ public:
   stn_book(const char* Name = "", const char* HistDir = "") {
     fName    = Name;
     fHistDir = HistDir;
+    printf("stn_book::stn_book fHistDir: %-40s %-s\n",fHistDir.Data(),fName.Data());
   }
   
   ~stn_book() {
