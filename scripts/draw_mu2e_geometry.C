@@ -392,6 +392,9 @@ void DrawMu2eGeometry::HideBuilding(int KeepOriginalColors) {
     "NorthRailDS",
     "SouthRailDS",
 
+    "VPSP",			// pieces behind the calorimeter
+    "IFB",
+    
     "stmMagnet",           // STM magnet and its support
     "stmDet",              // STM far behind
     "collimatorSS",	     // STM
@@ -422,6 +425,7 @@ void DrawMu2eGeometry::HideBuilding(int KeepOriginalColors) {
   for (int i=0; material[i] != ""; i++) {
     SetRecursiveVisibilityByMaterial(fTop,material[i].Data(),0);
   }
+
 //-----------------------------------------------------------------------------
 // hide last saddle boxes
 //-----------------------------------------------------------------------------
