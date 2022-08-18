@@ -115,7 +115,7 @@ int StntupleInitStepPointMCBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* 
 // time - within the microbunch
 //-----------------------------------------------------------------------------
 	double tx = fTimeOffsets->timeWithOffsetsApplied(*spmc);
-	time = fmod(tx,fMbTime);
+	time = fmod(tx+fMbTime,fMbTime);
       }
       else time =  spmc->time();
 
