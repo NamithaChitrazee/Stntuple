@@ -41,8 +41,7 @@ FillStntuple::~FillStntuple() {
 }
 
 //------------------------------------------------------------------------------
-bool FillStntuple::beginRun(art::Run &  aRun) 
-{
+bool FillStntuple::beginRun(art::Run &  aRun) {
 
   THistModule::beforeBeginRun(aRun);
 
@@ -52,7 +51,7 @@ bool FillStntuple::beginRun(art::Run &  aRun)
   if (runnum != fLastRun) {
 					// create new subdirectory and store 
 					// calibration constants in there
-    ProcessNewRun(TModule::fRun);
+    ProcessNewRun(runnum);
     fLastRun = runnum;
   }
 
@@ -71,7 +70,7 @@ bool FillStntuple::endRun(art::Run &  Rn) {
 }
 
 //------------------------------------------------------------------------------
-Int_t FillStntuple::ProcessNewRun(art::Run*  Rn) 
+Int_t FillStntuple::ProcessNewRun(int RunNumber) 
 {
   // create subdirectory with the name run_xxxxxxxx to store database-type
   // constants for this run
@@ -81,7 +80,7 @@ Int_t FillStntuple::ProcessNewRun(art::Run*  Rn)
   TDirectory* olddir = gDirectory;
 					// 
 
-  sprintf(dir_name,"run_%i",Rn->run());
+  sprintf(dir_name,"run_%i",RunNumber);
 
 					// make sure that "db" directory exists
   if (fgFile->GetKey("db") == 0) {
@@ -229,7 +228,8 @@ bool FillStntuple::filter(AbsEvent& anEvent) {
 					// and also redefine branch in the node
       node->SetBranch(output_branch);
 					// store calib consts for the last event
-      ProcessNewRun(TModule::fRun);
+					// pass run number
+      ProcessNewRun(anEvent.run());
     }
 					// close the old file
     old_file->Write();
