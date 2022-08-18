@@ -215,6 +215,9 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
 				       start_vol_id, end_vol_id,
 				       generator_id);
       simp->SetStartMom(px, py, pz, energy);
+//-----------------------------------------------------------------------------
+// for SimParticles, do not wrap the time around the microbunch, do that only for hits
+//-----------------------------------------------------------------------------
       simp->SetStartPos(sp->x(),sp->y(),sp->z(),sim->startGlobalTime()+time_offsets);
       simp->SetEndMom  (sim->endMomentum().x(),
 			sim->endMomentum().y(),
