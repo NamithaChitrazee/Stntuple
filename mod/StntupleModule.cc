@@ -43,7 +43,7 @@ StntupleModule::StntupleModule(fhicl::ParameterSet const& PSet, const char* Name
     fgStntupleFolder = gROOT->GetRootFolder()->AddFolder("Stntuple",
 							 "STNTUPLE folder");
     //    fgStntupleFolder->Add(fgErrorLogger);
-    THistModule::fgMaxFileSize = 8000;
+    THistModule::fgMaxFileSize = 2000;
   }
 }
 
