@@ -21,11 +21,41 @@
 #include <Stntuple/obj/TStnDBManager.hh>
 #include <Stntuple/obj/TStnHeaderBlock.hh>
 
-#include "Stntuple/mod/FillStntuple_module.hh"
+#include "Stntuple/mod/StntupleModule.hh"
 
-// ClassImp(FillStntuple)
 namespace mu2e {
 
+class FillStntuple : public StntupleModule {
+//------------------------------------------------------------------------------
+//  data members
+//------------------------------------------------------------------------------
+protected:
+  Int_t             fLastRun;		// last run with events
+//------------------------------------------------------------------------------
+// function members
+//------------------------------------------------------------------------------
+public:
+					// constructors and destructor
+
+  FillStntuple(fhicl::ParameterSet const& PSet);
+
+  ~FillStntuple();
+//-----------------------------------------------------------------------------
+// functions of the module
+//-----------------------------------------------------------------------------
+  int     ProcessNewRun      (int RunNumber);
+//-----------------------------------------------------------------------------
+// overloaded virtual functions of EDFilter
+//-----------------------------------------------------------------------------
+  virtual void beginRun(const art::Run&   r);
+  virtual void endRun  (const art::Run&   r);
+  virtual void analyze (const AbsEvent&   e);
+
+  //  ClassDef(FillStntuple,0)
+};
+
+
+// ClassImp(FillStntuple)
 //------------------------------------------------------------------------------
 // constructors
 //------------------------------------------------------------------------------
@@ -51,7 +81,7 @@ void FillStntuple::beginRun(const art::Run &  aRun) {
   if (runnum != fLastRun) {
 					// create new subdirectory and store 
 					// calibration constants in there
-    ProcessNewRun(TModule::fRun);
+    ProcessNewRun(runnum);
     fLastRun = runnum;
   }
 
@@ -66,7 +96,7 @@ void FillStntuple::endRun(const art::Run &  Rn) {
 }
 
 //------------------------------------------------------------------------------
-  Int_t FillStntuple::ProcessNewRun(const art::Run*  Rn)  {
+  Int_t FillStntuple::ProcessNewRun(int RunNumber)  {
   // create subdirectory with the name run_xxxxxxxx to store database-type
   // constants for this run
 
@@ -75,7 +105,7 @@ void FillStntuple::endRun(const art::Run &  Rn) {
   TDirectory* olddir = gDirectory;
 					// 
 
-  sprintf(dir_name,"run_%i",Rn->run());
+  sprintf(dir_name,"run_%i",RunNumber);
 
 					// make sure that "db" directory exists
   if (fgFile->GetKey("db") == 0) {
@@ -223,7 +253,7 @@ void FillStntuple::analyze(const AbsEvent& anEvent) {
 					// and also redefine branch in the node
       node->SetBranch(output_branch);
 					// store calib consts for the last event
-      ProcessNewRun(TModule::fRun);
+      ProcessNewRun(anEvent.run());
     }
 					// close the old file
     old_file->Write();
