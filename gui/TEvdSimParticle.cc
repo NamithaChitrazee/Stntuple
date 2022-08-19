@@ -358,19 +358,21 @@ Int_t TEvdSimParticle::DistancetoPrimitiveTZ(Int_t px, Int_t py) {
 
   int dpy (10);
 
+  TStnVisManager* vm = TStnVisManager::Instance();
+
   global.SetXYZ(gPad->AbsPixeltoX(px),gPad->AbsPixeltoY(py),0);
   g2.SetXYZ    (gPad->AbsPixeltoX(px),gPad->AbsPixeltoY(py+dpy),0);
 
   double  dy   = g2.y()-global.y();
 
   double z0    = fStep->position().z()-10171.;
-  double t0    = fStep->time();
+  double t0    = fmod(fStep->time(),vm->MbTime());
 
   double m     = fParticlePDG->Mass()*1e3;     // returned mass is in (GeV)
   double p     = fStep->momentum().mag();
   double vz    = fStep->momentum().z()/sqrt(p*p+m*m)*300.;  // vz in cm/ns
 
-  double tz    = t0+(global.x()-z0)/vz;
+  double tz    = fmod(t0+(global.x()-z0)/vz,vm->MbTime());
 
   double dt    = global.y()-tz;
 
