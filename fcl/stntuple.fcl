@@ -31,6 +31,7 @@ END_PROLOG
 #include "Offline/fcl/standardProducers.fcl"
 #include "Offline/fcl/standardServices.fcl"
 #include "Offline/fcl/TrkCaloDt.fcl"
+#include "Offline/ProditionsService/fcl/prolog.fcl"
 #------------------------------------------------------------------------------
 # simulation prologs
 #------------------------------------------------------------------------------
@@ -76,8 +77,6 @@ END_PROLOG
 # #include "Offline/TrkReco/fcl/prolog_trigger.fcl"
 # #include "Offline/TrkFilters/fcl/prolog_trigger.fcl"
 #\\\\ #include "Offline/CaloFilters/fcl/prolog_trigger.fcl"
-
-#include "Offline/ProditionsService/fcl/prolog.fcl"
 
 #------------------------------------------------------------------------------
 # templates: do not include prologs, 
@@ -144,6 +143,10 @@ stntuple : {
 	@table::Digitize.producers
 	@table::Reconstruction.producers
 	@table::Stntuple.producers 
+	# 
+	compressDigiMCs : { @table::Digitize.producers.compressDigiMCs       # defined in Filters/fcl/
+	    crvDigiMCTag         : ""
+	}
     }
 
     filters  : { 
@@ -171,9 +174,81 @@ stntuple : {
 #    end_paths     : [ @sequence::END_PATHS     ]
 }
 #------------------------------------------------------------------------------
+# output event formats for different jobs
+# 1. event format for mixing input
+#------------------------------------------------------------------------------
+# Beam.SimKeptProducts
+#    "keep art::EventIDs_*_*_*",
+#    "keep mu2e::GenParticles_*_*_*",
+#    "keep mu2e::GenEventCount_*_*_*",
+#    "keep mu2e::StatusG4_*_*_*"
+#
+# Digitize.TriggerProducts
+#    "keep mu2e::KalSeeds_TT*_*_*",
+#    "keep mu2e::HelixSeeds_TT*_*_*",
+#    "keep mu2e::TimeClusters_TT*_*_*",
+#    "keep mu2e::CaloClusters_CaloClusterFast_*_*",
+#
+# Digitize.DigiProducts
+# Primary.KeptProducts
+#
+output_products : {
+    gen_sim       : [ "drop    *_*_*_*"                                 ,
+		      "keep    art::EventIDs_*_*_*"                     ,
+		      "keep    mu2e::EventWeight_*_*_*"                 ,
+		      "keep    mu2e::EventWindowMarker_EWMProducer_*_*" ,
+		      "keep    mu2e::FixedTimeMap_*_*_*"                ,
+		      "keep    mu2e::GenEventCount_*_*_*"               ,
+		      "keep    mu2e::GenParticles_*_*_*"                ,
+		      "keep    *_g4run_*_*"                             ,
+		      "drop    mu2e::StepPointMCs_g4run_calorimeter_*"  ,
+		      "drop    mu2e::StepPointMCs_g4run_calorimeterRO_*",
+		      "keep    mu2e::CaloShowerSteps_*_*_*"
+		     ]
+#------------------------------------------------------------------------------
+# 2. output format for digi files, no trigger
+#------------------------------------------------------------------------------
+    gen_sim_digi  : [ "drop    *_*_*_*"                                ,
+		      "keep    *_compressDigiMCs_*_*"                  ,
+		      "keep    mu2e::GenEventCount_*_*_*"              ,
+		      "keep    mu2e::GenParticles_generate_photon_*"   ,
+		      "keep    mu2e::StatusG4_g4run_*_*"               ,
+		      "keep    mu2e::EventWeight_*_*_*"                ,
+		      "keep    mu2e::EventWindowMarker_EWMProducer_*_*",
+		      "keep    mu2e::FixedTimeMap_*_*_*"               ,
+		      "keep    mu2e::CaloDigis_CaloDigiFromShower_*_*" ,
+		      "keep    mu2e::CrvDigis_CrvDigi_*_*"             ,
+		      "keep    mu2e::ProtonBunchIntensity_*_*_*"       ,
+		      "keep    mu2e::StrawDigis_makeSD_*_*"            
+		     ]
+#------------------------------------------------------------------------------
+# 2. output format for digi files, w/trigger
+#------------------------------------------------------------------------------
+    gen_sim_digi_trig  : [ "drop    *_*_*_*"                                ,
+			   "keep    *_compressDigiMCs_*_*"                  ,
+			   "keep    mu2e::GenEventCount_*_*_*"              ,
+			   "keep    mu2e::GenParticles_generate_photon_*"   ,
+			   "keep    mu2e::StatusG4_g4run_*_*"               ,
+			   "keep    mu2e::EventWeight_*_*_*"                ,
+			   "keep    mu2e::EventWindowMarker_EWMProducer_*_*",
+			   "keep    mu2e::FixedTimeMap_*_*_*"               ,
+			   "keep    mu2e::CaloDigis_CaloDigiFromShower_*_*" ,
+			   "keep    mu2e::CrvDigis_CrvDigi_*_*"             ,
+			   "keep    mu2e::ProtonBunchIntensity_*_*_*"       ,
+			   "keep    mu2e::StrawDigis_makeSD_*_*"            ,
+			   
+			   "keep    mu2e::TriggerInfo_*_*_*"                ,
+			   "keep    art::TriggerResults_*_*_*"              ,
+			   "keep    mu2e::KalSeeds_TT*_*_*"                 ,
+			   "keep    mu2e::HelixSeeds_TT*_*_*"               ,
+			   "keep    mu2e::TimeClusters_TT*_*_*"             ,
+			   "keep    mu2e::CaloClusters_CaloClusterFast_*_*"
+			  ]
+}
+#------------------------------------------------------------------------------
 # output file names 
 #------------------------------------------------------------------------------
-services.TFileService.fileName            : "nts..stnmaker.xxx.000000_00000000.root"
+services.TFileService.fileName            : "nts.stnmaker.xxx.000000_00000000.root"
 outputs.defaultOutput.fileName            : "sim._USER_.stnmaker.xxx.000001.art"
 #------------------------------------------------------------------------------
 # this is it
