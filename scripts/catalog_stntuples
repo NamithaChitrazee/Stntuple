@@ -5,6 +5,7 @@
 #  Stntuple/scripts/catalog_stntuples -b book -d dataset -m mode -v verbose   \
 #                                   [-i install_directory]
 #                                   -u user -h host -D directory -p pattern 
+#                                   [-o offline_version]     
 # 
 # starts from already created file-level catalog file and assigns fileset 
 # numbers. Then creates fileset-level catalog
@@ -14,14 +15,14 @@
 #  'bluearc' : file in NFS  (default)
 #  'xrootd'  : file in PNFS
 #
+# 1) if pattern is not specified, it is assumed that all filenames contatain #{dataset} in them
+# 2) the fileset size can be specified, #{$nev_fileset}: number of events per fileset, default:200000
+#
 # N.B. it is assumed that stntuple files have '.stn' extension
 #
 # examples:
 # ---------
 # cdfopr/scripts/catalog_stntuples -h diskpool -d jbmmgh -b ewk/wtaunu -p jbmm --install /web/sites/mu2e.fnal.gov/htdocs/atwork/computing/Stntuple/cafdfc
-#
-# if pattern is not defined, it is assumed to coinside with the dataset name
-# $nev_fileset: number of events per fileset, default:200000
 #------------------------------------------------------------------------------
 require 'find'
 require 'fileutils'
