@@ -76,6 +76,8 @@ TEvdSimParticle::TEvdSimParticle(): TObject() {
   fSimp   = Simp;
   fStep   = Step;
 
+  TStnVisManager* vm = TStnVisManager::Instance();
+
   TDatabasePDG* pdb = TDatabasePDG::Instance();
 
   fParticlePDG = pdb->GetParticle(fSimp->pdgId());
@@ -139,13 +141,13 @@ TEvdSimParticle::TEvdSimParticle(): TObject() {
 //-----------------------------------------------------------------------------
   double z0    = fStep->position().z()-10171.; // tracker->origin().z();
   double z1    = fSimp->endPosition().z()-10171.; // tracker->origin().z();
-  double t0    = fStep->time();
+  double t0    = fmod(fStep->time(),vm->MbTime());
 
   double m     = fParticlePDG->Mass()*1e3;     // returned mass is in (GeV)
   //  double p     = fStep->momentum().mag();
   double vz    = fStep->momentum().z()/sqrt(p*p+m*m)*300.;  // vz in cm/ns
 
-  double t1    = t0+(z1-z0)/vz;
+  double t1    = fmod(t0+(z1-z0)/vz,vm->MbTime());
 
   fLineTZ      = new TLine(z0,t0,z1,t1);
   fLineTZ->SetLineColor(color);

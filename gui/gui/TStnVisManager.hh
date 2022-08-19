@@ -101,6 +101,7 @@ protected:
 					// later those can be redefined individually
   float               fTMin;
   float               fTMax;
+  float               fMbTime;
 
   int                 fDisplayStrawDigiMC;
 //-----------------------------------------------------------------------------
@@ -139,8 +140,10 @@ public:
   int            MaxStation() { return fMaxStation; }
   int            TimeCluster() { return fTimeCluster; }
 
-  double         TMin() { return fTMin; }
-  double         TMax() { return fTMax; }
+  float          TMin() { return fTMin; }
+  float          TMax() { return fTMax; }
+
+  float          MbTime() { return fMbTime; }
 
   void           GetTimeWindow(float& TMin, float& TMax) {
     TMin = fTMin;
@@ -162,6 +165,8 @@ public:
     fTMin = TMin;
     fTMax = TMax;
   }
+
+  void  SetMbTime(float MbTime) { fMbTime = MbTime; }
 
   void UpdateViews();
 
