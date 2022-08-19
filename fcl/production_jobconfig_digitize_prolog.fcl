@@ -1,4 +1,4 @@
-#
+# -*- mode:tcl -*- 
 # Prolog for digitizing detector steps.  These scripts can be run as-is, or in conjunction with mixing
 #
 BEGIN_PROLOG
@@ -60,17 +60,28 @@ Digitize: {
     }
   }
 
-  analyzers: {
-    digiCompressionCheck : @local::DigiCompression.Check
-  }
+    analyzers: {
+      digiCompressionCheck : @local::DigiCompression.Check
+    }
 
-  DigitizeSequence : [
-    PBISim,
-    @sequence::CommonMC.DigiSim,
-    @sequence::TrackerMC.DigiSim,
-    @sequence::CaloMC.DigiSim,
-    @sequence::CrvDAQPackage.CrvDAQSequence,
-    compressDigiMCs ]
+    DigitizeSequence : [
+			PBISim,
+			@sequence::CommonMC.DigiSim,
+			@sequence::TrackerMC.DigiSim,
+			@sequence::CaloMC.DigiSim,
+			@sequence::CrvDAQPackage.CrvDAQSequence,
+			compressDigiMCs 
+		       ]
+    
+    DigitizeSequenceNoCRV : [
+			     PBISim,
+			     @sequence::CommonMC.DigiSim,
+			     @sequence::TrackerMC.DigiSim,
+			     @sequence::CaloMC.DigiSim,
+#			     @sequence::CrvDAQPackage.CrvDAQSequence,
+			     compressDigiMCs 
+		       ]
+    
 
   UntriggeredSequence : [
     UntriggeredPrescale, Triggerable ]
@@ -170,6 +181,28 @@ Digitize.Outputs : {
   TrkOutput         : @local::Digitize.TrkOutput
   CaloOutput        : @local::Digitize.CaloOutput
   UntriggeredOutput : @local::Digitize.UntriggeredOutput
+}
+#------------------------------------------------------------------------------
+# from digitize/epilog
+#------------------------------------------------------------------------------
+# optimization of the memory footprint ?
+# services.GeometryService.bFieldFile     : "Offline/Mu2eG4/geom/bfgeom_reco_v01.txt"
+# setup proditions; as new proditions are added to the database this file MUST be updated or reco won't see them
+#------------------------------------------------------------------------------
+Digitize.Proditions : { @table::Proditions
+    alignedTracker : { @table::Proditions.alignedTracker
+	useDb                 : true
+	verbose               : 0
+    }
+    trackerStatus  : { @table::Proditions.trackerStatus
+	useDb                 : true
+	verbose               : 0
+    }
+    strawElectronics : { @table::Proditions.strawElectronics 
+	useDb                 : true
+	verbose               : 0
+	overrideDbTimeOffsets : true        # don't use database time offsets in digitization
+    }
 }
 
 END_PROLOG
