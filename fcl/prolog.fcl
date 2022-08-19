@@ -147,8 +147,8 @@ MuHitDisplay: { module_type:MuHitDisplay                 # the class name;
     strawHitFlagCollTag          : "DeltaFinder:StrawHits"
     comboHitCollTag              : makePH
 
-    caloCrystalHitsCollTag       : CaloCrystalHitFromHit
-    caloClusterCollTag           : CaloClusterFromProtoCluster
+    caloHitCollTag               : CaloHitMaker
+    caloClusterCollTag           : CaloClusterMaker
 
     timeClusterCollTag           : CalTimePeakFinder
     trackCollTag                 : "KFFDeMHDar"
