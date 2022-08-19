@@ -291,5 +291,22 @@ Reconstruction.Output : {
     @sequence::Reconstruction.HighRecoProducts,
     @sequence::Reconstruction.MCRecoProducts]
 }
-
+#------------------------------------------------------------------------------
+# proditions is defined in Offline/ProditionsService/fcl/prolog.fcl
+#------------------------------------------------------------------------------
+Reconstruction.Proditions : { @table::Proditions
+    alignedTracker : { @table::Proditions.alignedTracker
+	useDb                   : true
+	verbose                 : 0
+    }
+    trackerStatus  : { @table::Proditions.trackerStatus
+	useDb           : true
+	verbose         : 0
+    }
+    strawElectronics : { @table::Proditions.strawElectronics 
+	useDb                 : true
+	verbose               : 0
+	overrideDbTimeOffsets : false  # true        # don't use database time offsets in digitization
+    }
+}
 END_PROLOG
