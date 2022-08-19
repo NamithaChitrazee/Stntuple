@@ -97,6 +97,8 @@
 #include "TEllipse.h"
 #include "TText.h"
 #include "TDatabasePDG.h"
+#include "TROOT.h"
+#include "TInterpreter.h"
 
 #include "Stntuple/base/TNamedHandle.hh"
 #include "Stntuple/gui/TStnVisManager.hh"
@@ -123,6 +125,12 @@ using CLHEP::Hep3Vector;
 namespace mu2e {
 
 class MuHitDisplay : public THistModule {
+
+  struct Plugin_t {
+    TString file;
+    TString function;
+  };
+
 private:
 //-----------------------------------------------------------------------------
 // Input parameters: Module labels 
@@ -174,6 +182,8 @@ private:
   bool				foundCalo;
 
   fhicl::ParameterSet          _vmConfig;
+
+  string                       _plugin;
 //-----------------------------------------------------------------------------
 // end of input parameters
 // Options to control the display
@@ -223,6 +233,8 @@ private:
 
   TNamedHandle*          fDarHandle;
   DoubletAmbigResolver*  fDar;
+
+  TString                _macro;	// // macro to be executed
 
 public:
   explicit MuHitDisplay(fhicl::ParameterSet const& pset);
@@ -279,7 +291,9 @@ MuHitDisplay::MuHitDisplay(fhicl::ParameterSet const& pset) :
   _showCRVOnly             (pset.get<bool>("showCRVOnly", false)),
   _showTracks              (pset.get<bool>("showTracks")),
 
-  _vmConfig                (pset.get<fhicl::ParameterSet>("visManager", fhicl::ParameterSet()))
+  _vmConfig                (pset.get<fhicl::ParameterSet>("visManager", fhicl::ParameterSet())),
+
+  _plugin                  (pset.get<string>        ("plugin"))
 {
 
   fApplication = 0;
@@ -302,13 +316,13 @@ MuHitDisplay::MuHitDisplay(fhicl::ParameterSet const& pset) :
   fCrvPulseColl_Dwnstrm = new CrvRecoPulseCollection();
   fCrvPulseColl_Upstrm  = new CrvRecoPulseCollection();
 
-  fDar           = new DoubletAmbigResolver (pset.get<fhicl::ParameterSet>("DoubletAmbigResolver"),0.,0,0);
-  fDarHandle     = new TNamedHandle("DarHandle",fDar);
+  fDar                  = new DoubletAmbigResolver (pset.get<fhicl::ParameterSet>("DoubletAmbigResolver"),0.,0,0);
+  fDarHandle            = new TNamedHandle("DarHandle",fDar);
 
   fFolder->Add(fDarHandle);
 
-  _kalRepPtrColl    = nullptr;
-  _firstCall        = 1;
+  _kalRepPtrColl        = nullptr;
+  _firstCall            = 1;
 }
 
 //-----------------------------------------------------------------------------
@@ -343,6 +357,26 @@ void MuHitDisplay::beginJob() {
 // define collection names to be used for initialization
 //-----------------------------------------------------------------------------
   TModule::fDump->SetStrawDigiMCCollTag(_strawDigiMCCollTag.data());
+//-----------------------------------------------------------------------------
+// plugin initialization
+//-----------------------------------------------------------------------------
+  if (_plugin.length() > 0) {
+    TInterpreter::EErrorCode rc;
+    TInterpreter* cint = gROOT->GetInterpreter();
+
+    TString macro(_plugin.data());
+    cint->LoadMacro(macro.Data(),&rc);
+    if (rc != 0) printf("MuHitDisplay:beginJob ERROR : failed to load %s\n",_plugin.data());
+    else {
+      TObjArray* a = macro.Tokenize('/');
+      int n = a->GetEntries();
+					// last is the macro itself, strip the path
+      TObjString* ww = (TObjString*) a->At(n-1);
+
+      TObjArray* a1 = ww->String().Tokenize('.');
+      _macro = ((TObjString*) a1->At(0))->String();
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -743,6 +777,14 @@ int MuHitDisplay::getData(const art::Event* Evt) {
     
     fVisManager->SetEvent(Evt);
     fVisManager->DisplayEvent();
+//-----------------------------------------------------------------------------
+// if a plugin is defined, execute it
+//-----------------------------------------------------------------------------
+    if (_macro.Length() > 0) {
+      TInterpreter* cint = gROOT->GetInterpreter();
+      TString cmd = Form("%s()",_macro.Data());
+      cint->ProcessLine(cmd.Data());
+    }
 //-----------------------------------------------------------------------------
 // go into interactive mode, till '.q' is pressed
 //-----------------------------------------------------------------------------
