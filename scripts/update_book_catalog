@@ -79,7 +79,7 @@ for book in $books ; do
     #    echo catalog:$catalog
         description=`cat $catalog | grep "# :DESCRIPTION:" | sed 's/# :DESCRIPTION://'`
         offline_ver=`cat $catalog | grep "# :OFFLINE_VERSION:" | sed 's/# :OFFLINE_VERSION://'`
-        if [ ".$offline_ver" == "." ] ; then offline_ver="......" ; fi
+        if [ ".$offline_ver" == "." ] ; then offline_ver="........." ; fi
         len0=${#description}
         des1=`echo $description | sed 's#<b>##' |  sed 's#</b>##'`
         len1=${#des1}
