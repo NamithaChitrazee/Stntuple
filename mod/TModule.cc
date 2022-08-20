@@ -64,6 +64,7 @@ TModule::TModule(fhicl::ParameterSet const& PSet, const char* Name):
 //-----------------------------------------------------------------------------
 // plugin initialization - figure out the function name
 //-----------------------------------------------------------------------------
+  fFunction = nullptr;
   if (_rootMacro.length() > 0) {
     TInterpreter::EErrorCode rc;
     TInterpreter* cint = gROOT->GetInterpreter();
@@ -71,7 +72,6 @@ TModule::TModule(fhicl::ParameterSet const& PSet, const char* Name):
     cint->LoadMacro(_rootMacro.data(),&rc);
     if (rc != 0) {
       printf("MuHitDisplay:beginJob ERROR : failed to load %s\n",_rootMacro.data());
-      fFunction = nullptr;
     }
     else {
       vector<string> res, r2;
