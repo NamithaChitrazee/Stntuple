@@ -69,6 +69,7 @@ mu2e -c Stntuple/fcl/display.fcl -s dig.mu2e.CeEndpointDigiTriggered.MDC2020n_10
 
   - 3D views: need a simplified geometry, work in progress 
 * ------------------------------------------------------------------------------
-* [0/1] TODO's                                                               
-** TODO add a SimParticle node ? or just add a list of SimParticles to XY view ?
+* [1/1] TODO's                                                               
+** DONE add a SimParticle node ? or just add a list of SimParticles to XY view ?
+   added a list of SimParticles to TStnTrackNode
 * ------------------------------------------------------------------------------
