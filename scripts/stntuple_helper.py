@@ -40,7 +40,8 @@ class stntuple_helper:
         self._env.StntupleCodegen(cc,script);
         obj = cc.replace(".cc",".o");
         self._env.SharedObject(obj,cc)
-        self._list_of_object_files.append(obj);
+        if (obj.find("_module") < 0):
+            self._list_of_object_files.append(obj);
 
     def handle_dictionaries(self,suffix = ".hh",skip_list = []):
         self.suffix = suffix ;
@@ -75,12 +76,15 @@ class stntuple_helper:
 #------------------------------------------------------------------------------
 # compile dictionaries
 #------------------------------------------------------------------------------
-        list   = [];
+        # list   = [];
 
         for dict in list_of_dict_files:
+            # print("----- dict : ",dict);
             obj_cxx_file = dict.replace(".cxx",".o");
-            list.append(obj_cxx_file);
-            self._list_of_object_files.append(obj_cxx_file);
+
+            if (dict.find("_module_dict") < 0) : 
+                # list.append(obj_cxx_file);
+                self._list_of_object_files.append(obj_cxx_file);
         
             include  = dict.replace(".cxx",".h");
             self._env.SharedObject(obj_cxx_file,dict)
@@ -123,7 +127,7 @@ class stntuple_helper:
 
     def build_modules(self,list_of_module_files, skip_list, libs = []):
         if (self._debug):
-            print ("[Stntuple.build_libs]: list_of_module_files in Stntuple/"+self.subdir," : ",list_of_module_files)
+            print ("[Stntuple.build_modules]: list_of_module_files in Stntuple/"+self.subdir," : ",list_of_module_files)
 
         for module in list_of_module_files:
             if (not module in skip_list):
@@ -133,12 +137,25 @@ class stntuple_helper:
                 o = os.getenv("MUSE_BUILD_DIR")+'/'+self.dirname+'/tmp/'+self.subdir+'/'+module.split('.')[0]+'.o'
                 self._env.SharedObject(o,module)
 
+                # check for the presence of a dictionary
+                dict = self.dirname+'/'+self.subdir+'/'+self.subdir+'/dict/'+module.split('.')[0]+'_linkdef.h'
+
+                olist = [o];
+                if (os.path.isfile(os.getenv("PWD")+'/'+dict)):
+                    odict = os.getenv("MUSE_BUILD_DIR")+'/'+self.dirname+'/tmp/'+self.subdir+'/'+module.split('.')[0]+'_dict.o'
+                    olist.append(odict)
+                # else: 
+                #    print(" no ",dict ," found in",os.getenv('PWD'));
+
                 mname = os.path.basename(module).split('.')[0];
                 lib   = os.getenv("MUSE_BUILD_DIR")+'/'+self.dirname+'/lib/libmu2e_'+self.dirname+'_'+mname+'.so';
+
                 if (self._debug):
                     print ("o: "+o, "lib:"+lib)
-                    
-                self._env.SharedLibrary(lib,o,LIBS =  ['libStntuple_mod.so',libs]);
+                    print ("pwd: "+os.getenv("PWD"),"module dict: "+dict);
+                    print ("olist : ",olist);
+
+                self._env.SharedLibrary(lib,olist,LIBS =  ['libStntuple_mod.so',libs]);
 
     def print():
         print("stntuple_helper::print :  emoe");

@@ -18,7 +18,7 @@ def local_build():
     if ( not ("EG" in rootlibs)):
         rootlibs.insert(rootlibs.index("Physics")+1,"EG");
 
-    helper    = stntuple_helper(local_env);
+    helper    = stntuple_helper(local_env,debug=False);
     #------------------------------------------------------------------------------
     # '#' tells not to prepend local directory
     #------------------------------------------------------------------------------
@@ -91,7 +91,7 @@ def local_build():
     # print "2. Stntuple/mod: skip_list:",skip_list
 
     helper.build_libs   (list_of_cc_files,skip_list,libs)
-    helper.build_modules(list_of_modules,[],libs)
+    helper.build_modules(list_of_modules ,[]       ,libs)
 #------------------------------------------------------------------------------
 local_build();
 

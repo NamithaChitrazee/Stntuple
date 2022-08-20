@@ -4,7 +4,7 @@
 #------------------------------------------------------------------------------
 base=$MUSE_WORK_DIR
 
-echo Stntuple::build_config_muse:000: MUSE_VERBOSE:.$MUSE_VERBOSE.
+# echo Stntuple::build_config_muse:000: MUSE_VERBOSE:.$MUSE_VERBOSE.
 
 if [ ".$MUSE_VERBOSE" != ".0" ] ; then echo Stntuple::build_config_muse:001: $\0:$0 : \$PWD=$PWD  \$base=$base ; fi
 
@@ -14,7 +14,7 @@ pkg=`echo $0 | awk -F / '{print $(NF-2)}'`
         pkg_dir=$MUSE_WORK_DIR/$pkg
 pkg_include_dir=$base/include/$pkg
 
-echo Stntuple::build_config_muse: package=$pkg
+# echo Stntuple::build_config_muse: package=$pkg
 
 list_of_subpackages="alg ana base geom gui loop mod obj print val"
 #------------------------------------------------------------------------------

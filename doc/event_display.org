@@ -33,18 +33,30 @@ mu2e -c Stntuple/fcl/display.fcl -s dig.mu2e.CeEndpointDigiTriggered.MDC2020n_10
 
   - mouse weel (Up, and Down) changes the scale
 
-** plugins:
-   the following FCL command 
+** plugins:                                                                   
+   the following FCL parameter of a STNTUPLE module (any module class inheriting from TModule)
 #+begin_quote
-   rootMacro   : "/a/b/c/aaa.C"
+   interactiveMode : 2
+   rootMacro       : "Stntuple/mod/scripts/display_001.C"
 #+end_quote
 
-   makes the event display to execute an interpreted function "aaa()" in a loop
+   makes the module to execute an interpreted function "display_001(int MOde, TModule* Module)" 
+   each time the module is called, assuming the module calls proper hooks of the TModule
+   search the source of [[file:../mod/MuHitDisplay_module.cc][Stntuple/mod/MuHitDisplay_module.cc]]   for "TModule"
+
+   see example: [[file:../mod/scripts/display_001.C][Stntuple/mod/scripts/display_001.C]] 
+
+   Parameters
+   ----------
+   Mode = 0: begin job (run)
+        = 1: event
+        = 2: end job (run)
+
+   Module  : pointer to the calling module, if the module dictionary exists, could call its functions
 
    interactiveMode = 1 : stop at a ROOT prompt after processing each event
-                   = 2 : stop only in thee end of run
+                   = 2 : stop only in the end of run
     
-
 ** quick notes about internals                                                
 
   - Several views : derived from TStnView - XYView, RZView, TZView....

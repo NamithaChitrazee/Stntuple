@@ -4,7 +4,7 @@ import os, re, string, subprocess, sys, importlib
 Import('env')
 sys.path.append(os.getenv("MUSE_WORK_DIR")+'/site_scons')
 #------------------------------------------------------------------------------
-print("Stntuple/SConscript:muse branch: PWD:"+os.getenv("PWD"))
+# print("Stntuple/SConscript:muse branch: PWD:"+os.getenv("PWD"))
 
 x = subprocess.call(os.getenv("MUSE_WORK_DIR")+'/Stntuple/scripts/build_config_muse',shell=True)
 

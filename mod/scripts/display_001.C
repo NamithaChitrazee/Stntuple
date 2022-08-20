@@ -1,4 +1,6 @@
 //-----------------------------------------------------------------------------
+// file: Stntuple/mod/scripts/display_001.C
+//
 // test macro : fill and display histogram of N(combo hits) in the event
 // no includes needed
 // hide variables - dos it have any effect ?
