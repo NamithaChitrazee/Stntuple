@@ -2,6 +2,10 @@
 //
 //
 
+#include <iostream>
+#include <boost/algorithm/string.hpp>
+#include <string>
+
 #include "Stntuple/mod/TModule.hh"
 #include "Stntuple/mod/TAnaRint.hh"
 #include "Stntuple/print/TAnaDump.hh"
@@ -13,10 +17,9 @@
 #include "art/Framework/Principal/Event.h"
 #include "art/Framework/Principal/Handle.h"
 
-// C++ includes.
-#include <iostream>
-
 #include "TString.h"
+#include "TROOT.h"
+#include "TInterpreter.h"
 
 using namespace std;
 
@@ -36,9 +39,13 @@ TModule::TModule(fhicl::ParameterSet const& PSet, const char* Name):
 
   fFclDebugBits    = PSet.get<fhicl::ParameterSet>("debugBits"      );
   fInteractiveMode = PSet.get<int>                ("interactiveMode");
+  _rootMacro       = PSet.get<string>             ("rootMacro"      );
 
   fAnaRint         = TAnaRint::Instance(0,dummy);
 
+//-----------------------------------------------------------------------------
+// pass parameters to TAnaDump
+//-----------------------------------------------------------------------------
   fhicl::ParameterSet tadPset = PSet.get<fhicl::ParameterSet>("TAnaDump");
   fDump                       = TAnaDump::Instance(&tadPset);
 
@@ -54,6 +61,32 @@ TModule::TModule(fhicl::ParameterSet const& PSet, const char* Name):
     printf("... TModule: bit=%3i is set to %i \n",index,fDebugBit[index]);
   }
 
+//-----------------------------------------------------------------------------
+// plugin initialization - figure out the function name
+//-----------------------------------------------------------------------------
+  if (_rootMacro.length() > 0) {
+    TInterpreter::EErrorCode rc;
+    TInterpreter* cint = gROOT->GetInterpreter();
+
+    cint->LoadMacro(_rootMacro.data(),&rc);
+    if (rc != 0) {
+      printf("MuHitDisplay:beginJob ERROR : failed to load %s\n",_rootMacro.data());
+      fFunction = nullptr;
+    }
+    else {
+      vector<string> res, r2;
+      
+      boost::algorithm::split(res,_rootMacro, boost::is_any_of("/"));
+
+      int n = res.size();
+					// last is the macro itself, strip the path
+      string ww = res[n-1];
+
+      boost::algorithm::split(r2,ww, boost::is_any_of("."));
+
+      fFunction = new TString(r2[0].data());
+    }
+  }
 };
 
 //-----------------------------------------------------------------------------
@@ -65,19 +98,52 @@ TModule::~TModule() {
 };
 
 
+//______________________________________________________________________________
+int TModule::beforeBeginJob() {
+  return 0;
+}
+
 //-----------------------------------------------------------------------------
 void TModule::beginJob() {
 };
 
 
+//______________________________________________________________________________
+int TModule::afterBeginJob() {
+  return 0;
+}
+
+
+//-----------------------------------------------------------------------------
+int TModule::beforeBeginRun(const art::Run& aRun) {
+  return 0;
+}
+    
+
 //-----------------------------------------------------------------------------
 void TModule::beginRun(const art::Run &  Rn) {
+  ExecuteMacro(0);
 };
 
 //-----------------------------------------------------------------------------
+int TModule::afterBeginRun(const art::Run& aRun) {
+  return 0;
+}
+    
+//______________________________________________________________________________
+int TModule::beforeEvent(const AbsEvent& event) {
+  return 0;
+}
+
+//-----------------------------------------------------------------------------
 void TModule::analyze  (const art::Event& Evt) {
-  if (fInteractiveMode != 0) {
-    fDump->SetEvent(Evt);
+//-----------------------------------------------------------------------------
+// if a ROOT macro is defined, execute it
+//-----------------------------------------------------------------------------
+  ExecuteMacro(1);
+
+  if (fInteractiveMode == 1) {
+    fDump->SetEvent(&Evt);
     fAnaRint->SetInteractiveMode(fInteractiveMode);
     fAnaRint->Rint()->Run(true);
                                         // provision for switching the interactive mode OFF
@@ -86,15 +152,80 @@ void TModule::analyze  (const art::Event& Evt) {
   }
 };
 
+//______________________________________________________________________________
+int TModule::afterEvent(const AbsEvent& event) {
+  return 0;
+}
+
+//______________________________________________________________________________
+int TModule::beforeEndRun(const art::Run& _Run) {
+  return 0;
+}
+
+//-----------------------------------------------------------------------------
+// if fInteractiveMode=2, stop at the interactive prompt only in the end of run
+// however the macro is executed for each event
+//-----------------------------------------------------------------------------
+void TModule::endRun(const art::Run &  Rn) {
+  
+  ExecuteMacro(2);
+
+  if (fInteractiveMode == 2) {
+					// at this point the event is not defined
+    fDump->SetEvent(nullptr);
+    fAnaRint->SetInteractiveMode(fInteractiveMode);
+    fAnaRint->Rint()->Run(true);
+                                        // provision for switching the interactive mode OFF
+
+    fAnaRint->GetInteractiveMode(fInteractiveMode);
+  }
+};
+
+
+//______________________________________________________________________________
+int TModule::afterEndRun(const art::Run& _Run) {
+  return 0;
+}
+
+//______________________________________________________________________________
+int TModule::beforeEndJob() {
+  return 0;
+}
+
 //-----------------------------------------------------------------------------
 void TModule::endJob  () {
 };
 
+//______________________________________________________________________________
+int TModule::afterEndJob() {
+  return 0;
+}
+
 //_____________________________________________________________________________
-  void     TModule::AddHistogram(TObject* hist, const char* FolderName) {
-    TFolder* fol = (TFolder*) fFolder->FindObject(FolderName);
-    fol->Add(hist);
-  }
+void     TModule::AddHistogram(TObject* hist, const char* FolderName) {
+  TFolder* fol = (TFolder*) fFolder->FindObject(FolderName);
+  fol->Add(hist);
+}
+
+
+//-----------------------------------------------------------------------------
+// Function(int Mode, TModule* Mod)
+//-----------------------------------------------------------------------------
+int TModule::ExecuteMacro(int Mode) {
+  char  par[200];
+
+  if (fFunction == nullptr) return 0;
+
+  TInterpreter* cint = gROOT->GetInterpreter();
+  // sprintf(par,"%s(%i,(TModule*) %p)",Function(),Mode,this);
+  // cint->ProcessLine(par);
+
+  sprintf(par,"%i,(TModule*)%p",Mode,this);
+  cint->Execute(Function(),par);
+
+  return 0;
+}
+
 
 //_____________________________________________________________________________
   void TModule::HBook1F(TH1F*& Hist, const char* Name, const char* Title,

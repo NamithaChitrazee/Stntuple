@@ -28,7 +28,7 @@
 
 #include <boost/lexical_cast/lexical_cast_old.hpp>
 
-ClassImp(TStnVisManager)
+// ClassImp(TStnVisManager)
 
 //-----------------------------------------------------------------------------
 TStnVisManager::TStnVisManager(const char* Name, const char* Title): TVisManager(Name, Title) {
@@ -183,6 +183,12 @@ int TStnVisManager::InitGui(const char* Title) {
   fMain->MapWindow();
 
   return 0;
+}
+
+//-----------------------------------------------------------------------------
+int TStnVisManager::EndRun() {
+  if (fEvent == nullptr) return 1;
+  else                   return 0;
 }
 
 //-----------------------------------------------------------------------------

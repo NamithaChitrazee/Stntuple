@@ -152,30 +152,32 @@ public:
   //-----------------------------------------------------------------------------
   // modifiers
   //-----------------------------------------------------------------------------
-  void SetEvent(const art::Event& Evt) { fEvent = &Evt; }
+  void SetEvent(const art::Event* Evt) { fEvent = Evt; }
 
   void SetDisplayStrawDigiMC(int Display) {
     fDisplayStrawDigiMC = Display;
   }
 
-  void SetStations(int IMin, int IMax);
-  void SetTimeCluster(int I);
+  void SetStations(int IMin, int IMax) override;
+  void SetTimeCluster(int I) override;
   
-  void   SetTimeWindow(float TMin, float TMax) {
+  void   SetTimeWindow(float TMin, float TMax) override {
     fTMin = TMin;
     fTMax = TMax;
   }
 
   void  SetMbTime(float MbTime) { fMbTime = MbTime; }
 
-  void UpdateViews();
+  void  UpdateViews();
+
+  virtual int EndRun() override ;
 
   virtual TCanvas*  NewCanvas(const char* Name,
 			      const char* Title,
 			      Int_t       SizeX,
-			      Int_t       SizeY);
+			      Int_t       SizeY) override;
 
-  virtual void OpenView(TStnView* Mother, int Px1, int Py, int Px2, int Py2);
+  virtual void OpenView(TStnView* Mother, int Px1, int Py, int Px2, int Py2) override;
 
   Int_t   OpenTrkXYView();
   Int_t   OpenTrkXYView(TStnView* Mother, Axis_t x1, Axis_t y1, Axis_t x2, Axis_t y2);
@@ -194,6 +196,6 @@ public:
   
   void    CloseWindow();
   
-  ClassDef(TStnVisManager, 0)
+  // ClassDef(TStnVisManager, 0)
 };
 #endif

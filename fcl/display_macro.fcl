@@ -54,6 +54,11 @@ services.TFileService.fileName            : "nts.user.egun_stnmaker.xxx.000001.r
 #-----------------------------------------------------------------------------
 # physics.out                               : [ detectorOutput ]
 # outputs.detectorOutput.SelectEvents       : [ path_gen_digi_reco_stn_dem ]
-outputs.detectorOutput.fileName           : "sim.user.photon_stnmaker.xxx.000001.art"
+outputs.detectorOutput.fileName             : "sim.user.project.version.000000_00000000.art"
 #------------------------------------------------------------------------------
-
+# configure event display
+# mode=2
+# change interactive mode from 2 to 1 to stop after each event
+#------------------------------------------------------------------------------
+physics.analyzers.MuHitDisplay.interactiveMode  : 1
+physics.analyzers.MuHitDisplay.rootMacro        : "Stntuple/mod/scripts/display_001.C"

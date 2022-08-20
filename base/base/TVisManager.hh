@@ -37,7 +37,7 @@ protected:
   TDetectorElement* fClosestDetElement;	// !
   Int_t             fMinDistDetElement;	// !
   TVisNode*         fTitleNode;         // !
-  TStnView*        fCurrentView;       // ! 
+  TStnView*         fCurrentView;       // ! 
   int               fDebugLevel; 	// !
 //-----------------------------------------------------------------------------
 // methods
@@ -82,6 +82,8 @@ public:
 
   TVisNode*          GetNode      (Int_t i) { return (TVisNode*) fListOfNodes->UncheckedAt(i); }
 
+  TVisNode*          FindNode     (const char* Name) { return (TVisNode*) fListOfNodes->FindObject(Name); }
+
   int                GetNViews()    { return fListOfViews->GetEntriesFast(); }
   TStnView*          GetView(int I) { return (TStnView*) fListOfViews->UncheckedAt(I); } 
 
@@ -116,6 +118,9 @@ public:
 
   virtual void DefaultRange();
   virtual void DrawOneSpec(const char* name);
+
+					// returns 1 if end run
+  virtual int  EndRun();
 
   virtual TCanvas*       NewCanvas(const char* Name, 
 				   const char* Title, 

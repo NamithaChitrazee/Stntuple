@@ -21,7 +21,7 @@ mu2e -c Stntuple/fcl/display.fcl -s dig.mu2e.CeEndpointDigiTriggered.MDC2020n_10
 | magenta   |            | everything else |
 |-----------+------------+-----------------|
 
-** commands:
+** commands:                                                                  
 
   - process next event: type ".q" at the ROOT prompt
 
@@ -33,7 +33,19 @@ mu2e -c Stntuple/fcl/display.fcl -s dig.mu2e.CeEndpointDigiTriggered.MDC2020n_10
 
   - mouse weel (Up, and Down) changes the scale
 
-** quick notes about internals 
+** plugins:
+   the following FCL command 
+#+begin_quote
+   rootMacro   : "/a/b/c/aaa.C"
+#+end_quote
+
+   makes the event display to execute an interpreted function "aaa()" in a loop
+
+   interactiveMode = 1 : stop at a ROOT prompt after processing each event
+                   = 2 : stop only in thee end of run
+    
+
+** quick notes about internals                                                
 
   - Several views : derived from TStnView - XYView, RZView, TZView....
   - each view displays geometry and several nodes 

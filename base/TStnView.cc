@@ -315,6 +315,8 @@ char* TStnView::GetObjectInfo(Int_t Px, Int_t Py) const {
 void TStnView::Paint(Option_t* Option) {
   //
   TVisManager* vm = TVisManager::Instance();
+  
+  if (vm->EndRun() == 1) return; 
 
   vm->SetCurrentView(this);
 

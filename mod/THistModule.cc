@@ -131,6 +131,9 @@ int THistModule::beforeBeginJob() {
       fgFile->cd(fDirName);
     }
   }
+
+  rc = TModule::beforeBeginJob();
+
   return rc;
 }
 
@@ -138,34 +141,26 @@ int THistModule::beforeBeginJob() {
 //______________________________________________________________________________
 int THistModule::afterBeginJob() {
 
-  char par[200];
-
-  if (strcmp(FunctionName(),"") != 0) {
-					// call interpreted function if it 
-					// is defined
-    sprintf(par,"0,0x%lx",(long int) this);
-    gInterpreter->Execute(FunctionName(),par);
-  }
-
   if (fgMakeSubdirs && fgFile) {
     fOldDir->cd();
   }
 
-  return 0;
+  int rc = TModule::afterBeginJob();
+  return rc;
 }
 
 
 //______________________________________________________________________________
-int THistModule::beforeBeginRun(const art::Run& aRun) {
-  return 0;
+int THistModule::beforeBeginRun(const art::Run& _Run) {
+  return TModule::beforeBeginRun(_Run);
 }
     
 
 //______________________________________________________________________________
-int THistModule::afterBeginRun(const art::Run& aRun) {
-  return 0;
+int THistModule::afterBeginRun(const art::Run& _Run) {
+  return TModule::afterBeginRun(_Run);
 }
-    
+
 
 //______________________________________________________________________________
 int THistModule::beforeEvent(const AbsEvent& event) {
@@ -200,41 +195,39 @@ int THistModule::beforeEvent(const AbsEvent& event) {
       fgFile->cd(fDirName);
     }
   }
-  return 0;
+
+  int rc = TModule::beforeEvent(event);
+  return rc;
 }
     
 
 //______________________________________________________________________________
-int THistModule::afterEvent(const AbsEvent& event) {
+int THistModule::afterEvent(const AbsEvent& _Event) {
   // need to cd() back 
 
-  char par[200] ;
-  if (strcmp(FunctionName(),"") != 0) {
-					// call interpreted function if it 
-					// is defined
-
-    sprintf(par,"1,0x%lx",(long int) this);
-    gInterpreter->Execute(FunctionName(),par);
-  }
+  TModule::afterEvent(_Event);
 
   if (fgFile) {
     if (fgMakeSubdirs) {
       fOldDir->cd();
     }
   }
-  return 0;
+  int rc = TModule::afterEvent(_Event);
+  return rc;
 }
     
 
 //______________________________________________________________________________
-int THistModule::beforeEndRun(const art::Run& aRun) {
-  return 0;
+int THistModule::beforeEndRun(const art::Run& _Run) {
+  int rc = TModule::beforeEndRun(_Run);
+  return rc;
 }
     
 
 //______________________________________________________________________________
-int THistModule::afterEndRun(const art::Run& aRun) {
-  return 0;
+int THistModule::afterEndRun(const art::Run& _Run) {
+  int rc = TModule::afterEndRun(_Run);
+  return rc;
 }
     
 
@@ -250,23 +243,15 @@ int THistModule::beforeEndJob() {
     fOldDir->cd();
   }
 
-  return 0;
+  int rc = TModule::beforeEndJob();
+  return rc;
 }
     
 
 //-----------------------------------------------------------------------------
 int THistModule::afterEndJob() {
 					// return code
-  int   rc = 0;
-  char  par[200];
-
-  if (strcmp(FunctionName(),"") != 0) {
-					// call interpreted function if it is defined
-    sprintf(par,"2,0x%lx",(long int) this);
-    gInterpreter->Execute(FunctionName(),par);
-  }
-
-  return rc;
+  return TModule::afterEndJob();
 }
     
 

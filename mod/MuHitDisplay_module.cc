@@ -1,37 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// A half-interactive 2D event display. 
+// interactive 2D event display. 
 //
 // $Id: MuHitDisplay_module.cc,v 1.6 2014/09/20 17:54:06 murat Exp $
 // $Author: murat $
 // $Date: 2014/09/20 17:54:06 $
 //
 // Contact person:  Pavel Murat, Gianantonio Pezzulo
-//
-// What this event display shows: 2D view of the straw hits, tracks, and calorimeter clusters
-//
-// Straw hit display mode: 
-// -----------------------
-// displayBackgroundHits : false - respect hit flags set by FlagStrawHits_module (default)
-//                         the timing hit flag check is commented out - I didn't have a MC file
-//                         in hands to check
-//                       : true  - display all hits
-//
-// small black triangles: MC truth on the trajectory
-//
-// red   hits: hits on a track reconstructed as a downstream-moving conversion electron within the time window
-//             size of the timing window can be redefined via  talk-to (input .fcl file)
-// blue  hits: hits of the conversion electron track, which fall outside the time window
-// black hits: hits produced by anything, but the conversion electron
-//
-// a hit is displayed by a cross with the radial error bar of 5mm and the resolution 
-// along the straw of sigma(time division)/2, to better guide the eye
-//
-// green circles - contour of the disk-based calorimeter
-// clusters on the 1st disk are shown in red, on the second disk - in pink
-// 
-// there are few other features which we need to document
-//
-// .fcl file to use: Analyses/test/hitDisplay.fcl
 ///////////////////////////////////////////////////////////////////////////////
 
 // C++ includes.
@@ -82,29 +56,12 @@
 
 #include "Offline/TrkReco/inc/DoubletAmbigResolver.hh"
 
-// ROOT includes
 #include "TApplication.h"
-#include "TArc.h"
-#include "TArrow.h"
-#include "TSystem.h"
-#include "TCanvas.h"
-#include "TDirectory.h"
-#include "TGraph.h"
-#include "TH1F.h"
-#include "TLine.h"
-#include "TBox.h"
-#include "TMarker.h"
-#include "TEllipse.h"
-#include "TText.h"
-#include "TDatabasePDG.h"
-#include "TROOT.h"
-#include "TInterpreter.h"
 
 #include "Stntuple/base/TNamedHandle.hh"
 #include "Stntuple/gui/TStnVisManager.hh"
 #include "Stntuple/gui/THeaderVisNode.hh"
 #include "Stntuple/gui/TCalVisNode.hh"
-#include "Stntuple/gui/TComboHitVisNode.hh"
 #include "Stntuple/gui/TCrvVisNode.hh"
 #include "Stntuple/gui/TTrkVisNode.hh"
 
@@ -182,8 +139,6 @@ private:
   bool				foundCalo;
 
   fhicl::ParameterSet          _vmConfig;
-
-  string                       _plugin;
 //-----------------------------------------------------------------------------
 // end of input parameters
 // Options to control the display
@@ -234,8 +189,6 @@ private:
   TNamedHandle*          fDarHandle;
   DoubletAmbigResolver*  fDar;
 
-  TString                _macro;	// // macro to be executed
-
 public:
   explicit MuHitDisplay(fhicl::ParameterSet const& pset);
   virtual ~MuHitDisplay();
@@ -250,6 +203,7 @@ public:
 //-----------------------------------------------------------------------------
   virtual void     beginJob();
   virtual void     beginRun(const art::Run& aRun);
+  virtual void     endRun  (const art::Run& aRun);
   virtual void     analyze (const art::Event& Evt);
 };
 
@@ -291,9 +245,7 @@ MuHitDisplay::MuHitDisplay(fhicl::ParameterSet const& pset) :
   _showCRVOnly             (pset.get<bool>("showCRVOnly", false)),
   _showTracks              (pset.get<bool>("showTracks")),
 
-  _vmConfig                (pset.get<fhicl::ParameterSet>("visManager", fhicl::ParameterSet())),
-
-  _plugin                  (pset.get<string>        ("plugin"))
+  _vmConfig                (pset.get<fhicl::ParameterSet>("visManager", fhicl::ParameterSet()))
 {
 
   fApplication = 0;
@@ -341,7 +293,6 @@ MuHitDisplay::~MuHitDisplay() {
   delete fDar;
 }
 
-
 //-----------------------------------------------------------------------------
 void MuHitDisplay::beginJob() {
 
@@ -357,26 +308,7 @@ void MuHitDisplay::beginJob() {
 // define collection names to be used for initialization
 //-----------------------------------------------------------------------------
   TModule::fDump->SetStrawDigiMCCollTag(_strawDigiMCCollTag.data());
-//-----------------------------------------------------------------------------
-// plugin initialization
-//-----------------------------------------------------------------------------
-  if (_plugin.length() > 0) {
-    TInterpreter::EErrorCode rc;
-    TInterpreter* cint = gROOT->GetInterpreter();
-
-    TString macro(_plugin.data());
-    cint->LoadMacro(macro.Data(),&rc);
-    if (rc != 0) printf("MuHitDisplay:beginJob ERROR : failed to load %s\n",_plugin.data());
-    else {
-      TObjArray* a = macro.Tokenize('/');
-      int n = a->GetEntries();
-					// last is the macro itself, strip the path
-      TObjString* ww = (TObjString*) a->At(n-1);
-
-      TObjArray* a1 = ww->String().Tokenize('.');
-      _macro = ((TObjString*) a1->At(0))->String();
-    }
-  }
+  TModule::beginJob();
 }
 
 //-----------------------------------------------------------------------------
@@ -389,6 +321,19 @@ void MuHitDisplay::beginRun(const art::Run& Run) {
 
   TStnVisManager* vm = TStnVisManager::Instance();
   vm->SetMbTime(mbtime);
+
+  TModule::beginRun(Run);
+}
+
+
+//-----------------------------------------------------------------------------
+void MuHitDisplay::endRun(const art::Run& Run) {
+  TStnVisManager* vm = TStnVisManager::Instance();
+  vm->SetEvent(nullptr);
+//-----------------------------------------------------------------------------
+// if a ROOT macro is defined, execute it
+//-----------------------------------------------------------------------------
+  TModule::endRun(Run);
 }
 
 
@@ -511,11 +456,6 @@ void MuHitDisplay::InitVisManager() {
 //-----------------------------------------------------------------------------
 // TZ view : TTrkNode only, so far
 //-----------------------------------------------------------------------------
-//   TComboHitVisNode* chn = new TComboHitVisNode ();
-//   chn->SetComboHitHitColl(&fComboHitColl   );
-//   chn->SetStrawDigiMCColl(&_strawDigiMCColl);
-//   chn->SetSimParticleColl(&_simParticleColl);
-
   TStnView* vtz = new TStnView(TStnView::kTZ,-1,"TZView","TZ View");
   vtz->AddNode(tnode);
   vm->AddView(vtz);
@@ -610,7 +550,6 @@ int MuHitDisplay::getData(const art::Event* Evt) {
 	printf(">>> [%s] WARNING: GenParticleCollection by %s is missing. CONTINUE\n",
 	       oname, _genpCollTag.data());
       }
-
 //-----------------------------------------------------------------------------
 //  StepPointMCs - on virtual detectors
 //-----------------------------------------------------------------------------
@@ -767,7 +706,7 @@ int MuHitDisplay::getData(const art::Event* Evt) {
       InitVisManager();
     }
 
-    TModule::fDump->SetEvent(Evt);
+    //    TModule::fDump->SetEvent(&Evt);
 
     int rc = getData(&Evt);
     if (rc < 0) {
@@ -775,18 +714,12 @@ int MuHitDisplay::getData(const art::Event* Evt) {
       return;
     }
     
-    fVisManager->SetEvent(Evt);
+    fVisManager->SetEvent(&Evt);
     fVisManager->DisplayEvent();
 //-----------------------------------------------------------------------------
-// if a plugin is defined, execute it
-//-----------------------------------------------------------------------------
-    if (_macro.Length() > 0) {
-      TInterpreter* cint = gROOT->GetInterpreter();
-      TString cmd = Form("%s()",_macro.Data());
-      cint->ProcessLine(cmd.Data());
-    }
-//-----------------------------------------------------------------------------
-// go into interactive mode, till '.q' is pressed
+// go into interactive mode, 
+// fInteractiveMode = 1 : stop after each event (event display mode)
+// fInteractiveMode = 2 : stop only in the end of run, till '.q' is pressed
 //-----------------------------------------------------------------------------
     TModule::analyze(Evt);
     return;

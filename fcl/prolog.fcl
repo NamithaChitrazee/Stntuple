@@ -189,7 +189,7 @@ MuHitDisplay: { module_type:MuHitDisplay                 # the class name;
 # it is assumed that if the name of the script is "/s/../b/a.C", a call to void "a()" 
 # should be executed once per event
 #------------------------------------------------------------------------------
-    plugin                  : ""
+    rootMacro              : ""
 }
 
 #------------------------------------------------------------------------------
