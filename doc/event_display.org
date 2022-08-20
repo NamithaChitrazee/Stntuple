@@ -46,7 +46,7 @@ mu2e -c Stntuple/fcl/display.fcl -s dig.mu2e.CeEndpointDigiTriggered.MDC2020n_10
    search the source of [[file:../mod/MuHitDisplay_module.cc][Stntuple/mod/MuHitDisplay_module.cc]]   for "TModule"
 
    see example: [[file:../mod/scripts/display_001.C][Stntuple/mod/scripts/display_001.C]] 
-
+#+begin_src
    Parameters
    ----------
    Mode = 0: begin job (run)
@@ -57,6 +57,7 @@ mu2e -c Stntuple/fcl/display.fcl -s dig.mu2e.CeEndpointDigiTriggered.MDC2020n_10
 
    interactiveMode = 1 : stop at a ROOT prompt after processing each event
                    = 2 : stop only in the end of run
+#+end_src
     
 ** quick notes about internals                                                
 
