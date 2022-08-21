@@ -12,17 +12,21 @@
 #include "TEllipse.h"
 #include "TParticlePDG.h"
 
+#include "Stntuple/obj/TSimParticle.hh"
+
 namespace mu2e {
-  class SimParticle;
-  class StepPointMC;
+  class StrawGasStep;
 };
 
 namespace stntuple {
 class TEvdSimParticle: public TObject {
 public:
   int                       fNumber;
-  const mu2e::SimParticle*  fSimp;
-  const mu2e::StepPointMC*  fStep;
+
+  TSimParticle*             fSimp;
+  const mu2e::StrawGasStep* fS1;	// first step on the trajectory
+  const mu2e::StrawGasStep* fS2;	// last  step on the trajectory, 
+					// not sure how to deal with turning particles
 
   TObjArray*                fListOfHits;
   TEllipse*                 fEllipse;
@@ -32,7 +36,7 @@ public:
 // constructors and destructor
 //-----------------------------------------------------------------------------
   TEvdSimParticle();
-  TEvdSimParticle(int Number, const mu2e::SimParticle* Simp, const mu2e::StepPointMC* Step); 
+  TEvdSimParticle(int Number, TSimParticle* TSimp, const mu2e::StrawGasStep* S1, const mu2e::StrawGasStep* S2); 
 
   virtual ~TEvdSimParticle();
 //-----------------------------------------------------------------------------

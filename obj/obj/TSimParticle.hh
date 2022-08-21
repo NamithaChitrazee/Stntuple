@@ -4,11 +4,17 @@
 #ifndef STNTUPLE_TSimParticle
 #define STNTUPLE_TSimParticle
 
+#include <vector>
+
 #include "TMath.h"
 #include "TObject.h"
 #include "TParticlePDG.h"
 #include "TLorentzVector.h"
 #include "TBuffer.h"
+
+namespace mu2e {
+  class SimParticle;
+};
 
 class TSimParticle : public TObject {
 public:
@@ -29,10 +35,12 @@ public:
   TLorentzVector  fEndPos;
   TLorentzVector  fEndMom;
 //-----------------------------------------------------------------------------
-// here start transient variables
+// transient variables
 //-----------------------------------------------------------------------------
-  int             fNumber;              //! number in the list, transient,
-					//  set by the reading streamer
+  int             fNumber;                //! number in the list, transient,
+					  //  set by the reading streamer
+  const mu2e::SimParticle*  fSimParticle; //! backward pointer to the offline SimParticle 
+  std::vector<int>*         fShid;        //! vector of straw hit indices
 public:
 //------------------------------------------------------------------------------
 //  functions
@@ -69,6 +77,9 @@ public:
   const TLorentzVector* StartMom() const { return &fStartMom; }
   const TLorentzVector* EndPos  () const { return &fEndPos;   }
   const TLorentzVector* EndMom  () const { return &fEndMom;   }
+
+  const mu2e::SimParticle* SimParticle() const { return fSimParticle; }
+  std::vector<int>*        Shid       ()       { return fShid;        }
 //------------------------------------------------------------------------------
 //  missing TParticle accessors and setters
 //------------------------------------------------------------------------------
@@ -94,10 +105,15 @@ public:
   }
 
   void     SetNumber(int N) { fNumber = N; }
+
+  void     SetShid       (std::vector<int>* Shid) { fShid = Shid; }
+  void     SetSimParticle(const mu2e::SimParticle* Simp) { fSimParticle = Simp; }
 //-----------------------------------------------------------------------------
 // overloaded methods of TObject
 //-----------------------------------------------------------------------------
-  void     Print(Option_t* opt = "") const;
+  virtual void     Print (Option_t* opt = "") const;
+  virtual void     Clear (Option_t* Opt = "");
+  virtual void     Delete(Option_t* Opt = "");
 //-----------------------------------------------------------------------------
 // schema evolution
 //-----------------------------------------------------------------------------

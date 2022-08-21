@@ -6,9 +6,11 @@
 // hide variables - dos it have any effect ?
 //-----------------------------------------------------------------------------
 namespace {
-  TH1F*     hist(nullptr);	       // to be accessed interactively
-  TCanvas*  c   (nullptr);
+  TH1F*               hist   (nullptr);	       // to be accessed interactively
+  TCanvas*            c      (nullptr);
 }
+
+mu2e::MuHitDisplay* m_disp (nullptr); 
 //-----------------------------------------------------------------------------
 // Mode = 0: begin job (run)
 // Mode = 1: event
@@ -17,7 +19,9 @@ namespace {
 void display_001(int Mode, TModule* Module) {
   printf("display_001 called: Mode = %i, Module = %p\n",Mode,Module);
 
-  TStnVisManager* vm = TStnVisManager::Instance();
+  // TStnVisManager* vm = TStnVisManager::Instance();
+  
+  m_disp = (mu2e::MuHitDisplay*) Module;
 
   if (Mode == 0) {  
 //-----------------------------------------------------------------------------
@@ -32,9 +36,7 @@ void display_001(int Mode, TModule* Module) {
 //-----------------------------------------------------------------------------
 // fill histograms 
 //-----------------------------------------------------------------------------
-    TTrkVisNode* tvn = (TTrkVisNode*) vm->FindNode("TrkVisNode");
-
-    const mu2e::ComboHitCollection* chc = tvn->GetComboHitColl();
+    const mu2e::ComboHitCollection* chc = m_disp->GetComboHitColl();
 
     int nh = chc->size();
 

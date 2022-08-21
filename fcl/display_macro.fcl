@@ -16,9 +16,7 @@ source       : { module_type : RootInput   }
 
 physics : {
     producers  : { @table::stntuple.producers }
-    
     filters    : { @table::stntuple.filters   }
-
     analyzers  : { @table::stntuple.analyzers }
 
     @table::stntuple.paths
@@ -26,8 +24,8 @@ physics : {
 
     p1 : [ @sequence::CaloReco.Reco,
 	   @sequence::CaloCluster.Reco,
-	   @sequence::TrkHitReco.PrepareHits,
-	   @sequence::CrvRecoPackage.CrvRecoSequence
+	   @sequence::TrkHitReco.PrepareHits 
+	   # , @sequence::CrvRecoPackage.CrvRecoSequence
 	   # , @sequence::production.trk_reco_de
 	  ]
 
@@ -59,6 +57,8 @@ outputs.detectorOutput.fileName             : "sim.user.project.version.000000_0
 # configure event display
 # mode=2
 # change interactive mode from 2 to 1 to stop after each event
+# see description at 
 #------------------------------------------------------------------------------
-physics.analyzers.MuHitDisplay.interactiveMode  : 1
-physics.analyzers.MuHitDisplay.rootMacro        : "Stntuple/mod/scripts/display_001.C"
+physics.analyzers.MuHitDisplay.interactiveMode    : 1
+physics.analyzers.MuHitDisplay.minSimpMomentum    : 40
+physics.analyzers.MuHitDisplay.rootMacro          : "Stntuple/mod/scripts/display_001.C"

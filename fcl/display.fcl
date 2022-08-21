@@ -26,8 +26,8 @@ physics : {
 
     p1 : [ @sequence::CaloReco.Reco,
 	   @sequence::CaloCluster.Reco,
-	   @sequence::TrkHitReco.PrepareHits,
-	   @sequence::CrvRecoPackage.CrvRecoSequence
+	   @sequence::TrkHitReco.PrepareHits
+	   # , @sequence::CrvRecoPackage.CrvRecoSequence
 	   # , @sequence::production.trk_reco_de
 	  ]
 
@@ -48,12 +48,18 @@ physics : {
     end_paths     : [ end_p1, out ]
 }
 
-services.TFileService.fileName            : "nts.user.egun_stnmaker.xxx.000001.root"
+services.TFileService.fileName            : "nts.user.display.xxx.000001.root"
 #------------------------------------------------------------------------------
 # uncomment the next 2 lines if you want the DST file to be written out
 #-----------------------------------------------------------------------------
 # physics.out                               : [ detectorOutput ]
 # outputs.detectorOutput.SelectEvents       : [ path_gen_digi_reco_stn_dem ]
-outputs.detectorOutput.fileName           : "sim.user.photon_stnmaker.xxx.000001.art"
+outputs.detectorOutput.fileName           : "sim.user.display.xxx.000001.art"
 #------------------------------------------------------------------------------
-
+# uncomment 'primaryParticleTag' line do display more particles
+# uncomment 'rootMacro' line to execute macro
+# see https://github.com/Mu2e/Stntuple/blob/muse/doc/event_display.org for more details
+#------------------------------------------------------------------------------
+# physics.analyzers.MuHitDisplay.minSimpMomentum    : 100
+# physics.analyzers.MuHitDisplay.primaryParticleTag : ""
+# physics.analyzers.MuHitDisplay.rootMacro          : "Stntuple/mod/scripts/display_001.C"

@@ -72,6 +72,7 @@
 #include "Stntuple/mod/THistModule.hh"
 
 #include "Stntuple/obj/TStnHeaderBlock.hh"
+#include "Stntuple/obj/TSimpBlock.hh"
 
 #include "Offline/Mu2eUtilities/inc/McUtilsToolBase.hh"
 
@@ -99,14 +100,15 @@ private:
   
   string        _trackCollTag;
   string        _simpCollTag;
-  string        fTimeClusterModuleLabel;
+  string        _timeClusterCollTag;
   string        _caloHitCollTag;
-  string        fTrkExtrapol;
-  string        fTrkCalMatch;
-  string        fPidCollTag;
+  string        _trkExtrapol;
+  string        _trkCalMatch;
+  string        _pidCollTag;
+  string        _ppTag;			// primary particle tag
+  string        _vdHitsCollTag;
   
   GenId         _generatorID;
-  string        _trackerStepPoints;
 
   double        _minEnergyDep;
   double        _timeWindow;
@@ -114,6 +116,7 @@ private:
   StrawHitFlag  fGoodHitMask;
   StrawHitFlag  fBadHitMask;
   size_t        _minHits;
+  double        _minSimpMomentum;
 
   bool          fDisplayBackgroundHits;
   bool          fPrintHits;
@@ -122,14 +125,14 @@ private:
 //-----------------------------------------------------------------------------
   bool				_showCRVOnly;
   bool				_showTracks;
-  bool				foundTrkr;
+  // bool				foundTrkr;
   bool				foundTrkr_StrawHitColl;
   bool				foundTrkr_StrawDigiMCColl;
   bool				foundTrkr_StrawHitPosColl;
   bool				foundTrkr_StrawHitFlagColl;
   bool				foundCalo_CrystalHitColl;
   bool				foundCalo_ClusterColl;
-  bool				foundCalo;
+  //  bool				foundCalo;
 
   fhicl::ParameterSet          _vmConfig;
 //-----------------------------------------------------------------------------
@@ -137,23 +140,23 @@ private:
 // Options to control the display
 // hit flag bits which should be ON and OFF
 //-----------------------------------------------------------------------------
-  TApplication*                               fApplication;
+  TApplication*                         fApplication;
 
-  const mu2e::GenParticleCollection*    _genParticleColl;         // 
+  const mu2e::GenParticleCollection*    _genpColl;         // 
 
-  const mu2e::ComboHitCollection*       fShComboHitColl;     // 
-  const mu2e::ComboHitCollection*       fComboHitColl;     // 
+  const mu2e::ComboHitCollection*       _strawHitColl;     // 
+  const mu2e::ComboHitCollection*       _comboHitColl;     // 
 
-  const mu2e::StrawHitFlagCollection*   fStrawHitFlagColl; //
-  const mu2e::StrawDigiMCCollection*    _strawDigiMCColl; //
+  const mu2e::StrawHitFlagCollection*   _strawHitFlagColl; //
+  const mu2e::StrawDigiMCCollection*    _strawDigiMCColl;  //
   
-  const mu2e::CaloHitCollection*        fListOfCrystalHits;//
-  const mu2e::CaloClusterCollection*    fListOfClusters;   //
+  const mu2e::CaloHitCollection*        _caloHitColl;      //
+  const mu2e::CaloClusterCollection*    _caloClusterColl;  //
   
   const mu2e::StepPointMCCollection*    _spmcColl;         // on virtual detectors
-  const mu2e::SimParticleCollection*    _simParticleColl;  //
+  const mu2e::SimParticleCollection*    _simpColl;         //
 
-  const mu2e::TimeClusterCollection*    fTimeClusterColl;  //
+  const mu2e::TimeClusterCollection*    _timeClusterColl;  //
 
   mu2e::CrvRecoPulseCollection*		fCrvPulseColl_Right;
   mu2e::CrvRecoPulseCollection*		fCrvPulseColl_Left;
@@ -162,18 +165,21 @@ private:
   mu2e::CrvRecoPulseCollection*		fCrvPulseColl_Dwnstrm;
   mu2e::CrvRecoPulseCollection*		fCrvPulseColl_Upstrm;
   
-  const mu2e::KalRepPtrCollection*            _kalRepPtrColl;
+  const mu2e::KalRepPtrCollection*      _kalRepPtrColl;
 
-  std::unique_ptr<McUtilsToolBase>            _mcUtils;
+  std::unique_ptr<McUtilsToolBase>      _mcUtils;
 
-
-  mu2e::TimeCluster*     fTimeCluster;
+  // mu2e::TimeCluster*     _timeCluster;
   int                    fNClusters;
   int                    fNTracks[4];
   int                    _firstCall;
 		
   TStnVisManager*        fVisManager;
+//-----------------------------------------------------------------------------
+// reuse STNTUPLE data blocks
+//-----------------------------------------------------------------------------
   TStnHeaderBlock*       fHeaderBlock;
+  TSimpBlock*            fSimpBlock;
 
   TStnTrackID*           fTrackID;
 
@@ -186,13 +192,24 @@ public:
   explicit MuHitDisplay(fhicl::ParameterSet const& pset);
   virtual ~MuHitDisplay();
 
-  int      getData(const art::Event* Evt);
-  void     InitVisManager();
-  int      getCRVSection(int shieldNumber);
+  int      getData      (const art::Event* Evt);
+  int      getCRVSection(int   shieldNumber   );
 
-  void     printCaloCluster(const CaloCluster* Cl, const char* Opt);
+  const mu2e::ComboHitCollection*    GetComboHitColl   () { return _comboHitColl   ; }
+  const mu2e::GenParticleCollection* GetGenppColl      () { return _genpColl       ; }
+  const mu2e::ComboHitCollection*    GetStrawHitColl   () { return _strawHitColl   ; }
+  const mu2e::KalRepPtrCollection*   GetKalRepPtrColl  () { return _kalRepPtrColl  ; }
+  const mu2e::SimParticleCollection* GetSimpColl       () { return _simpColl       ; }
+  const mu2e::StepPointMCCollection* GetSpmcColl       () { return _spmcColl       ; }
+  const mu2e::TimeClusterCollection* GetTimeClusterColl() { return _timeClusterColl; }
+
+  TSimpBlock*                        GetSimpBlock      () { return fSimpBlock      ; }
+
+  void     InitVisManager();
+
+  // void     printCaloCluster(const CaloCluster* Cl, const char* Opt);
 //-----------------------------------------------------------------------------
-// overloaded virtual methods of the base class
+// overloaded virtual methods of the base class - EDAnalyzer 
 //-----------------------------------------------------------------------------
   virtual void     beginJob();
   virtual void     beginRun(const art::Run& aRun);

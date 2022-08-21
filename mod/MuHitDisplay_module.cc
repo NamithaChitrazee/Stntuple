@@ -10,7 +10,9 @@
 
 #include "Stntuple/mod/MuHitDisplay_module.hh"
 
-// ClassImp(mu2e::MuHitDisplay)
+#include "Stntuple/obj/AbsEvent.hh"
+#include "Stntuple/obj/TSimpBlock.hh"
+#include "Stntuple/mod/InitSimpBlock.hh"
 
 namespace mu2e {
 //-----------------------------------------------------------------------------
@@ -31,19 +33,21 @@ MuHitDisplay::MuHitDisplay(fhicl::ParameterSet const& pset) :
   
   _trackCollTag            (pset.get<string>("trackCollTag")),
   _simpCollTag             (pset.get<string>("simpCollTag")),
-  fTimeClusterModuleLabel  (pset.get<string>("timeClusterCollTag")),
-  _caloHitCollTag   (pset.get<string>("caloHitCollTag")),
-  fTrkExtrapol             (pset.get<string>("trkExtrapol")),
-  fTrkCalMatch             (pset.get<string>("trkCalMatch")),
-  fPidCollTag              (pset.get<string>("pidCollTag")),
+  _timeClusterCollTag      (pset.get<string>("timeClusterCollTag")),
+  _caloHitCollTag          (pset.get<string>("caloHitCollTag")),
+  _trkExtrapol             (pset.get<string>("trkExtrapol")),
+  _trkCalMatch             (pset.get<string>("trkCalMatch")),
+  _pidCollTag              (pset.get<string>("pidCollTag")),
+  _ppTag                   (pset.get<string>("primaryParticleTag")),
+  _vdHitsCollTag           (pset.get<string>("vdHitsCollTag")),
 
   _generatorID             (pset.get<mu2e::GenId>   ("generatorID", mu2e::GenId::CeEndpoint)),
-  _trackerStepPoints       (pset.get<string>        ("trackerStepPoints")),
   _minEnergyDep            (pset.get<double>        ("minEnergyDep", 0)),
   _timeWindow              (pset.get<double>        ("timeWindow", 1.e6)),
   fGoodHitMask             (pset.get<vector<string>>("goodHitMask")),
   fBadHitMask              (pset.get<vector<string>>("badHitMask")),
   _minHits                 (pset.get<unsigned>      ("minHits")),
+  _minSimpMomentum         (pset.get<double>        ("minSimpMomentum")),
 
   fDisplayBackgroundHits   (pset.get<bool>("displayBackgroundHits", false)),
   fPrintHits               (pset.get<bool>("printHits", false)),
@@ -63,8 +67,8 @@ MuHitDisplay::MuHitDisplay(fhicl::ParameterSet const& pset) :
     
   fTrackID = new TStnTrackID();
   
-  foundTrkr = false;
-  foundCalo = false;
+  // foundTrkr = false;
+  // foundCalo = false;
   
   fCrvPulseColl_Right   = new CrvRecoPulseCollection();
   fCrvPulseColl_Left    = new CrvRecoPulseCollection();
@@ -80,6 +84,8 @@ MuHitDisplay::MuHitDisplay(fhicl::ParameterSet const& pset) :
 
   _kalRepPtrColl        = nullptr;
   _firstCall            = 1;
+
+  fSimpBlock     = new TSimpBlock;
 }
 
 //-----------------------------------------------------------------------------
@@ -96,6 +102,8 @@ MuHitDisplay::~MuHitDisplay() {
 
   //  delete fKalDiag;
   delete fDar;
+
+  delete fSimpBlock;
 }
 
 //-----------------------------------------------------------------------------
@@ -104,11 +112,27 @@ void MuHitDisplay::beginJob() {
   //     const char oname[] = "MuHitDisplay::beginJob";
   int    tmp_argc(0);
   char** tmp_argv(0);
+//-----------------------------------------------------------------------------
+// reuse STNTUPLE initialization of the sim particle list 
+// init_block is deleted by the block
+//-----------------------------------------------------------------------------
+  StntupleInitSimpBlock* init_block = new StntupleInitSimpBlock();
+
+  init_block->SetSimpCollTag       (_simpCollTag);
+  init_block->SetStrawHitCollTag   (_strawHitCollTag);
+  init_block->SetStrawDigiMCCollTag(_strawDigiMCCollTag);
+  init_block->SetVDHitsCollTag     (_vdHitsCollTag);
+  init_block->SetPrimaryParticleTag(_ppTag);
+  init_block->SetMinSimpMomentum   (_minSimpMomentum);         // in MeV
+  init_block->SetMaxZ              (1800.);                    // in mm, wrt tracker
+  init_block->SetGenProcessID      (-1);
+  init_block->SetPdgID             (-1);
+  
+  fSimpBlock->SetInitBlock(init_block);
 
   if (!gApplication) {
     fApplication = new TApplication("MuHitDisplay_module", &tmp_argc, tmp_argv);
   }
-
 //-----------------------------------------------------------------------------
 // define collection names to be used for initialization
 //-----------------------------------------------------------------------------
@@ -217,17 +241,17 @@ void MuHitDisplay::InitVisManager() {
 
   cal_view = new TCalView(0);
   cal_node[0] = new TCalVisNode("CalVisNode#0", &dc->disk(0), 0);
-  cal_node[0]->SetListOfClusters(&fListOfClusters);
-  cal_node[0]->SetListOfCrystalHits(&fListOfCrystalHits);
-  cal_node[0]->SetTimeClusterColl(&fTimeClusterColl);
+  cal_node[0]->SetListOfClusters(&_caloClusterColl);
+  cal_node[0]->SetListOfCrystalHits(&_caloHitColl);
+  cal_node[0]->SetTimeClusterColl(&_timeClusterColl);
   cal_view->AddNode(cal_node[0]);
   vm->AddView(cal_view);
   
   cal_view = new TCalView(1);
   cal_node[1] = new TCalVisNode("CalVisNode#1", &dc->disk(1), 1);
-  cal_node[1]->SetListOfClusters   (&fListOfClusters);
-  cal_node[1]->SetListOfCrystalHits(&fListOfCrystalHits);
-  cal_node[1]->SetTimeClusterColl  (&fTimeClusterColl);
+  cal_node[1]->SetListOfClusters   (&_caloClusterColl);
+  cal_node[1]->SetListOfCrystalHits(&_caloHitColl);
+  cal_node[1]->SetTimeClusterColl  (&_timeClusterColl);
   cal_view->AddNode(cal_node[1]);
   vm->AddView(cal_view);
 //-----------------------------------------------------------------------------
@@ -236,14 +260,18 @@ void MuHitDisplay::InitVisManager() {
 //-----------------------------------------------------------------------------
   TTrkVisNode* tnode = new TTrkVisNode ("TrkVisNode", fTracker, NULL);
 
-  tnode->SetStrawHitColl    (&fShComboHitColl  );
-  tnode->SetComboHitColl    (&fComboHitColl    );
+  tnode->SetStrawHitColl    (&_strawHitColl    );
+  tnode->SetComboHitColl    (&_comboHitColl    );
   //  tnode->SetStrawHitFlagColl(&fStrawHitFlagColl);
-  tnode->SetTimeClusterColl (&fTimeClusterColl );
+  tnode->SetTimeClusterColl (&_timeClusterColl );
   tnode->SetKalRepPtrColl   (&_kalRepPtrColl   );
   tnode->SetStrawDigiMCColl (&_strawDigiMCColl );
-  tnode->SetSimParticleColl (&_simParticleColl );
-  tnode->SetSpmcColl        (&_spmcColl );
+  tnode->SetSimParticleColl (&_simpColl        );
+  tnode->SetSpmcColl        (&_spmcColl        );
+//-----------------------------------------------------------------------------
+// SimpBlock is initialized in the module, a node references it via the pointer
+//-----------------------------------------------------------------------------
+  tnode->SetSimpBlock       (fSimpBlock       );
 //-----------------------------------------------------------------------------
 // XY view : tracker + calorimeter
 //-----------------------------------------------------------------------------
@@ -349,9 +377,9 @@ int MuHitDisplay::getData(const art::Event* Evt) {
       art::Handle<GenParticleCollection> gensHandle;
       Evt->getByLabel(_genpCollTag, gensHandle);
 
-      if (gensHandle.isValid()) _genParticleColl = gensHandle.product();
+      if (gensHandle.isValid()) _genpColl = gensHandle.product();
       else {
-	_genParticleColl = 0;
+	_genpColl = 0;
 	printf(">>> [%s] WARNING: GenParticleCollection by %s is missing. CONTINUE\n",
 	       oname, _genpCollTag.data());
       }
@@ -369,15 +397,15 @@ int MuHitDisplay::getData(const art::Event* Evt) {
       art::Handle<mu2e::SimParticleCollection> simpHandle;
       Evt->getByLabel(_simpCollTag, simpHandle);
 
-      if (simpHandle.isValid()) _simParticleColl = simpHandle.product();
-      else                      _simParticleColl = NULL;
+      if (simpHandle.isValid()) _simpColl = simpHandle.product();
+      else                      _simpColl = NULL;
 //-----------------------------------------------------------------------------
 //  straw hit information
 //-----------------------------------------------------------------------------
       art::Handle<ComboHitCollection> chH;
 
       Evt->getByLabel(_comboHitCollTag, chH);
-      if (chH.isValid()) fComboHitColl = chH.product();
+      if (chH.isValid()) _comboHitColl = chH.product();
       else {
 	printf(">>> [%s] ERROR: ComboHitCollection by %s is missing. BAIL OUT\n",
 	       oname, _comboHitCollTag.data());
@@ -385,7 +413,7 @@ int MuHitDisplay::getData(const art::Event* Evt) {
       }
 
       Evt->getByLabel(_strawHitCollTag, chH);
-      if (chH.isValid()) fShComboHitColl = chH.product();
+      if (chH.isValid()) _strawHitColl = chH.product();
       else {
 	printf(">>> [%s] ERROR: ComboHitCollection by %s is missing. BAIL OUT\n",
 	       oname, _strawHitCollTag.data());
@@ -413,74 +441,74 @@ int MuHitDisplay::getData(const art::Event* Evt) {
       art::Handle<mu2e::StrawHitFlagCollection> shfH;
       Evt->getByLabel(_strawHitFlagCollTag, shfH);
 
-      if (shfH.isValid()) fStrawHitFlagColl = shfH.product();
-      else                fStrawHitFlagColl = nullptr;
+      if (shfH.isValid()) _strawHitFlagColl = shfH.product();
+      else                _strawHitFlagColl = nullptr;
 //-----------------------------------------------------------------------------
-// calorimeter crystal hit data
+// calorimeter hit data
 //-----------------------------------------------------------------------------
-      art::Handle<CaloHitCollection> ccHandle;
-      Evt->getByLabel(_caloHitCollTag.data(), ccHandle);
+      art::Handle<CaloHitCollection> calohit_ch;
+      Evt->getByLabel(_caloHitCollTag.data(), calohit_ch);
 
-      if (ccHandle.isValid()) {
-	fListOfCrystalHits = (CaloHitCollection*) ccHandle.product();
+      if (calohit_ch.isValid()) {
+	_caloHitColl = (CaloHitCollection*) calohit_ch.product();
       }
       else {
-	fListOfCrystalHits = NULL;
+	_caloHitColl = NULL;
 	printf(">>> [%s] ERROR: CaloHitCollection by %s is missing. BAIL OUT\n",
 	       oname, _caloHitCollTag.data());
       }
 //-----------------------------------------------------------------------------
 // calorimeter cluster data
 //-----------------------------------------------------------------------------
-      art::Handle<CaloClusterCollection> calo_cluster_handle;
-      Evt->getByLabel(_caloClusterCollTag, "", calo_cluster_handle);
+      art::Handle<CaloClusterCollection> calocluster_ch;
+      Evt->getByLabel(_caloClusterCollTag, "", calocluster_ch);
 
-      if (calo_cluster_handle.isValid()) {
-	fListOfClusters = calo_cluster_handle.product();
+      if (calocluster_ch.isValid()) {
+	_caloClusterColl = calocluster_ch.product();
       }
       else {
-	fListOfClusters = NULL;
+	_caloClusterColl = NULL;
 	printf(">>> [%s] ERROR: CaloClusterCollection by %s is missing. BAIL OUT\n",
 	       oname, _caloClusterCollTag.data());
       }
 //-----------------------------------------------------------------------------
 // timepeaks 
 //-----------------------------------------------------------------------------
-      fTimeClusterColl = NULL;
-      fTimeCluster     = NULL;
+      _timeClusterColl = NULL;
+      //      _timeCluster     = NULL;
 
       art::Handle<TimeClusterCollection> tpch;
 
       if (_showTracks){
-	Evt->getByLabel(fTimeClusterModuleLabel, "", tpch);
+	Evt->getByLabel(_timeClusterCollTag, "", tpch);
       } 
       else {
 //-----------------------------------------------------------------------------
 // not sure I understand the clause
 //-----------------------------------------------------------------------------
-	Evt->getByLabel(fTimeClusterModuleLabel, tpch);
+	Evt->getByLabel(_timeClusterCollTag, tpch);
       }
-      if (tpch.isValid()) {
-	fTimeClusterColl = tpch.product();
-//-----------------------------------------------------------------------------
-// find the right time peak to display - display the first one with the track
-// 2018-10-12 P.Murat: dont enforce! 
-//-----------------------------------------------------------------------------
-	// const TimeCluster* tp;
-	// int ipeak = -1;
-	// if (fTimeClusterColl != NULL) {
-	//   int ntp = fTimeClusterColl->size();
-	//   for (int i = 0; i<ntp; i++) {
-	//     tp = &fTimeClusterColl->at(i);
-	//     // if (tp->CprIndex() >= 0) {
-	//     fTimeCluster = tp;
-	//     ipeak = i;
-	//     break;
-	//     // }
-	//   }
-	// }
-	// fVisManager->SetTimeCluster(ipeak);
-      }
+//       if (tpch.isValid()) {
+// 	_timeClusterColl = tpch.product();
+// //-----------------------------------------------------------------------------
+// // find the right time peak to display - display the first one with the track
+// // 2018-10-12 P.Murat: dont enforce! 
+// //-----------------------------------------------------------------------------
+// 	// const TimeCluster* tp;
+// 	// int ipeak = -1;
+// 	// if (fTimeClusterColl != NULL) {
+// 	//   int ntp = fTimeClusterColl->size();
+// 	//   for (int i = 0; i<ntp; i++) {
+// 	//     tp = &fTimeClusterColl->at(i);
+// 	//     // if (tp->CprIndex() >= 0) {
+// 	//     fTimeCluster = tp;
+// 	//     ipeak = i;
+// 	//     break;
+// 	//     // }
+// 	//   }
+// 	// }
+// 	// fVisManager->SetTimeCluster(ipeak);
+//       }
 //-----------------------------------------------------------------------------
 // tracking data - downstream moving electrons
 //-----------------------------------------------------------------------------
@@ -494,6 +522,11 @@ int MuHitDisplay::getData(const art::Event* Evt) {
 	fNTracks[0] = _kalRepPtrColl->size();
       }
     }
+//-----------------------------------------------------------------------------
+// finally, TSimpBlock. The second parameter, Mode, is not used
+//-----------------------------------------------------------------------------
+    fSimpBlock->Init((art::Event*)Evt,0);
+
     return 0;
   }
 

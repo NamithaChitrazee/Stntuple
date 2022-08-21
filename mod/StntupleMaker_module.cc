@@ -174,7 +174,7 @@ protected:
   
   double                   fMinTActive   ;  // start of the active window
   double                   fMinECrystal  ;  // 
-  double                   fSimpMinEnergy; // min energy of a particle to be stored in SIMP block
+  double                   fMinSimpMomentum; // min tot momentum of a particle to be stored in SIMP block
   double                   fSimpMaxZ     ; // max Z of a particle to be stored in SIMP block
 
   string                   fCutHelixSeedCollTag; // helix collection to cut on
@@ -286,7 +286,7 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
 
   , fMinTActive              (PSet.get<double>        ("minTActive"          ))
   , fMinECrystal             (PSet.get<double>        ("minECrystal"         ))
-  , fSimpMinEnergy           (PSet.get<double>        ("simpMinEnergy"       ))
+  , fMinSimpMomentum         (PSet.get<double>        ("minSimpMomentum"     ))
   , fSimpMaxZ                (PSet.get<double>        ("simpMaxZ"            ))
   , fCutHelixSeedCollTag     (PSet.get<string>        ("cutHelixSeedCollTag" ))
   , fMinNHelices             (PSet.get<int>           ("minNHelices"         ))
@@ -563,15 +563,15 @@ void StntupleMaker::beginJob() {
   if (fMakeSimp) {
     fInitSimpBlock = new StntupleInitSimpBlock();
 
-    fInitSimpBlock->SetSimpCollTag(fSimpCollTag);
-    fInitSimpBlock->SetStrawHitCollTag(fStrawHitCollTag);
+    fInitSimpBlock->SetSimpCollTag       (fSimpCollTag);
+    fInitSimpBlock->SetStrawHitCollTag   (fStrawHitCollTag);
     fInitSimpBlock->SetStrawDigiMCCollTag(fStrawDigiMCCollTag);
-    fInitSimpBlock->SetVDHitsCollTag(fVDHitsCollTag);
+    fInitSimpBlock->SetVDHitsCollTag     (fVDHitsCollTag);
     fInitSimpBlock->SetPrimaryParticleTag(fPrimaryParticleTag);
-    fInitSimpBlock->SetMinSimpEnergy(fSimpMinEnergy);
-    fInitSimpBlock->SetMaxZ         (fSimpMaxZ);
-    fInitSimpBlock->SetGenProcessID (fGenId.id());
-    fInitSimpBlock->SetPdgID        (fPdgId);
+    fInitSimpBlock->SetMinSimpMomentum   (fMinSimpMomentum);
+    fInitSimpBlock->SetMaxZ              (fSimpMaxZ);
+    fInitSimpBlock->SetGenProcessID      (fGenId.id());
+    fInitSimpBlock->SetPdgID             (fPdgId);
 
     AddDataBlock("SimpBlock","TSimpBlock",fInitSimpBlock,buffer_size,split_mode,compression_level);
   }

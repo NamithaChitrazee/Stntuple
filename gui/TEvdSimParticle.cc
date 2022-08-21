@@ -43,12 +43,13 @@
 #include "Offline/TrackerGeom/inc/Tracker.hh"
 
 #include "Offline/MCDataProducts/inc/SimParticle.hh"
-#include "Offline/MCDataProducts/inc/StepPointMC.hh"
+#include "Offline/MCDataProducts/inc/StrawGasStep.hh"
+
+#include "Stntuple/obj/TSimParticle.hh"
 
 #include "Stntuple/gui/TEvdSimParticle.hh"
 #include "Stntuple/gui/TStnVisManager.hh"
 #include "Stntuple/gui/TEvdTrkStrawHit.hh"
-#include "Stntuple/base/TObjHandle.hh"
 
 #include "Stntuple/print/TAnaDump.hh"
 
@@ -63,7 +64,8 @@ TEvdSimParticle::TEvdSimParticle(): TObject() {
   fListOfHits  = NULL;
   fEllipse     = new TEllipse();
   fParticlePDG = nullptr;
-  fStep        = nullptr;
+  fS1          = nullptr;
+  fS2          = nullptr;
   fSimp        = nullptr;
 }
 
@@ -71,16 +73,20 @@ TEvdSimParticle::TEvdSimParticle(): TObject() {
 // pointer to track is just cached
 // Step - at the trackerfront
 //-----------------------------------------------------------------------------
-  TEvdSimParticle::TEvdSimParticle(int Number, const mu2e::SimParticle* Simp, const mu2e::StepPointMC* Step): TObject() {
+  TEvdSimParticle::TEvdSimParticle(int                       Number, 
+				   TSimParticle*             Simp  , 
+				   const mu2e::StrawGasStep* S1    ,
+				   const mu2e::StrawGasStep* S2    ): TObject() {
   fNumber = Number;
   fSimp   = Simp;
-  fStep   = Step;
+  fS1     = S1;
+  fS2     = S2;
 
   TStnVisManager* vm = TStnVisManager::Instance();
 
   TDatabasePDG* pdb = TDatabasePDG::Instance();
 
-  fParticlePDG = pdb->GetParticle(fSimp->pdgId());
+  fParticlePDG = pdb->GetParticle(fSimp->PDGCode());
 
   // mu2e::GeomHandle<mu2e::Tracker> ttHandle;
   // const mu2e::Tracker* tracker = ttHandle.get();
@@ -91,16 +97,16 @@ TEvdSimParticle::TEvdSimParticle(): TObject() {
 
   double r, phi0, x0, y0, xc, yc, p, pt, q;
 
-  x0 = (fStep->position().x()+3904.); // in mm
-  y0 = fStep->position().y();
+  x0 = fS1->startPosition().x();	// in mm
+  y0 = fS1->startPosition().y();
+					// rely on particle traveling along the Z axis
+  p  = fS1->momentum().R  ();
+  pt = fS1->momentum().Rho();
+  r  = pt/2.9979*10;			//    10^10/c, in mm
 
-  p  = fStep->momentum().mag();
-  pt = fStep->momentum().perp();
-  r  = pt/2.9979*10;                          //    10^10/c, in mm
+  phi0 = fS1->momentum().Phi();
 
-  phi0 =  fStep->momentum().phi();
-  q    = fParticlePDG->Charge()/3;	// returned is the charge in units of 1/3 
-
+  q = fParticlePDG->Charge()/3;	// returned is the charge in units of 1/3 
     
   xc   =  x0+r*q*sin(phi0);
   yc   =  y0-r*q*cos(phi0);
@@ -116,7 +122,7 @@ TEvdSimParticle::TEvdSimParticle(): TObject() {
   fEllipse->SetPhimax(2*M_PI*180);
   fEllipse->SetTheta(0);
 
-  int pdg_id = fSimp->pdgId();
+  int pdg_id = fSimp->PDGCode();
 
   int color;
 
@@ -136,16 +142,15 @@ TEvdSimParticle::TEvdSimParticle(): TObject() {
   fEllipse->SetLineColor(color);
   // fEllipse->SetFillStyle(3001);		// make it transparent
 //-----------------------------------------------------------------------------
-// TZ view, Z positons of StepPoints - in the global coord system, need to subtract 
-// the tracker origin
+// TZ view, Z positons of StrawGasSteps - in the tracker system
 //-----------------------------------------------------------------------------
-  double z0    = fStep->position().z()-10171.; // tracker->origin().z();
-  double z1    = fSimp->endPosition().z()-10171.; // tracker->origin().z();
-  double t0    = fmod(fStep->time(),vm->MbTime());
+  double z0    = fS1->startPosition().z();   // tracker->origin().z();
+  double z1    = fS2->startPosition().z();   // tracker->origin().z();
+  double t0    = fmod(fS1->time(),vm->MbTime());
 
-  double m     = fParticlePDG->Mass()*1e3;     // returned mass is in (GeV)
+  double m = fParticlePDG->Mass()*1e3;          // returned mass is in (GeV)
   //  double p     = fStep->momentum().mag();
-  double vz    = fStep->momentum().z()/sqrt(p*p+m*m)*300.;  // vz in cm/ns
+  double vz    = fS1->momentum().z()/sqrt(p*p+m*m)*300.;  // vz in cm/ns
 
   double t1    = fmod(t0+(z1-z0)/vz,vm->MbTime());
 
@@ -365,12 +370,12 @@ Int_t TEvdSimParticle::DistancetoPrimitiveTZ(Int_t px, Int_t py) {
 
   double  dy   = g2.y()-global.y();
 
-  double z0    = fStep->position().z()-10171.;
-  double t0    = fmod(fStep->time(),vm->MbTime());
+  double z0    = fS1->position().z();
+  double t0    = fmod(fS1->time(),vm->MbTime());
 
   double m     = fParticlePDG->Mass()*1e3;     // returned mass is in (GeV)
-  double p     = fStep->momentum().mag();
-  double vz    = fStep->momentum().z()/sqrt(p*p+m*m)*300.;  // vz in cm/ns
+  double p     = fS1->momentum().R();
+  double vz    = fS1->momentum().z()/sqrt(p*p+m*m)*300.;  // vz in cm/ns
 
   double tz    = fmod(t0+(global.x()-z0)/vz,vm->MbTime());
 
@@ -390,13 +395,16 @@ void TEvdSimParticle::Clear(Option_t* Opt) {
 //-----------------------------------------------------------------------------
 void TEvdSimParticle::Print(Option_t* Option) const {
 
-  TAnaDump* tad = TAnaDump::Instance();
+  //  TAnaDump* tad = TAnaDump::Instance();
 
   TString opt = Option;
   opt.ToLower();
 
-  if (opt == "") tad->printSimParticle(fSimp, "banner+data", nullptr);
-  else           tad->printSimParticle(fSimp, Option       , nullptr);
+  // if (opt == "") tad->printSimParticle(fSimp->SimParticle(), "banner+data", nullptr);
+  // else           tad->printSimParticle(fSimp->SimParticle(), Option       , nullptr);
+
+  if (opt == "") fSimp->Print("banner+data");
+  else           fSimp->Print(Option);
 
 }
 }

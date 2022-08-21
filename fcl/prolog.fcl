@@ -81,8 +81,8 @@ StntupleMakerTemplate : { module_type:StntupleMaker
     primaryParticleTag   : "compressDigiMCs"                     # this is new, to be passed to InitSimpBlock
     triggerResultsTag    : "TriggerResults"                      # assume TriggerResults produced at digi step
     vdHitsCollTag        : @local::STN_VDHITS_COLL_TAG           # was "g4run" before
-    simpMinEnergy        : 5.0                                   # MeV , simpMinEnergy < 0: store all
-    simpMaxZ             : 11800.0                               # not used
+    minSimpMomentum      : 40.0                                  # MeV , minSimpMomentum < 0: store all with straw hits
+    simpMaxZ             : 1800.0                                # not used
 
     genpCollTag          : "compressDigiMCs"                     # save signal-only: "generate" 
     genId                : @local::GEN_ID                        # defined in Stntuple/fcl/stntuple.fcl, by default, store all simparticles
@@ -132,31 +132,33 @@ StntupleMakerTemplate : { module_type:StntupleMaker
 MuHitDisplay: { module_type:MuHitDisplay                 # the class name;
     @table::StntupleModuleFclDefaults                    # defaults of the base class
 
-    interactiveMode              : 1
+    interactiveMode              : 1   # 1:stop  after each event 2: stop at end-of-job
     
-    crvRecoPulsesCollTag         : CrvRecoPulses
+    crvRecoPulsesCollTag         : "CrvRecoPulses"
     showCRVOnly 		 : false
     showTracks                   : true
     
-    genpCollTag                  : generate
+    genpCollTag                  : "generate"
     spmcCollTag                  : "compressDigiMCs:virtualdetector" # was g4run
-    simpCollTag                  : "compressDigiMCs" # was g4run
-    statuG4Tag                   : "g4run"           # 
+    simpCollTag                  : "compressDigiMCs"                 # was g4run
+    statuG4Tag                   : "g4run"                           # 
     strawHitCollTag              : "makeSH"
-    strawDigiMCCollTag           : "compressDigiMCs" #  was "makeSD"
-    strawHitFlagCollTag          : "DeltaFinder:StrawHits"
-    comboHitCollTag              : makePH
+    strawDigiMCCollTag           : "compressDigiMCs"                 #  was "makeSD"
+    strawHitFlagCollTag          : "DeltaFinder:StrawHits"           # 
+    comboHitCollTag              : "makePH"                          # comboHits
 
-    caloHitCollTag               : CaloHitMaker
-    caloClusterCollTag           : CaloClusterMaker
+    caloHitCollTag               : "CaloHitMaker"
+    caloClusterCollTag           : "CaloClusterMaker"
 
-    timeClusterCollTag           : CalTimePeakFinder
+    timeClusterCollTag           : "CalTimePeakFinder"
     trackCollTag                 : "KFFDeMHDar"
 
-    trkExtrapol                  : TrackCaloIntersection
-    trkCalMatch                  : TrackCaloMatching
+    trkExtrapol                  : "TrackCaloIntersection"
+    trkCalMatch                  : "TrackCaloMatching"
 
-    pidCollTag                   : ParticleID
+    pidCollTag                   : "ParticleID"
+    primaryParticleTag           : "compressDigiMCs"                 # this is new, to be passed to InitSimpBlock
+    vdHitsCollTag                : "compressDigiMCs"                 # this is new, to be passed to InitSimpBlock
     
     # if set to true, all hits will be displayed unconditionally
     # otherwise, display only hits with right flags
@@ -166,9 +168,8 @@ MuHitDisplay: { module_type:MuHitDisplay                 # the class name;
     goodHitMask                  : ["EnergySelection", "RadiusSelection"]
     badHitMask                   : ["Background"] 
     
-    trackerStepPoints            : tracker
     minHits                      : 5
-    clickToAdvance               : true
+    minSimpMomentum              : 40. # MeV
     printHits                    : false
     timeWindow                   : 100000.
     #      timeWindow           : 50.

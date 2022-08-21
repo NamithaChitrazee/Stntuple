@@ -1,6 +1,6 @@
 #
 
-* STNTUPLE event display 
+* STNTUPLE event display                                                     
 ** how to run:                                                                
 #+begin_src
 mu2e -c Stntuple/fcl/display.fcl -s dig.mu2e.CeEndpointDigiTriggered.MDC2020n_10pc.001210_00000000.art 
@@ -33,6 +33,13 @@ mu2e -c Stntuple/fcl/display.fcl -s dig.mu2e.CeEndpointDigiTriggered.MDC2020n_10
 
   - mouse weel (Up, and Down) changes the scale
 
+** display of SimParticles                 
+   - if *primaryParticleTag* is set to an empty string, 
+     all particles with E>Emin and hits in the straw tracker will be saved
+     and displayed
+   - if, however, *primaryParticleTag* is set not non-empty string, 
+     saved in STNTUPLE and displayed will be only particles pre-selected 
+     from that list , still with N(straw hits) > 0 and E > Emin
 ** plugins:                                                                   
    the following FCL parameter of a STNTUPLE module (any module class inheriting from TModule)
 

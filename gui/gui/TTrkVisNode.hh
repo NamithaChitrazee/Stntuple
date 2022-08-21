@@ -28,6 +28,7 @@ namespace mu2e {
 #include "Stntuple/gui/TStnVisNode.hh"
 
 class TStnTrackBlock;
+class TSimpBlock;
 
 namespace stntuple {
   class TEvdStrawTracker;
@@ -73,6 +74,7 @@ protected:
   TObjArray*                fListOfSimParticles;
   TObjArray*                fListOfComboHits;
 
+  TSimpBlock*               fSimpBlock;
 public:
 //-----------------------------------------------------------------------------
 // constructors and destructor
@@ -111,8 +113,11 @@ public:
     fKalRepPtrColl = Coll;
   }
 
-  void  SetListOfTracks(TObjArray* List) { fListOfTracks = List; }
-  void  SetTrackColor  (Color_t      c ) { fTrackColor   = c   ; }
+  //  void  SetInitSimpBlock(StntupleInitSimpBlock* InitBlock) { fInitSimpBlock = InitBlock; }
+
+  void  SetSimpBlock   (TSimpBlock* Block) { fSimpBlock    = Block; }
+  void  SetListOfTracks(TObjArray*  List ) { fListOfTracks = List ; }
+  void  SetTrackColor  (Color_t     Color) { fTrackColor   = Color; }
 
   void SetComboHitColl(const mu2e::ComboHitCollection** Coll) { 
     fComboHitColl = Coll;

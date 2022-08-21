@@ -12,6 +12,9 @@
 #include "TArc.h"
 #include "TArrow.h"
 #include "TBox.h"
+#include "TDatabasePDG.h"
+#include "TParticlePDG.h"
+
 // #include "art/Framework/Principal/Event.h"
 // #include "art/Framework/Principal/Handle.h"
 
@@ -32,6 +35,8 @@
 #include "Stntuple/gui/TEvdStrawTracker.hh"
 #include "Stntuple/gui/TEvdSimParticle.hh"
 #include "Stntuple/gui/TStnVisManager.hh"
+
+#include "Stntuple/obj/TSimpBlock.hh"
 
 #include "Offline/RecoDataProducts/inc/StrawHit.hh"
 
@@ -71,7 +76,8 @@ TTrkVisNode::TTrkVisNode(const char* name, const mu2e::Tracker* Tracker, TStnTra
   fKalRepPtrColl      = nullptr;
   fSimpColl           = nullptr;
   fSpmcColl           = nullptr;
-  
+					// owned externally (by MuHitDisplay)
+  fSimpBlock          = new TSimpBlock();
 }
 
 //-----------------------------------------------------------------------------
@@ -172,15 +178,9 @@ int TTrkVisNode::InitEvent() {
 
     // printf("TTrkVisNode::InitEvent: no mcdigi->stepPointMC any more\n");
 
-    const mu2e::StrawGasStep* step(nullptr);
-    if (mcdigi->wireEndTime(mu2e::StrawEnd::cal) < mcdigi->wireEndTime(mu2e::StrawEnd::hv)) {
-      step = mcdigi->strawGasStep(mu2e::StrawEnd::cal).get();
-    }
-    else {
-      step = mcdigi->strawGasStep(mu2e::StrawEnd::hv ).get();
-    }
+    const mu2e::StrawGasStep* step = mcdigi->earlyStrawGasStep().get();
 
-    const mu2e::SimParticle* sim = &(*step->simParticle());
+    const mu2e::SimParticle* sim   = &(*step->simParticle());
     
     if ( sim->fromGenerator() ){
       mu2e::GenParticle* gen = (mu2e::GenParticle*) &(*sim->genParticle());
@@ -329,40 +329,37 @@ int TTrkVisNode::InitEvent() {
   fListOfSimParticles->Delete();
 
   stntuple::TEvdSimParticle *esim;
-  const mu2e::SimParticle   *simp;
 
-  int nsteps = (*fSpmcColl)->size();
+  TDatabasePDG* pdb = TDatabasePDG::Instance();
 
+  int np = fSimpBlock->NParticles();
   int ipp = 0;
-  for (mu2e::SimParticleCollection::const_iterator ip = (*fSimpColl)->begin(); ip != (*fSimpColl)->end(); ip++) {  
-    simp = &ip->second;
-//-----------------------------------------------------------------------------
-// figure out step point MC at the tracker front ... this could be a limitation
-// start from that anyway
-//-----------------------------------------------------------------------------
-    for (int is=0; is<nsteps; is++) {
-      const mu2e::StepPointMC* step = &(*fSpmcColl)->at(is);
-      if ((step->volumeId() == 13) and (step->simParticle().get() == simp)) {  // tracker front
-	esim = new stntuple::TEvdSimParticle(ipp,simp,step);
-	ipp++;
-	fListOfSimParticles->Add(esim);
-	break;
-      }
+  for (int i=0; i<np; i++) {
+    TSimParticle* tsimp = fSimpBlock->Particle(i);
+
+    TParticlePDG* p_pdg = pdb->GetParticle(tsimp->PDGCode());
+
+    if (p_pdg == nullptr) {
+      printf("Unknown SimParticle with code %i, SKIP\n",tsimp->PDGCode());
+                                                            continue;
     }
 
+    if (tsimp->NStrawHits() > 0) {
 //-----------------------------------------------------------------------------
-// add hits later - they need to be determined....
+// taking the first and the last StrawGasStep's in hope that they are ordered in Z
 //-----------------------------------------------------------------------------
-//    const TrkHitVector* hits = &krep->hitVector();
-//    for (auto it=hits->begin(); it!=hits->end(); it++) {
-//      track_hit = dynamic_cast<mu2e::TrkStrawHit*> (*it);
-//      if (track_hit == nullptr) continue;
-//      stntuple::TEvdTrkStrawHit* h = new stntuple::TEvdTrkStrawHit(track_hit);
-//      trk->AddHit(h);
-//    }
-//
+      int first = tsimp->Shid()->front();
+      int last  = tsimp->Shid()->back ();
+
+      const mu2e::StrawGasStep* s1 = (*fStrawDigiMCColl)->at(first).earlyStrawGasStep().get();
+      const mu2e::StrawGasStep* s2 = (*fStrawDigiMCColl)->at(last ).earlyStrawGasStep().get();
+
+      esim = new stntuple::TEvdSimParticle(ipp,tsimp,s1,s2);
+      fListOfSimParticles->Add(esim);
+      ipp++;
+    }
   }
-  
+
   return 0;
 }
 

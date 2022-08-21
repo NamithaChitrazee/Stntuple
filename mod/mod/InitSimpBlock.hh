@@ -18,7 +18,7 @@ public:
   art::InputTag   fStrawDigiMCCollTag;
   art::InputTag   fVDHitsCollTag;
   art::InputTag   fPrimaryParticleTag;
-  float           fMinSimpEnergy;
+  float           fMinSimpMomentum;
   float           fMaxZ;
   int             fGenProcessID;
   int             fPdgID;
@@ -32,7 +32,7 @@ public:
   void   SetStrawDigiMCCollTag(std::string& Tag ) { fStrawDigiMCCollTag = art::InputTag(Tag); }
   void   SetVDHitsCollTag     (std::string& Tag ) { fVDHitsCollTag      = art::InputTag(Tag); }
   void   SetPrimaryParticleTag(std::string& Tag ) { fPrimaryParticleTag = art::InputTag(Tag); }
-  void   SetMinSimpEnergy     (double       MinE) { fMinSimpEnergy      = MinE              ; }
+  void   SetMinSimpMomentum   (double       MinP) { fMinSimpMomentum    = MinP              ; }
   void   SetMaxZ              (double       MaxZ) { fMaxZ               = MaxZ              ; }
   void   SetGenProcessID      (int          ID  ) { fGenProcessID       = ID                ; }
   void   SetPdgID             (int          ID  ) { fPdgID              = ID                ; }

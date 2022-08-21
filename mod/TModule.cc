@@ -42,7 +42,6 @@ TModule::TModule(fhicl::ParameterSet const& PSet, const char* Name):
   _rootMacro       = PSet.get<string>             ("rootMacro"      );
 
   fAnaRint         = TAnaRint::Instance(0,dummy);
-
 //-----------------------------------------------------------------------------
 // pass parameters to TAnaDump
 //-----------------------------------------------------------------------------

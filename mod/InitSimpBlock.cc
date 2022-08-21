@@ -41,14 +41,8 @@
 //-----------------------------------------------------------------------------
 // fill SimParticle's data block
 //-----------------------------------------------------------------------------
-int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent, int mode) 
-{
+int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent, int Mode) {
   const char* oname = {"StntupleInitMu2eSimpBlock"};
-
-  //  static int    initialized(0);
-  //  static char   g4_module_label  [100], g4_description  [100];
-
-  // static double _min_energy;
 
   std::vector<art::Handle<mu2e::SimParticleCollection>> list_of_sp;
 
@@ -91,29 +85,30 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
   }
 //-----------------------------------------------------------------------------
 // figure out how many straw hits each particle has produced
+// StrawHitCollection, StrawDigiCollection, and StrawDigiMCCollection are all parallel,
+// indexed with the same index
 //-----------------------------------------------------------------------------
-  std::vector<int> vid, vin;
-  int np_with_straw_hits(0);   // number of particles with straw hits
+  std::vector<int>  vid, vin;
+  int               np_with_straw_hits(0);  // number of particles with straw hits
+					   // straw hit ID's, per particle
+  std::vector<int>* vshid[n_straw_hits+1];
+
+  vid.reserve(n_straw_hits);
+  vin.reserve(n_straw_hits);
+
+  for (int i=0; i<n_straw_hits; i++) {
+    vin[i]   = 0;
+    vshid[i] = nullptr;
+  }
 
   if (n_straw_hits > 0) {
-
-    vid.reserve(n_straw_hits);
-    vin.reserve(n_straw_hits);
-
-    for (int i=0; i<n_straw_hits; i++) vin[i] = 0;
 
     const mu2e::StrawGasStep* step(nullptr);
 
     for (int i=0; i<n_straw_hits; i++) {
       const mu2e::StrawDigiMC* mcdigi = &mcdigis->at(i);
 
-      if (mcdigi->wireEndTime(mu2e::StrawEnd::cal) < mcdigi->wireEndTime(mu2e::StrawEnd::hv)) {
-      	step = mcdigi->strawGasStep(mu2e::StrawEnd::cal).get();
-      }
-      else {
-      	step = mcdigi->strawGasStep(mu2e::StrawEnd::hv ).get();
-      }
-    
+      step = mcdigi->earlyStrawGasStep().get();
       if (step) {
 //------------------------------------------------------------------------------
 // looking at the ppbar annihilation events - 
@@ -131,15 +126,18 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
 	for (int ip=0; ip<np_with_straw_hits; ip++) {
 	  if (sim_id == vid[ip]) {
 	    vin[ip] += 1;
+	    vshid[ip]->push_back(i);
 	    found    = 1;
 	    break;
 	  }
 	}
 
 	if (found == 0) {
-	  vid[np_with_straw_hits] = sim_id;
-	  vin[np_with_straw_hits] = 1;
-	  np_with_straw_hits      = np_with_straw_hits+1;
+	  vshid[np_with_straw_hits]      = new std::vector<int>;
+	  vshid[np_with_straw_hits]->push_back(i);
+	  vid[np_with_straw_hits]        = sim_id;
+	  vin[np_with_straw_hits]        = 1;
+	  np_with_straw_hits             = np_with_straw_hits+1;
 	}
       }
     }
@@ -167,41 +165,32 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
 
     for (mu2e::SimParticleCollection::const_iterator ip = simp_coll->begin(); ip != simp_coll->end(); ip++) {
       sim      = &ip->second;
-      //      const mu2e::GenParticle* genp;
 
       id        = sim->id().asInt();
       parent_id = -1;
 //------------------------------------------------------------------------------
 // count number of straw hits produced by the particle
 //-----------------------------------------------------------------------------
-      nhits = 0;
-      
+      nhits  = 0;
+      std::vector<int>* v_shid(nullptr);
+
       for (int i=0; i<np_with_straw_hits; i++) {
 	if (vid[i] == id) {
-	  nhits = vin[i];
+	  nhits    = vin  [i];
+	  v_shid   = vshid[i];
+	  vshid[i] = nullptr;
 	  break;
 	}
       }
 //-----------------------------------------------------------------------------
-// a semi-kludge: store e+ and e- from an external photon conversion
+// need to store e+ and e- from an external photon conversion
 // it is possible that will need to lop over the primary particles
 //-----------------------------------------------------------------------------
-      // if (sim->parent()) { 
-      // 	parent_id = sim->parent()->id().asInt();
-      // 	genp      = sim->parent()->genParticle().get();
-      // }
-      // else {
-      // 	genp      = sim->genParticle().get();
-      // }
-
       pdg_code         = (int) sim->pdgId();
       process_id       = sim->creationCode();
 
-      // if (genp) generator_id = genp->generatorId().id();   // ID of the MC generator
-      // else      generator_id = -1;
-
-      int found = 0;
-      if (pp_handle.isValid()) {
+      if (pp != nullptr) {
+	int found = 0;
 	for (auto pr : pp->primarySimParticles()) {
 	  if (pr.get() == sim) {
 	    found = 1;
@@ -220,22 +209,23 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
       start_vol_id     = sim->startVolumeIndex();
       end_vol_id       = sim->endVolumeIndex();
       
-      px     = sim->startMomentum().x();
-      py     = sim->startMomentum().y();
-      pz     = sim->startMomentum().z();
-      energy = sim->startMomentum().e();
+      px               = sim->startMomentum().x();
+      py               = sim->startMomentum().y();
+      pz               = sim->startMomentum().z();
+      double ptot      = sim->startMomentum().vect().mag();
+      energy           = sim->startMomentum().e();
 //-----------------------------------------------------------------------------
 // by default, do not store low energy SimParticles not making hits in the tracker
 //-----------------------------------------------------------------------------
       const CLHEP::Hep3Vector sp = sim->startPosition();
 
-      if (fMinSimpEnergy >= 0) {
-	if ((nhits == 0) and (energy < fMinSimpEnergy))       continue;
+      if (fMinSimpMomentum >= 0) {
+	if ((nhits == 0) or  (ptot < fMinSimpMomentum))     continue;
       }
 
-      simp   = simp_block->NewParticle(id, parent_id, pdg_code, 
+      simp   = simp_block->NewParticle(id, parent_id, pdg_code        , 
 				       creation_code, termination_code,
-				       start_vol_id, end_vol_id,
+				       start_vol_id , end_vol_id      ,
 				       process_id);
       simp->SetStartMom(px, py, pz, energy);
       simp->SetStartPos(sp.x(),sp.y(),sp.z(),sim->startGlobalTime());
@@ -246,8 +236,11 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
       const CLHEP::Hep3Vector ep = sim->endPosition();
       simp->SetEndPos(ep.x(),ep.y(),ep.z(),sim->endGlobalTime());
       simp->SetNStrawHits(nhits);
+      simp->SetSimParticle(sim);
+      simp->SetShid(v_shid);
 //-----------------------------------------------------------------------------
-// particle parameters at virtual detectors
+// particle parameters at virtual detectors -stored only for those which have 
+// VD hits stored
 //-----------------------------------------------------------------------------
       if (vdg->nDet() > 0) {
 	art::Handle<mu2e::StepPointMCCollection> vdhits;
@@ -294,6 +287,12 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
 	  }
 	}
       }
+    }
+//-----------------------------------------------------------------------------
+// memory clean up , reassigned ones will be deleted together with particles ? 
+//-----------------------------------------------------------------------------
+    for (int i=0; i<np_with_straw_hits; i++) {
+      if (vshid[i]) delete vshid[i];
     }
   }
   else {

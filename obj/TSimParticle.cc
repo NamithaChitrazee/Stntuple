@@ -100,7 +100,6 @@ void TSimParticle::ReadV2(TBuffer &R__b) {
 
   fEndPos.SetXYZT(0.,0.,0.,0.);		// ** added in V3 **
   fEndMom.SetXYZT(0.,0.,0.,0.);		// ** added in V3 **
-  
 }
 
 //-----------------------------------------------------------------------------
@@ -159,7 +158,14 @@ TSimParticle::TSimParticle(Int_t ID, Int_t ParentID, Int_t PDGCode,
 }
 
 //-----------------------------------------------------------------------------
+// fSimp is just cached
+//-----------------------------------------------------------------------------
 TSimParticle::~TSimParticle() {
+  if (fShid) {
+    delete fShid;
+    fShid = nullptr;
+  }
+  fSimParticle = nullptr;
 }
 
 //_____________________________________________________________________________
@@ -176,18 +182,40 @@ int  TSimParticle::Init(Int_t ID, Int_t ParentID, Int_t PDGCode,
   fStartVolumeIndex = StartVolumeIndex;
   fEndVolumeIndex   = EndVolumeIndex;
   fNStrawHits       = 0;
-  fGeneratorID           = GeneratorID;
+  fGeneratorID      = GeneratorID;
   fMomTargetEnd     = -1.;
   fMomTrackerFront  = -1.;
+  fSimParticle      = nullptr;
+  fShid             = nullptr;
 
   return 0;
 }
 
 //_____________________________________________________________________________
+void TSimParticle::Clear(Option_t* Opt) {
+  fSimParticle = nullptr;
+  if (fShid) {
+    delete fShid;
+    fShid = nullptr;
+  }
+}
+
+
+//_____________________________________________________________________________
+void TSimParticle::Delete(Option_t* Opt) {
+  fSimParticle = nullptr;
+  if (fShid) {
+    delete fShid;
+    fShid = nullptr;
+  }
+}
+
+
+//_____________________________________________________________________________
 void TSimParticle::Print(Option_t* Opt) const {
 
   TString opt = Opt;
-  if ((opt == "banner") || (opt == "")) {
+  if ((opt.Index("banner") >= 0) || (opt == "")) {
 				// print banner
     printf("------------------------------------------------------");
     printf("--------------------------------------------------------------------------------------");
@@ -204,7 +232,7 @@ void TSimParticle::Print(Option_t* Opt) const {
 
   TParticlePDG* pdg = db->GetParticle(fPdgCode);
 
-  if ((opt == "data") || (opt == "")) {
+  if ((opt.Index("data") >= 0) || (opt == "")) {
     printf("%4i",Number());
 
     if (pdg) printf(" %-19s",pdg->GetName());
