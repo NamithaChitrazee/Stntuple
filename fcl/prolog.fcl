@@ -9,8 +9,14 @@ BEGIN_PROLOG
 # see example of redefining GEN_ID in Stntuple/test/read_reco_stntuple.fcl
 # to be included by Stntuple/fcl/stntuple.fcl
 #------------------------------------------------------------------------------
-StntupleModuleFclDefaults : {
-    interactiveMode : 0
+StntupleTModuleFclDefaults : {
+    interactiveMode     : 0
+#------------------------------------------------------------------------------
+# if rootMacro is non-empty, it defines the name of a ROOT macro to be executed 
+# in interpreted mode in the art event loop
+# see https://github.com/Mu2e/Stntuple/blob/muse/doc/event_display.org#plugins
+#------------------------------------------------------------------------------
+    rootMacro           : ""
 #------------------------------------------------------------------------------
 # unlike everywhere else, TAnaDump sets mcTruth to 1 by default
 #------------------------------------------------------------------------------
@@ -30,7 +36,7 @@ StntupleModuleFclDefaults : {
 # default configuration of StntupleMaker
 #------------------------------------------------------------------------------
 StntupleMakerTemplate : { module_type:StntupleMaker
-    @table::StntupleModuleFclDefaults                   # defaults of the base class
+    @table::StntupleTModuleFclDefaults                  # defaults of the base class
     module_name          : StntupleMaker
     processName          : undefined
 #------------------------------------------------------------------------------
@@ -45,7 +51,7 @@ StntupleMakerTemplate : { module_type:StntupleMaker
     makePid              : 1
     makeSimp             : 1  # 0: dont write
     makeStepPointMC      : 1
-    makeStrawData        : 0
+    makeStrawHits        : 0
     makeTracks           : 1
     makeTrackStrawHits   : 0
     makeTrackSeeds       : 0
@@ -130,7 +136,7 @@ StntupleMakerTemplate : { module_type:StntupleMaker
 # 
 #------------------------------------------------------------------------------
 MuHitDisplay: { module_type:MuHitDisplay                 # the class name;
-    @table::StntupleModuleFclDefaults                    # defaults of the base class
+    @table::StntupleTModuleFclDefaults                   # defaults of the base class
 
     interactiveMode              : 1   # 1:stop  after each event 2: stop at end-of-job
     
@@ -204,19 +210,19 @@ Stntuple : {
 #------------------------------------------------------------------------------
     analyzers : {
 	InitStntuple : { module_type:InitStntuple
-	    @table::StntupleModuleFclDefaults                   # defaults of the base class
+	    @table::StntupleTModuleFclDefaults                  # defaults of the base class
 	    module_name       : InitStntuple
 	    histFileName      : "default.stn"
 	    splitLevel        : 99
 	}
 
 	FillStntuple : { module_type:FillStntuple
-	    @table::StntupleModuleFclDefaults                   # defaults of the base class
+	    @table::StntupleTModuleFclDefaults                  # defaults of the base class
 	    module_name       : FillStntuple
 	}
 
 	StntupleEventDump : { module_type:StntupleEventDump 
-	    @table::StntupleModuleFclDefaults                   # defaults of the base class
+	    @table::StntupleTModuleFclDefaults                  # defaults of the base class
 	    module_name       : StntupleEventDump
 	}
 #------------------------------------------------------------------------------
