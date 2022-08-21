@@ -1,15 +1,15 @@
-#ifndef STNTUPLE_TStrawDataBlock
-#define STNTUPLE_TStrawDataBlock
+#ifndef STNTUPLE_TStrawHitBlock
+#define STNTUPLE_TStrawHitBlock
 
 #include "TClonesArray.h"
 
 #include "Stntuple/obj/TStnDataBlock.hh"
-#include "Stntuple/obj/TStrawHitData.hh"
+#include "Stntuple/obj/TStrawHit.hh"
 
 #include "Stntuple/mod/InitStntupleDataBlocks.hh"
 
-class TStrawDataBlock: public TStnDataBlock {
-  friend class StntupleInitStrawDataBlock;
+class TStrawHitBlock: public TStnDataBlock {
+  friend class stntuple::InitStrawHitBlock;
 
 public:
   Int_t          fNHits;	        // number of hits in the straw tracker
@@ -18,12 +18,13 @@ public:
 //  functions
 //-----------------------------------------------------------------------------
 public:
-					// ****** constructors and destructor
-  TStrawDataBlock();
-  virtual ~TStrawDataBlock();
-					// ****** accessors
+					// constructors and destructor
+  TStrawHitBlock();
+  virtual ~TStrawHitBlock();
+					// accessors
+
   Int_t          NHits    () { return fNHits; }
-  TStrawHitData* Hit (int i) { return (TStrawHitData*) fListOfHits->UncheckedAt(i); }
+  TStrawHit* Hit (int i) { return (TStrawHit*) fListOfHits->UncheckedAt(i); }
   
   TClonesArray* GetListOfHits () { return fListOfHits; }
 //-----------------------------------------------------------------------------
@@ -31,14 +32,14 @@ public:
 //-----------------------------------------------------------------------------
                                         //Create hit, increse number of hits
 
-  TStrawHitData* NewHit() { return new ((*fListOfHits)[fNHits++]) TStrawHitData(); } 
+  TStrawHit* NewHit() { return new ((*fListOfHits)[fNHits++]) TStrawHit(); } 
 //-----------------------------------------------------------------------------
 // overloaded methods of TObject
 //-----------------------------------------------------------------------------
   void Clear(Option_t* opt="");
   void Print(Option_t* opt="") const;
 
-  ClassDef(TStrawDataBlock,1)	// straw tracker data block
+  ClassDef(TStrawHitBlock,1)	// straw hit data block
 };
 
 

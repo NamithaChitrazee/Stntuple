@@ -36,7 +36,7 @@
 #include "Stntuple/obj/TStnErrorLogger.hh"
 #include "Stntuple/obj/TStnTrackBlock.hh"
 #include "Stntuple/obj/TStnHelixBlock.hh"
-#include "Stntuple/obj/TStrawDataBlock.hh"
+#include "Stntuple/obj/TStrawHitBlock.hh"
 #include "Stntuple/obj/TCalDataBlock.hh"
 #include "Stntuple/obj/TSimpBlock.hh"
 #include "Stntuple/obj/TGenpBlock.hh"
@@ -53,7 +53,7 @@
 #include "Stntuple/mod/InitCrvClusterBlock.hh"
 #include "Stntuple/mod/InitGenpBlock.hh"
 #include "Stntuple/mod/InitSimpBlock.hh"
-#include "Stntuple/mod/InitStrawDataBlock.hh"
+#include "Stntuple/mod/InitStrawHitBlock.hh"
 #include "Stntuple/mod/InitStepPointMCBlock.hh"
 #include "Stntuple/mod/InitTrackBlock.hh"
 #include "Stntuple/mod/InitTriggerBlock.hh"
@@ -95,7 +95,7 @@ protected:
   int                      fMakePid;
   int                      fMakeSimp;         // 0:dont store, 1:all;
   int                      fMakeStepPointMC;
-  int                      fMakeStrawData;
+  int                      fMakeStrawHits;
   int                      fMakeTracks;
   int                      fMakeTrackStrawHits;
   int                      fMakeTimeClusters;
@@ -161,7 +161,7 @@ protected:
   StntupleInitCrvClusterBlock* fInitCrvClusterBlock;
   StntupleInitGenpBlock*       fInitGenpBlock;
   StntupleInitSimpBlock*       fInitSimpBlock;
-  StntupleInitStrawDataBlock*  fInitStrawDataBlock;
+  stntuple::InitStrawHitBlock* fInitStrawHitBlock;
   StntupleInitTriggerBlock*    fInitTriggerBlock;
   TObjArray*                   fInitTrackBlock;
   TObjArray*                   fInitStepPointMCBlock;
@@ -230,7 +230,7 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
   , fMakePid                 (PSet.get<int>           ("makePid"             ))
   , fMakeSimp                (PSet.get<int>           ("makeSimp"            ))
   , fMakeStepPointMC         (PSet.get<int>           ("makeStepPointMC"     ))
-  , fMakeStrawData           (PSet.get<int>           ("makeStrawData"       ))
+  , fMakeStrawHits           (PSet.get<int>           ("makeStrawHits"       ))
   , fMakeTracks              (PSet.get<int>           ("makeTracks"          ))
   , fMakeTrackStrawHits      (PSet.get<int>           ("makeTrackStrawHits"  ))
   , fMakeTimeClusters        (PSet.get<int>           ("makeTimeClusters"    ))
@@ -302,7 +302,7 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
   fInitCrvClusterBlock  = nullptr;
   fInitGenpBlock        = nullptr;
   fInitSimpBlock        = nullptr;
-  fInitStrawDataBlock   = nullptr;
+  fInitStrawHitBlock    = nullptr;
   fInitTriggerBlock     = nullptr;
 
   fInitStepPointMCBlock = new TObjArray();
@@ -605,13 +605,13 @@ void StntupleMaker::beginJob() {
 //-----------------------------------------------------------------------------
 // straw hit data
 //-----------------------------------------------------------------------------
-  if (fMakeStrawData) {
-    fInitStrawDataBlock = new StntupleInitStrawDataBlock();
+  if (fMakeStrawHits) {
+    fInitStrawHitBlock = new stntuple::InitStrawHitBlock();
 
-    fInitStrawDataBlock->SetStrawHitCollTag (fStrawHitCollTag);
-    fInitStrawDataBlock->SetStrawDigiMCCollTag(fStrawDigiMCCollTag);
+    fInitStrawHitBlock->SetStrawHitCollTag (fStrawHitCollTag);
+    fInitStrawHitBlock->SetStrawDigiMCCollTag(fStrawDigiMCCollTag);
 
-    AddDataBlock("StrawDataBlock","TStrawDataBlock",fInitStrawDataBlock,buffer_size,split_mode,compression_level);
+    AddDataBlock("StrawHitBlock","TStrawHitBlock",fInitStrawHitBlock,buffer_size,split_mode,compression_level);
   }
 //--------------------------------------------------------------------------------
 // time clusters

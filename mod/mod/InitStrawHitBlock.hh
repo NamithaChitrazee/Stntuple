@@ -1,17 +1,18 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
 ///////////////////////////////////////////////////////////////////////////////
-#ifndef __InitStrawDataBlock__
-#define __InitStrawDataBlock__
+#ifndef __InitStrawHitBlock__
+#define __InitStrawHitBlock__
 
 #include <string.h>
 
 #include "canvas/Utilities/InputTag.h"
 
 #include "Stntuple/obj/TStnInitDataBlock.hh"
-#include "Stntuple/obj/TStrawDataBlock.hh"
+#include "Stntuple/obj/TStrawHitBlock.hh"
 
-class StntupleInitStrawDataBlock : public TStnInitDataBlock {
+namespace stntuple {
+class InitStrawHitBlock : public TStnInitDataBlock {
 public:
   art::InputTag   fStrawHitCollTag;
   art::InputTag   fStrawDigiMCCollTag;
@@ -27,5 +28,5 @@ public:
   //  virtual int ResolveLinks   (TStnDataBlock* Block, AbsEvent* Evt, int Mode);
 
 };
-
+}
 #endif

@@ -35,7 +35,7 @@ TTrackStrawHitBlock::TTrackStrawHitBlock() {
   fNTrackHits = new TStnArrayI(0);
   fFirst      = new TStnArrayI(0);
   
-  fListOfHits = new TClonesArray("TTrackStrawHitData",200);
+  fListOfHits = new TClonesArray("TTrackStrawHit",200);
   fListOfHits->BypassStreamer(kFALSE);
 
   Clear();

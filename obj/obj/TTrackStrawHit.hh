@@ -1,15 +1,15 @@
 //-----------------------------------------------------------------------------
-//  2014-01-26 P.Murat - TTrackStrawHitData
+//  2014-01-26 P.Murat - TTrackStrawHit
 //-----------------------------------------------------------------------------
-#ifndef TTrackStrawHitData_hh
-#define TTrackStrawHitData_hh
+#ifndef TTrackStrawHit_hh
+#define TTrackStrawHit_hh
 
 #include <math.h>
 #include "TMath.h"
 #include "TObject.h"
 #include "TBuffer.h"
 
-class TTrackStrawHitData : public TObject {
+class TTrackStrawHit : public TObject {
 public:
   int     fIndex;
   int     fActive;
@@ -25,9 +25,9 @@ public:
   float   fMcDoca;
   float   fMcMomentum;			// MC particle momentum, assumed to be the last word
 public:
-                                        // ****** constructors and destructors
-  TTrackStrawHitData();
-  virtual ~TTrackStrawHitData();
+                                        // constructors and destructors
+  TTrackStrawHit();
+  virtual ~TTrackStrawHit();
 //-----------------------------------------------------------------------------
 // accessors
 //-----------------------------------------------------------------------------
@@ -62,7 +62,7 @@ public:
 //-----------------------------------------------------------------------------
   void ReadV1(TBuffer &R__b);
 
-  ClassDef (TTrackStrawHitData,1)
+  ClassDef (TTrackStrawHit,1)
 };
 
 #endif

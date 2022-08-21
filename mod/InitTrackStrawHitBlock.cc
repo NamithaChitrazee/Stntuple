@@ -82,7 +82,7 @@ Int_t StntupleInitMu2eTrackStrawHitBlock(TStnDataBlock* Block, AbsEvent* AnEvent
   const mu2e::SimParticle  *sim(nullptr);
   const mu2e::Straw        *straw(nullptr);
     
-  TTrackStrawHitData*      hit; 
+  TTrackStrawHit*      hit; 
   data->fNTracks = list_of_kreps->size();
 
   const KalRep*            krep;
