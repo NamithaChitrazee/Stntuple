@@ -154,9 +154,11 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
 
     if (pp_handle.isValid()) {
       pp            = pp_handle.product();
-      primary       = pp->primarySimParticles().front().get();
-      fGenProcessID = primary->creationCode();
-      fPdgID        = primary->pdgId();
+      if (pp->primarySimParticles().size() > 0) {
+	primary       = pp->primarySimParticles().front().get();
+	fGenProcessID = primary->creationCode();
+	fPdgID        = primary->pdgId();
+      }
     }
   }
 
