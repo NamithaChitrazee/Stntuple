@@ -57,9 +57,9 @@ services.TFileService.fileName            : "nts.user.display.xxx.000001.root"
 outputs.detectorOutput.fileName           : "sim.user.display.xxx.000001.art"
 #------------------------------------------------------------------------------
 # uncomment 'primaryParticleTag' line do display more particles
-# uncomment 'rootMacro' line to execute macro
+# uncomment 'rootMacro' line to execute test macro
 # see https://github.com/Mu2e/Stntuple/blob/muse/doc/event_display.org for more details
 #------------------------------------------------------------------------------
+physics.analyzers.MuHitDisplay.primaryParticleTag : ""
 # physics.analyzers.MuHitDisplay.minSimpMomentum    : 100
-# physics.analyzers.MuHitDisplay.primaryParticleTag : ""
 # physics.analyzers.MuHitDisplay.rootMacro          : "Stntuple/mod/scripts/display_001.C"

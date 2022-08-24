@@ -62,3 +62,4 @@ outputs.detectorOutput.fileName             : "sim.user.project.version.000000_0
 physics.analyzers.MuHitDisplay.interactiveMode    : 1
 physics.analyzers.MuHitDisplay.minSimpMomentum    : 40
 physics.analyzers.MuHitDisplay.rootMacro          : "Stntuple/mod/scripts/display_001.C"
+physics.analyzers.MuHitDisplay.primaryParticleTag : ""  # display all particles

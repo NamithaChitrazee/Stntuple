@@ -12,11 +12,13 @@
 #include "TGMenu.h"
 #include "TGMsgBox.h"
 #include "TGFrame.h"
+#include "TGButton.h"
 #include "TGFileDialog.h"
 #include "TControlBar.h"
 #include "TInterpreter.h"
 #include "TGStatusBar.h"
-//#include "TGGroupFrame.h"
+#include "TGShutter.h"
+
 #include "TRootEmbeddedCanvas.h"
 #include "TCanvas.h"
 
@@ -94,6 +96,8 @@ TStnFrame::TStnFrame(const char* Name,
   TGMainFrame(gClient->GetRoot(),w, h, Options),
   fView(View)
 {
+
+  TStnVisManager* vm = TStnVisManager::Instance();
 //-----------------------------------------------------------------------------
 //  create menu bar
 //-----------------------------------------------------------------------------
@@ -120,15 +124,17 @@ TStnFrame::TStnFrame(const char* Name,
   fMenuHelp->AddEntry("&Search...", M_HELP_SEARCH);
   fMenuHelp->AddSeparator();
   fMenuHelp->AddEntry("&About", M_HELP_ABOUT);
-
-					// Menu item EDIT
-
+//-----------------------------------------------------------------------------
+// EDIT menu item on top 
+//-----------------------------------------------------------------------------
   fMenuEdit = new TGPopupMenu(gClient->GetRoot());
   fMenuEdit->AddEntry("&Editor",             M_EDIT_EDITOR);
   fMenuEdit->AddEntry("&Undo",               M_EDIT_UNDO);
   fMenuEdit->AddEntry("Clear &Pad",          M_EDIT_CLEARPAD);
   fMenuEdit->AddEntry("&Clear Canvas",       M_EDIT_CLEARCANVAS);
-
+//-----------------------------------------------------------------------------
+// OPTION menu item on top 
+//-----------------------------------------------------------------------------
   fMenuOption = new TGPopupMenu(gClient->GetRoot());
   fMenuOption->AddEntry("&Event Status",         M_OPTION_EVENT_STATUS);
   fMenuOption->AddEntry("&Pad Auto Exec",        M_OPTION_AUTO_EXEC);
@@ -143,14 +149,18 @@ TStnFrame::TStnFrame(const char* Name,
   fMenuOption->AddEntry("Show &Histogram Title", M_OPTION_HIST_TITLE);
   fMenuOption->AddEntry("Show &Fit Parameters",  M_OPTION_FIT_PARAMS);
   fMenuOption->AddEntry("Can Edit Histograms",   M_OPTION_CAN_EDIT);
-
+//-----------------------------------------------------------------------------
+// OPEN menu item on top 
+//-----------------------------------------------------------------------------
   fMenuOpen = new TGPopupMenu(gClient->GetRoot());
   fMenuOpen->AddEntry("&XY View",            M_OPEN_XY);
   fMenuOpen->AddEntry("&RZ View",            M_OPEN_RZ);
   fMenuOpen->AddEntry("&TZ View",            M_OPEN_TZ);
   fMenuOpen->AddEntry("&Cal View",           M_OPEN_CAL);
   fMenuOpen->AddEntry("&CRV View",           M_OPEN_CRV);
-
+//-----------------------------------------------------------------------------
+// PRINT menu item on top 
+//-----------------------------------------------------------------------------
   fMenuPrint = new TGPopupMenu(gClient->GetRoot());
   fMenuPrint->AddEntry("Print &Straw Hits",  M_PRINT_STRAW_H);
   fMenuPrint->AddEntry("Print &Combo Hits",  M_PRINT_COMBO_H);
@@ -174,7 +184,7 @@ TStnFrame::TStnFrame(const char* Name,
   
   AddFrame(fMenuBar, fMenuBarLayout);
 //-----------------------------------------------------------------------------
-// left group frame for commands, options and such
+// left Group frame for commands, options and such
 //-----------------------------------------------------------------------------
 //  SetLayoutManager(new TGHorizontalLayout(this));
 
@@ -184,11 +194,131 @@ TStnFrame::TStnFrame(const char* Name,
 
   fGroupFrame = new TGGroupFrame(fHorizontalFrame,"GroupFrame");
   fGroupFrame->SetLayoutBroken(kTRUE);
+//-----------------------------------------------------------------------------
+// "Next Event" button
+//-----------------------------------------------------------------------------
+  TGTextButton *tb(nullptr);
+  tb = new TGTextButton(fGroupFrame,"Next Event",-1,
+			TGTextButton::GetDefaultGC()(),
+			TGTextButton::GetDefaultFontStruct(),
+			kRaisedFrame);
+  tb->SetTextJustify(36);
+  tb->SetMargins(0,0,0,0);
+  tb->SetWrapLength(-1);
+  fGroupFrame->AddFrame(tb, new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
+  tb->MoveResize(5,10,100,30);
+  tb->Connect("Pressed()", "TStnVisManager", vm, "NextEvent()");
+//-----------------------------------------------------------------------------
+// "Next Event" button
+//-----------------------------------------------------------------------------
+  tb = new TGTextButton(fGroupFrame,"Quit",-1,
+			TGTextButton::GetDefaultGC()(),
+			TGTextButton::GetDefaultFontStruct(),
+			kRaisedFrame);
+  tb->SetTextJustify(36);
+  tb->SetMargins(0,0,0,0);
+  tb->SetWrapLength(-1);
+  tb->MoveResize(5,45,100,30);
+  fGroupFrame->AddFrame(tb, new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
+  tb->Connect("Pressed()", "TStnVisManager", vm, "Quit()");
+//-----------------------------------------------------------------------------
+// shutter - below the "Next Event" button
+//-----------------------------------------------------------------------------
+  TGShutter *sh = new TGShutter(fGroupFrame,kSunkenFrame);
+//-----------------------------------------------------------------------------
+// configure shutter items
+// "Display" : choose collections to display
+//-----------------------------------------------------------------------------
+  TGShutterItem    *sh_item    = new TGShutterItem(sh, new TGHotString("Display"),1000,kVerticalFrame);
 
-  //  fGroupFrame->SetLayoutManager(new TGVerticalLayout(fGroupFrame));
+  TGCompositeFrame *frame = (TGCompositeFrame *) sh_item->GetContainer();
+
+  // TGPictureButton *fPictureButton805  = new TGPictureButton(frame,gClient->GetPicture("profile_s.xpm"),-1,TGPictureButton::GetDefaultGC()(),kRaisedFrame);
+  // fPictureButton805->SetToolTipText("TProfile");
+  // frame->AddFrame(fPictureButton805, new TGLayoutHints(kLHintsNormal));
+
+  // TGPictureButton *fPictureButton802 = new TGPictureButton(frame,gClient->GetPicture("h3_s.xpm"),-1,TGPictureButton::GetDefaultGC()(),kRaisedFrame);
+  // fPictureButton802->SetToolTipText("TH3");
+  // frame->AddFrame(fPictureButton802, new TGLayoutHints(kLHintsNormal));
+
+  // TGPictureButton *fPictureButton799 = new TGPictureButton(frame,gClient->GetPicture("h2_s.xpm"),-1,TGPictureButton::GetDefaultGC()(),kRaisedFrame);
+  // fPictureButton799->SetToolTipText("TH2");
+  // frame->AddFrame(fPictureButton799, new TGLayoutHints(kLHintsNormal));
+
+  // TGPictureButton *fPictureButton796 = new TGPictureButton(frame,gClient->GetPicture("h1_s.xpm"),-1,TGPictureButton::GetDefaultGC()(),kRaisedFrame);
+  // fPictureButton796->SetToolTipText("TH1");
+  // frame->AddFrame(fPictureButton796, new TGLayoutHints(kLHintsNormal));
+
+  tb = new TGTextButton(frame,"test_01",-1,TGTextButton::GetDefaultGC()(),TGTextButton::GetDefaultFontStruct(),kRaisedFrame);
+  frame->AddFrame(tb, new TGLayoutHints(kLHintsNormal));
+  
+  fRb[0] = new TGRadioButton(frame,"display SH", 21);
+  // rb->SetTextJustify(36);
+  // rb->SetMargins    (0,0,0,0);
+  // rb->SetWrapLength (-1);
+  // rb->MoveResize    (8,64,100,40);
+  fRb[0]->Connect("Clicked()", "TStnFrame", this, "DoRadio()");
+  frame->AddFrame(fRb[0], new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
+
+  fRb[1] = new TGRadioButton(frame,"display CH", 22);
+  // rb->SetTextJustify(36);
+  // rb->SetMargins    (0,0,0,0);
+  // rb->SetWrapLength (-1);
+  // rb->MoveResize    (8,64,100,40);
+  fRb[1]->Connect("Clicked()", "TStnFrame", this, "DoRadio()");
+  frame->AddFrame(fRb[1], new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
+
+  sh->AddItem(sh_item);
+//-----------------------------------------------------------------------------
+// "print" : print different collections
+//-----------------------------------------------------------------------------
+  TGShutterItem *fShutter02 = new TGShutterItem(sh, new TGHotString("print"),1001,kVerticalFrame);
+  // TGCompositeFrame *fVerticalFrame820 = (TGCompositeFrame *)fShutter02->GetContainer();
+
+  // TGPictureButton *fPictureButton821 = new TGPictureButton(fVerticalFrame820,gClient->GetPicture("f1_s.xpm"),-1,TGPictureButton::GetDefaultGC()(),kRaisedFrame);
+  // fPictureButton821->SetToolTipText("print_straw_hits");
+  // fVerticalFrame820->AddFrame(fPictureButton821, new TGLayoutHints(kLHintsCenterX | kLHintsTop,5,5,5,0));
+
+  // TGPictureButton *fPictureButton824 = new TGPictureButton(fVerticalFrame820,gClient->GetPicture("f2_s.xpm"),-1,TGPictureButton::GetDefaultGC()(),kRaisedFrame);
+  // fPictureButton824->SetToolTipText("TF2");
+  // fVerticalFrame820->AddFrame(fPictureButton824, new TGLayoutHints(kLHintsCenterX | kLHintsTop,5,5,5,0));
+
+  sh->AddItem(fShutter02);
+//-----------------------------------------------------------------------------
+// "Trees" : no use yet
+//-----------------------------------------------------------------------------
+  TGShutterItem *fShutterItem827 = new TGShutterItem(sh, new TGHotString("Trees"),1002,kVerticalFrame);
+  //TGCompositeFrame *fVerticalFrame839 = (TGCompositeFrame *)fShutterItem827->GetContainer();
+
+  // TGPictureButton *fPictureButton840 = new TGPictureButton(fVerticalFrame839,gClient->GetPicture("ntuple_s.xpm"),-1,TGPictureButton::GetDefaultGC()(),kRaisedFrame);
+  // fPictureButton840->SetToolTipText("TNtuple");
+  // fVerticalFrame839->AddFrame(fPictureButton840, new TGLayoutHints(kLHintsCenterX | kLHintsTop,5,5,5,0));
+
+  // TGPictureButton *fPictureButton843 = new TGPictureButton(fVerticalFrame839,gClient->GetPicture("tree_s.xpm"),-1,TGPictureButton::GetDefaultGC()(),kRaisedFrame);
+  // fPictureButton843->SetToolTipText("TTree");
+  // fVerticalFrame839->AddFrame(fPictureButton843, new TGLayoutHints(kLHintsCenterX | kLHintsTop,5,5,5,0));
+
+  // TGPictureButton *fPictureButton846 = new TGPictureButton(fVerticalFrame839,gClient->GetPicture("chain_s.xpm"),-1,TGPictureButton::GetDefaultGC()(),kRaisedFrame);
+  // fPictureButton846->SetToolTipText("TChain");
+  // fVerticalFrame839->AddFrame(fPictureButton846, new TGLayoutHints(kLHintsCenterX | kLHintsTop,5,5,5,0));
+
+  sh->AddItem(fShutterItem827);
+
+  //  sh->SetSelectedItem(fShutter02);
+
+  sh->Resize(100,300);
+  sh->MoveResize(16,160,100,300);
+
+  fGroupFrame->AddFrame(sh, new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
+//-----------------------------------------------------------------------------
+// 'group frame' has vertical layout
+//-----------------------------------------------------------------------------
+  fGroupFrame->SetLayoutManager(new TGVerticalLayout(fGroupFrame));
+  fGroupFrame->Resize(150,770);
   fGroupFrame->Resize(fGroupFrameWidth,GetHeight()+4);
 //-----------------------------------------------------------------------------
 // Create canvas and canvas container that will host the ROOT graphics
+// fHorizontalFrame holds them
 //-----------------------------------------------------------------------------
   fEmbeddedCanvas = new TRootEmbeddedCanvas(Name, 
 					    fHorizontalFrame, 
@@ -519,3 +649,23 @@ void TStnFrame::DoTab(Int_t id) {
    printf("*** TStnFrame::DoTab : Tab item %d activated\n", id);
 }
 
+//-----------------------------------------------------------------------------
+void TStnFrame::DoRadio() {
+   // Handle radio buttons.
+
+  TGButton *btn = (TGButton *) gTQSender;
+  Int_t id = btn->WidgetId();
+
+  printf(" TStnFrame::DoRadio radio button ID: %i\n",id);
+  
+  TStnVisManager* vm = TStnVisManager::Instance();
+  if (id >= 21 && id <= 22) {
+
+    if (id == 21) vm->SetDisplayStrawHitsXY(1);
+    else          vm->SetDisplayStrawHitsXY(0);
+
+    for (int i = 0; i < 2; i++) {
+      if (fRb[i]->WidgetId() != id) fRb[i]->SetState(kButtonUp);
+    }
+  }
+}

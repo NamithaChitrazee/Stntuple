@@ -11,6 +11,8 @@ class TGPopupMenu;
 class TGLayoutHints;
 class TGStatusBar;
 class TGGroupFrame;
+class TGTextButton;
+class TGRadioButton;
 
 class TStnVisManager;
 
@@ -22,31 +24,34 @@ public:
 
 protected:
 
-  TGMenuBar           *fMenuBar;	// !
-  TGPopupMenu         *fMenuFile;	// !
-  TGPopupMenu         *fMenuEdit;	// !
-  TGPopupMenu         *fMenuOption;	// !
-  TGPopupMenu         *fMenuOpen;	// !
-  TGPopupMenu         *fMenuPrint;	// !
-  TGPopupMenu         *fMenuHelp;	// !
+  TGMenuBar           *fMenuBar;	   // !
+  TGPopupMenu         *fMenuFile;	   // !
+  TGPopupMenu         *fMenuEdit;	   // !
+  TGPopupMenu         *fMenuOption;	   // !
+  TGPopupMenu         *fMenuOpen;	   // !
+  TGPopupMenu         *fMenuPrint;	   // !
+  TGPopupMenu         *fMenuHelp;	   // !
 
-  TGLayoutHints       *fMenuBarLayout;	// !
+  TGLayoutHints       *fMenuBarLayout;	   // !
   TGLayoutHints       *fMenuBarItemLayout; // !
   TGLayoutHints       *fMenuBarHelpLayout; // !
 
   TGHorizontalFrame   *fHorizontalFrame;   // !
-  TGGroupFrame        *fGroupFrame;       // !
+  TGGroupFrame        *fGroupFrame;        // !
+  TGTextButton        *fNextEvent;         // ! "Next Event" command
 
-  TControlBar         *fEditorBar;       //! Editor control bar
+  TControlBar         *fEditorBar;         // ! Editor control bar
 
-  TRootEmbeddedCanvas *fEmbeddedCanvas;	// ! canvas widget
-  TGLayoutHints       *fCanvasLayout;	// ! layout for canvas widget
+  TRootEmbeddedCanvas *fEmbeddedCanvas;	   // ! canvas widget
+  TGLayoutHints       *fCanvasLayout;	   // ! layout for canvas widget
 
-  TGStatusBar*        fStatusBar;       // !
-  TGLayoutHints       *fStatusBarLayout; // ! layout for the status bar
+  TGStatusBar         *fStatusBar;         // !
+  TGLayoutHints       *fStatusBarLayout;   // ! layout for the status bar
 
-  TStnVisManager*     fVisManager;	// !
-  int                 fView;		// !
+  TGRadioButton       *fRb[2];             // ! [0]: SH [1]: CH 
+
+  TStnVisManager*     fVisManager;	   // !
+  int                 fView;		   // !
 
 public:
   TStnFrame(const char* name, const char* title, Int_t View, 
@@ -68,6 +73,9 @@ public:
   void DoOK();
   void DoCancel();
   void DoTab(Int_t id);
+
+  void DoRadio();
+
   void HandleButtons(Int_t id = -1);
   void EditorBar();
   virtual Bool_t ProcessMessage(Long_t msg, Long_t parm1, Long_t parm2);

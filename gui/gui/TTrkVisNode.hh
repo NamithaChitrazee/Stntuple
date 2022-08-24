@@ -33,6 +33,7 @@ class TSimpBlock;
 namespace stntuple {
   class TEvdStrawTracker;
   class TEvdStrawHit;
+  class TEvdComboHit;
   class TEvdTrack;
   class TEvdSimParticle;
 }
@@ -69,10 +70,10 @@ protected:
   Int_t                     fUseStereoHits;
   double                    fEventTime;
 		            
+  TObjArray*                fListOfComboHits;
   TObjArray*                fListOfStrawHits;
   TObjArray*                fListOfTracks;
   TObjArray*                fListOfSimParticles;
-  TObjArray*                fListOfComboHits;
 
   TSimpBlock*               fSimpBlock;
 public:
@@ -90,12 +91,24 @@ public:
   Color_t    GetTrackColor  () { return fTrackColor;   }
 
   int        GetNTracks()      { return fListOfTracks->GetEntriesFast(); }
-  int        GetNHits  ()      { return fListOfStrawHits->GetEntriesFast(); }
+  int        GetNStrawHits  () { return fListOfStrawHits->GetEntriesFast(); }
+  int        GetNComboHits  () { return fListOfComboHits->GetEntriesFast(); }
 
-  stntuple::TEvdStrawHit* GetHit  (int I) { return (stntuple::TEvdStrawHit*) fListOfStrawHits->At(I); }
-  stntuple::TEvdTrack*    GetTrack(int I) { return (stntuple::TEvdTrack*)    fListOfTracks->At(I); }
+  stntuple::TEvdComboHit* GetEvdComboHit(int I) { 
+    return (stntuple::TEvdComboHit*) fListOfComboHits->At(I); 
+  }
 
-  stntuple::TEvdSimParticle* GetSimParticle(int I) { return (stntuple::TEvdSimParticle*)  fListOfSimParticles->At(I); }
+  stntuple::TEvdStrawHit* GetEvdStrawHit(int I) { 
+    return (stntuple::TEvdStrawHit*) fListOfStrawHits->At(I); 
+  }
+
+  stntuple::TEvdTrack*    GetEvdTrack   (int I) { 
+    return (stntuple::TEvdTrack*)    fListOfTracks->At(I); 
+  }
+
+  stntuple::TEvdSimParticle* GetEvdSimParticle(int I) { 
+    return (stntuple::TEvdSimParticle*)  fListOfSimParticles->At(I); 
+  }
 
   const mu2e::ComboHitCollection* GetComboHitColl() { 
     return *fComboHitColl; 

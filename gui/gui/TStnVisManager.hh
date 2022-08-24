@@ -2,24 +2,13 @@
 #define TStnVisManager_hh
 
 #include "TObjArray.h"
-#include "Stntuple/base/TVisManager.hh"
-
 #include "TGDoubleSlider.h"
 #include "TGButton.h"
 #include "TGTextEntry.h"
 #include "TGTextBuffer.h"
 
-#ifndef __CINT__
-
-#include "art/Framework/Principal/Event.h"
-
-#else
-
-namespace art {
-  class Event;
-}
-
-#endif
+#include "Stntuple/obj/AbsEvent.hh"
+#include "Stntuple/base/TVisManager.hh"
 
 class TControlBar;
 class TGMenuBar;
@@ -104,6 +93,7 @@ protected:
   float               fMbTime;
 
   int                 fDisplayStrawDigiMC;
+  int                 fDisplayStrawHitsXY;
 //-----------------------------------------------------------------------------
 //  functions
 //-----------------------------------------------------------------------------
@@ -149,6 +139,8 @@ public:
     TMin = fTMin;
     TMax = fTMax;
   }
+
+  int DisplayStrawHitsXY() { return fDisplayStrawHitsXY; }
   //-----------------------------------------------------------------------------
   // modifiers
   //-----------------------------------------------------------------------------
@@ -156,6 +148,10 @@ public:
 
   void SetDisplayStrawDigiMC(int Display) {
     fDisplayStrawDigiMC = Display;
+  }
+
+  void SetDisplayStrawHitsXY(int Flag) {
+    fDisplayStrawHitsXY = Flag;
   }
 
   void SetStations(int IMin, int IMax) override;
@@ -195,6 +191,12 @@ public:
   Int_t   OpenCrvView  (TStnView* Mother, Axis_t x1, Axis_t y1, Axis_t x2, Axis_t y2);
   
   void    CloseWindow();
+
+//-----------------------------------------------------------------------------
+// commands associated with buttons
+//-----------------------------------------------------------------------------
+  void    NextEvent();   //
+  void    Quit     ();   //
   
   // ClassDef(TStnVisManager, 0)
 };

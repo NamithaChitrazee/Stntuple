@@ -190,6 +190,7 @@ MuHitDisplay: { module_type:MuHitDisplay                 # the class name;
     visManager: {
 	debugLevel         : 0
 	displayStrawDigiMC : 1
+	displayStrawHitsXY : 1
     }
 #------------------------------------------------------------------------------
 # plugin configurration, plugin is a name of the script to be loaded

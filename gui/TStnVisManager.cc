@@ -2,6 +2,7 @@
 // 
 ///////////////////////////////////////////////////////////////////////////////
 #include "TROOT.h"
+#include "TInterpreter.h"
 #include "TMath.h"
 #include "TApplication.h"
 #include "TVirtualX.h"
@@ -877,3 +878,16 @@ void TStnVisManager::HandleText() {
     break;
   }
 }
+
+//_____________________________________________________________________________
+void TStnVisManager::NextEvent() {
+  printf(" TStnVisManager::NextEvent : next event \n");
+  gROOT->ProcessLine(".q");
+}
+
+//_____________________________________________________________________________
+void TStnVisManager::Quit() {
+  printf(" TStnVisManager::Quit  \n");
+  gROOT->ProcessLine(".qqqq");
+}
+

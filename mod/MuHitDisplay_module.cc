@@ -224,6 +224,9 @@ void MuHitDisplay::InitVisManager() {
     
   int display_straw_digi_mc = _vmConfig.get<int>("displayStrawDigiMC");
   vm->SetDisplayStrawDigiMC(display_straw_digi_mc);
+
+  int display_straw_hits_xy = _vmConfig.get<int>("displayStrawHitsXY");
+  vm->SetDisplayStrawHitsXY(display_straw_hits_xy);
 //-----------------------------------------------------------------------------
 // do the geometry
 //-----------------------------------------------------------------------------

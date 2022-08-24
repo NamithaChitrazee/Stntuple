@@ -368,14 +368,12 @@ int TTrkVisNode::InitEvent() {
 //-----------------------------------------------------------------------------
 void TTrkVisNode::PaintXY(Option_t* Option) {
 
-  double        time;
-  int           station, ntrk(0);
-  stntuple::TEvdStrawHit  *hit;
+  double                  time;
+  int                     station, ntrk(0);
 
-  const mu2e::ComboHit   *straw_hit;
   const mu2e::Straw      *straw; 
 
-  //  const char* view = TVisManager::Instance()->GetCurrentView();
+  //  int view_type = TVisManager::Instance()->GetCurrentView()->Type();
 
   mu2e::GeomHandle<mu2e::Tracker> ttHandle;
   const mu2e::Tracker* tracker = ttHandle.get();
@@ -399,21 +397,47 @@ void TTrkVisNode::PaintXY(Option_t* Option) {
     tmax = fTimeCluster->t0().t0() + 20;//FIXME!
   }
   
-  int nhits = fListOfStrawHits->GetEntries();
-  for (int i=0; i<nhits; i++) {
-    hit       = (stntuple::TEvdStrawHit*) fListOfStrawHits->At(i);
-    straw_hit = hit->StrawHit();
-    straw     = &tracker->getStraw(straw_hit->strawId());//strawIndex());
-    station   = straw->id().getStation();
-    time      = straw_hit->time();
+  if (vm->DisplayStrawHitsXY()) {
+//-----------------------------------------------------------------------------
+// display straw hits
+//-----------------------------------------------------------------------------
+    int nhits = fListOfStrawHits->GetEntries();
+    for (int i=0; i<nhits; i++) {
+      stntuple::TEvdStrawHit* evd_sh = GetEvdStrawHit(i);
+      const mu2e::ComboHit*   sh     = evd_sh->StrawHit();
+      straw     = &tracker->getStraw(sh->strawId());//strawIndex());
+      station   = straw->id().getStation();
+      time      = sh->time();
 
-    if ((station >= vm->MinStation()) && (station <= vm->MaxStation())) { 
-      if ((time >= tmin) && (time <= tmax)) {
-	hit->Paint(Option);
+      if ((station >= vm->MinStation()) && (station <= vm->MaxStation())) { 
+	if ((time >= tmin) && (time <= tmax)) {
+	  evd_sh->PaintXY(Option);
+	}
       }
     }
   }
+  else {
+//-----------------------------------------------------------------------------
+// display combo hits
+//-----------------------------------------------------------------------------
+    int nch = fListOfComboHits->GetEntries();
+    for (int i=0; i<nch; i++) {
+      stntuple::TEvdComboHit* evd_ch = (stntuple::TEvdComboHit*) fListOfComboHits->At(i);
+      const mu2e::ComboHit*   ch     = evd_ch->ComboHit();
+      int index = ch->index(0);
+      const mu2e::ComboHit* sh = &(*fStrawHitColl)->at(index);
 
+      straw     = &tracker->getStraw(sh->strawId());           // first straw hit
+      station   = straw->id().getStation();
+      time      = ch->time();
+
+      if ((station >= vm->MinStation()) && (station <= vm->MaxStation())) { 
+	if ((time >= tmin) && (time <= tmax)) {
+	  evd_ch->PaintXY(Option);
+	}
+      }
+    }
+  }
 //-----------------------------------------------------------------------------
 // now - tracks
 //-----------------------------------------------------------------------------
@@ -423,7 +447,7 @@ void TTrkVisNode::PaintXY(Option_t* Option) {
   if ( (fListOfTracks) != 0 )  ntrk = fListOfTracks->GetEntriesFast();
 
   for (int i=0; i<ntrk; i++ ) {
-    evd_trk = (stntuple::TEvdTrack*) fListOfTracks->At(i);
+    evd_trk = GetEvdTrack(i);
     evd_trk->Paint(Option);
   }
 
@@ -435,7 +459,7 @@ void TTrkVisNode::PaintXY(Option_t* Option) {
   int nsim = fListOfSimParticles->GetEntriesFast();
 
   for (int i=0; i<nsim; i++ ) {
-    esp = (stntuple::TEvdSimParticle*) fListOfSimParticles->At(i);
+    esp = GetEvdSimParticle(i);
     esp->Paint(Option);
   }
 //-----------------------------------------------------------------------------
@@ -548,20 +572,40 @@ int TTrkVisNode::DistancetoPrimitiveXY(Int_t px, Int_t py) {
   TObject* closest(nullptr);
 
   int  x1, y1, dx1, dy1, min_dist(9999), dist;
+  TStnVisManager* vm = TStnVisManager::Instance();
 
-  int nhits = fListOfStrawHits->GetEntries();
-  for (int i=0; i<nhits; i++) {
-    stntuple::TEvdStrawHit* hit = (stntuple::TEvdStrawHit*) fListOfStrawHits->At(i);
+  if (vm->DisplayStrawHitsXY() == 1) {
+    int nhits = fListOfStrawHits->GetEntries();
+    for (int i=0; i<nhits; i++) {
+      stntuple::TEvdStrawHit* hit = GetEvdStrawHit(i);
 
-    x1  = gPad->XtoAbsPixel(hit->Pos()->X());
-    y1  = gPad->YtoAbsPixel(hit->Pos()->Y());
-    dx1 = px-x1;
-    dy1 = py-y1;
+      x1  = gPad->XtoAbsPixel(hit->Pos()->X());
+      y1  = gPad->YtoAbsPixel(hit->Pos()->Y());
+      dx1 = px-x1;
+      dy1 = py-y1;
 
-    dist  = (int) sqrt(dx1*dx1+dy1*dy1);
-    if (dist < min_dist) {
-      min_dist = dist;
-      closest  = hit;
+      dist  = (int) sqrt(dx1*dx1+dy1*dy1);
+      if (dist < min_dist) {
+	min_dist = dist;
+	closest  = hit;
+      }
+    }
+  }
+  else {
+    int nhits = fListOfComboHits->GetEntries();
+    for (int i=0; i<nhits; i++) {
+      stntuple::TEvdComboHit* hit = GetEvdComboHit(i);
+
+      x1  = gPad->XtoAbsPixel(hit->Pos()->X());
+      y1  = gPad->YtoAbsPixel(hit->Pos()->Y());
+      dx1 = px-x1;
+      dy1 = py-y1;
+
+      dist  = (int) sqrt(dx1*dx1+dy1*dy1);
+      if (dist < min_dist) {
+	min_dist = dist;
+	closest  = hit;
+      }
     }
   }
 
@@ -570,7 +614,7 @@ int TTrkVisNode::DistancetoPrimitiveXY(Int_t px, Int_t py) {
 //-----------------------------------------------------------------------------
   int ntracks = fListOfTracks->GetEntries();
   for (int i=0; i<ntracks; i++) {
-    stntuple::TEvdTrack* trk = GetTrack(i);
+    stntuple::TEvdTrack* trk = GetEvdTrack(i);
 
     dist = trk->DistancetoPrimitiveXY(px,py);
 
@@ -585,7 +629,7 @@ int TTrkVisNode::DistancetoPrimitiveXY(Int_t px, Int_t py) {
 //-----------------------------------------------------------------------------
   int nsim = fListOfSimParticles->GetEntries();
   for (int i=0; i<nsim; i++) {
-    stntuple::TEvdSimParticle* sim = GetSimParticle(i);
+    stntuple::TEvdSimParticle* sim = GetEvdSimParticle(i);
 
     dist = sim->DistancetoPrimitiveXY(px,py);
 
@@ -629,13 +673,12 @@ Int_t TTrkVisNode::DistancetoPrimitiveTZ(Int_t px, Int_t py) {
       closest  = hit;
     }
   }
-
 //-----------------------------------------------------------------------------
 // simparticles are represented by lines
 //-----------------------------------------------------------------------------
   int nsim = fListOfSimParticles->GetEntries();
   for (int i=0; i<nsim; i++) {
-    stntuple::TEvdSimParticle* esp = GetSimParticle(i);
+    stntuple::TEvdSimParticle* esp = GetEvdSimParticle(i);
 
     dist = esp->DistancetoPrimitiveTZ(px,py);
 
