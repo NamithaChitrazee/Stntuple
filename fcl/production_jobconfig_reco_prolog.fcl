@@ -1,4 +1,4 @@
-#
+# -*- mode:tcl -*- 
 #  Prolog for production reconstruction jobs
 #
 BEGIN_PROLOG
@@ -183,12 +183,12 @@ Reconstruction : {
   # reconstruct multiple types of tracks.  These are separate sequences to allow granular execution
   # Downstream electron sequence (plus and minus), using merged helices
   DeReco : [
-    TimeClusterFinderDe, HelixFinderDe,  # TrkPatRec
-    CalTimePeakFinder, CalHelixFinderDe,  # CalPatRec
-    MHDeM, MHDeP, # helix merging
-    KSFDeM, KSFDeP, # Seed fit (chisquared, no drift)
-    KKSDeM, KKSDeP, # KinKal seed fits
-    KFFDeM, KFFDeP # final Kalman filter fit
+    TimeClusterFinderDe, HelixFinderDe   ,  # TrkPatRec
+    CalTimePeakFinder  , CalHelixFinderDe,  # CalPatRec
+    MHDeM , MHDeP ,                         # helix merging
+    KSFDeM, KSFDeP,                         # Seed fit (chisquared, no drift)
+    KKSDeM, KKSDeP,                         # KinKal seed fits
+    KFFDeM, KFFDeP                          # final Kalman filter fit
   ]
   # Upstream electron sequence (plus and minus): TrkPatRec only
   UeReco : [
@@ -250,15 +250,19 @@ Reconstruction : {
 Reconstruction.EndPath : [ @sequence::Reconstruction.EndSequence, Output  ]
 
 # override CalPatRec defaults: FIXME!
-Reconstruction.filters.CalHelixFinderDe.StrawHitFlagCollectionLabel                 : "FlagBkgHits:ComboHits"
-Reconstruction.filters.CalHelixFinderDmu.StrawHitFlagCollectionLabel                 : "FlagBkgHits:ComboHits"
+Reconstruction.filters.CalHelixFinderDe.StrawHitFlagCollectionLabel  : "FlagBkgHits:ComboHits"
+Reconstruction.filters.CalHelixFinderDmu.StrawHitFlagCollectionLabel : "FlagBkgHits:ComboHits"
 
 # override CaloMC Truth matching provenance for compression
 
 Reconstruction.producers.CaloHitTruthMatch.caloShowerSimCollection : "compressDigiMCs"
-Reconstruction.producers.CaloHitTruthMatch.primaryParticle : "compressDigiMCs"
+Reconstruction.producers.CaloHitTruthMatch.primaryParticle         : "compressDigiMCs"
 # fix time map lookup
 Reconstruction.producers.CrvCoincidenceClusterMatchMC.timeOffsets.inputs :  [ @sequence::DigiCompression.TimeMaps ]
+
+
+# physics.producers.EWMProducer.SpillType          : 1
+
 
 # all production tracks
 Reconstruction.TrackReco : [

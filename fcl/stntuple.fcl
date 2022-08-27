@@ -18,7 +18,6 @@ BEGIN_PROLOG
   bgHitFiles          : @nil
   INPUT_MODULE        : EmptyEvent
   TRIGGER_PATHS       : []
-  OUTPUT_PATH         : []
   END_PATHS           : []
   PROCESS_NAME        : nil
   BLIND_TIME          : 500                                  # default
@@ -98,7 +97,7 @@ services : { @table::Services.SimAndReco
 
 services.SeedService.baseSeed         : 8
 services.SeedService.maxUniqueEngines : 100
-services.scheduler.wantSummary        : true
+sservices.scheduler.wantSummary        : true
 services.TFileService.fileName        : "nts._USER_._DATASET_._DSCONF_.sequencer.root" 
 
 # Limit the amount of "Begin processing the ... record" messages
@@ -106,7 +105,9 @@ services.message.destinations.log.categories.ArtReport.reportEvery : 1
 services.message.destinations.log.categories.ArtReport.limit       : 10000
 services.message.destinations.log.categories.ArtReport.timespan    : 300
 # services.DbService : @local::DbEmpty
-
+#------------------------------------------------------------------------------
+# here come templates
+#------------------------------------------------------------------------------
 # include "Stntuple/fcl/trigger_templates.fcl"
 # # onclude "Stntuple/fcl/mixing_templates.fcl"
 #include "Stntuple/fcl/production_templates.fcl"
@@ -170,8 +171,7 @@ stntuple : {
 #------------------------------------------------------------------------------
     trigger_paths : [ @sequence::TRIGGER_PATHS ]
 
-    output_path   : [ @sequence::OUTPUT_PATH   ]
-#    end_paths     : [ @sequence::END_PATHS     ]
+    end_paths     : [ @sequence::END_PATHS     ]
 }
 #------------------------------------------------------------------------------
 # output event formats for different jobs
@@ -216,7 +216,7 @@ output_products : {
 		      "keep    mu2e::EventWeight_*_*_*"                ,
 		      "keep    mu2e::EventWindowMarker_EWMProducer_*_*",
 		      "keep    mu2e::FixedTimeMap_*_*_*"               ,
-		      "keep    mu2e::CaloDigis_CaloDigiFromShower_*_*" ,
+		      "keep    mu2e::CaloDigis_*CaloDigiFromShower_*_*",
 		      "keep    mu2e::CrvDigis_CrvDigi_*_*"             ,
 		      "keep    mu2e::ProtonBunchIntensity_*_*_*"       ,
 		      "keep    mu2e::StrawDigis_makeSD_*_*"            
@@ -248,8 +248,8 @@ output_products : {
 #------------------------------------------------------------------------------
 # output file names 
 #------------------------------------------------------------------------------
-services.TFileService.fileName            : "nts.stnmaker.xxx.000000_00000000.root"
-outputs.defaultOutput.fileName            : "sim._USER_.stnmaker.xxx.000001.art"
+services.TFileService.fileName            : "nts.user.stntuple.xxx.000000_00000000.root"
+outputs.defaultOutput.fileName            : "sim.user.stntuple.xxx.000000_00000000.art"
 #------------------------------------------------------------------------------
 # this is it
 #------------------------------------------------------------------------------

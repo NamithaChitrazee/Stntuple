@@ -11,30 +11,29 @@ Digitize: {
     @table::CrvDAQPackage.producers
 
     compressDigiMCs : {
-      module_type : CompressDigiMCs
-      strawDigiMCTag : @local::DigiCompressionTags.commonStrawDigiMCTag
-      crvDigiMCTag : @local::DigiCompressionTags.commonCrvDigiMCTag
-      simParticleTags : [ @local::DigiCompressionTags.primarySimParticleTag ]
-      mcTrajectoryTag : @local::DigiCompressionTags.primarySimParticleTag
-      extraStepPointMCTags : @local::DigiCompressionTags.commonExtraStepPointMCTags
-      timeMapTags : [ ]
-      caloShowerStepTags : @local::DigiCompressionTags.primaryCaloShowerStepTags
-      caloShowerSimTag : @local::DigiCompressionTags.commonCaloShowerSimTag
-      caloShowerROTag : @local::DigiCompressionTags.commonCaloShowerROTag
-      primaryParticleTag : "FindMCPrimary"
-      keepAllGenParticles : true
-      rekeySimParticleCollection : true
-      noCompression : false
+	module_type                :   CompressDigiMCs
+	strawDigiMCTag             :   @local::DigiCompressionTags.commonStrawDigiMCTag
+	crvDigiMCTag               :   @local::DigiCompressionTags.commonCrvDigiMCTag
+	simParticleTags            : [ @local::DigiCompressionTags.primarySimParticleTag ]
+	mcTrajectoryTag            :   @local::DigiCompressionTags.primarySimParticleTag
+	extraStepPointMCTags       :   @local::DigiCompressionTags.commonExtraStepPointMCTags
+	timeMapTags                : [ ]
+	caloShowerStepTags         :   @local::DigiCompressionTags.primaryCaloShowerStepTags
+	caloShowerSimTag           :   @local::DigiCompressionTags.commonCaloShowerSimTag
+	caloShowerROTag            :   @local::DigiCompressionTags.commonCaloShowerROTag
+	primaryParticleTag         : "FindMCPrimary"
+	keepAllGenParticles        : true
+	rekeySimParticleCollection : true
+	noCompression              : false
 
       # Unused options
       strawDigiMCIndexMapTag : ""
-      crvDigiMCIndexMapTag : ""
-      caloClusterMCTag : ""
-      crvCoincClusterMCTag : ""
+      crvDigiMCIndexMapTag   : ""
+      caloClusterMCTag       : ""
+      crvCoincClusterMCTag   : ""
     }
-    PBISim : {
-      module_type: ProtonBunchIntensityFlat
-      mean : 1
+    PBISim : { module_type: ProtonBunchIntensityFlat
+      mean      : 1
       halfWidth : 0
     }
   }
