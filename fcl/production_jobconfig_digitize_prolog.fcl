@@ -16,7 +16,10 @@ Digitize: {
 	crvDigiMCTag               :   @local::DigiCompressionTags.commonCrvDigiMCTag
 	simParticleTags            : [ @local::DigiCompressionTags.primarySimParticleTag ]
 	mcTrajectoryTag            :   @local::DigiCompressionTags.primarySimParticleTag
-	extraStepPointMCTags       :   @local::DigiCompressionTags.commonExtraStepPointMCTags
+	extraStepPointMCTags       : [ "g4run:virtualdetector", 
+				       "g4run:stoppingtarget" ,
+				       "g4run:protonabsorber" 
+				      ]
 	timeMapTags                : [ ]
 	caloShowerStepTags         :   @local::DigiCompressionTags.primaryCaloShowerStepTags
 	caloShowerSimTag           :   @local::DigiCompressionTags.commonCaloShowerSimTag
@@ -82,8 +85,7 @@ Digitize: {
 		       ]
     
 
-  UntriggeredSequence : [
-    UntriggeredPrescale, Triggerable ]
+    UntriggeredSequence : [ UntriggeredPrescale, Triggerable ]
 
   TriggerProducts : [
     "keep mu2e::TriggerInfo_*_*_*",
@@ -203,5 +205,10 @@ Digitize.Proditions : { @table::Proditions
 	overrideDbTimeOffsets : true        # don't use database time offsets in digitization
     }
 }
-
+#------------------------------------------------------------------------------
+# redefinitions
+#------------------------------------------------------------------------------
+Digitize.producers.CrvPhotons.crvStepModuleLabels : [ "" ]
+Digitize.producers.CrvPhotons.crvStepProcessNames : [ "" ]
+Digitize.producers.EWMProducer.SpillType          : 1         # on-spill
 END_PROLOG

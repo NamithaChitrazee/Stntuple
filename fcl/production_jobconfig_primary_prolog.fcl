@@ -146,8 +146,7 @@ Primary: {
 	genCountLogger: { module_type: GenEventCountReader makeHistograms: false }
     }
 
-    PrimaryOutput  : {
-	module_type  : RootOutput
+    PrimaryOutput  : { module_type  : RootOutput
 	SelectEvents : [ PrimaryPath ]
 	fileName     : @nil
     }
@@ -156,5 +155,5 @@ Primary: {
 }
 # define the main sequence
 Primary.PrimaryOutput.outputCommands : [ "drop *_*_*_*", @sequence::Primary.KeptProducts]
-Primary.EndPath : [ @sequence::Primary.EndSequence, PrimaryOutput ]
+Primary.EndPath                      : [ @sequence::Primary.EndSequence, PrimaryOutput ]
 END_PROLOG

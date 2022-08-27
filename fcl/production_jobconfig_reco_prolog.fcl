@@ -131,29 +131,30 @@ Reconstruction : {
         "MHUeM", "MHUeP", "MHUmuM", "MHUmuP" ]
       VDSPCollection : "compressDigiMCs:virtualdetector"
     }
+
     # Compresion
-    compressRecoMCs : {
-      module_type : CompressDigiMCs
-      strawDigiMCTag : "compressDigiMCs"
-      crvDigiMCTag : "compressDigiMCs"
-      simParticleTags : [ "compressDigiMCs" ]
-      extraStepPointMCTags : [ "compressDigiMCs:virtualdetector", "compressDigiMCs:protonabsorber" ]
-      timeMapTags : [ ]
-      caloShowerStepTags : [ ]
-      caloShowerSimTag : ""
-      caloShowerROTag : ""
-      caloClusterMCTag : "CaloClusterTruthMatch"
-      strawDigiMCIndexMapTag : "SelectRecoMC:StrawDigiMap"
-      crvDigiMCIndexMapTag : "SelectRecoMC:CrvDigiMap"
-      keepAllGenParticles : false
-      crvCoincClusterMCTag : "CrvCoincidenceClusterMatchMC"
-      primaryParticleTag : "compressDigiMCs"
-      mcTrajectoryTag : "compressDigiMCs"
+    compressRecoMCs : { module_type : CompressDigiMCs
+      strawDigiMCTag             : "compressDigiMCs"
+      crvDigiMCTag               : "compressDigiMCs"
+      simParticleTags            : [ "compressDigiMCs" ]
+      extraStepPointMCTags       : [ "compressDigiMCs:virtualdetector", 
+				     "compressDigiMCs:stoppingtarget" ,
+				     "compressDigiMCs:protonabsorber" 
+				    ]
+      timeMapTags                : [ ]
+      caloShowerStepTags         : [ ]
+      caloShowerSimTag           : ""
+      caloShowerROTag            : ""
+      caloClusterMCTag           : "CaloClusterTruthMatch"
+      strawDigiMCIndexMapTag     : "SelectRecoMC:StrawDigiMap"
+      crvDigiMCIndexMapTag       : "SelectRecoMC:CrvDigiMap"
+      keepAllGenParticles        : false
+      crvCoincClusterMCTag       : "CrvCoincidenceClusterMatchMC"
+      primaryParticleTag         : "compressDigiMCs"
+      mcTrajectoryTag            : "compressDigiMCs"
       rekeySimParticleCollection : false
-      noCompression : false
+      noCompression              : false
     }
-
-
   }
 
   filters : {
@@ -161,19 +162,19 @@ Reconstruction : {
     # They should be remade as producers FIXME!
     @table::CalPatRec.filters
     # reco filter
-    RecoFilter : {
-      module_type   : RecoMomFilter
+    RecoFilter : { module_type   : RecoMomFilter
       KalFinalTagRoot : ""
       TrkTags : [ "KFFDeM", "KFFDeP",
-        "KFFUeM", "KFFUeP",
-        "KFFDmuM", "KFFDmuP",
-        "KFFUmuM", "KFFUmuP"
-      ]
+		  "KFFUeM", "KFFUeP",
+		  "KFFDmuM", "KFFDmuP",
+		  "KFFUmuM", "KFFUmuP"
+		 ]
       # // set low cutoffs
-      MomentumCutoff : [ 60.0, 60.0,
-        60.0, 60.0,
-        60.0, 60.0,
-        60.0, 60.0 ]
+	MomentumCutoff : [ 60.0, 60.0,
+			   60.0, 60.0,
+			   60.0, 60.0,
+			   60.0, 60.0 
+			  ]
     }
   }
 
