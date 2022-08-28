@@ -78,9 +78,9 @@ First 4 parameters in a call to *stnana* describe the input dataset: (read more 
 
   - */grl=name,min_rn,max_rn* : name of the good run list and the run range to be processed. 
 
-    Special good run list name 'none' simply selects the run range :
+    Special good run list name *none* simply selects the run range :
 
-    Example: '/grl=non,1000115,100015' selects for processing events of run=100015
+    Example: */grl=none,1000115,100015* selects for processing events of run=100015
 
     For a large [cataloged] dataset, only files containing events of runs selected by the 'grl'
     parameter will be opened
