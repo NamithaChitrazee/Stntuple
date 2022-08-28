@@ -71,11 +71,20 @@ First 4 parameters in a call to *stnana* describe the input dataset: (read more 
 
   - allowed options:
 
-  - /save : defines name of the histogram file. When the job finishes, the histograms will be saved 
-    into a file with the predefined name. The file name can't include '/' characters, so the file has 
-    to be stored in the current directory
-  - /grl : name of the good run list (Mu2e doesn't have such yet)
+  - */save=filename* : defines name of the histogram file. When the job finishes, the histograms will be saved 
+    into a file with the predefined name=filename. 
 
+    The file name can't include '/' characters, so the histograms will be stored in the current directory
+
+  - */grl=name,min_rn,max_rn* : name of the good run list and the run range to be processed. 
+
+    Special good run list name 'none' simply selects the run range :
+
+    Example: '/grl=non,1000115,100015' selects for processing events of run=100015
+
+    For a large [cataloged] dataset, only files containing events of runs selected by the 'grl'
+    parameter will be opened
+     
 - NEvents : number of events to be processed. If NEvents<=0 (default): process all events ​
 ** interactive capabilities of *stnana*                                 
 
