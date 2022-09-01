@@ -41,7 +41,8 @@ Int_t StntupleInitMu2eHeaderBlock(TStnDataBlock* block, AbsEvent* AnEvent, int m
   data->fEventNumber   = AnEvent->event();
   data->fRunNumber     = AnEvent->run();
   data->fSectionNumber = AnEvent->subRun();
-  data->fMcFlag        = 1.; // gblEnv->monteFlag();
+  if (data->fRunNumber < 100000) data->fMcFlag = 1.; // gblEnv->monteFlag();
+  else                           data->fMcFlag = 0;
 
   data->fNTracks       = -1;
 //-----------------------------------------------------------------------------
@@ -50,17 +51,9 @@ Int_t StntupleInitMu2eHeaderBlock(TStnDataBlock* block, AbsEvent* AnEvent, int m
   data->fInstLum       = -1.;
   data->fMeanLum       = -1.;
 
-  // typedef std::vector< art::Handle<mu2e::ProtonBunchIntensity> > HandleVector;
-  // HandleVector pbiHandles;
   art::Handle<mu2e::ProtonBunchIntensity> pbiHandle;
-
-  //  art::Selector  selector(art::ProcessNameSelector("") );
-
-  //  AnEvent->getManyByType(pbiHandles);
-  //  AnEvent->getMany(selector,pbiHandles);
   AnEvent->getByLabel("protonBunchIntensity", pbiHandle);
 
-  //  if (pbiHandle.empty()) {
   if (!pbiHandle.isValid()) {
     mf::LogWarning(oname) << " WARNING: no ProtonBunchIntensity objects found\n";
   }
@@ -68,25 +61,7 @@ Int_t StntupleInitMu2eHeaderBlock(TStnDataBlock* block, AbsEvent* AnEvent, int m
 //-----------------------------------------------------------------------------
 // Loop over ProtonBunchIntensity objects
 //-----------------------------------------------------------------------------
-    // bool first(true);
-    const mu2e::ProtonBunchIntensity* pbi;
-    // for (HandleVector::const_iterator ipbi=pbiHandles.begin(), epbi=pbiHandles.end();ipbi != epbi; ++ipbi) {
-    //   art::Handle<mu2e::ProtonBunchIntensity> const& pbihandle(*ipbi);
-
-//       const art::Provenance* prov = pbihandle.provenance();
-//       printf("module label: %s, instance name: %s, friendly class name: %s\n",
-// 	     prov->moduleLabel().data(), prov->productInstanceName().data(), prov->friendlyClassName().data());
-
-      // if (first) {
-    pbi   = pbiHandle.product();
-      // 	first = false;
-      // } 
-      // else {
-      // 	if (pbi->intensity()     != pbihandle->intensity()    ) {
-      // 	  throw cet::exception("SIM")<<"Inconsistent ProtonBunchIntensity objects found" << std::endl;
-      // 	}
-      // }
-      //    }
+    const mu2e::ProtonBunchIntensity* pbi= pbiHandle.product();
 
     data->fInstLum = pbi->intensity();
     data->fMeanLum = -1. ; // pbi->meanIntensity();
