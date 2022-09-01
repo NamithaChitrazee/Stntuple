@@ -26,7 +26,7 @@ Primary: {
 	    compressionOptions : @local::DetStepCompression.standardCompression
 	}
 	FindMCPrimary : { module_type : FindMCPrimary
-	    SimParticles : "compressDetStepMCs"
+	    SimParticles : "g4run"               #  "compressDetStepMCs" if the job is split
 	}
 	# null MCPrimary, for NoPrimary events
 	NullMCPrimary : { module_type: NullMCPrimary
