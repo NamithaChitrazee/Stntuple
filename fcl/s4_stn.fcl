@@ -3,10 +3,7 @@
 # S4 Sim file s- inputs for mixing
 #------------------------------------------------------------------------------
 BEGIN_PROLOG
-  TIME_MAPS        @protect_ignore: [ ]
-  TIME_OFFSET_MAPS @protect_ignore: { inputs : @local::TIME_MAPS }
   TRIGGER_PATHS                   : [ p1 ]
-  END_PATHS        @protect_ignore: [ stntuple_p0 ]
 END_PROLOG
 
 #include "Stntuple/fcl/stntuple.fcl"
@@ -50,7 +47,7 @@ physics : { @table::Stntuple.physics
 
     trigger_paths : [ p1 ]
     out           : [ ]                   # [defaultOutput]/[]
-    end_paths     : [ @sequence::END_PATHS , out ]
+    end_paths     : [ stntuple_p0 , out ]
 }
 
 #------------------------------------------------------------------------------

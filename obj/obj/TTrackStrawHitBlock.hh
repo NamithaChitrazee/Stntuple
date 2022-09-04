@@ -11,10 +11,8 @@
 #include "TBuffer.h"
 
 class TTrackStrawHitBlock: public TStnDataBlock {
+  friend class stntuple::InitTrackStrawHitBlock;
 
-  friend Int_t StntupleInitMu2eTrackStrawHitBlock(TStnDataBlock* block, 
-						  AbsEvent*      event, 
-						  int            mode);
 public:
   Int_t          fNTracks;	        // total number of tracks
   Int_t          fNStrawHits;

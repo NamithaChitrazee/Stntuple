@@ -21,11 +21,12 @@ BEGIN_PROLOG
   END_PATHS           : []
   PROCESS_NAME        : nil
   BLIND_TIME          : 500                                  # default
+  STN_COMPRESS_MCS    : "compressDigiMCs"                    # "compressRecoMCs" looks dangerous
   STN_VDHITS_COLL_TAG : "compressDigiMCs:virtualdetector"
   PDG_ID              : 0                                    # 0: ignore PDG_ID
   GEN_ID              : "unknown"                            #    ignore GEN_ID check
 END_PROLOG
-
+#------------------------------------------------------------------------------
 #include "Offline/fcl/minimalMessageService.fcl"
 #include "Offline/fcl/standardProducers.fcl"
 #include "Offline/fcl/standardServices.fcl"
@@ -59,13 +60,6 @@ END_PROLOG
 #include "Stntuple/fcl/prolog.fcl"
 #include "pbar2m/fcl/prolog.fcl"
 #------------------------------------------------------------------------------
-#  include-less clones on Production fcls
-#------------------------------------------------------------------------------
-#include "Stntuple/fcl/production_jobconfig_common_prolog.fcl" 
-#include "Stntuple/fcl/production_jobconfig_digitize_prolog.fcl" 
-#include "Stntuple/fcl/production_jobconfig_primary_prolog.fcl"
-#include "Stntuple/fcl/production_jobconfig_reco_prolog.fcl"   
-#------------------------------------------------------------------------------
 # trigger prologs
 #------------------------------------------------------------------------------
 # #include "Offline/TrkPatRec/fcl/prolog_trigger.fcl"
@@ -76,13 +70,22 @@ END_PROLOG
 # #include "Offline/TrkReco/fcl/prolog_trigger.fcl"
 # #include "Offline/TrkFilters/fcl/prolog_trigger.fcl"
 #\\\\ #include "Offline/CaloFilters/fcl/prolog_trigger.fcl"
-
 #------------------------------------------------------------------------------
 # templates: do not include prologs, 
 # define table and sequence templates combining information from multiples packages
 # services are initialized in Stntuple/fcl/stntuple_templates.fcl
 # (1): services section (Services.SimAndReco and Services.Sim today are the same)
 #       add time tracker template
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+# include-less clones on Production fcls with all templates
+# assume that '_prolog' files don't have BEGIN_PROLOG/END_PROLOG clauses
+#------------------------------------------------------------------------------
+#include "Stntuple/fcl/production_jobconfig_common_prolog.fcl" 
+#include "Stntuple/fcl/production_jobconfig_digitize_prolog.fcl" 
+#include "Stntuple/fcl/production_jobconfig_primary_prolog.fcl"
+#include "Stntuple/fcl/production_jobconfig_reco_prolog.fcl"   
+#include "Stntuple/fcl/stntuple_templates.fcl"
 #------------------------------------------------------------------------------
 services : { @table::Services.SimAndReco 
     TimeTracker : {
@@ -117,7 +120,6 @@ services.message.destinations.log.categories.ArtReport.timespan    : 300
 # (1): definition of the input module - can redefine in the top-level prolog
 #------------------------------------------------------------------------------
 source : { module_type : @local::INPUT_MODULE
-    firstRun      : 1000
     # reportFrequency : 1
     #    fileNames : ["/mu2e/data/tdr/beam/g4s4p5/tdr.beam.g4s4.conversion.1504a.15729672/good/00000/dsStopsToHitsConversion.root"]
     #    maxEvents   : -1
@@ -167,11 +169,10 @@ stntuple : {
 #------------------------------------------------------------------------------
     paths : { @table::Stntuple.paths }
 #------------------------------------------------------------------------------
-# final part
+# final part - make sure 'trigger_paths' is aleways defined
+# 'end_paths' defined in the top-level job configuration FCL's 
 #------------------------------------------------------------------------------
     trigger_paths : [ @sequence::TRIGGER_PATHS ]
-
-    end_paths     : [ @sequence::END_PATHS     ]
 }
 #------------------------------------------------------------------------------
 # output event formats for different jobs
@@ -243,6 +244,9 @@ output_products : {
 			   "keep    mu2e::HelixSeeds_TT*_*_*"               ,
 			   "keep    mu2e::TimeClusters_TT*_*_*"             ,
 			   "keep    mu2e::CaloClusters_CaloClusterFast_*_*"
+			  ]
+
+    reco :                [
 			  ]
 }
 #------------------------------------------------------------------------------

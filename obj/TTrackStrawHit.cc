@@ -10,7 +10,7 @@ ClassImp(TTrackStrawHit)
 //-----------------------------------------------------------------------------
 void TTrackStrawHit::ReadV1(TBuffer &R__b) {
   struct TTrackStrawHitV1_t {
-    int     fIndex;
+    int     fStrawID;
     float   fTime;
     float   fDt;
     float   fEnergy;
@@ -20,7 +20,7 @@ void TTrackStrawHit::ReadV1(TBuffer &R__b) {
 
   int nwf_v1 = 3;
 
-  R__b >> fIndex;
+  R__b >> fStrawID;
   R__b.ReadFastArray(&data.fTime,nwf_v1);
 
   fTime   = data.fTime;
@@ -33,7 +33,7 @@ void TTrackStrawHit::ReadV1(TBuffer &R__b) {
 //_____________________________________________________________________________
 void TTrackStrawHit::Streamer(TBuffer &R__b) {
 
-  int nwi = ((int*) &fTime) - &fIndex;
+  int nwi = ((int*) &fTime) - &fStrawID;
   int nwf = &fMcMomentum - &fTime +1;
   
   if(R__b.IsReading()) {
@@ -42,13 +42,13 @@ void TTrackStrawHit::Streamer(TBuffer &R__b) {
 //-----------------------------------------------------------------------------
 // curent version: V1
 //-----------------------------------------------------------------------------
-    R__b.ReadFastArray(&fIndex,nwi);
-    R__b.ReadFastArray(&fTime ,nwf);
+    R__b.ReadFastArray(&fStrawID,nwi);
+    R__b.ReadFastArray(&fTime   ,nwf);
   }
   else {
     R__b.WriteVersion(TTrackStrawHit::IsA());
-    R__b.WriteFastArray(&fIndex,nwi);
-    R__b.WriteFastArray(&fTime ,nwf);
+    R__b.WriteFastArray(&fStrawID,nwi);
+    R__b.WriteFastArray(&fTime   ,nwf);
   } 
 }
 
@@ -62,12 +62,12 @@ TTrackStrawHit::~TTrackStrawHit() {
 }
 
 //_____________________________________________________________________________
-void TTrackStrawHit::Set(int Index, float Time, float Dt, float EnergyDep,
-			     int Active, int Ambig, float DriftRadius,
-			     int PdgCode, int MotherPdgCode, int GenCode, int SimID, 
-			     float McDoca, float McMomentum) 
+void TTrackStrawHit::Set(int StrawID, float Time, float Dt, float EnergyDep,
+			 int Active, int Ambig, float DriftRadius,
+			 int PdgCode, int MotherPdgCode, int GenCode, int SimID, 
+			 float McDoca, float McMomentum) 
 {
-  fIndex         = Index; 
+  fStrawID       = StrawID; 
   fTime          = Time; 
   fDt            = Dt; 
   fEnergy        = EnergyDep;
@@ -88,7 +88,7 @@ void TTrackStrawHit::Set(int Index, float Time, float Dt, float EnergyDep,
 
 //_____________________________________________________________________________
 void TTrackStrawHit::Clear(Option_t* opt) {
-  fIndex         = -1;
+  fStrawID         = -1;
   fTime          = 1.e6;
   fDt            = 1.e6;
   fEnergy        = -1;
@@ -123,7 +123,7 @@ void TTrackStrawHit::Print(Option_t* Option) const {
   if (opt == "banner") return;
   
   printf("%6i %6i %6i %10.3f %10.3f %10.3f %10.5f %8i %8i %8i %8i %10.3f %10.3f\n",
-	 fIndex, 
+	 fStrawID, 
 	 fActive,
 	 fAmbig,
 	 fDriftRadius,

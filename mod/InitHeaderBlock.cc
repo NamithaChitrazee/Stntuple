@@ -52,7 +52,7 @@ Int_t StntupleInitMu2eHeaderBlock(TStnDataBlock* block, AbsEvent* AnEvent, int m
   data->fMeanLum       = -1.;
 
   art::Handle<mu2e::ProtonBunchIntensity> pbiHandle;
-  AnEvent->getByLabel("protonBunchIntensity", pbiHandle);
+  AnEvent->getByLabel("PBISim", pbiHandle);
 
   if (!pbiHandle.isValid()) {
     mf::LogWarning(oname) << " WARNING: no ProtonBunchIntensity objects found\n";
@@ -64,7 +64,7 @@ Int_t StntupleInitMu2eHeaderBlock(TStnDataBlock* block, AbsEvent* AnEvent, int m
     const mu2e::ProtonBunchIntensity* pbi= pbiHandle.product();
 
     data->fInstLum = pbi->intensity();
-    data->fMeanLum = -1. ; // pbi->meanIntensity();
+    data->fMeanLum = -1. ;
   }
 //-----------------------------------------------------------------------------
 //  STNTUPLE version

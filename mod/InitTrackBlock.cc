@@ -309,7 +309,7 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 
     for (int ih=0; ih<n_krep_hits; ++ih) {
       const mu2e::TrkStrawHitSeed* hit =  &hots->at(ih);
-      if (hit   != nullptr) {
+      if ((hit != nullptr) and (hit->flag().hasAnyProperty(mu2e::StrawHitFlagDetail::active))) {
 	if (first == nullptr) first = hit;
 	last = hit;
       }
@@ -321,16 +321,26 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
     sent        = std::min(h1_fltlen,hn_fltlen);
     sexit       = std::max(h1_fltlen,hn_fltlen);
 //-----------------------------------------------------------------------------
-// find a helical segment (kseg) corresponding to sent
+// find segments corresponding to entry and exit points
 //-----------------------------------------------------------------------------
     const mu2e::KalSegment *kseg(nullptr), *kseg_exit(nullptr);
 
+    double min_ds1(1.e6), min_ds2(1.e6);
+
     for(auto const& ks : krep->segments() ) {
       double smin = ks.timeToFlt(ks.tmin());
-      double smax = ks.timeToFlt(ks.tmin());
-      if ((smin <= sent) and (smax >= sent)) {
-	kseg = &ks;
-	break;
+      double smax = ks.timeToFlt(ks.tmax());
+
+      double ds1 = fabs(sent-(smin+smax)/2);
+      if (ds1 < min_ds1) {
+	kseg    = &ks;
+	min_ds1 = ds1;
+      }
+
+      double ds2 = fabs(sexit-(smin+smax)/2);
+      if (ds2 < min_ds2) {
+	kseg_exit = &ks;
+	min_ds2   = ds2;
       }
     }
 
@@ -369,9 +379,11 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
     // double     zfront = tfront.z();
     // double     sz0    = s_at_given_z(krep,zfront);
 //-----------------------------------------------------------------------------
-// fP0 - track momentum value at Z(TT_FrontPA) - the same as in the first point
+// fP0 : track momentum value at Z(TT_FrontPA) - the same as in the first point
+// fP2 : track momentum at Z(TT_Back), just for fun, should not be used for anything
 //-----------------------------------------------------------------------------
     track->fP0        = track->fP; // can reuse , if needed
+    track->fP2        = kseg_exit->mom();
 //-----------------------------------------------------------------------------
 // helical parameters at Z(TT_FrontPA)
 //-----------------------------------------------------------------------------
@@ -393,19 +405,6 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 					// rename later
     track->fTBack         = tback;
 //-----------------------------------------------------------------------------
-// fP2 : track momentum at Z(TT_Back), just for fun, should not be used for anything
-//-----------------------------------------------------------------------------
-    for(auto const& ks : krep->segments() ) {
-      double smin = ks.timeToFlt(ks.tmin());
-      double smax = ks.timeToFlt(ks.tmin());
-      if ((smin <= sexit) and (smax >= sexit)) {
-	kseg_exit = &ks;
-	break;
-      }
-    }
-
-    track->fP2            = kseg_exit->mom();
-//-----------------------------------------------------------------------------
 // the total number of planes is 36, use 40 for simplicity
 //-----------------------------------------------------------------------------
     const mu2e::TrkStrawHitSeed  *hit; // , *closest_hit(NULL);
@@ -423,11 +422,8 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
     int     nwrong = 0;
     double  mcdoca;
 
-    // const mu2e::ComboHit      *s_hit0(nullptr);
-    // const mu2e::ComboHit      *s_hit (nullptr); 
     const mu2e::SimParticle   *sim   (nullptr); 
     const mu2e::StrawGasStep  *stgs  (nullptr);
-    // const mu2e::TrkStraw      *straw (nullptr);
 
     n_straw_hits = list_of_combo_hits->size();
 
@@ -436,8 +432,6 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 	     n_straw_hits);
     }
     else {
-      // s_hit0 = &list_of_combo_hits->at(0);
-
       for (int it=0; it<n_krep_hits; it++) {
 	hit = &hots->at(it);
 	mu2e::StrawId sid = hit->strawId();
@@ -453,21 +447,13 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 // now requires comparing the outputs of a seed fit and a full fit
 //-----------------------------------------------------------------------------
 	if (1) { // hit->isActive()) { // all KalSeed hits are active 
-	  // s_hit = &hit->comboHit();
-	  loc   = hit->index(); // s_hit-s_hit0;
+	  loc   = hit->index();
 	  if ((loc >= 0) && (loc < n_straw_hits)) {
 	    if ((list_of_mc_straw_hits != NULL) && (list_of_mc_straw_hits->size() > 0)) {
 
 	      const mu2e::StrawDigiMC* mcdigi = &list_of_mc_straw_hits->at(loc);
 
-	      //	      printf("StntupleInitTrackBlock : no StrawDigiMC::stepPointMC any more. Ask Dave Brown.\n");
-
-	      if (mcdigi->wireEndTime(mu2e::StrawEnd::cal) < mcdigi->wireEndTime(mu2e::StrawEnd::hv)) {
-		stgs = mcdigi->strawGasStep(mu2e::StrawEnd::cal).get();
-	      }
-	      else {
-		stgs = mcdigi->strawGasStep(mu2e::StrawEnd::hv ).get();
-	      }
+	      stgs = mcdigi->earlyStrawGasStep().get();
 //-----------------------------------------------------------------------------
 // count number of active hits with R > 200 um and misassigned drift signs
 //-----------------------------------------------------------------------------
@@ -540,7 +526,7 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 //-----------------------------------------------------------------------------
 // Dave's variables calculated by KalDiag
 //-----------------------------------------------------------------------------
-    printf("InitTrackBlock: ERROR: kalDiag is gone, FIXIT\n");
+    // printf("InitTrackBlock: ERROR: kalDiag is gone, FIXIT\n");
     // _kalDiag->kalDiag(krep,false);
 //-----------------------------------------------------------------------------
 // total number of hits associated with the trackand the number of bend sites
@@ -701,6 +687,9 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
     track->fPStOut = -1.;
 
     if (vdg->nDet() > 0) {
+//-----------------------------------------------------------------------------
+// no more step point MC's in the tracker - straw gas steps there
+//-----------------------------------------------------------------------------
       art::Handle<mu2e::StepPointMCCollection> vdhits;
       AnEvent->getByLabel(fSpmcCollTag,vdhits);
       if (!vdhits.isValid()) {
@@ -977,42 +966,44 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
       vtch = &(track->fTrkCaloHit);
       const mu2e::CaloCluster* cl = tch->caloCluster().get();
       
-      CLHEP::Hep3Vector cpos = bc->geomUtil().mu2eToTracker(bc->geomUtil().diskFFToMu2e( cl->diskID(), cl->cog3Vector()));
+      if (cl) {
+	CLHEP::Hep3Vector cpos = bc->geomUtil().mu2eToTracker(bc->geomUtil().diskFFToMu2e( cl->diskID(), cl->cog3Vector()));
     
-      CLHEP::Hep3Vector pos;
-      // tch->hitPosition(pos);
+	CLHEP::Hep3Vector pos;
+	// tch->hitPosition(pos);
       
-      vtch->fID           = cl->diskID();		// 
-      vtch->fClusterIndex = -1;         // cluster index in the list of clusters
+	vtch->fID           = cl->diskID();		// 
+	vtch->fClusterIndex = -1;         // cluster index in the list of clusters
 
       // the following includes the (Calibrated) light-propagation time delay.  It should eventually be put in the reconstruction FIXME!
       // This velocity should come from conditions FIXME!
 
-      vtch->fTime         = tch->t0().t0();          // extrapolated track time, not corrected by _dtOffset
-      vtch->fEnergy       = cl->energyDep();            // cluster energy
-      vtch->fXTrk         = pos.x();
-      vtch->fYTrk         = pos.y();
-      vtch->fZTrk         = pos.z();
-      // vtch->fNxTrk        = -9999.;		// track direction cosines in the intersection point
-      // vtch->fNyTrk        = -9999.;
-      // vtch->fNzTrk        = -9999.;
-      vtch->fXCl          = cpos.x();			// cluster coordinates
-      vtch->fYCl          = cpos.y();
-      vtch->fZCl          = cpos.z();
-      vtch->fDx           = vtch->fXTrk - vtch->fXCl;	// TRK-CL
-      vtch->fDy           = vtch->fYTrk - vtch->fYCl;	// TRK-CL
-      vtch->fDz           = vtch->fZTrk - vtch->fZCl;	// TRK-CL
-      vtch->fDt           = tch->t0().t0() - tch->time();
-      // vtch->fDu           = -9999.;			// ** added in V6
-      // vtch->fDv           = -9999.;			// ** added in V6
-      // vtch->fChi2Match    = -9999.;		// track-cluster match chi&^2 (coord)
-      // vtch->fChi2Time     = -9999.;		// track-cluster match chi&^2 (time)
-      vtch->fPath         = tch->hitLen();			// track path in the disk
-      vtch->fIntDepth     = -9999.;                     // ** added in V6 :assumed interaction depth
-      vtch->fDr           = tch->clusterAxisDOCA(); // tch->poca().doca();         // distance of closest approach
-      // vtch->fSInt         = -9999.;                 // ** added in V10: interaction length, calculated
-      vtch->fCluster      = cl;
-      //    vtch->fExtrk        = NULL;
+	vtch->fTime         = tch->t0().t0();          // extrapolated track time, not corrected by _dtOffset
+	vtch->fEnergy       = cl->energyDep();            // cluster energy
+	vtch->fXTrk         = pos.x();
+	vtch->fYTrk         = pos.y();
+	vtch->fZTrk         = pos.z();
+	// vtch->fNxTrk        = -9999.;		// track direction cosines in the intersection point
+	// vtch->fNyTrk        = -9999.;
+	// vtch->fNzTrk        = -9999.;
+	vtch->fXCl          = cpos.x();			// cluster coordinates
+	vtch->fYCl          = cpos.y();
+	vtch->fZCl          = cpos.z();
+	vtch->fDx           = vtch->fXTrk - vtch->fXCl;	// TRK-CL
+	vtch->fDy           = vtch->fYTrk - vtch->fYCl;	// TRK-CL
+	vtch->fDz           = vtch->fZTrk - vtch->fZCl;	// TRK-CL
+	vtch->fDt           = tch->t0().t0() - tch->time();
+	// vtch->fDu           = -9999.;			// ** added in V6
+	// vtch->fDv           = -9999.;			// ** added in V6
+	// vtch->fChi2Match    = -9999.;		// track-cluster match chi&^2 (coord)
+	// vtch->fChi2Time     = -9999.;		// track-cluster match chi&^2 (time)
+	vtch->fPath         = tch->hitLen();			// track path in the disk
+	vtch->fIntDepth     = -9999.;                     // ** added in V6 :assumed interaction depth
+	vtch->fDr           = tch->clusterAxisDOCA(); // tch->poca().doca();         // distance of closest approach
+	// vtch->fSInt         = -9999.;                 // ** added in V10: interaction length, calculated
+	vtch->fCluster      = cl;
+	//    vtch->fExtrk        = NULL;
+      }
     }
   }
 					// on return set event and run numbers

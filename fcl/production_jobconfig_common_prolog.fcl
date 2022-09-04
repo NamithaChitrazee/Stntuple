@@ -18,6 +18,13 @@ Common: {
             TrajectoryControl: @local::mu2eg4DefaultTrajectories
 	}
 	genCounter: { module_type: GenEventCounter }
+#-------------------------------------------------------------------------------
+# every simulated event shoudl have the bunch intensity stored, even if zero
+#-------------------------------------------------------------------------------
+        protonBunchIntensity : { module_type: ProtonBunchIntensityFlat
+            mean      : 0.
+            halfWidth : 0.
+        }
     }
 
     filters : {

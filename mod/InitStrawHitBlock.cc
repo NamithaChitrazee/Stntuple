@@ -95,13 +95,7 @@ int InitStrawHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int 
       step = nullptr;
       if (sdmcc) {  
 	const mu2e::StrawDigiMC* mcdigi = &sdmcc->at(shids[0]);
-
-	if (mcdigi->wireEndTime(mu2e::StrawEnd::cal) < mcdigi->wireEndTime(mu2e::StrawEnd::hv)) {
-	  step = mcdigi->strawGasStep(mu2e::StrawEnd::cal).get();
-	}
-	else {
-	  step = mcdigi->strawGasStep(mu2e::StrawEnd::hv ).get();
-	}
+	step = mcdigi->earlyStrawGasStep().get();
       }
 
       hit = data->NewHit();

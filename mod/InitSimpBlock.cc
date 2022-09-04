@@ -66,14 +66,22 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
       list_of_straw_hits = shHandle.product();
       n_straw_hits      = list_of_straw_hits->size();
     }
+    else {
+      printf(" ERROR in InitSimpBlock: cant find StrawHitColl %s. BAIL OUT\n",
+	     fStrawHitCollTag.encode().data());
+      return -1;
+    }
   }
 
   art::Handle<mu2e::StrawDigiMCCollection> mcdH;
 
   if (! fStrawDigiMCCollTag.empty()) {
     bool ok = AnEvent->getByLabel(fStrawDigiMCCollTag,mcdH);
-    if (ok) {
-      mcdigis = mcdH.product();
+    if (ok) mcdigis = mcdH.product();
+    else {
+      printf(" ERROR in InitSimpBlock: cant find StrawDigiMCColl %s. BAIL OUT\n",
+	     fStrawDigiMCCollTag.encode().data());
+      return -1;
     }
   }
 
@@ -81,7 +89,12 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
 
   art::Handle<mu2e::SimParticleCollection> simp_handle;
   if (! fSimpCollTag.empty()) {
-    AnEvent->getByLabel(fSimpCollTag,simp_handle);
+    bool ok = AnEvent->getByLabel(fSimpCollTag,simp_handle);
+    if (! ok) {
+      printf(" ERROR in InitSimpBlock: cant find SimpCollColl %s. BAIL OUT\n",
+	     fSimpCollTag.encode().data());
+      return -1;
+    }
   }
 //-----------------------------------------------------------------------------
 // figure out how many straw hits each particle has produced

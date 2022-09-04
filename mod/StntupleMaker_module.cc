@@ -56,6 +56,7 @@
 #include "Stntuple/mod/InitStrawHitBlock.hh"
 #include "Stntuple/mod/InitStepPointMCBlock.hh"
 #include "Stntuple/mod/InitTrackBlock.hh"
+#include "Stntuple/mod/InitTrackStrawHitBlock.hh"
 #include "Stntuple/mod/InitTriggerBlock.hh"
 #include "Stntuple/mod/InitTimeClusterBlock.hh"
 
@@ -157,15 +158,16 @@ protected:
 //-----------------------------------------------------------------------------
 // initialization of various data blocks
 //-----------------------------------------------------------------------------
-  StntupleInitCrvPulseBlock*   fInitCrvPulseBlock;
-  StntupleInitCrvClusterBlock* fInitCrvClusterBlock;
-  StntupleInitGenpBlock*       fInitGenpBlock;
-  StntupleInitSimpBlock*       fInitSimpBlock;
-  stntuple::InitStrawHitBlock* fInitStrawHitBlock;
-  StntupleInitTriggerBlock*    fInitTriggerBlock;
-  TObjArray*                   fInitTrackBlock;
-  TObjArray*                   fInitStepPointMCBlock;
-  TObjArray*                   fInitTimeClusterBlock;
+  StntupleInitCrvPulseBlock*    fInitCrvPulseBlock;
+  StntupleInitCrvClusterBlock*  fInitCrvClusterBlock;
+  StntupleInitGenpBlock*        fInitGenpBlock;
+  StntupleInitSimpBlock*        fInitSimpBlock;
+  stntuple::InitStrawHitBlock*  fInitStrawHitBlock;
+  StntupleInitTriggerBlock*     fInitTriggerBlock;
+  TObjArray*                    fInitTrackStrawHitBlock;
+  TObjArray*                    fInitTrackBlock;
+  TObjArray*                    fInitStepPointMCBlock;
+  TObjArray*                    fInitTimeClusterBlock;
 //-----------------------------------------------------------------------------
 // cut-type parameters
 //-----------------------------------------------------------------------------
@@ -310,6 +312,9 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
 
   fInitTrackBlock       = new TObjArray();
   fInitTrackBlock->SetOwner(kTRUE);
+
+  fInitTrackStrawHitBlock = new TObjArray();
+  fInitTrackStrawHitBlock->SetOwner(kTRUE);
 
   fInitTimeClusterBlock = new TObjArray();
   fInitTimeClusterBlock->SetOwner(kTRUE);
@@ -669,18 +674,16 @@ void StntupleMaker::beginJob() {
 
     for (int i=0; i<nblocks; i++) {
       const char* block_name = fTrackSHBlockName[i].data();
-      TStnDataBlock  *block = AddDataBlock(block_name,
-					   "TTrackStrawHitBlock",
-					   StntupleInitMu2eTrackStrawHitBlock,
-					   buffer_size,
-					   split_mode,
-					   compression_level);
-      if (block) {
-	block->AddCollName("mu2e::KalRepCollection"              ,fTrackCollTag[i].data()   );
-	block->AddCollName("mu2e::StrawHitCollection"            ,fStrawHitCollTag.data()   );
-	block->AddCollName("mu2e::StrawDigiMCCollection"         ,fStrawDigiMCCollTag.data());
-	//      SetResolveLinksMethod(block_name,StntupleInitMu2eTrackBlockLinks);
-      }
+
+      stntuple::InitTrackStrawHitBlock* init_block = new stntuple::InitTrackStrawHitBlock();
+      fInitTrackStrawHitBlock->Add(init_block);
+
+      init_block->SetStrawHitCollTag    (fStrawHitCollTag   );
+      init_block->SetKalSeedCollTag     (fTrackCollTag[i]   );  // tracks saved as lists of KalSeeds
+      init_block->SetStrawDigiMCCollTag (fStrawDigiMCCollTag);
+
+      AddDataBlock(block_name,"TTrackStrawHitBlock",init_block,buffer_size,
+		   split_mode,compression_level);
     }
   }
 //-----------------------------------------------------------------------------
@@ -706,12 +709,8 @@ void StntupleMaker::beginJob() {
 
       init_block->SetDoubletAmbigResolver(fDar);
 
-      TStnDataBlock* db = AddDataBlock(block_name,
-				       "TStnTracklock",
-				       init_block,
-				       buffer_size,
-				       split_mode,
-				       compression_level);
+      TStnDataBlock* db = AddDataBlock(block_name,"TStnTrackBlock",init_block,
+				       buffer_size,split_mode,compression_level);
 //-----------------------------------------------------------------------------
 // each track points back to its seed
 // if nshortblocks != 0, for each track we store an index to that tracks's seed

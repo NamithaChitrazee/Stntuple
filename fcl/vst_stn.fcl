@@ -5,7 +5,6 @@
 #------------------------------------------------------------------------------
 BEGIN_PROLOG
   TRIGGER_PATHS    @protect_ignore: [ p1 ]
-  END_PATHS        @protect_ignore: [ stntuple_p0 ]
 END_PROLOG
 
 #include "Stntuple/fcl/stntuple.fcl"
@@ -48,8 +47,8 @@ physics : {
 #------------------------------------------------------------------------------
     p1            : [    ]
     trigger_paths : [ p1 ]
-    out           : [ ]                                  # [defaultOutput]/[]
-    end_paths     : [ @sequence::END_PATHS , out ]
+    out           : [    ]                               # [defaultOutput]/[]
+    end_paths     : [ stntuple_p0 , out ]
 }
 #------------------------------------------------------------------------------
 # output file names
