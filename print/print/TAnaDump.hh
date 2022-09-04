@@ -243,12 +243,12 @@ public:
   
   void printTrkCaloHit(const KalRep* Krep, mu2e::TrkCaloHit* CaloHit);
 
-  void printTrackSeed          (const mu2e::KalSeed* TrkSeed                      , 
+  void printKalSeed            (const mu2e::KalSeed* TrkSeed                      , 
 				const char* Opt                = ""               ,
 				const char* StrawHitCollTag    = "makeSH"         ,
 				const char* StrawDigiMCCollTag = "compressDigiMCs");
 
-  void printTrackSeedCollection(const char* CollTag                               ,
+  void printKalSeedCollection  (const char* CollTag                               ,
 				int         hitOpt             = 0                ,
 				const char* StrawHitCollTag    = "makeSH"         ,
 				const char* StrawDigiMCCollTag = "compressDigiMCs");
