@@ -191,12 +191,12 @@ public:
   Int_t   OpenCrvView  (TStnView* Mother, Axis_t x1, Axis_t y1, Axis_t x2, Axis_t y2);
   
   void    CloseWindow();
-
 //-----------------------------------------------------------------------------
 // commands associated with buttons
 //-----------------------------------------------------------------------------
-  void    NextEvent();   //
-  void    Quit     ();   //
+  void    NextEvent        ();   //
+  void    PrintColls(const char* Tag);
+  void    Quit             ();   //
   
   // ClassDef(TStnVisManager, 0)
 };

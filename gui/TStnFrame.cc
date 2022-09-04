@@ -206,7 +206,7 @@ TStnFrame::TStnFrame(const char* Name,
   tb->SetMargins(0,0,0,0);
   tb->SetWrapLength(-1);
   fGroupFrame->AddFrame(tb, new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
-  tb->MoveResize(5,10,100,30);
+  tb->MoveResize(10,20,120,25);
   tb->Connect("Pressed()", "TStnVisManager", vm, "NextEvent()");
 //-----------------------------------------------------------------------------
 // "Next Event" button
@@ -218,20 +218,19 @@ TStnFrame::TStnFrame(const char* Name,
   tb->SetTextJustify(36);
   tb->SetMargins(0,0,0,0);
   tb->SetWrapLength(-1);
-  tb->MoveResize(5,45,100,30);
+  tb->MoveResize(10,50,120,25);
   fGroupFrame->AddFrame(tb, new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
   tb->Connect("Pressed()", "TStnVisManager", vm, "Quit()");
 //-----------------------------------------------------------------------------
 // shutter - below the "Next Event" button
 //-----------------------------------------------------------------------------
-  TGShutter *sh = new TGShutter(fGroupFrame,kSunkenFrame);
+  TGShutter *shutter = new TGShutter(fGroupFrame,kSunkenFrame);
 //-----------------------------------------------------------------------------
 // configure shutter items
 // "Display" : choose collections to display
 //-----------------------------------------------------------------------------
-  TGShutterItem    *sh_item    = new TGShutterItem(sh, new TGHotString("Display"),1000,kVerticalFrame);
-
-  TGCompositeFrame *frame = (TGCompositeFrame *) sh_item->GetContainer();
+  TGShutterItem*    sh_item = new TGShutterItem(shutter, new TGHotString("Display"),1000,kVerticalFrame);
+  TGCompositeFrame* frame   = (TGCompositeFrame *) sh_item->GetContainer();
 
   // TGPictureButton *fPictureButton805  = new TGPictureButton(frame,gClient->GetPicture("profile_s.xpm"),-1,TGPictureButton::GetDefaultGC()(),kRaisedFrame);
   // fPictureButton805->SetToolTipText("TProfile");
@@ -249,8 +248,8 @@ TStnFrame::TStnFrame(const char* Name,
   // fPictureButton796->SetToolTipText("TH1");
   // frame->AddFrame(fPictureButton796, new TGLayoutHints(kLHintsNormal));
 
-  tb = new TGTextButton(frame,"test_01",-1,TGTextButton::GetDefaultGC()(),TGTextButton::GetDefaultFontStruct(),kRaisedFrame);
-  frame->AddFrame(tb, new TGLayoutHints(kLHintsNormal));
+  // tb = new TGTextButton(frame,"test_01",-1,TGTextButton::GetDefaultGC()(),TGTextButton::GetDefaultFontStruct(),kRaisedFrame);
+  // frame->AddFrame(tb, new TGLayoutHints(kLHintsNormal));
   
   fRb[0] = new TGRadioButton(frame,"display SH", 21);
   // rb->SetTextJustify(36);
@@ -268,12 +267,40 @@ TStnFrame::TStnFrame(const char* Name,
   fRb[1]->Connect("Clicked()", "TStnFrame", this, "DoRadio()");
   frame->AddFrame(fRb[1], new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
 
-  sh->AddItem(sh_item);
+  shutter->AddItem(sh_item);
 //-----------------------------------------------------------------------------
 // "print" : print different collections
 //-----------------------------------------------------------------------------
-  TGShutterItem *fShutter02 = new TGShutterItem(sh, new TGHotString("print"),1001,kVerticalFrame);
-  // TGCompositeFrame *fVerticalFrame820 = (TGCompositeFrame *)fShutter02->GetContainer();
+  TGShutterItem *sh02 = new TGShutterItem(shutter, new TGHotString("print"),1001,kVerticalFrame);
+  frame = (TGCompositeFrame *)sh02->GetContainer();
+
+//-----------------------------------------------------------------------------
+// "print KalSeedColls" button
+//-----------------------------------------------------------------------------
+  tb = new TGTextButton(frame,"p_KalSeedColls",-1,
+			TGTextButton::GetDefaultGC()(),
+			TGTextButton::GetDefaultFontStruct(),
+			kRaisedFrame);
+  tb->SetTextJustify(36);
+  tb->SetMargins(0,0,0,0);
+  tb->SetWrapLength(-1);
+  tb->MoveResize(5,50,120,30);
+  frame->AddFrame(tb, new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
+  tb->Connect("Pressed()", "TStnVisManager", vm, "PrintColls(=\"kalseed_colls\")");
+//-----------------------------------------------------------------------------
+// "print StrawDigiMCs" button
+//-----------------------------------------------------------------------------
+  tb = new TGTextButton(frame,"StrawDigiMCs",-1,
+			TGTextButton::GetDefaultGC()(),
+			TGTextButton::GetDefaultFontStruct(),
+			kRaisedFrame);
+  tb->SetTextJustify(36);
+  tb->SetMargins(0,0,0,0);
+  tb->SetWrapLength(-1);
+  tb->MoveResize(5,850,120,30);
+  frame->AddFrame(tb, new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
+
+  tb->Connect("Pressed()", "TStnVisManager", vm, "PrintColls(=\"sdmc_colls\")");
 
   // TGPictureButton *fPictureButton821 = new TGPictureButton(fVerticalFrame820,gClient->GetPicture("f1_s.xpm"),-1,TGPictureButton::GetDefaultGC()(),kRaisedFrame);
   // fPictureButton821->SetToolTipText("print_straw_hits");
@@ -283,12 +310,12 @@ TStnFrame::TStnFrame(const char* Name,
   // fPictureButton824->SetToolTipText("TF2");
   // fVerticalFrame820->AddFrame(fPictureButton824, new TGLayoutHints(kLHintsCenterX | kLHintsTop,5,5,5,0));
 
-  sh->AddItem(fShutter02);
+  shutter->AddItem(sh02);
 //-----------------------------------------------------------------------------
 // "Trees" : no use yet
 //-----------------------------------------------------------------------------
-  TGShutterItem *fShutterItem827 = new TGShutterItem(sh, new TGHotString("Trees"),1002,kVerticalFrame);
-  //TGCompositeFrame *fVerticalFrame839 = (TGCompositeFrame *)fShutterItem827->GetContainer();
+  TGShutterItem* shi03 = new TGShutterItem(shutter, new TGHotString("Trees"),1002,kVerticalFrame);
+  frame = (TGCompositeFrame *) shi03->GetContainer();
 
   // TGPictureButton *fPictureButton840 = new TGPictureButton(fVerticalFrame839,gClient->GetPicture("ntuple_s.xpm"),-1,TGPictureButton::GetDefaultGC()(),kRaisedFrame);
   // fPictureButton840->SetToolTipText("TNtuple");
@@ -302,14 +329,14 @@ TStnFrame::TStnFrame(const char* Name,
   // fPictureButton846->SetToolTipText("TChain");
   // fVerticalFrame839->AddFrame(fPictureButton846, new TGLayoutHints(kLHintsCenterX | kLHintsTop,5,5,5,0));
 
-  sh->AddItem(fShutterItem827);
+  shutter->AddItem(shi03);
 
   //  sh->SetSelectedItem(fShutter02);
 
-  sh->Resize(100,300);
-  sh->MoveResize(16,160,100,300);
+  shutter->Resize(100,300);
+  shutter->MoveResize(10,140,120,300);
 
-  fGroupFrame->AddFrame(sh, new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
+  fGroupFrame->AddFrame(shutter, new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
 //-----------------------------------------------------------------------------
 // 'group frame' has vertical layout
 //-----------------------------------------------------------------------------

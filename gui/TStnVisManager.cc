@@ -27,6 +27,8 @@
 #include "Stntuple/gui/TStnFrame.hh"
 #include "Stntuple/gui/TStnVisManager.hh"
 
+#include "Stntuple/print/Stntuple_print_functions.hh"
+
 #include <boost/lexical_cast/lexical_cast_old.hpp>
 
 // ClassImp(TStnVisManager)
@@ -883,6 +885,16 @@ void TStnVisManager::HandleText() {
 void TStnVisManager::NextEvent() {
   printf(" TStnVisManager::NextEvent : next event \n");
   gROOT->ProcessLine(".q");
+}
+
+//_____________________________________________________________________________
+void TStnVisManager::PrintColls(const char* Tag) {
+  TString tag = Tag;
+  tag.ToLower();
+
+  if      (tag == "sdmc_colls"   ) print_sdmc_colls   ();
+  else if (tag == "kalseed_colls") print_kalseed_colls();
+
 }
 
 //_____________________________________________________________________________
