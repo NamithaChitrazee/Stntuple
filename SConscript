@@ -6,7 +6,10 @@ sys.path.append(os.getenv("MUSE_WORK_DIR")+'/site_scons')
 #------------------------------------------------------------------------------
 # print("Stntuple/SConscript:muse branch: PWD:"+os.getenv("PWD"))
 
-x = subprocess.call(os.getenv("MUSE_WORK_DIR")+'/Stntuple/scripts/build_config_muse',shell=True)
+# pass the package name as a parameter
+
+x = subprocess.call(os.getenv("MUSE_WORK_DIR")+'/Stntuple/scripts/build_config_muse Stntuple',shell=True)
+# print("Stntuple/SConscript back from build_config_muse")
 
 stntuple_env = env.Clone()
 #------------------------------------------------------------------------------

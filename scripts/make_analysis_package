@@ -9,7 +9,9 @@
 #------------------------------------------------------------------------------
         pkg=$USER ; if [ ".$1" != "." ] ; then pkg=$1         ; fi
 debug_level=0     ; if [ ".$2" != "." ] ; then debug_level=$2 ; fi
-
+#------------------------------------------------------------------------------
+# start from making a package directory and copying there a Stntuple/.muse file
+#------------------------------------------------------------------------------
 if [ -d $pkg ] ; then 
     echo package $pkg already exists, do the cleanup first.
     exit
@@ -18,16 +20,58 @@ fi
 mkdir -p $pkg/ana/ana/dict
 mkdir -p $pkg/ana/scripts
 mkdir -p $pkg/scripts
-#------------------------------------------------------------------------------
-# populate
-#------------------------------------------------------------------------------
-cp Stntuple/SConscript     $pkg/
-cp Stntuple/ana/SConscript $pkg/ana
 
-cat Stntuple/scripts/build_config  | grep -v site_scons | grep -v .rootrc | grep -v rootlogon \
+cp Stntuple/.muse  $pkg/.muse
+#------------------------------------------------------------------------------
+# next: populate the package, start from SConscript files
+# need package-level SConscript as a package may be processed by scons before Stntuple
+#------------------------------------------------------------------------------
+cat Stntuple/SConscript | awk -v pkg=$pkg '
+BEGIN {printed=0}
+
+/subprocess.call/{
+  gsub("Stntuple",pkg,$0)
+  gsub("build_config_muse","build_config",$0)
+  print $0;
+  printed = 1
+}
+
+/stntuple_env/{
+  gsub("stntuple_env",pkg"_env",$0)
+  print $0;
+  printed = 1
+}
+
+{
+  if (printed == 0) print $0;
+  printed = 0;
+}' >| $pkg/SConscript
+
+if [ $debug_level != 0 ] ; then echo  "----->"  step 1.0 ; fi
+cat Stntuple/ana/SConscript |  awk -v pkg=$pkg '
+BEGIN {printed=0}
+
+/stntuple_env/{
+  gsub("stntuple_env",pkg"_env",$0)
+  print $0;
+  printed = 1
+}
+
+{ 
+  if (printed == 0) print $0;
+  printed = 0;
+}' >| $pkg/ana/SConscript
+
+if [ $debug_level != 0 ] ; then echo "----->"  step 1.5 ; fi
+#------------------------------------------------------------------------------
+# don't forget to rename Stntuple/scripts/build_config_muse --> build_config_muse
+#------------------------------------------------------------------------------
+cat Stntuple/scripts/build_config_muse | grep -v site_scons | grep -v .rootrc | grep -v rootlogon \
     | sed "s/Stntuple/$pkg/g" \
     | awk -F = '{if ($1 == "list_of_subpackages") { print "list_of_subpackages=\"ana\""} else {print $0}}' \
     >| $pkg/scripts/build_config
+
+if [ $debug_level != 0 ] ; then echo "----->"  step 1.6 ; fi
 
 chmod 755 $pkg/scripts/build_config
 #------------------------------------------------------------------------------
@@ -88,7 +132,7 @@ done
 # step 2.6 : copy additional non-module source files
 #------------------------------------------------------------------------------
 list_of_additional_files="InitVirtualDetectors"
-if [ $debug_level != 0 ] ; then echo "----->"  step 2.6 ; fi
+if [ $debug_level != 0 ] ; then echo step 2.6 "----->"  pkg=$pkg ; fi
 for f in $list_of_additional_files; do
 
     cat Stntuple/ana/$f.cc | sed "s/stntuple::/$pkg::/g" | \
@@ -105,12 +149,12 @@ for f in $list_of_additional_files; do
 #	>| $pkg/ana/ana/dict/${f}_linkdef.h
 done
 
-if [ $debug_level != 0 ] ; then echo "----->"  step 3 ; fi
-source $pkg/scripts/build_config
+if [ $debug_level != 0 ] ; then echo step 3 "----->"  pkg=$pkg  ; fi
+# source $pkg/scripts/build_config
 #------------------------------------------------------------------------------
 # modules.hh
 #------------------------------------------------------------------------------
-if [ $debug_level != 0 ] ; then echo "----->"  step 4 ; fi
+if [ $debug_level != 0 ] ; then echo step 4 "----->"  pkg=$pkg ; fi
 echo "#ifndef ${pkg}_ana_scripts_modules_hh"                                >| $pkg/ana/scripts/modules.hh
 echo "#define ${pkg}_ana_scripts_modules_hh"                                >> $pkg/ana/scripts/modules.hh
 echo ""                                                                     >> $pkg/ana/scripts/modules.hh
@@ -199,13 +243,14 @@ cat rootlogon.C | awk -v pkg=$pkg '
 { 
   print $0 ;
   if ($1 == "//insert_user_libs_here") {
-    printf("      gSystem->Load(\"lib/lib%s_ana.so\");\n",pkg) ;
+    printf("      gSystem->Load(\"$MUSE_BUILD_DIR/%s/lib/lib%s_ana.so\");\n",pkg,pkg) ;
   }
 }' >| rootlogon.C.new ; 
 cat  rootlogon.C.new | uniq >| rootlogon.C
 #------------------------------------------------------------------------------
-# finally, run build_config
+# 8.0 : finally, run build_config
 #------------------------------------------------------------------------------
-if [ $debug_level != 0 ] ; then echo echo "----->"  step 8 ; fi 
-source $pkg/scripts/build_config
+if [ $debug_level != 0 ] ; then echo echo "----->"  step 8 pkg=$pkg; fi 
+source $pkg/scripts/build_config $pkg $debug_level
+
 echo package $pkg successfully created

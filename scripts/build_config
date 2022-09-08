@@ -16,7 +16,7 @@ list_of_subpackages="alg ana base geom gui loop mod obj print val"
 # Stntuple and its subpackages
 #------------------------------------------------------------------------------
 if [ ! -d $base/include/$pkg ] ; then
-    echo pwd=$pwd ; creating $base/include/$pkg
+    echo pwd=$pwd : creating $base/include/$pkg
     mkdir -p $base/include/$pkg ;
 fi
 #------------------------------------------------------------------------------
