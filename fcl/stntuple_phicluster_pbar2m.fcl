@@ -55,7 +55,7 @@ END_PROLOG
 #include "Offline/CaloCluster/fcl/prolog.fcl"
 #include "Offline/CalPatRec/fcl/prolog.fcl"
 #\\\include "Offline/Trigger/fcl/prolog_trigger.fcl"
-#include "pbar2m/fcl/TimeandPhiCluster.fcl"
+#include "pbar2m/fcl/PhiClusterFinder.fcl"
 #include "Stntuple/fcl/prolog.fcl"
 #include "pbar2m/fcl/prolog.fcl"
 #------------------------------------------------------------------------------
