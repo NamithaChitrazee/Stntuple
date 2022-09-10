@@ -21,6 +21,7 @@ BEGIN_PROLOG
   END_PATHS           : []
   PROCESS_NAME        : nil
   BLIND_TIME          : 500                                  # default
+  STN_COMPRESS_MCS    : "compressDigiMCs"                    # "compressRecoMCs" looks dangerous
   STN_VDHITS_COLL_TAG : "compressDigiMCs:virtualdetector"
   PDG_ID              : 0                                    # 0: ignore PDG_ID
   GEN_ID              : "unknown"                            #    ignore GEN_ID check
@@ -117,7 +118,6 @@ services.message.destinations.log.categories.ArtReport.timespan    : 300
 # (1): definition of the input module - can redefine in the top-level prolog
 #------------------------------------------------------------------------------
 source : { module_type : @local::INPUT_MODULE
-    firstRun      : 1000
     # reportFrequency : 1
     #    fileNames : ["/mu2e/data/tdr/beam/g4s4p5/tdr.beam.g4s4.conversion.1504a.15729672/good/00000/dsStopsToHitsConversion.root"]
     #    maxEvents   : -1
@@ -170,8 +170,6 @@ stntuple : {
 # final part
 #------------------------------------------------------------------------------
     trigger_paths : [ @sequence::TRIGGER_PATHS ]
-
-    end_paths     : [ @sequence::END_PATHS     ]
 }
 #------------------------------------------------------------------------------
 # output event formats for different jobs
@@ -243,6 +241,8 @@ output_products : {
 			   "keep    mu2e::HelixSeeds_TT*_*_*"               ,
 			   "keep    mu2e::TimeClusters_TT*_*_*"             ,
 			   "keep    mu2e::CaloClusters_CaloClusterFast_*_*"
+			  ]
+    reco :                [
 			  ]
 }
 #------------------------------------------------------------------------------
