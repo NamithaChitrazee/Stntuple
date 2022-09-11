@@ -46,6 +46,7 @@
 #include "Offline/RecoDataProducts/inc/CaloCluster.hh"
 #include "Offline/RecoDataProducts/inc/ComboHit.hh"
 #include "Offline/RecoDataProducts/inc/StrawHitFlag.hh"
+#include "Offline/RecoDataProducts/inc/StrawDigi.hh"
 
 #include "Offline/RecoDataProducts/inc/CrvRecoPulse.hh"
 #include "Offline/RecoDataProducts/inc/TimeCluster.hh"
@@ -95,8 +96,10 @@ private:
 
   string        _strawHitCollTag;
   string        _comboHitCollTag;
-  string        _strawDigiMCCollTag;
-  string        _strawHitFlagCollTag;
+  string        _sdCollTag;		// strawDigiCollTag
+  string        _sdmcCollTag;
+  string        _shfCollTag;            // straw hit flags
+  string        _swCollTag;
   
   string        _trackCollTag;
   string        _simpCollTag;
@@ -107,32 +110,22 @@ private:
   string        _pidCollTag;
   string        _ppTag;			// primary particle tag
   string        _vdHitsCollTag;
+  string        _defaultView;           // view open in the first window
   
   GenId         _generatorID;
 
-  double        _minEnergyDep;
-  double        _timeWindow;
+  double        _minEnergyDep;          // unused
+  double        _timeWindow;            // unused
 
-  StrawHitFlag  fGoodHitMask;
-  StrawHitFlag  fBadHitMask;
-  size_t        _minHits;
-  double        _minSimpMomentum;
-
-  bool          fDisplayBackgroundHits;
-  bool          fPrintHits;
+  StrawHitFlag  fGoodHitMask;           // unused
+  StrawHitFlag  fBadHitMask;            // unused
+  size_t        _minHits;               // unused
+  double        _minSimpMomentum;       // to initialize Simp Block
 //-----------------------------------------------------------------------------
 // Control for CRV-specific viewing
 //-----------------------------------------------------------------------------
   bool				_showCRVOnly;
   bool				_showTracks;
-  // bool				foundTrkr;
-  bool				foundTrkr_StrawHitColl;
-  bool				foundTrkr_StrawDigiMCColl;
-  bool				foundTrkr_StrawHitPosColl;
-  bool				foundTrkr_StrawHitFlagColl;
-  bool				foundCalo_CrystalHitColl;
-  bool				foundCalo_ClusterColl;
-  //  bool				foundCalo;
 
   fhicl::ParameterSet          _vmConfig;
 //-----------------------------------------------------------------------------
@@ -142,39 +135,40 @@ private:
 //-----------------------------------------------------------------------------
   TApplication*                         fApplication;
 
-  const mu2e::GenParticleCollection*    _genpColl;         // 
+  const mu2e::GenParticleCollection*    _genpColl;        // 
 
-  const mu2e::ComboHitCollection*       _strawHitColl;     // 
-  const mu2e::ComboHitCollection*       _comboHitColl;     // 
+  const mu2e::ComboHitCollection*             _sComboHitColl;   // 
+  const mu2e::ComboHitCollection*             _cComboHitColl;   // 
 
-  const mu2e::StrawHitFlagCollection*   _strawHitFlagColl; //
-  const mu2e::StrawDigiMCCollection*    _strawDigiMCColl;  //
+  const mu2e::StrawDigiCollection*            _sdColl;   //
+  const mu2e::StrawDigiMCCollection*          _sdmcColl; //
+  const mu2e::StrawDigiADCWaveformCollection* _swColl;   //
+  const mu2e::StrawHitCollection*             _shColl;   //
+  const mu2e::StrawHitFlagCollection*         _shfColl;  //
   
-  const mu2e::CaloHitCollection*        _caloHitColl;      //
-  const mu2e::CaloClusterCollection*    _caloClusterColl;  //
+  const mu2e::CaloHitCollection*              _caloHitColl;      //
+  const mu2e::CaloClusterCollection*          _caloClusterColl;  //
   
-  const mu2e::StepPointMCCollection*    _spmcColl;         // on virtual detectors
-  const mu2e::SimParticleCollection*    _simpColl;         //
+  const mu2e::StepPointMCCollection*          _spmcColl;         // on virtual detectors
+  const mu2e::SimParticleCollection*          _simpColl;         //
 
-  const mu2e::TimeClusterCollection*    _timeClusterColl;  //
+  const mu2e::TimeClusterCollection*          _timeClusterColl;  //
 
-  mu2e::CrvRecoPulseCollection*		fCrvPulseColl_Right;
-  mu2e::CrvRecoPulseCollection*		fCrvPulseColl_Left;
-  mu2e::CrvRecoPulseCollection*		fCrvPulseColl_TopDS;
-  mu2e::CrvRecoPulseCollection*		fCrvPulseColl_TopTS;
-  mu2e::CrvRecoPulseCollection*		fCrvPulseColl_Dwnstrm;
-  mu2e::CrvRecoPulseCollection*		fCrvPulseColl_Upstrm;
+  mu2e::CrvRecoPulseCollection*		      fCrvPulseColl_Right;
+  mu2e::CrvRecoPulseCollection*		      fCrvPulseColl_Left;
+  mu2e::CrvRecoPulseCollection*		      fCrvPulseColl_TopDS;
+  mu2e::CrvRecoPulseCollection*		      fCrvPulseColl_TopTS;
+  mu2e::CrvRecoPulseCollection*		      fCrvPulseColl_Dwnstrm;
+  mu2e::CrvRecoPulseCollection*		      fCrvPulseColl_Upstrm;
   
-  const mu2e::KalRepPtrCollection*      _kalRepPtrColl;
+  const mu2e::KalRepPtrCollection*            _kalRepPtrColl;
 
-  std::unique_ptr<McUtilsToolBase>      _mcUtils;
-
-  // mu2e::TimeCluster*     _timeCluster;
-  int                    fNClusters;
-  int                    fNTracks[4];
-  int                    _firstCall;
-		
-  TStnVisManager*        fVisManager;
+  std::unique_ptr<McUtilsToolBase>            _mcUtils;
+//-----------------------------------------------------------------------------
+// need to detect teh first call to initialize fVisManager
+//-----------------------------------------------------------------------------
+  int                                         _firstCall;    
+  TStnVisManager*                             fVisManager;
 //-----------------------------------------------------------------------------
 // reuse STNTUPLE data blocks
 //-----------------------------------------------------------------------------
@@ -195,15 +189,19 @@ public:
   int      getData      (const art::Event* Evt);
   int      getCRVSection(int   shieldNumber   );
 
-  const mu2e::ComboHitCollection*    GetComboHitColl   () { return _comboHitColl   ; }
-  const mu2e::GenParticleCollection* GetGenppColl      () { return _genpColl       ; }
-  const mu2e::ComboHitCollection*    GetStrawHitColl   () { return _strawHitColl   ; }
-  const mu2e::KalRepPtrCollection*   GetKalRepPtrColl  () { return _kalRepPtrColl  ; }
-  const mu2e::SimParticleCollection* GetSimpColl       () { return _simpColl       ; }
-  const mu2e::StepPointMCCollection* GetSpmcColl       () { return _spmcColl       ; }
-  const mu2e::TimeClusterCollection* GetTimeClusterColl() { return _timeClusterColl; }
+  const mu2e::ComboHitCollection*               GetCComboHitColl  () { return _cComboHitColl  ; }
+  const mu2e::ComboHitCollection*               GetSComboColl     () { return _sComboHitColl  ; }
+  const mu2e::GenParticleCollection*            GetGenppColl      () { return _genpColl       ; }
+  const mu2e::KalRepPtrCollection*              GetKalRepPtrColl  () { return _kalRepPtrColl  ; }
+  const mu2e::SimParticleCollection*            GetSimpColl       () { return _simpColl       ; }
+  const mu2e::StepPointMCCollection*            GetSpmcColl       () { return _spmcColl       ; }
+  const mu2e::StrawDigiCollection*              GetSdColl         () { return _sdColl         ; }
+  const mu2e::StrawDigiADCWaveformCollection*   GetSwColl         () { return _swColl         ; }
+  const mu2e::StrawHitCollection*               GetShColl         () { return _shColl         ; }
+  const mu2e::StrawDigiMCCollection*            GetSdmcColl       () { return _sdmcColl       ; }
+  const mu2e::TimeClusterCollection*            GetTimeClusterColl() { return _timeClusterColl; }
 
-  TSimpBlock*                        GetSimpBlock      () { return fSimpBlock      ; }
+  TSimpBlock*                                   GetSimpBlock      () { return fSimpBlock      ; }
 
   void     InitVisManager();
 

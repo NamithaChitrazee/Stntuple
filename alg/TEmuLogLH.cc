@@ -561,17 +561,19 @@ void TEmuLogLH::InitMuoEpHist(const TH2F* Hist) {
 //-----------------------------------------------------------------------------
 int TEmuLogLH::Init_v4_2_4() {
 
+  char dir[200];
+
   char f_ele_ep_vs_path[256], f_ele_dt[256], f_ele_xs[256];
   char f_muo_ep_vs_path[256], f_muo_dt[256], f_muo_xs[256];
 
-  const char* dir = getenv("MU2E_BASE_RELEASE");
+  sprintf(dir,"%s/Offline/ConditionsService/data",getenv("MUSE_WORK_DIR"));
 
-  sprintf(f_ele_ep_vs_path,"%s/ConditionsService/data/pid_ele_ep_vs_path_v4_2_4.tab",dir);
-  sprintf(f_ele_dt        ,"%s/ConditionsService/data/pid_ele_dt_v4_2_4.tab",dir);
-  sprintf(f_ele_xs        ,"%s/ConditionsService/data/pid_ele_xs_v4_2_4.tab",dir);
-  sprintf(f_muo_ep_vs_path,"%s/ConditionsService/data/pid_muo_ep_vs_path_v4_2_4.tab",dir);
-  sprintf(f_muo_dt        ,"%s/ConditionsService/data/pid_muo_dt_v4_2_4.tab",dir);
-  sprintf(f_muo_xs        ,"%s/ConditionsService/data/pid_muo_xs_v4_2_4.tab",dir);
+  sprintf(f_ele_ep_vs_path,"%s/pid_ele_ep_vs_path_v4_2_4.tab",dir);
+  sprintf(f_ele_dt        ,"%s/pid_ele_dt_v4_2_4.tab",dir);
+  sprintf(f_ele_xs        ,"%s/pid_ele_xs_v4_2_4.tab",dir);
+  sprintf(f_muo_ep_vs_path,"%s/pid_muo_ep_vs_path_v4_2_4.tab",dir);
+  sprintf(f_muo_dt        ,"%s/pid_muo_dt_v4_2_4.tab",dir);
+  sprintf(f_muo_xs        ,"%s/pid_muo_xs_v4_2_4.tab",dir);
 
   InitEleEpHist(f_ele_ep_vs_path);
   InitEleDtHist(f_ele_dt);
@@ -589,18 +591,19 @@ int TEmuLogLH::Init_v4_2_4() {
 //-----------------------------------------------------------------------------
 int TEmuLogLH::Init_v5_7_0() {
 
+  char dir[200];
   char f_ele_ep_vs_path[256], f_ele_dt[256], f_ele_xs[256];
   char f_muo_ep_vs_path[256], f_muo_dt[256], f_muo_xs[256];
 
-  const char* dir = getenv("MU2E_BASE_RELEASE");
+  sprintf(dir,"%s/Offline/ConditionsService/data/v5_7_0",getenv("MUSE_WORK_DIR"));
 
-  sprintf(f_ele_ep_vs_path,"%s/ConditionsService/data/v5_7_0/pid_ele_ep_vs_path.tbl",dir);
-  sprintf(f_ele_dt        ,"%s/ConditionsService/data/v5_7_0/pid_ele_dt.tbl",dir);
-  sprintf(f_ele_xs        ,"%s/ConditionsService/data/v5_7_0/pid_ele_xdrds.tbl",dir);
+  sprintf(f_ele_ep_vs_path,"%s/pid_ele_ep_vs_path.tbl",dir);
+  sprintf(f_ele_dt        ,"%s/pid_ele_dt.tbl",dir);
+  sprintf(f_ele_xs        ,"%s/pid_ele_xdrds.tbl",dir);
 
-  sprintf(f_muo_ep_vs_path,"%s/ConditionsService/data/v5_7_0/pid_muo_ep_vs_path.tbl",dir);
-  sprintf(f_muo_dt        ,"%s/ConditionsService/data/v5_7_0/pid_muo_dt.tbl",dir);
-  sprintf(f_muo_xs        ,"%s/ConditionsService/data/v5_7_0/pid_muo_xdrds.tbl",dir);
+  sprintf(f_muo_ep_vs_path,"%s/pid_muo_ep_vs_path.tbl",dir);
+  sprintf(f_muo_dt        ,"%s/pid_muo_dt.tbl",dir);
+  sprintf(f_muo_xs        ,"%s/pid_muo_xdrds.tbl",dir);
 
   InitEleEpHist(f_ele_ep_vs_path);
   InitEleDtHist(f_ele_dt);
@@ -618,18 +621,19 @@ int TEmuLogLH::Init_v5_7_0() {
 //-----------------------------------------------------------------------------
 int TEmuLogLH::Init_v5_7_2() {
 
+  char dir[200];
   char f_ele_ep_vs_path[256], f_ele_dt[256], f_ele_xs[256];
   char f_muo_ep_vs_path[256], f_muo_dt[256], f_muo_xs[256];
 
-  const char* dir = getenv("MU2E_BASE_RELEASE");
+  sprintf(dir,"%s/Offline/ConditionsService/data/v5_7_2",getenv("MUSE_WORK_DIR"));
 
-  sprintf(f_ele_ep_vs_path,"%s/ConditionsService/data/v5_7_2/pid_ele_ep_vs_path.tbl",dir);
-  sprintf(f_ele_dt        ,"%s/ConditionsService/data/v5_7_2/pid_ele_dt.tbl",dir);
-  sprintf(f_ele_xs        ,"%s/ConditionsService/data/v5_7_2/pid_ele_xdrds.tbl",dir);
+  sprintf(f_ele_ep_vs_path,"%s/pid_ele_ep_vs_path.tbl",dir);
+  sprintf(f_ele_dt        ,"%s/pid_ele_dt.tbl",dir);
+  sprintf(f_ele_xs        ,"%s/pid_ele_xdrds.tbl",dir);
 
-  sprintf(f_muo_ep_vs_path,"%s/ConditionsService/data/v5_7_2/pid_muo_ep_vs_path.tbl",dir);
-  sprintf(f_muo_dt        ,"%s/ConditionsService/data/v5_7_2/pid_muo_dt.tbl",dir);
-  sprintf(f_muo_xs        ,"%s/ConditionsService/data/v5_7_2/pid_muo_xdrds.tbl",dir);
+  sprintf(f_muo_ep_vs_path,"%s/pid_muo_ep_vs_path.tbl",dir);
+  sprintf(f_muo_dt        ,"%s/pid_muo_dt.tbl",dir);
+  sprintf(f_muo_xs        ,"%s/pid_muo_xdrds.tbl",dir);
 
   InitEleEpHist(f_ele_ep_vs_path);
   InitEleDtHist(f_ele_dt);
@@ -647,18 +651,19 @@ int TEmuLogLH::Init_v5_7_2() {
 //-----------------------------------------------------------------------------
 int TEmuLogLH::Init_v5_7_9() {
 
+  char dir[200];
   char f_ele_ep_vs_path[256], f_ele_dt[256], f_ele_xs[256];
   char f_muo_ep_vs_path[256], f_muo_dt[256], f_muo_xs[256];
 
-  const char* dir = getenv("MU2E_BASE_RELEASE");
+  sprintf(dir,"%s/Offline/ConditionsService/data/v5_7_9",getenv("MUSE_WORK_DIR"));
 
-  sprintf(f_ele_ep_vs_path,"%s/ConditionsService/data/v5_7_9/pid_ele_ep_vs_path.tbl",dir);
-  sprintf(f_ele_dt        ,"%s/ConditionsService/data/v5_7_9/pid_ele_dt.tbl",dir);
-  sprintf(f_ele_xs        ,"%s/ConditionsService/data/v5_7_9/pid_ele_xdrds.tbl",dir);
+  sprintf(f_ele_ep_vs_path,"%s/pid_ele_ep_vs_path.tbl",dir);
+  sprintf(f_ele_dt        ,"%s/pid_ele_dt.tbl",dir);
+  sprintf(f_ele_xs        ,"%s/pid_ele_xdrds.tbl",dir);
 
-  sprintf(f_muo_ep_vs_path,"%s/ConditionsService/data/v5_7_9/pid_muo_ep_vs_path.tbl",dir);
-  sprintf(f_muo_dt        ,"%s/ConditionsService/data/v5_7_9/pid_muo_dt.tbl",dir);
-  sprintf(f_muo_xs        ,"%s/ConditionsService/data/v5_7_9/pid_muo_xdrds.tbl",dir);
+  sprintf(f_muo_ep_vs_path,"%s/pid_muo_ep_vs_path.tbl",dir);
+  sprintf(f_muo_dt        ,"%s/pid_muo_dt.tbl",dir);
+  sprintf(f_muo_xs        ,"%s/pid_muo_xdrds.tbl",dir);
 
   InitEleEpHist(f_ele_ep_vs_path);
   InitEleDtHist(f_ele_dt);

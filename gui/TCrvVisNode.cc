@@ -254,7 +254,7 @@ int TCrvVisNode::InitEvent() {
       //   } // Loop over SiPMs
     }
   }
-  printf("Finished TCrvVisNode::InitEvent() for section %i \n", fSectionID);
+  //  printf("Finished TCrvVisNode::InitEvent() for section %i \n", fSectionID);
   
   return 0;
 }

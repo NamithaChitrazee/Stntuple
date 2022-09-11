@@ -54,8 +54,14 @@ TEvdComboHit::TEvdComboHit(const mu2e::ComboHit*      Hit,
 {
   fSim         = Sim;
   fStep        = Step;
-  fSimID       = Sim->id().asInt();
-  fPdgID       = Sim->pdgId();
+  if (Sim) {
+    fSimID       = Sim->id().asInt();
+    fPdgID       = Sim->pdgId();
+  }
+  else {
+    fSimID       = -1;
+    fPdgID       =  0;
+  }
   fMotherPdgID = MotherPdgID;
   fP           = P;
   fPz          = Pz;

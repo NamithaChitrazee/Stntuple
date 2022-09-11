@@ -95,12 +95,15 @@ StntupleMakerTemplate : { module_type:StntupleMaker
     genpCollTag          : @local::STN_COMPRESS_MCS              # save signal-only: "generate" 
     genId                : @local::GEN_ID                        # defined in Stntuple/fcl/stntuple.fcl, by default, store all simparticles
     pdgId                : @local::PDG_ID                        # defined in Stntuple/fcl/stntuple.fcl, by default, don't check PDG ID
-    
-    timeClusterBlockName : ["TimeClusterBlock"   ]               # to be renamed, *FIXME*
-    timeClusterCollTag   : ["TimeClusterFinderDe"]               # 
 #------------------------------------------------------------------------------
-# ultimately all downstream helices will be in one block,
-# upstream ones - in another
+# time clusters
+#------------------------------------------------------------------------------
+    timeClusterBlockName : [ "TimeClusterBlock"   ]              # to be renamed, *FIXME*
+    timeClusterCollTag   : [ "TimeClusterFinderDe"]              # 
+    tcShCollTag          : [ "makeSH"             ]              # time clusters could be searched for using straw hits
+    tcChCollTag          : [ "makePH"             ]              # only
+#------------------------------------------------------------------------------
+# ultimately all downstream helices will be in one block, upstream ones - in another
 #------------------------------------------------------------------------------
     helixBlockName       : [ "MHDeM"      ]
     helixCollTag         : [ "HelixBlock" ]
@@ -142,23 +145,24 @@ StntupleMakerTemplate : { module_type:StntupleMaker
 #------------------------------------------------------------------------------
 # 
 #------------------------------------------------------------------------------
-MuHitDisplay: { module_type:MuHitDisplay                 # the class name;
+MuHitDisplay: { module_type:MuHitDisplay                 # class name;
     @table::StntupleTModuleFclDefaults                   # defaults of the base class
 
-    interactiveMode              : 1   # 1:stop  after each event 2: stop at end-of-job
+    interactiveMode              : 1                                # 1:stop  after each event 2: stop at end-of-job
     
     crvRecoPulsesCollTag         : "CrvRecoPulses"
     showCRVOnly 		 : false
     showTracks                   : true
     
     genpCollTag                  : "generate"
+    comboHitCollTag              : "makePH"                          # comboHits
+    strawHitCollTag              : "makeSH"
+    sdCollTag                    : "FromTrackerPrototypeData"        # tracker VST
+    swCollTag                    : "FromTrackerPrototypeData"        # tracker VST
+    sdmcCollTag                  : "compressDigiMCs"                 #  was "makeSD"
+    shfCollTag                   : "DeltaFinder:StrawHits"           # straw hit flags
     spmcCollTag                  : "compressDigiMCs:virtualdetector" # was g4run
     simpCollTag                  : "compressDigiMCs"                 # was g4run
-    statuG4Tag                   : "g4run"                           # 
-    strawHitCollTag              : "makeSH"
-    strawDigiMCCollTag           : "compressDigiMCs"                 #  was "makeSD"
-    strawHitFlagCollTag          : "DeltaFinder:StrawHits"           # 
-    comboHitCollTag              : "makePH"                          # comboHits
 
     caloHitCollTag               : "CaloHitMaker"
     caloClusterCollTag           : "CaloClusterMaker"
@@ -173,19 +177,13 @@ MuHitDisplay: { module_type:MuHitDisplay                 # the class name;
     primaryParticleTag           : "compressDigiMCs"                 # this is new, to be passed to InitSimpBlock
     vdHitsCollTag                : "compressDigiMCs"                 # this is new, to be passed to InitSimpBlock
     
-    # if set to true, all hits will be displayed unconditionally
-    # otherwise, display only hits with right flags
-    displayBackgroundHits        : true
-
     #      goodHitMask                 : ["EnergySelection","RadiusSelection","TimeSelection"]
     goodHitMask                  : ["EnergySelection", "RadiusSelection"]
     badHitMask                   : ["Background"] 
     
     minHits                      : 5
     minSimpMomentum              : 40. # MeV
-    printHits                    : false
     timeWindow                   : 100000.
-    #      timeWindow           : 50.
 #------------------------------------------------------------------------------
 # kalDiag and Doublet Resolver
 #------------------------------------------------------------------------------
@@ -195,12 +193,13 @@ MuHitDisplay: { module_type:MuHitDisplay                 # the class name;
 # configuration of the underlying visualization manager 
 #------------------------------------------------------------------------------
     visManager: {
-	debugLevel         : 0
+	defaultView        : "xy"     # view open by default
 	displayStrawDigiMC : 1
 	displayStrawHitsXY : 1
+	debugLevel         : 0
     }
 #------------------------------------------------------------------------------
-# plugin configurration, plugin is a name of the script to be loaded
+# plugin configuration, plugin is a name of the script to be loaded
 # it is assumed that if the name of the script is "/s/../b/a.C", a call to void "a()" 
 # should be executed once per event
 #------------------------------------------------------------------------------
