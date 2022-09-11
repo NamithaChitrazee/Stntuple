@@ -18,10 +18,10 @@ physics : {
     analyzers  : { @table::stntuple.analyzers }
 #------------------------------------------------------------------------------
 # running on output of the reconstruction
-# erything becomes compressRecoMCs
+# everything becomes 
 # hits still need to be reconstructed
 #------------------------------------------------------------------------------
-    p1 : [ @sequence::TrkHitReco.PrepareHits ]
+    p1 : [ ]  # @sequence::TrkHitReco.PrepareHits ]
 
     e1 : [ MuHitDisplay ]
 
@@ -31,13 +31,13 @@ physics : {
     end_paths     : [ e1      ]  # , out ]
 }
 #------------------------------------------------------------------------------
-# tell MuHitDisplay to use things compressed by the reconstruction
+# assume only one level of compression - the code shouldn't crash anyway
 #------------------------------------------------------------------------------
 physics.analyzers.MuHitDisplay : { @table::stntuple.analyzers.MuHitDisplay 
-    spmcCollTag                  : "compressRecoMCs:virtualdetector" # was g4run
-    simpCollTag                  : "compressRecoMCs"                 # was g4run
-    strawDigiMCCollTag           : "compressRecoMCs"                 #  was "makeSD"
-    primaryParticleTag           : "compressRecoMCs"
+    spmcCollTag                  : "compressDigiMCs:virtualdetector" # was g4run
+    simpCollTag                  : "compressDigiMCs"                 # was g4run
+    strawDigiMCCollTag           : "compressDigiMCs"                 #  was "makeSD"
+    primaryParticleTag           : "compressDigiMCs"
     vdHitsCollTag                : "compressDigiMCs"
 }
 
