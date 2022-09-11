@@ -384,10 +384,6 @@ void StntupleMaker::beginRun(const art::Run& aRun) {
     }
   }
 
-  if (fMakeSimp and fSimpUseTimeOffsets) {
-    fInitSimpBlock->SetMbTime(mbtime);
-  }
-
   THistModule::afterBeginRun(aRun);
 }
 
@@ -583,9 +579,6 @@ void StntupleMaker::beginJob() {
     fInitSimpBlock->SetMaxZ              (fSimpMaxZ);
     fInitSimpBlock->SetGenProcessID      (fGenId.id());
     fInitSimpBlock->SetPdgID             (fPdgId);
-
-    if (fSimpUseTimeOffsets != 0) fInitSimpBlock->SetTimeOffsets(fTimeOffsets);
-    else                          fInitSimpBlock->SetTimeOffsets(NULL);
 
     AddDataBlock("SimpBlock","TSimpBlock",fInitSimpBlock,buffer_size,split_mode,compression_level);
   }

@@ -97,10 +97,6 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
     }
   }
 //-----------------------------------------------------------------------------
-// load simulation time offsets for this event: timeOffsets may not be defined yet (stages 1, 2, 3)
-//-----------------------------------------------------------------------------
-  if (fTimeOffsets) fTimeOffsets->updateMap(*AnEvent);
-//-----------------------------------------------------------------------------
 // figure out how many straw hits each particle has produced
 // StrawHitCollection, StrawDigiCollection, and StrawDigiMCCollection are all parallel,
 // indexed with the same index

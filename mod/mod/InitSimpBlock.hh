@@ -11,8 +11,6 @@
 #include "Stntuple/obj/TStnInitDataBlock.hh"
 #include "Stntuple/obj/TSimpBlock.hh"
 
-#include "Mu2eUtilities/inc/SimParticleTimeOffset.hh"
-
 class StntupleInitSimpBlock : public TStnInitDataBlock {
 public:
   art::InputTag   fSimpCollTag;
@@ -38,9 +36,6 @@ public:
   void   SetMaxZ              (double       MaxZ) { fMaxZ               = MaxZ              ; }
   void   SetGenProcessID      (int          ID  ) { fGenProcessID       = ID                ; }
   void   SetPdgID             (int          ID  ) { fPdgID              = ID                ; }
-
-  void   SetTimeOffsets       (mu2e::SimParticleTimeOffset* TimeOffsets) { fTimeOffsets = TimeOffsets; }
-  void   SetMbTime            (float MbTime) { fMbTime = MbTime; }
 
   virtual int InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mode);
   //  virtual int ResolveLinks (TStnDataBlock* Block, AbsEvent* Evt, int Mode);
