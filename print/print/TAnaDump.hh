@@ -241,8 +241,6 @@ public:
 			   int                       INit  = -1,
 			   int                       Flags = -1);
   
-  void printTrkCaloHit(const KalRep* Krep, mu2e::TrkCaloHit* CaloHit);
-
   void printKalSeed            (const mu2e::KalSeed* TrkSeed                      , 
 				const char* Opt                = ""               ,
 				const char* StrawHitCollTag    = "makeSH"         ,
@@ -258,19 +256,6 @@ public:
   void printKalRepCollection(const char* KalRepCollTag               , 
 			     int         hitOpt             = 0      , 
 			     const char* StrawDigiMCCollTag = nullptr); 
-//-----------------------------------------------------------------------------
-// time clusters
-//-----------------------------------------------------------------------------
-  void printTimeCluster   (const mu2e::TimeCluster* TimePeak, const char* Opt = "", 
-			   const mu2e::ComboHitCollection* ChColl=0,
-			   const char*StrawDigiMCModuleLabel = "makeSD");
-
-  void printTimeClusterCollection(const char* ModuleLabel        , 
-				  const char* ComboHitModuleLabel,
-				  const char* ProductName = ""   , 
-				  const char* ProcessName = ""   ,
-				  int         PrintHits   = 0    ,
-				  const char* StrawDigiMCModuleLabel = "makeSD");
 //-----------------------------------------------------------------------------
 // MC truth: gen and sim particles
 //-----------------------------------------------------------------------------
@@ -293,6 +278,21 @@ public:
 				   const char* ProductName = "", 
 				   const char* ProcessName = "");
 //-----------------------------------------------------------------------------
+// time clusters
+//-----------------------------------------------------------------------------
+  void printTimeCluster   (const mu2e::TimeCluster* TimePeak, const char* Opt = "", 
+			   const mu2e::ComboHitCollection* ChColl=0,
+			   const char*StrawDigiMCModuleLabel = "makeSD");
+
+  void printTimeClusterCollection(const char* TcCollTag             ,    // time cluster collection tag
+				  const char* ChCollTag             ,    // combo hit collection tag
+				  int         PrintHits   = 0       ,
+				  const char* SdmcCollTag = "makeSD");   // straw digi mc coll tag
+//-----------------------------------------------------------------------------
+// calorimeter cluster added to the track fit
+//-----------------------------------------------------------------------------
+  void printTrkCaloHit(const KalRep* Krep, mu2e::TrkCaloHit* CaloHit);
+//-----------------------------------------------------------------------------
 // extrapolation and track-to-calorimeter matching
 //-----------------------------------------------------------------------------
   void printTrkToCaloExtrapol           (const mu2e::TrkToCaloExtrapol*extrk,
@@ -301,7 +301,9 @@ public:
   void printTrkToCaloExtrapolCollection (const char* ModuleLabel, 
 					 const char* ProductName = "", 
 					 const char* ProcessName = "");
-  void printTrackClusterMatch          (const mu2e::TrackClusterMatch* TcMatch, const char* Option);
+
+  void printTrackClusterMatch           (const mu2e::TrackClusterMatch* TcMatch, const char* Option);
+
 
   void printTrackClusterMatchCollection(const char* ModuleLabel     , 
 					const char* ProductName = "", 
