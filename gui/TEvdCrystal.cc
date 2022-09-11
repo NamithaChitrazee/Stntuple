@@ -18,8 +18,8 @@
 
 #include "art/Framework/Principal/Handle.h"
 
-#include "GeometryService/inc/GeometryService.hh"
-#include "GeometryService/inc/GeomHandle.hh"
+#include "Offline/GeometryService/inc/GeometryService.hh"
+#include "Offline/GeometryService/inc/GeomHandle.hh"
 
 #include "Stntuple/gui/TEvdCrystal.hh"
 #include "Stntuple/gui/TStnVisManager.hh"
@@ -29,10 +29,10 @@
 #include "Stntuple/base/TObjHandle.hh"
 
 //#include "CalorimeterGeom/inc/VaneCalorimeter.hh"
-#include "CalorimeterGeom/inc/Crystal.hh"
-#include "CalorimeterGeom/inc/Disk.hh"
-#include "CalorimeterGeom/inc/DiskCalorimeter.hh"
-#include "CalorimeterGeom/inc/Calorimeter.hh"
+#include "Offline/CalorimeterGeom/inc/Crystal.hh"
+#include "Offline/CalorimeterGeom/inc/Disk.hh"
+#include "Offline/CalorimeterGeom/inc/DiskCalorimeter.hh"
+#include "Offline/CalorimeterGeom/inc/Calorimeter.hh"
 
 ClassImp(TEvdCrystal)
 
@@ -70,8 +70,8 @@ void TEvdCrystal::Paint(Option_t* Option) {
 
   int view = TVisManager::Instance()->GetCurrentView()->Type();
 
-  if      (view == TStnView::kXY ) PaintXY(Option);
-  else if (view == TStnView::kCal) {
+  if      (view == TStnVisManager::kXY ) PaintXY(Option);
+  else if (view == TStnVisManager::kCal) {
     PaintCal(Option);
   }
   else {
@@ -118,7 +118,7 @@ Int_t TEvdCrystal::DistancetoPrimitiveRZ(Int_t px, Int_t py) {
 }
 
 //-----------------------------------------------------------------------------
-void TEvdCrystal::AddHit(const mu2e::CaloCrystalHit* CrystalHit) {
+void TEvdCrystal::AddHit(const mu2e::CaloHit* CrystalHit) {
   fEnergy  += CrystalHit->energyDep();
   TObjHandle* h = new ((*fListOfHits)[fNHits]) TObjHandle((void*) CrystalHit);
   if (h != NULL) fNHits++;
@@ -142,8 +142,8 @@ void TEvdCrystal::Clear(Option_t* Opt) {
 //-----------------------------------------------------------------------------
 void TEvdCrystal::Print(Option_t* Opt) const {
 
-  TObjHandle*                  h;
-  const mu2e::CaloCrystalHit*  hit;
+  TObjHandle*           h;
+  const mu2e::CaloHit*  hit;
 
   printf (" X0 = %10.3f Y0 = %10.3f  E = %10.3f  njits = %5i\n",
 	  X0(),Y0(),fEnergy,fNHits);
@@ -154,13 +154,13 @@ void TEvdCrystal::Print(Option_t* Opt) const {
   for (int i=0; i<fNHits; i++) {
 
     h   = (TObjHandle*) fListOfHits->At(i);
-    hit = (const mu2e::CaloCrystalHit*) h->Object();
+    hit = (const mu2e::CaloHit*) h->Object();
 
     printf("%7i  %10.3f %10.3f %10.3f %5i\n",
-	   hit->id(),
+	   hit->crystalID(),
 	   hit->time(),
 	   hit->energyDep(),
 	   hit->energyDepTot(),
-	   hit->nROId());
+	   hit->nSiPMs());
   }
 }

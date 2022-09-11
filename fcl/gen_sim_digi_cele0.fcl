@@ -7,7 +7,7 @@ BEGIN_PROLOG
   GEN_ID        @protect_ignore: CeLeadingLog
 END_PROLOG
 
-#include "Stntuple/fcl/stnmaker.fcl"
+#include "Stntuple/fcl/stntuple.fcl"
 
 source                                 : { module_type: @local::INPUT_MODULE }
 physics                                : { @table::Stntuple.physics }

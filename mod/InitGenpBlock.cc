@@ -12,9 +12,8 @@
 #include "art/Framework/Principal/Selector.h"
 #include "canvas/Utilities/InputTag.h"
 
-#include "MCDataProducts/inc/GenParticle.hh"
-#include "MCDataProducts/inc/GenParticleCollection.hh"
-#include "MCDataProducts/inc/EventWeight.hh"
+#include "Offline/MCDataProducts/inc/GenParticle.hh"
+#include "Offline/MCDataProducts/inc/EventWeight.hh"
 
 #include "Stntuple/obj/TGenpBlock.hh"
 #include "Stntuple/mod/InitGenpBlock.hh"
@@ -77,7 +76,7 @@ int StntupleInitGenpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
 //-----------------------------------------------------------------------------
 // loop over existing GENP collections, there could be many of them
 //-----------------------------------------------------------------------------
-  AnEvent->getMany(selector,list_of_gp);
+  list_of_gp = AnEvent->getMany<mu2e::GenParticleCollection>(selector);
 
   TDatabasePDG* pdg_db = TDatabasePDG::Instance();
   TParticlePDG* part;

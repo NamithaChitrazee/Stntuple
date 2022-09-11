@@ -8,35 +8,35 @@
 #include "TClonesArray.h"
 #include "TH1.h"
 #include "TPad.h"
-#include "TArc.h"
+#include "TLine.h"
+#include "TEllipse.h"
+#include "TParticlePDG.h"
 
-#include "Stntuple/base/TVisNode.hh"
+#include "Stntuple/obj/TSimParticle.hh"
 
-#ifndef __CINT__
-#include "RecoDataProducts/inc/StrawHitCollection.hh"
-#include "RecoDataProducts/inc/StrawHitPositionCollection.hh"
-#include "RecoDataProducts/inc/StrawHitFlagCollection.hh"
-#include "MCDataProducts/inc/PtrStepPointMCVectorCollection.hh"
-#else
 namespace mu2e {
-  class StrawHitCollection;
-  class StrawHitPositionCollection;
-  class StrawHitFlagCollection;
-  class PtrStepPointMCVectorCollection;
+  class StrawGasStep;
 };
-#endif
 
+namespace stntuple {
 class TEvdSimParticle: public TObject {
 public:
-  
-protected:
+  int                       fNumber;
 
-public:
+  TSimParticle*             fSimp;
+  const mu2e::StrawGasStep* fS1;	// first step on the trajectory
+  const mu2e::StrawGasStep* fS2;	// last  step on the trajectory, 
+					// not sure how to deal with turning particles
+
+  TObjArray*                fListOfHits;
+  TEllipse*                 fEllipse;
+  TLine*                    fLineTZ;
+  TParticlePDG*             fParticlePDG;
 //-----------------------------------------------------------------------------
 // constructors and destructor
 //-----------------------------------------------------------------------------
-  TEvdSimParticle() {}
-  TEvdSimParticle(const char* Name); 
+  TEvdSimParticle();
+  TEvdSimParticle(int Number, TSimParticle* TSimp, const mu2e::StrawGasStep* S1, const mu2e::StrawGasStep* S2); 
 
   virtual ~TEvdSimParticle();
 //-----------------------------------------------------------------------------
@@ -45,21 +45,28 @@ public:
 //-----------------------------------------------------------------------------
 // modifiers
 //-----------------------------------------------------------------------------
+  virtual int DistancetoPrimitive   (int px, int py);
+  virtual int DistancetoPrimitiveXY (int px, int py);
+  virtual int DistancetoPrimitiveRZ (int px, int py);
+  virtual int DistancetoPrimitiveTZ (int px, int py);
 
-  //  virtual void  Draw    (Option_t* option = "");
+  //  virtual void  ExecuteEvent(Int_t event, Int_t px, Int_t py)
+//-----------------------------------------------------------------------------
+// drawing functions
+//-----------------------------------------------------------------------------
+  virtual void  PaintXY  (Option_t* option = "");
+  virtual void  PaintRZ  (Option_t* option = "");
+  virtual void  PaintTZ  (Option_t* option = "");
+//-----------------------------------------------------------------------------
+// overloaded methods of TObject
+//-----------------------------------------------------------------------------
+  virtual void  Paint(Option_t* Opt = "");
+  virtual void  Clear(Option_t* Opt = "");
+  virtual void  Print(Option_t* Opt = "") const ; // **MENU**
 
-  virtual void  Paint   (Option_t* option = "");
-
-  //  virtual void  ExecuteEvent(Int_t event, Int_t px, Int_t py);
-
-  virtual Int_t DistancetoPrimitive  (Int_t px, Int_t py);
-  virtual Int_t DistancetoPrimitiveXY(Int_t px, Int_t py);
-  virtual Int_t DistancetoPrimitiveRZ(Int_t px, Int_t py);
-
-  //  virtual void   Print(const char* Opt = "") const ; // **MENU**
-
-  ClassDef(TEvdSimParticle,0)
+  ClassDef(stntuple::TEvdSimParticle,0)
 };
 
+}
 
 #endif

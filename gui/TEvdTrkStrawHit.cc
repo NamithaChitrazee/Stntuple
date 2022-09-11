@@ -18,8 +18,8 @@
 
 #include "art/Framework/Principal/Handle.h"
 
-#include "GeometryService/inc/GeometryService.hh"
-#include "GeometryService/inc/GeomHandle.hh"
+#include "Offline/GeometryService/inc/GeometryService.hh"
+#include "Offline/GeometryService/inc/GeomHandle.hh"
 
 #include "Stntuple/gui/TEvdTrkStrawHit.hh"
 #include "Stntuple/gui/TStnVisManager.hh"
@@ -65,9 +65,9 @@ void TEvdTrkStrawHit::Paint(Option_t* Option) {
 
   int view = TVisManager::Instance()->GetCurrentView()->Type();
 
-  if      (view == TStnView::kXY ) PaintXY (Option);
-  else if (view == TStnView::kRZ ) PaintRZ (Option);
-  else if (view == TStnView::kCal) PaintCal(Option);
+  if      (view == TStnVisManager::kXY ) PaintXY (Option);
+  else if (view == TStnVisManager::kRZ ) PaintRZ (Option);
+  else if (view == TStnVisManager::kCal) PaintCal(Option);
   else {
     printf("[%s] >>> ERROR: unknown view: %i, DO NOTHING\n",oname,view);
   }

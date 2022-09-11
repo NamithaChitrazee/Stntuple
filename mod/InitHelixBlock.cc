@@ -27,31 +27,25 @@
 #include "art/Framework/Principal/Handle.h"
 #include "art/Framework/Principal/Event.h"
 
-#include "GeometryService/inc/GeometryService.hh"
-#include "GeometryService/inc/GeomHandle.hh"
+#include "Offline/GeometryService/inc/GeometryService.hh"
+#include "Offline/GeometryService/inc/GeomHandle.hh"
 
-#include "CalorimeterGeom/inc/Calorimeter.hh"
+#include "Offline/CalorimeterGeom/inc/Calorimeter.hh"
 
-#include "DataProducts/inc/XYZVec.hh"
-#include "RecoDataProducts/inc/TimeCluster.hh"
-#include "RecoDataProducts/inc/HelixSeed.hh"
-#include "RecoDataProducts/inc/HelixHit.hh"
-#include "RecoDataProducts/inc/KalSeed.hh"
+#include "Offline/RecoDataProducts/inc/TimeCluster.hh"
+#include "Offline/RecoDataProducts/inc/HelixSeed.hh"
+#include "Offline/RecoDataProducts/inc/HelixHit.hh"
+#include "Offline/RecoDataProducts/inc/KalSeed.hh"
 
-// #include "RecoDataProducts/inc/AlgorithmIDCollection.hh"
-#include "RecoDataProducts/inc/CaloCluster.hh"
-#include "RecoDataProducts/inc/StrawHitPositionCollection.hh"
+#include "Offline/RecoDataProducts/inc/CaloCluster.hh"
+#include "Offline/RecoDataProducts/inc/StrawHitPosition.hh"
 
-// #include "MCDataProducts/inc/PtrStepPointMCVectorCollection.hh"
-#include "MCDataProducts/inc/StrawDigiMC.hh"
-#include "MCDataProducts/inc/SimParticle.hh"
-#include "MCDataProducts/inc/SimParticleCollection.hh"
-#include "MCDataProducts/inc/StepPointMC.hh"
-#include "MCDataProducts/inc/StepPointMCCollection.hh"
-#include "MCDataProducts/inc/StrawDigiMCCollection.hh"
-#include "TrkDiag/inc/TrkMCTools.hh"
+#include "Offline/MCDataProducts/inc/StrawDigiMC.hh"
+#include "Offline/MCDataProducts/inc/SimParticle.hh"
+#include "Offline/MCDataProducts/inc/StepPointMC.hh"
+#include "Offline/TrkDiag/inc/TrkMCTools.hh"
 
-#include "Mu2eUtilities/inc/LsqSums4.hh"
+#include "Offline/Mu2eUtilities/inc/LsqSums4.hh"
 #include "Math/VectorUtil.h"
 
 using namespace ROOT::Math::VectorUtil;
@@ -112,7 +106,7 @@ int  StntupleInitMu2eHelixBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mode) {
   TParticlePDG* part(nullptr);
   TDatabasePDG* pdg_db = TDatabasePDG::Instance();
 
-  static XYZVec zaxis(0.0,0.0,1.0); // unit in z direction
+  static  CLHEP::Hep3Vector zaxis(0.0,0.0,1.0); // unit in z direction
 
   for (int i=0; i<nhelices; i++) {
     std::vector<int>     hits_simp_id, hits_simp_index, hits_simp_z;
@@ -127,7 +121,7 @@ int  StntupleInitMu2eHelixBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mode) {
       
       helix->fClusterTime    = cluster->time();
       helix->fClusterEnergy  = cluster->energyDep();
-      CLHEP::Hep3Vector gpos = _calorimeter->geomUtil().diskToMu2e(cluster->diskId(),cluster->cog3Vector());
+      CLHEP::Hep3Vector gpos = _calorimeter->geomUtil().diskToMu2e(cluster->diskID(),cluster->cog3Vector());
       CLHEP::Hep3Vector tpos = _calorimeter->geomUtil().mu2eToTracker(gpos);
       helix->fClusterX       = tpos.x();
       helix->fClusterY       = tpos.y();
@@ -284,8 +278,8 @@ int  StntupleInitMu2eHelixBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mode) {
       }
       helix->fMom1.SetPxPyPzE(px,py,pz,energy);
 
-      const CLHEP::Hep3Vector* sp = &simptr->startPosition();
-      helix->fOrigin1.SetXYZT(sp->x(),sp->y(),sp->z(),simptr->startGlobalTime());
+      CLHEP::Hep3Vector sp = simptr->startPosition();
+      helix->fOrigin1.SetXYZT(sp.x(),sp.y(),sp.z(),simptr->startGlobalTime());
     }
     
     //look for the second most frequent hit
@@ -344,8 +338,8 @@ int  StntupleInitMu2eHelixBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mode) {
 	  }
 	  helix->fMom2.SetPxPyPzE(px,py,pz,energy);
 
-	  const CLHEP::Hep3Vector* sp = &simptr->startPosition();
-	  helix->fOrigin2.SetXYZT(sp->x(),sp->y(),sp->z(),simptr->startGlobalTime());
+	  const CLHEP::Hep3Vector sp = simptr->startPosition();
+	  helix->fOrigin2.SetXYZT(sp.x(),sp.y(),sp.z(),simptr->startGlobalTime());
 	}      
       }
     }
@@ -385,12 +379,12 @@ Int_t StntupleInitMu2eHelixBlockLinks(TStnDataBlock* Block, AbsEvent* AnEvent, i
   TStnHelixBlock*          hb;
   TStnHelix*               helix;
   TStnTrackSeedBlock*      tsb;
-  TStnTrackSeed*           trkseed;
+  // TStnTrackSeed*           trkseed;
   TStnTimeClusterBlock*    tcb;
   TStnTimeCluster*         tp;
 
   const mu2e::HelixSeed*   khelix, *fkhelix;
-  const mu2e::KalSeed*     kseed;
+  // const mu2e::KalSeed*     kseed;
   const mu2e::TimeCluster* ktimepeak, *fktimepeak;
 
   char                     ts_block_name[100], tc_block_name[100];
@@ -417,9 +411,10 @@ Int_t StntupleInitMu2eHelixBlockLinks(TStnDataBlock* Block, AbsEvent* AnEvent, i
     khelix = helix->fHelix;
     int      trackseedIndex(-1);
     for (int j=0; j<ntseeds; ++j){
-      trkseed = tsb->TrackSeed(j);
-      kseed   = trkseed->fTrackSeed;
-      fkhelix = kseed->helix().get();
+      // trkseed = tsb->TrackSeed(j);
+      // kseed   = trkseed->fTrackSeed;
+      printf("StntupleInitMu2eHelixBlockLinks ERROR:  kseed->helix() undefined, FIXIT\n");
+      fkhelix = nullptr; // kseed->helix().get();
       if (fkhelix == khelix) {
 	trackseedIndex = j;
 	break;

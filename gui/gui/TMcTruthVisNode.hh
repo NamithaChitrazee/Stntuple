@@ -14,15 +14,12 @@
 #include "Stntuple/base/TVisNode.hh"
 
 #ifndef __CINT__
-#include "MCDataProducts/inc/PtrStepPointMCVectorCollection.hh"
-#include "MCDataProducts/inc/StepPointMCCollection.hh"
-// #include "Mu2eUtilities/inc/SimParticlesWithHits.hh"
-#include "MCDataProducts/inc/GenParticleCollection.hh"
+#include "Offline/MCDataProducts/inc/StepPointMC.hh"
+#include "Offline/MCDataProducts/inc/GenParticle.hh"
 
 #else
 
 namespace mu2e {
-  class PtrStepPointMCVectorCollection;
   class SimParticlesWithHits;
   class StepPointMCCollection;
   class GenParticleCollection;
@@ -37,10 +34,8 @@ public:
   };
   
 protected:
-  const mu2e::PtrStepPointMCVectorCollection** fListOfHitsMcPtr; 
   const mu2e::StepPointMCCollection**          fSteps; 
   const mu2e::GenParticleCollection**          fGenpColl; 
-  //  mu2e::SimParticlesWithHits**                 fSimParticlesWithHits;
  
   TArc*         fArc;
   TGraph*       fGraph;
@@ -61,32 +56,17 @@ public:
 //-----------------------------------------------------------------------------
 // accessors
 //-----------------------------------------------------------------------------
-  const mu2e::PtrStepPointMCVectorCollection* GetListOfHitsMcPtr() { 
-    return *fListOfHitsMcPtr;
-  }
-
   const mu2e::StepPointMCCollection* GetStepPointMCCollection() { 
     return *fSteps;
   }
-
-  // mu2e::SimParticlesWithHits* GetSimParticlesWithHits() { 
-  //   return *fSimParticlesWithHits;
-  // }
 
   const mu2e::GenParticleCollection* GetGenpColl() { return *fGenpColl; }
 //-----------------------------------------------------------------------------
 // modifiers
 //-----------------------------------------------------------------------------
-  void SetListOfHitsMcPtr(const mu2e::PtrStepPointMCVectorCollection** Coll) { 
-    fListOfHitsMcPtr = Coll;
-  }
   void SetStepPointMCCollection(const mu2e::StepPointMCCollection** Coll) { 
     fSteps = Coll;
   }
-  // void SetSimParticlesWithHits(mu2e::SimParticlesWithHits** Map) { 
-  //   fSimParticlesWithHits = Map;
-  // }
-
   void SetGenpColl(const mu2e::GenParticleCollection** Coll) { fGenpColl = Coll; }
 
   void  SetPickMode   (Int_t Mode) { fPickMode    = Mode; }

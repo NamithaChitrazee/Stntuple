@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
 ///////////////////////////////////////////////////////////////////////////////
-#include "RecoDataProducts/inc/KalSeed.hh"
+#include "Offline/RecoDataProducts/inc/KalSeed.hh"
 
 #include "Stntuple/print/TAnaDump.hh"
 #include "Stntuple/print/Stntuple_print_functions.hh"
@@ -12,12 +12,12 @@ void print_kalseed_colls() {
 
   printf("--------------------------- Available mu2e::KalSeedCollection\'s: \n");
 
-  std::vector<art::Handle<mu2e::KalSeedCollection>> vcoll;
-
   const art::Event* event = TAnaDump::Instance()->Event();
 
   art::Selector  selector(art::ProductInstanceNameSelector(""));
-  event->getMany(selector,vcoll);
+
+  // std::vector<art::Handle<mu2e::KalSeedCollection>> vcoll;
+  auto vcoll = event->getMany<mu2e::KalSeedCollection>(selector);
 
   for (auto handle = vcoll.begin(); handle != vcoll.end(); handle++) {
     if (handle->isValid()) {

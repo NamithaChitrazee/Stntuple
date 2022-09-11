@@ -3,7 +3,7 @@
 #include "TRint.h"
 #endif
 // #include "RootUtils/Utils/TCdfRoot.hh"
-#include "mod/TAnaRint.hh"
+#include "Stntuple/mod/TAnaRint.hh"
 
 TAnaRint* TAnaRint::fgInstance = 0;
 TRint*    TAnaRint::fgRint     = 0;

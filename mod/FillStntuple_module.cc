@@ -21,11 +21,41 @@
 #include <Stntuple/obj/TStnDBManager.hh>
 #include <Stntuple/obj/TStnHeaderBlock.hh>
 
-#include "Stntuple/mod/FillStntuple_module.hh"
+#include "Stntuple/mod/StntupleModule.hh"
 
-// ClassImp(FillStntuple)
 namespace mu2e {
 
+class FillStntuple : public StntupleModule {
+//------------------------------------------------------------------------------
+//  data members
+//------------------------------------------------------------------------------
+protected:
+  Int_t             fLastRun;		// last run with events
+//------------------------------------------------------------------------------
+// function members
+//------------------------------------------------------------------------------
+public:
+					// constructors and destructor
+
+  FillStntuple(fhicl::ParameterSet const& PSet);
+
+  ~FillStntuple();
+//-----------------------------------------------------------------------------
+// functions of the module
+//-----------------------------------------------------------------------------
+  int     ProcessNewRun      (int RunNumber);
+//-----------------------------------------------------------------------------
+// overloaded virtual functions of EDFilter
+//-----------------------------------------------------------------------------
+  virtual void beginRun(const art::Run&   r);
+  virtual void endRun  (const art::Run&   r);
+  virtual void analyze (const AbsEvent&   e);
+
+  //  ClassDef(FillStntuple,0)
+};
+
+
+// ClassImp(FillStntuple)
 //------------------------------------------------------------------------------
 // constructors
 //------------------------------------------------------------------------------
@@ -41,7 +71,7 @@ FillStntuple::~FillStntuple() {
 }
 
 //------------------------------------------------------------------------------
-bool FillStntuple::beginRun(art::Run &  aRun) {
+void FillStntuple::beginRun(const art::Run &  aRun) {
 
   THistModule::beforeBeginRun(aRun);
 
@@ -56,22 +86,17 @@ bool FillStntuple::beginRun(art::Run &  aRun) {
   }
 
   THistModule::afterBeginRun(aRun);
-
-  return true;
 }
 
 //------------------------------------------------------------------------------
-bool FillStntuple::endRun(art::Run &  Rn) {
+void FillStntuple::endRun(const art::Run &  Rn) {
 
   THistModule::beforeEndRun(Rn);
   THistModule::afterEndRun (Rn);
-
-  return true;
 }
 
 //------------------------------------------------------------------------------
-Int_t FillStntuple::ProcessNewRun(int RunNumber) 
-{
+  Int_t FillStntuple::ProcessNewRun(int RunNumber)  {
   // create subdirectory with the name run_xxxxxxxx to store database-type
   // constants for this run
 
@@ -110,7 +135,7 @@ Int_t FillStntuple::ProcessNewRun(int RunNumber)
 }
 
 //------------------------------------------------------------------------------
-bool FillStntuple::filter(AbsEvent& anEvent) {
+void FillStntuple::analyze(const AbsEvent& anEvent) {
   // it only fills the tree
 
   TTree* tree;
@@ -130,7 +155,7 @@ bool FillStntuple::filter(AbsEvent& anEvent) {
   unsigned long rtime = (unsigned long)(gSystem->Now());
   while(TStnNode* node = (TStnNode*) it.Next()) {
     TStnDataBlock* block = node->GetDataBlock();
-    rc = block->ResolveLinks(&anEvent,0);
+    rc = block->ResolveLinks((AbsEvent*) &anEvent,0);
     if (rc != 0) {
 					// pass all the messages/warnings
 					// to the error logger
@@ -228,7 +253,6 @@ bool FillStntuple::filter(AbsEvent& anEvent) {
 					// and also redefine branch in the node
       node->SetBranch(output_branch);
 					// store calib consts for the last event
-					// pass run number
       ProcessNewRun(anEvent.run());
     }
 					// close the old file
@@ -247,8 +271,6 @@ bool FillStntuple::filter(AbsEvent& anEvent) {
 
   THistModule::afterEvent(anEvent);
 
-
-  return true;
 }
 
 } // end namespace mu2e

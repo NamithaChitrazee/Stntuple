@@ -8,7 +8,7 @@ BEGIN_PROLOG
   GEN_ID           @protect_ignore: "unknown"  
 END_PROLOG
 
-#include "Stntuple/fcl/stnmaker.fcl"
+#include "Stntuple/fcl/stntuple.fcl"
 
 process_name : S3TgtstopsStn
 

@@ -2,6 +2,7 @@
 // 
 ///////////////////////////////////////////////////////////////////////////////
 #include "TROOT.h"
+#include "TInterpreter.h"
 #include "TMath.h"
 #include "TApplication.h"
 #include "TVirtualX.h"
@@ -26,8 +27,11 @@
 #include "Stntuple/gui/TStnFrame.hh"
 #include "Stntuple/gui/TStnVisManager.hh"
 
+#include "Stntuple/print/Stntuple_print_functions.hh"
 
-ClassImp(TStnVisManager)
+#include <boost/lexical_cast/lexical_cast_old.hpp>
+
+// ClassImp(TStnVisManager)
 
 //-----------------------------------------------------------------------------
 TStnVisManager::TStnVisManager(const char* Name, const char* Title): TVisManager(Name, Title) {
@@ -110,28 +114,28 @@ int TStnVisManager::InitGui(const char* Title) {
 //-----------------------------------------------------------------------------
 // view buttons
 //-----------------------------------------------------------------------------
-  trkrBtnXY = new TGTextButton(fMain, "Tracker XY", TStnView::kXY);
+  trkrBtnXY = new TGTextButton(fMain, "Tracker XY", TStnVisManager::kXY);
   trkrBtnXY->Connect("Clicked()", "TStnVisManager", this, "HandleButtons()");
   trkrBtnXY->SetTextJustify(36);
   trkrBtnXY->SetMargins(0, 0, 0, 0);
   trkrBtnXY->SetWrapLength(-1);
   trkrBtnXY->MoveResize(16, 26, 98, 24);
 
-  trkrBtnRZ = new TGTextButton(fMain, "Tracker RZ", TStnView::kRZ);
+  trkrBtnRZ = new TGTextButton(fMain, "Tracker RZ", TStnVisManager::kRZ);
   trkrBtnRZ->Connect("Clicked()", "TStnVisManager", this, "HandleButtons()");
   trkrBtnRZ->SetTextJustify(36);
   trkrBtnRZ->SetMargins(0, 0, 0, 0);
   trkrBtnRZ->SetWrapLength(-1);
   trkrBtnRZ->MoveResize(16, 58, 98, 24);
 
-  calBtn = new TGTextButton(fMain, "Calorimeter", TStnView::kCal);
+  calBtn = new TGTextButton(fMain, "Calorimeter", TStnVisManager::kCal);
   calBtn->Connect("Clicked()", "TStnVisManager", this, "HandleButtons()");
   calBtn->SetTextJustify(36);
   calBtn->SetMargins(0, 0, 0, 0);
   calBtn->SetWrapLength(-1);
   calBtn->MoveResize(16, 90, 98, 24);
 
-  crvBtn = new TGTextButton(fMain, "CRV", TStnView::kCrv);
+  crvBtn = new TGTextButton(fMain, "CRV", TStnVisManager::kCrv);
   crvBtn->Connect("Clicked()", "TStnVisManager", this, "HandleButtons()");
   crvBtn->SetTextJustify(36);
   crvBtn->SetMargins(0, 0, 0, 0);
@@ -185,6 +189,12 @@ int TStnVisManager::InitGui(const char* Title) {
 }
 
 //-----------------------------------------------------------------------------
+int TStnVisManager::EndRun() {
+  if (fEvent == nullptr) return 1;
+  else                   return 0;
+}
+
+//-----------------------------------------------------------------------------
 int TStnVisManager::InitViews() {
   return 0;
 }
@@ -198,14 +208,32 @@ TCanvas* TStnVisManager::NewCanvas(const char* Name, const char* Title, int Size
 }
 
 //-----------------------------------------------------------------------------
+int TStnVisManager::GetViewID(const char* View) {
+
+  TString view_id = View;
+  view_id.ToLower();
+
+  if      (view_id == "xy" ) return TStnVisManager::kXY;
+  else if (view_id == "rz" ) return TStnVisManager::kRZ;
+  else if (view_id == "tz" ) return TStnVisManager::kTZ;
+  else if (view_id == "cal") return TStnVisManager::kCal;
+  else if (view_id == "crv") return TStnVisManager::kCrv;
+  else if (view_id == "vst") return TStnVisManager::kVST;
+  else {
+    printf("TStnVisManager::%s: ERROR: unknown view type : %s\n",__func__,View);
+    return -1;
+  }
+}
+
+//-----------------------------------------------------------------------------
 void TStnVisManager::OpenView(TStnView* Mother, int Px1, int Py1, int Px2, int Py2) {
   int vtype = Mother->Type();
 
-  if      (vtype == TStnView::kXY ) OpenTrkXYView(Mother,Px1,Py1,Px2,Py2);
-  else if (vtype == TStnView::kRZ ) OpenTrkRZView(Mother,Px1,Py1,Px2,Py2);
-  else if (vtype == TStnView::kTZ ) OpenTrkTZView(Mother,Px1,Py1,Px2,Py2);
-  else if (vtype == TStnView::kCal) OpenCalView  (Mother,Px1,Py1,Px2,Py2);
-  else if (vtype == TStnView::kCrv) OpenCrvView  (Mother,Px1,Py1,Px2,Py2);
+  if      (vtype == TStnVisManager::kXY ) OpenTrkXYView(Mother,Px1,Py1,Px2,Py2);
+  else if (vtype == TStnVisManager::kRZ ) OpenTrkRZView(Mother,Px1,Py1,Px2,Py2);
+  else if (vtype == TStnVisManager::kTZ ) OpenTrkTZView(Mother,Px1,Py1,Px2,Py2);
+  else if (vtype == TStnVisManager::kCal) OpenCalView  (Mother,Px1,Py1,Px2,Py2);
+  else if (vtype == TStnVisManager::kCrv) OpenCrvView  (Mother,Px1,Py1,Px2,Py2);
   else {
     printf("TStnVisManager::OpenView: ERROR: unknown view type : %i\n",vtype);
   }
@@ -222,7 +250,7 @@ Int_t TStnVisManager::OpenTrkXYView() {
   sprintf(name, "xy_view_%i", n);
   sprintf(title, "XY view number %i", n);
 
-  TStnFrame* win = new TStnFrame(name, title, TStnView::kXY, 750+TStnFrame::fGroupFrameWidth, 750);
+  TStnFrame* win = new TStnFrame(name, title, TStnVisManager::kXY, 750+TStnFrame::fGroupFrameWidth, 750);
   TCanvas* c = win->GetCanvas();
   fListOfCanvases->Add(c);
 
@@ -232,7 +260,7 @@ Int_t TStnVisManager::OpenTrkXYView() {
   p1->Range(-1000., -1000., 1000., 1000.);
   p1->cd();
 					// should be the only one
-  TStnView* v = FindView(TStnView::kXY,-1);
+  TStnView* v = FindView(TStnVisManager::kXY,-1);
   v->Draw();
 
   TString name_title(name);
@@ -263,7 +291,7 @@ Int_t TStnVisManager::OpenTrkXYView(TStnView* Mother, Axis_t x1, Axis_t y1, Axis
   xsize = x2-x1;
   ysize = (int) (xsize*abs((y2 - y1)/(x2 - x1)) + 20);
 
-  TStnFrame* win = new TStnFrame(name, title, TStnView::kXY, xsize+TStnFrame::fGroupFrameWidth, ysize);
+  TStnFrame* win = new TStnFrame(name, title, TStnVisManager::kXY, xsize+TStnFrame::fGroupFrameWidth, ysize);
   TCanvas* c = win->GetCanvas();
   fListOfCanvases->Add(c);
 
@@ -297,7 +325,7 @@ Int_t TStnVisManager::OpenTrkRZView() {
   sprintf(name, "rz_view_%i", n);
   sprintf(title, "RZ view number %i", n);
 
-  TStnFrame* win = new TStnFrame(name, title, TStnView::kRZ, 1300+TStnFrame::fGroupFrameWidth, 500);
+  TStnFrame* win = new TStnFrame(name, title, TStnVisManager::kRZ, 1300+TStnFrame::fGroupFrameWidth, 500);
   TCanvas* c = win->GetCanvas();
   fListOfCanvases->Add(c);
 
@@ -310,7 +338,7 @@ Int_t TStnVisManager::OpenTrkRZView() {
 //-----------------------------------------------------------------------------
 // find and draw the view itself
 //-----------------------------------------------------------------------------
-  TStnView* v = FindView(TStnView::kRZ,-1);
+  TStnView* v = FindView(TStnVisManager::kRZ,-1);
   if (v) v->Draw();
 //-----------------------------------------------------------------------------
 // draw title
@@ -345,7 +373,7 @@ Int_t TStnVisManager::OpenTrkRZView(TStnView* Mother, Axis_t x1, Axis_t y1, Axis
   xsize = x2-x1;
   ysize = (Int_t) (xsize*TMath::Abs((y2 - y1) / (x2 - x1)) + 20);
 
-  TStnFrame* win = new TStnFrame(name, title, TStnView::kRZ, xsize+TStnFrame::fGroupFrameWidth, ysize);
+  TStnFrame* win = new TStnFrame(name, title, TStnVisManager::kRZ, xsize+TStnFrame::fGroupFrameWidth, ysize);
   TCanvas* c = win->GetCanvas();
   fListOfCanvases->Add(c);
 
@@ -380,7 +408,7 @@ int TStnVisManager::OpenTrkTZView() {
   sprintf(name,  "zt_view_%i", n);
   sprintf(title, "ZT view number %i", n);
 
-  TStnFrame* win = new TStnFrame(name, title, TStnView::kXY, 1100+TStnFrame::fGroupFrameWidth, 760);
+  TStnFrame* win = new TStnFrame(name, title, TStnVisManager::kXY, 1100+TStnFrame::fGroupFrameWidth, 760);
   TCanvas* c = win->GetCanvas();
   fListOfCanvases->Add(c);
 
@@ -390,7 +418,7 @@ int TStnVisManager::OpenTrkTZView() {
   p1->Range(-1600., 0., 1600., 1800.);
   p1->cd();
 
-  TStnView* v = FindView(TStnView::kTZ,-1);
+  TStnView* v = FindView(TStnVisManager::kTZ,-1);
 
   v->Draw();
 
@@ -422,7 +450,7 @@ int TStnVisManager::OpenTrkTZView(TStnView* Mother, Axis_t x1, Axis_t y1, Axis_t
   xsize = x2-x1;
   ysize = (int) (xsize*abs((y2 - y1)/(x2 - x1)) + 20);
 
-  TStnFrame* win = new TStnFrame(name, title, TStnView::kTZ, xsize+TStnFrame::fGroupFrameWidth, ysize);
+  TStnFrame* win = new TStnFrame(name, title, TStnVisManager::kTZ, xsize+TStnFrame::fGroupFrameWidth, ysize);
   TCanvas* c = win->GetCanvas();
   fListOfCanvases->Add(c);
 
@@ -456,7 +484,7 @@ Int_t TStnVisManager::OpenCalView() {
   sprintf(name, "cal_view_%i", n);
   sprintf(title, "CAL view number %i", n);
 
-  TStnFrame* win = new TStnFrame(name, title, TStnView::kCal, 1150+TStnFrame::fGroupFrameWidth, 600);
+  TStnFrame* win = new TStnFrame(name, title, TStnVisManager::kCal, 1150+TStnFrame::fGroupFrameWidth, 600);
   TCanvas*   c = win->GetCanvas();
   fListOfCanvases->Add(c);
 
@@ -473,7 +501,7 @@ Int_t TStnVisManager::OpenCalView() {
   for (int i=0; i<2; i++) {
     p1->cd(i+1);
     gPad->Range(-800., -800., 800., 800.);
-    TCalView* v = (TCalView*) FindView(TStnView::kCal,i);
+    TCalView* v = (TCalView*) FindView(TStnVisManager::kCal,i);
     if (v) {
       //      v->SetPad(gPad);
       v->Draw();
@@ -552,7 +580,7 @@ Int_t TStnVisManager::OpenCrvView() {
   sprintf(name, "crv_view_%i", n);
   sprintf(title, "CRV view number %i", n);
 
-  TStnFrame* win = new TStnFrame(name, title, TStnView::kCrv, 1700+TStnFrame::fGroupFrameWidth, 600);
+  TStnFrame* win = new TStnFrame(name, title, TStnVisManager::kCrv, 1700+TStnFrame::fGroupFrameWidth, 600);
   TCanvas*   c = win->GetCanvas();
   c->SetFixedAspectRatio(kTRUE);
   fListOfCanvases->Add(c);
@@ -569,7 +597,7 @@ Int_t TStnVisManager::OpenCrvView() {
 
   TCrvView* crv;
 
-  crv = (TCrvView*) FindView(TStnView::kCrv,0);
+  crv = (TCrvView*) FindView(TStnVisManager::kCrv,0);
   crv->SetPad(gPad);
   crv->Draw();
   Tl.DrawText(3000, -6565, "RIGHT");
@@ -579,7 +607,7 @@ Int_t TStnVisManager::OpenCrvView() {
   p1->cd(2);
   gPad->Range(2698., -1420., 18750., -1260.); // Left CRV
   gPad->SetFixedAspectRatio(kTRUE);
-  crv = (TCrvView*) FindView(TStnView::kCrv,1);
+  crv = (TCrvView*) FindView(TStnVisManager::kCrv,1);
   crv->SetPad(gPad);
   crv->Draw();
   Tl.DrawText(3000, -1420, "LEFT");
@@ -589,7 +617,7 @@ Int_t TStnVisManager::OpenCrvView() {
   p1->cd(3);
   gPad->Range(2698., 2560., 18750., 2715.); // Top DS CRV
   gPad->SetFixedAspectRatio(kTRUE);
-  crv = (TCrvView*) FindView(TStnView::kCrv,2);
+  crv = (TCrvView*) FindView(TStnVisManager::kCrv,2);
   crv->SetPad(gPad);
   crv->Draw();
   Tl.DrawText(3000, 2560, "TOP DS");
@@ -615,7 +643,7 @@ Int_t TStnVisManager::OpenCrvView() {
   gPad->Range(-2220., -6570., 2750., -6415.); // Right CRV TS region
   gPad->SetFixedAspectRatio(kTRUE);
   //fCrvView[0]->SetPad(gPad);
-  crv = (TCrvView*) FindView(TStnView::kCrv,0);
+  crv = (TCrvView*) FindView(TStnVisManager::kCrv,0);
   crv->Draw("crv");
   Tl.DrawText(-2150, -6565, "RIGHT");
   gPad->SetEditable(kFALSE);
@@ -624,7 +652,7 @@ Int_t TStnVisManager::OpenCrvView() {
   p1->cd(6);
   gPad->Range(-2220., 2560., 2750., 2715.); // Top TS CRV
   gPad->SetFixedAspectRatio(kTRUE);
-  crv = (TCrvView*) FindView(TStnView::kCrv,5);
+  crv = (TCrvView*) FindView(TStnVisManager::kCrv,5);
   crv->SetPad(gPad);
   crv->Draw();
   Tl.DrawText(-2150, 2560, "TOP TS");
@@ -650,7 +678,7 @@ Int_t TStnVisManager::OpenCrvView() {
   p1->cd(8);
   gPad->Range(-2220., 18695., 2780., 18970.); // Downstream CRV
   gPad->SetFixedAspectRatio(kTRUE);
-  crv = (TCrvView*) FindView(TStnView::kCrv,3);
+  crv = (TCrvView*) FindView(TStnVisManager::kCrv,3);
   crv->SetPad(gPad);
   crv->Draw();
   gPad->SetEditable(kFALSE);
@@ -659,7 +687,7 @@ Int_t TStnVisManager::OpenCrvView() {
   p1->cd(9);
   gPad->Range(-2220., -2415., 2780., -2260.); // Upstream CRV
   gPad->SetFixedAspectRatio(kTRUE);
-  crv = (TCrvView*) FindView(TStnView::kCrv,4);
+  crv = (TCrvView*) FindView(TStnVisManager::kCrv,4);
   crv->SetPad(gPad);
   crv->Draw();
   Tl.DrawText(-2000., -2300., "DWNSTRM");
@@ -713,7 +741,83 @@ int TStnVisManager::OpenCrvView(TStnView* Mother, Axis_t x1, Axis_t y1, Axis_t x
   xsize = 700;
   ysize = (Int_t) (xsize*TMath::Abs((y2 - y1) / (x2 - x1)) + 20);
 
-  TStnFrame* win = new TStnFrame(name, title, TStnView::kCrv, xsize+TStnFrame::fGroupFrameWidth, ysize);
+  TStnFrame* win = new TStnFrame(name, title, TStnVisManager::kCrv, xsize+TStnFrame::fGroupFrameWidth, ysize);
+  TCanvas* c = win->GetCanvas();
+  fListOfCanvases->Add(c);
+
+  TString name1(name);
+  name1 += "_1";
+  TPad* p1 = (TPad*) c->FindObject(name1);
+  p1->Range(x1, y1, x2, y2);
+  p1->cd();
+  Mother->Draw();
+
+  TString name_title(name);
+  name1 += "_title";
+  TPad* title_pad = (TPad*) c->FindObject(name_title);
+  title_pad->cd();
+  fTitleNode->Draw();
+
+  c->Modified();
+  c->Update();
+  return 0;
+}
+
+//-----------------------------------------------------------------------------
+// open new RZ view of the detector with the default options
+//-----------------------------------------------------------------------------
+int TStnVisManager::OpenVSTView() {
+  // open new TZ view of the detector with the default options
+
+  int n = fListOfCanvases->GetSize();
+
+  char name[100], title[100];
+
+  sprintf(name,  "vst_view_%i", n);
+  sprintf(title, "VST view number %i", n);
+
+  TStnFrame* win = new TStnFrame(name, title, TStnVisManager::kVST, 1100+TStnFrame::fGroupFrameWidth, 760);
+  TCanvas* c = win->GetCanvas();
+  fListOfCanvases->Add(c);
+
+  TString name1(name);
+  name1 += "_1";
+  TPad* p1 = (TPad*) c->FindObject(name1);
+  p1->Range(-1600., 0., 1600., 1800.);
+  p1->cd();
+
+  TStnView* v = FindView(TStnVisManager::kVST,-1);
+
+  v->Draw();
+
+  TString name_title(name);
+  name1 += "_title";
+  TPad* title_pad = (TPad*) c->FindObject(name_title);
+  title_pad->cd();
+  if (fTitleNode) fTitleNode->Draw();
+
+  c->Modified();
+  c->Update();
+  return 0;
+}
+
+//-----------------------------------------------------------------------------
+int TStnVisManager::OpenVSTView(TStnView* Mother, Axis_t x1, Axis_t y1, Axis_t x2, Axis_t y2) {
+
+  int n = fListOfCanvases->GetSize();
+  
+  char name[100], title[100];
+  
+  sprintf(name , "vst_view_%i", n);
+  sprintf(title, "VST view number %i", n);
+
+  // try to preserve the aspect ration
+  Int_t   xsize, ysize;
+
+  xsize = 700;
+  ysize = (Int_t) (xsize*TMath::Abs((y2 - y1) / (x2 - x1)) + 20);
+
+  TStnFrame* win = new TStnFrame(name, title, TStnVisManager::kVST, xsize+TStnFrame::fGroupFrameWidth, ysize);
   TCanvas* c = win->GetCanvas();
   fListOfCanvases->Add(c);
 
@@ -778,21 +882,24 @@ void TStnVisManager::HandleButtons() {
   int id = btn->WidgetId();
   
   switch (id) {
-  case TStnView::kXY:
+  case TStnVisManager::kXY:
     OpenTrkXYView();
     break;
-  case TStnView::kRZ:
+  case TStnVisManager::kRZ:
     OpenTrkRZView();
     break;
-  case TStnView::kCal:
+  case TStnVisManager::kCal:
     OpenCalView();
     break;
-  case TStnView::kCrv:
+  case TStnVisManager::kCrv:
     OpenCrvView();
+    break;
+  case TStnVisManager::kVST:
+    OpenVSTView();
     break;
   case UPDATER_BTN:
     for (int i=0; i<6; i++) {
-      TCrvView* v = (TCrvView*) FindView(TStnView::kCrv,i);
+      TCrvView* v = (TCrvView*) FindView(TStnVisManager::kCrv,i);
       v->SetTimeWindow(timeWindowSlider->GetMinPosition(), timeWindowSlider->GetMaxPosition());
     }
     UpdateViews();
@@ -870,3 +977,26 @@ void TStnVisManager::HandleText() {
     break;
   }
 }
+
+//_____________________________________________________________________________
+void TStnVisManager::NextEvent() {
+  printf(" TStnVisManager::NextEvent : next event \n");
+  gROOT->ProcessLine(".q");
+}
+
+//_____________________________________________________________________________
+void TStnVisManager::PrintColls(const char* Tag) {
+  TString tag = Tag;
+  tag.ToLower();
+
+  if      (tag == "sdmc_colls"   ) print_sdmc_colls   ();
+  else if (tag == "kalseed_colls") print_kalseed_colls();
+
+}
+
+//_____________________________________________________________________________
+void TStnVisManager::Quit() {
+  printf(" TStnVisManager::Quit  \n");
+  gROOT->ProcessLine(".qqqq");
+}
+

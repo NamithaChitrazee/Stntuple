@@ -3,109 +3,106 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "Stntuple/mod/InitStntupleDataBlocks.hh"
+#include "Stntuple/mod/InitTrackStrawHitBlock.hh"
 #include "Stntuple/obj/TTrackStrawHitBlock.hh"
+#include "Stntuple/obj/AbsEvent.hh"
 
-#include "RecoDataProducts/inc/StrawHitCollection.hh"
+#include "Offline/RecoDataProducts/inc/StrawHit.hh"
 
-#include "RecoDataProducts/inc/KalRepPtrCollection.hh"
-#include "BTrkData/inc/TrkStrawHit.hh"
+#include "Offline/RecoDataProducts/inc/KalRepPtrCollection.hh"
+#include "Offline/RecoDataProducts/inc/KalSeed.hh"
 
-#include "MCDataProducts/inc/SimParticle.hh"
-#include "MCDataProducts/inc/StrawGasStep.hh"
-#include "MCDataProducts/inc/StrawDigiMCCollection.hh"
+#include "Offline/BTrkData/inc/TrkStrawHit.hh"
 
+#include "Offline/MCDataProducts/inc/SimParticle.hh"
+#include "Offline/MCDataProducts/inc/StrawGasStep.hh"
+#include "Offline/MCDataProducts/inc/StrawDigiMC.hh"
+
+#include "Offline/GeometryService/inc/GeomHandle.hh"
+#include "Offline/TrackerGeom/inc/Tracker.hh"
+
+namespace stntuple {
 //-----------------------------------------------------------------------------
-Int_t StntupleInitMu2eTrackStrawHitBlock(TStnDataBlock* Block, AbsEvent* AnEvent, int Mode) 
-{
-  // initialize COT data block with the `event' data
-  // return -1, if bank doesn't exist, 0, if everything is OK
+int InitTrackStrawHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* _Event, int Mode) {
 
-  int ev_number, rn_number, nhits;
-
-  mu2e::KalRepPtrCollection*               list_of_kreps(0);
-
-  static char   strh_module_label[100], strh_description[100];
-  static char   sdmc_module_label[100], sdmc_description[100];
-  static char   krep_module_label[100], krep_description[100];
-
-  ev_number = AnEvent->event();
-  rn_number = AnEvent->run();
+  int ev_number = _Event->event();
+  int rn_number = _Event->run();
 
   if (Block->Initialized(ev_number,rn_number)) return 0;
+
+  mu2e::GeomHandle<mu2e::Tracker> ttHandle;
+  tracker = ttHandle.get();
 
   TTrackStrawHitBlock* data = (TTrackStrawHitBlock*) Block;
   data->Clear();
 //-----------------------------------------------------------------------------
 //  straw hit information
 //-----------------------------------------------------------------------------
-  data->GetModuleLabel("mu2e::StrawHitCollection",strh_module_label);
-  data->GetDescription("mu2e::StrawHitCollection",strh_description );
+  art::Handle<mu2e::KalSeedCollection>  kscH;
+  const mu2e::KalSeedCollection*        ks_coll(nullptr);
 
-  data->GetModuleLabel("mu2e::KalRepCollection"  ,krep_module_label);
-  data->GetDescription("mu2e::KalRepCollection"  ,krep_description );
-
-  data->GetModuleLabel("mu2e::StrawDigiMCCollection",sdmc_module_label);
-  data->GetDescription("mu2e::StrawDigiMCCollection",sdmc_description );
-
-  art::Handle<mu2e::ComboHitCollection>       strh_handle;
-  const mu2e::ComboHitCollection*             list_of_hits(nullptr);
-
-
-  art::Handle<mu2e::KalRepPtrCollection> krepsHandle;
-  if (krep_module_label[0] != 0) {
-    if (krep_description[0] == 0) AnEvent->getByLabel(krep_module_label,krepsHandle);
-    else                          AnEvent->getByLabel(krep_module_label,krep_description, krepsHandle);
-    if (krepsHandle.isValid())    list_of_kreps = (mu2e::KalRepPtrCollection*) krepsHandle.product();
-  }
+  art::Handle<mu2e::ComboHitCollection> shcH;
+  const mu2e::ComboHitCollection*       sh_coll(nullptr);
 
   art::Handle<mu2e::StrawDigiMCCollection> sdmccH;
-  const mu2e::StrawDigiMCCollection* sdmcc(nullptr);
+  const mu2e::StrawDigiMCCollection*       sdmc_coll(nullptr);
 
-  if (strh_module_label[0] != 0) {
-    if (strh_description[0] == 0) AnEvent->getByLabel(strh_module_label,strh_handle);
-    else                          AnEvent->getByLabel(strh_module_label,strh_description,strh_handle);
-
-    if (strh_handle.isValid()) list_of_hits = strh_handle.product();
-
-    AnEvent->getByLabel(sdmc_module_label,sdmc_description,sdmccH);
-    if (sdmccH.isValid()) sdmcc = sdmccH.product();
+  if (! fStrawHitCollTag.empty() != 0) {
+    bool ok = _Event->getByLabel(fStrawHitCollTag,shcH);
+    if (ok) sh_coll = shcH.product();
+    else {
+      printf(" >>> ERROR in InitTrackStrawHitBlock: no StrawHitColl with tag: %s. BAIL OUT\n",
+	     fStrawHitCollTag.encode().data());
+      return -1;
+    }
   }
 
-  if (list_of_hits == nullptr) {
-    printf(" >>> ERROR in StntupleInitMu2eTrackStrawHitBlock: no list_of_hits. BAIL OUT\n");
-    return -1;
+  if (! fKalSeedCollTag.empty() != 0) {
+    bool ok = _Event->getByLabel(fKalSeedCollTag,kscH);
+    if (ok) ks_coll = kscH.product();
+    else {
+      printf(" >>> ERROR in InitTrackStrawHitBlock: no KalSeedColl with tag: %s. BAIL OUT\n",
+	     fKalSeedCollTag.encode().data());
+      return -1;
+    }
+  }
+
+  if (! fStrawDigiMCCollTag.empty() != 0) {
+    bool ok = _Event->getByLabel(fStrawDigiMCCollTag,sdmccH);
+    if (ok) sdmc_coll = sdmccH.product();
+    else {
+      printf(" >>> ERROR in InitTrackStrawHitBlock: no StrawDigiMCColl with tag: %s. BAIL OUT\n",
+	     fStrawDigiMCCollTag.encode().data());
+      return -1;
+    }
   }
 //-----------------------------------------------------------------------------
-// 
+  int nhits   = sh_coll->size();
+  int ntracks = ks_coll->size();
 //-----------------------------------------------------------------------------
-  const mu2e::StrawGasStep *step(nullptr);
-  const mu2e::SimParticle  *sim(nullptr);
-  const mu2e::Straw        *straw(nullptr);
+  const mu2e::StrawGasStep* step (nullptr);
+  const mu2e::SimParticle*  sim  (nullptr);
+  const mu2e::Straw*        straw(nullptr);
     
-  TTrackStrawHitData*      hit; 
-  data->fNTracks = list_of_kreps->size();
-
-  const KalRep*            krep;
-  const TrkHitVector*      krep_hits; 
+  TTrackStrawHit*      hit; 
 
   int   pdg_id, mother_pdg_id, sim_id, gen_index;
   float mcdoca, mc_mom;
 
+  data->fNTracks = ntracks;
   data->fNTrackHits->Set(data->fNTracks);
   data->fFirst->Set(data->fNTracks);
 
-  const mu2e::ComboHit      *s_hit0(0), *sh(0); 
+  const mu2e::ComboHit* sh(nullptr);
 
   int nhtot = 0;
 
-  if (list_of_hits->size() > 0) {
+  if (nhits > 0) {
 
-    s_hit0 = &list_of_hits->at(0);
-
-    for (int i=0; i<data->fNTracks; i++) {
-      krep      = list_of_kreps->at(i).get();
-      krep_hits = &krep->hitVector();
-      nhits     = krep_hits->size();
+    for (int i=0; i<ntracks; i++) {
+      const mu2e::KalSeed* ks = &ks_coll->at(i);
+      std::vector<mu2e::TrkStrawHitSeed> const* ks_hits = &ks->hits();
+      nhits   = ks_hits->size();
     
       (*data->fNTrackHits)[i] = nhits;
       (*data->fFirst)     [i] = nhtot;
@@ -113,21 +110,17 @@ Int_t StntupleInitMu2eTrackStrawHitBlock(TStnDataBlock* Block, AbsEvent* AnEvent
       nhtot += nhits;
 
       for (int ih=0; ih<nhits; ih++) {
-	const mu2e::TrkStrawHit* tsh = static_cast<const mu2e::TrkStrawHit*> (krep_hits->at(ih));
-	sh    = &tsh->comboHit();
-	straw = &tsh->straw();
-	
-	int loc   = sh-s_hit0;
-      
-	hit  = data->NewHit();
+	const mu2e::TrkStrawHitSeed* tsh = static_cast<const mu2e::TrkStrawHitSeed*> (&ks_hits->at(ih));
+	int ind = tsh->index(); // in the list of straw hits
+	sh      = &sh_coll->at(ind);
 
-	const mu2e::StrawDigiMC* sdmc = &sdmcc->at(loc);
-	if (sdmc->wireEndTime(mu2e::StrawEnd::cal) < sdmc->wireEndTime(mu2e::StrawEnd::hv)) {
-	  step = sdmc->strawGasStep(mu2e::StrawEnd::cal).get();
-	}
-	else {
-	  step = sdmc->strawGasStep(mu2e::StrawEnd::hv ).get();
-	}
+	mu2e::StrawId const& sid = tsh->strawId();
+
+	straw = &tracker->getStraw(sid);
+	hit   = data->NewHit();
+
+	const mu2e::StrawDigiMC* sdmc = &sdmc_coll->at(ind);  // loc
+	step = sdmc->earlyStrawGasStep().get();
 
 	if (step) {
 	  art::Ptr<mu2e::SimParticle> const& simptr = step->simParticle(); 
@@ -168,8 +161,10 @@ Int_t StntupleInitMu2eTrackStrawHitBlock(TStnDataBlock* Block, AbsEvent* AnEvent
 	  mcdoca        = 1.e6;
 	}
       
+	int is_active = tsh->flag().hasAnyProperty(mu2e::StrawHitFlagDetail::active);
+
 	hit->Set(sh->strawId().asUint16(), sh->time(), -1. /*sh->dt()*/, sh->energyDep(),
-		 tsh->isActive(),tsh->ambig(),tsh->driftRadius(),
+		 is_active,tsh->ambig(),tsh->driftRadius(),
 		 pdg_id, mother_pdg_id, gen_index, sim_id, 
 		 mcdoca, mc_mom);
       }
@@ -184,3 +179,4 @@ Int_t StntupleInitMu2eTrackStrawHitBlock(TStnDataBlock* Block, AbsEvent* AnEvent
   return 0;
 }
 
+}

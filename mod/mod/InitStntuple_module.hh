@@ -46,14 +46,14 @@ public:
 //-----------------------------------------------------------------------------
 // overloaded virtual functions of EDFilter
 //-----------------------------------------------------------------------------
-  virtual bool beginRun(art::Run&   r);
-  virtual bool filter  (AbsEvent&   e);
-  virtual bool endRun (art::Run&   r);
+  virtual void beginRun(const art::Run&   r);
+  virtual void analyze (const AbsEvent&   e);
+  virtual void endRun  (const art::Run&   r);
   virtual void beginJob();
   virtual void endJob  ();
 					// ****** functions of the module
 
-  int          ProcessNewRun      (art::Run* ARun);
+  int          ProcessNewRun      (const art::Run* ARun);
   int          InitTriggerTable   ();
   // int       InitRunSummary     ();
 					// ****** setters

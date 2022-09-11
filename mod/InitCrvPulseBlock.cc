@@ -3,9 +3,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "Stntuple/mod/InitCrvPulseBlock.hh"
-#include "RecoDataProducts/inc/CrvRecoPulse.hh"
-#include "RecoDataProducts/inc/CrvCoincidenceCollection.hh"
-#include "RecoDataProducts/inc/CrvCoincidenceCluster.hh"
+#include "Offline/RecoDataProducts/inc/CrvRecoPulse.hh"
+#include "Offline/RecoDataProducts/inc/CrvCoincidence.hh"
+#include "Offline/RecoDataProducts/inc/CrvCoincidenceCluster.hh"
 
 //-----------------------------------------------------------------------------
 // in this case AbsEvent is just not used
@@ -40,8 +40,6 @@ int StntupleInitCrvPulseBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Eve
     }
   }
   
-  //  block->fNPulses = ncrp;
-
   const mu2e::CrvRecoPulse* p0(nullptr);
   if (ncrp > 0) p0 = &crpc->at(0);
 
@@ -79,8 +77,6 @@ int StntupleInitCrvPulseBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Eve
     }
   }
   
-  //  block->fNCoincidences = ncc;
-
   for (int icc=0; icc<ncc; icc++) {
     const mu2e::CrvCoincidence* ralph_cc = &ccc->at(icc);
 

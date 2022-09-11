@@ -2,10 +2,16 @@
 #------------------------------------------------------------------------------
 # BUILD_BASE doesn't replace the SATELLITE_RELEASE, need both
 #------------------------------------------------------------------------------
-base=$MU2E_SATELLITE_RELEASE ; if [ ".$base" == "." ] ; then base=$BUILD_BASE ; fi
+base=$MUSE_WORK_DIR/build
+echo build_config_muse: 1: $0 : PWD=$PWD
 
- pkg=Stntuple
-list_of_subpackages="alg ana base geom gui loop mod obj print val stat"
+pkg=Stntuple
+pkg_dir=$MUSE_WORK_DIR/$pkg
+
+# pkg=Stntuple
+echo build_config_muse: package=$pkg
+
+list_of_subpackages="alg ana base geom gui loop mod obj print val"
 #------------------------------------------------------------------------------
 # Stntuple and its subpackages
 #------------------------------------------------------------------------------
@@ -13,22 +19,25 @@ if [ ! -d $base/include/$pkg ] ; then
     echo pwd=$pwd : creating $base/include/$pkg
     mkdir -p $base/include/$pkg ;
 fi
-
+#------------------------------------------------------------------------------
+# make symbolic links local, as they are 
+#------------------------------------------------------------------------------
 for d in $list_of_subpackages ; do
-    if [[ -e $base/$pkg/$d ]] && [[ ! -e $base/include/$pkg/$d ]] ; then 
-	echo `pwd`/$0 : creating symbolic link $base/include/$pkg/$d
-	ln -s ../../$pkg/$d/$d $base/include/$pkg/$d
+    if [[ -e $base/include/$pkg ]] && [[ ! -e $base/include/$pkg/$d ]] ; then 
+	echo `pwd`/$0 : creating symbolic link to $base/include/$pkg/$d
+	ln -s $pkg_dir/$d/$d $base/include/$pkg/$d
     fi
 done
 #------------------------------------------------------------------------------
+# make sure $WORK_DIR/site_scons directory exists
 # SCons-related things: executed from Stntuple
 # execution in Stntuple
 #------------------------------------------------------------------------------
-if [ ! -d ../site_scons ] ; then mkdir ../site_scons ; fi
-cp -u scripts/site_init.py             ../site_scons/.
-cp -u scripts/stntuple_helper.py       ../site_scons/.
+if [ ! -d $MUSE_WORK_DIR/site_scons ] ; then mkdir $MUSE_WORK_DIR/site_scons ; fi
+cp -u $pkg_dir/scripts/stntuple_site_init.py    $MUSE_WORK_DIR/site_scons/.
+cp -u $pkg_dir/scripts/stntuple_helper.py       $MUSE_WORK_DIR/site_scons/.
 #------------------------------------------------------------------------------
 # .rootrc and rootlogon.C could be modified by the user, copy them just once
 #------------------------------------------------------------------------------
-if [ ! -f ../.rootrc     ] ; then cp scripts/.rootrc     ../. ; fi
-if [ ! -f ../rootlogon.C ] ; then cp scripts/rootlogon.C ../. ; fi
+if [ ! -f $MUSE_WORK_DIR/.rootrc     ] ; then cp $pkg_dir/scripts/.rootrc     $MUSE_WORK_DIR/. ; fi
+if [ ! -f $MUSE_WORK_DIR/rootlogon.C ] ; then cp $pkg_dir/scripts/rootlogon.C $MUSE_WORK_DIR/. ; fi

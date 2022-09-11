@@ -18,47 +18,43 @@
 #include "Stntuple/obj/TStnTrackSeed.hh"
 #include "Stntuple/obj/TStnTrackSeedBlock.hh"
 
+#include "messagefacility/MessageLogger/MessageLogger.h"
+
 #include "art/Framework/Principal/Selector.h"
 #include "art/Framework/Principal/Handle.h"
 
-#include "GeometryService/inc/GeometryService.hh"
-#include "GeometryService/inc/GeomHandle.hh"
-#include "GeometryService/inc/VirtualDetector.hh"
-#include "GeometryService/inc/DetectorSystem.hh"
+#include "Offline/GeometryService/inc/GeometryService.hh"
+#include "Offline/GeometryService/inc/GeomHandle.hh"
+#include "Offline/GeometryService/inc/VirtualDetector.hh"
+#include "Offline/GeometryService/inc/DetectorSystem.hh"
 
-//#include "TrackerConditions/inc/Types.hh"
-#include "TrackerGeom/inc/Tracker.hh"
-#include "CalorimeterGeom/inc/Calorimeter.hh"
-#include "CalorimeterGeom/inc/DiskCalorimeter.hh"
-// #include "CalorimeterGeom/inc/VaneCalorimeter.hh"
+#include "Offline/TrackerGeom/inc/Tracker.hh"
+#include "Offline/CalorimeterGeom/inc/Calorimeter.hh"
+#include "Offline/CalorimeterGeom/inc/DiskCalorimeter.hh"
 
-#include "RecoDataProducts/inc/HelixSeed.hh"
-#include "RecoDataProducts/inc/KalSeed.hh"
-#include "RecoDataProducts/inc/KalRepPtrCollection.hh"
-#include "RecoDataProducts/inc/KalRepCollection.hh"
-#include "BTrkData/inc/TrkStrawHit.hh"
-#include "BTrkData/inc/TrkCaloHit.hh"
-#include "BTrkData/inc/Doublet.hh"
-#include "RecoDataProducts/inc/TrkQual.hh"
-#include "TrkReco/inc/DoubletAmbigResolver.hh"
+#include "Offline/RecoDataProducts/inc/HelixSeed.hh"
+#include "Offline/RecoDataProducts/inc/KalSeed.hh"
 
-#include "RecoDataProducts/inc/TrkCaloIntersectCollection.hh"
-#include "RecoDataProducts/inc/TrackClusterMatch.hh"
+// #include "Offline/RecoDataProducts/inc/KalRepPtrCollection.hh"
+// #include "Offline/RecoDataProducts/inc/KalRepCollection.hh"
 
-#include "MCDataProducts/inc/GenParticleCollection.hh"
-#include "MCDataProducts/inc/SimParticleCollection.hh"
-#include "MCDataProducts/inc/StepPointMCCollection.hh"
-#include "MCDataProducts/inc/StrawDigiMCCollection.hh"
-#include "MCDataProducts/inc/StrawGasStep.hh"
-#include "DataProducts/inc/VirtualDetectorId.hh"
+#include "Offline/BTrkData/inc/TrkStrawHit.hh"
+#include "Offline/BTrkData/inc/TrkCaloHit.hh"
+#include "Offline/BTrkData/inc/Doublet.hh"
 
-#include "RecoDataProducts/inc/StrawDigi.hh"
-#include "RecoDataProducts/inc/StrawHitCollection.hh"
-#include "RecoDataProducts/inc/CaloCrystalHitCollection.hh"
-#include "RecoDataProducts/inc/CaloHitCollection.hh"
-#include "RecoDataProducts/inc/CaloClusterCollection.hh"
-#include "RecoDataProducts/inc/PIDProductCollection.hh"
-#include "RecoDataProducts/inc/AlgorithmIDCollection.hh"
+#include "Offline/RecoDataProducts/inc/TrkCaloIntersect.hh"
+#include "Offline/RecoDataProducts/inc/TrackClusterMatch.hh"
+
+#include "Offline/MCDataProducts/inc/GenParticle.hh"
+#include "Offline/MCDataProducts/inc/SimParticle.hh"
+#include "Offline/MCDataProducts/inc/StrawGasStep.hh"
+#include "Offline/DataProducts/inc/VirtualDetectorId.hh"
+
+#include "Offline/RecoDataProducts/inc/StrawDigi.hh"
+#include "Offline/RecoDataProducts/inc/StrawHit.hh"
+#include "Offline/RecoDataProducts/inc/CaloHit.hh"
+#include "Offline/RecoDataProducts/inc/CaloCluster.hh"
+#include "Offline/RecoDataProducts/inc/AlgorithmID.hh"
 
 					          // BaBar 
 #include "BTrk/ProbTools/ChisqConsistency.hh"
@@ -67,176 +63,138 @@
 #include "BTrk/TrkBase/TrkPoca.hh"
 #include "BTrk/KalmanTrack/KalHit.hh"
 
+#include "Stntuple/mod/InitTrackBlock.hh"
 #include "Stntuple/mod/THistModule.hh"
 #include "Stntuple/base/TNamedHandle.hh"
-
-#include "TrkDiag/inc/KalDiag.hh"
-
-namespace {
-
-  struct ZMap_t {
-    int    fMap[44][6][2];		// 44 means "by plane"
-    double fZ  [88];
-  };
 
 //-----------------------------------------------------------------------------
 // Map[iplane][ipanel][il]: index of the layer in Z-ordered sequence
 //-----------------------------------------------------------------------------
-  void InitTrackerZMap(const mu2e::Tracker* Tracker, ZMap_t* Map) {
-    int      ix, loc;
-    double   z0, z1;
+void StntupleInitTrackBlock::InitTrackerZMap(const mu2e::Tracker* Tracker, ZMap_t* Map) {
+  int      ix, loc;
+  double   z0, z1;
 
-    int nplanes = Tracker->nPlanes();
+  int nplanes = Tracker->nPlanes();
 
-    for (int ipl=0; ipl<nplanes; ipl++) {
-      for (int isec=0; isec<6; isec++) {
-	ix  = isec % 2;
-	loc = 2*ipl+ix;
-	Map->fMap[ipl][isec][0] = loc;
-	Map->fMap[ipl][isec][1] = loc;
-      }
-					// form the list of Z-coordinates
-      const mu2e::Straw *s0, *s1;
-
-      s0 = &Tracker->getPlane(ipl).getPanel(0).getStraw(0);
-      s1 = &Tracker->getPlane(ipl).getPanel(0).getStraw(1);
-      z0 = s0->getMidPoint().z();
-      z1 = s1->getMidPoint().z();
-
-      Map->fZ[2*ipl] = (z0+z1)/2.;
-
-      s0 = &Tracker->getPlane(ipl).getPanel(1).getStraw(0);
-      s1 = &Tracker->getPlane(ipl).getPanel(1).getStraw(1);
-      z0 = s0->getMidPoint().z();
-      z1 = s1->getMidPoint().z();
-
-      Map->fZ[2*ipl+1] = (z0+z1)/2.;
+  for (int ipl=0; ipl<nplanes; ipl++) {
+    for (int isec=0; isec<6; isec++) {
+      ix  = isec % 2;
+      loc = 2*ipl+ix;
+      Map->fMap[ipl][isec][0] = loc;
+      Map->fMap[ipl][isec][1] = loc;
     }
+    // form the list of Z-coordinates
+    const mu2e::Straw *s0, *s1;
+
+    s0 = &Tracker->getPlane(ipl).getPanel(0).getStraw(0);
+    s1 = &Tracker->getPlane(ipl).getPanel(0).getStraw(1);
+    z0 = s0->getMidPoint().z();
+    z1 = s1->getMidPoint().z();
+
+    Map->fZ[2*ipl] = (z0+z1)/2.;
+
+    s0 = &Tracker->getPlane(ipl).getPanel(1).getStraw(0);
+    s1 = &Tracker->getPlane(ipl).getPanel(1).getStraw(1);
+    z0 = s0->getMidPoint().z();
+    z1 = s1->getMidPoint().z();
+
+    Map->fZ[2*ipl+1] = (z0+z1)/2.;
   }
+}
 
 //-----------------------------------------------------------------------------
 // for a given Z find closest Z-layer, returns 'Plane'
 // 'Offset' is a 'face number' within the Plane
 //-----------------------------------------------------------------------------
-  void get_station(const mu2e::Tracker* Tracker, ZMap_t* Map, double Z, int* Plane, int* Offset) {
+void StntupleInitTrackBlock::get_station(const mu2e::Tracker* Tracker, ZMap_t* Map, double Z, int* Plane, int* Offset) {
 
-    double dz, dz_min(1.e10);
-    int    iface(-1);
-					// looks that Device == Plane 
-    int nplanes = Tracker->nPlanes();
-					// a plane has 2 "faces", 2 layers in each
-    int nfaces  = 2*nplanes;
+  double dz, dz_min(1.e10);
+  int    iface(-1);
+  // looks that Device == Plane 
+  int nplanes = Tracker->nPlanes();
+  // a plane has 2 "faces", 2 layers in each
+  int nfaces  = 2*nplanes;
 
-    for (int i=0; i<nfaces; i++) {
-      dz = Map->fZ[i]-Z;
-      if (fabs(dz) < dz_min) {
-	iface  = i;
-	dz_min = fabs(dz);
-      }
+  for (int i=0; i<nfaces; i++) {
+    dz = Map->fZ[i]-Z;
+    if (fabs(dz) < dz_min) {
+      iface  = i;
+      dz_min = fabs(dz);
     }
-
-    *Plane   = iface / 2;
-    *Offset  = iface % 2;
   }
 
+  *Plane   = iface / 2;
+  *Offset  = iface % 2;
+}
 
 //-----------------------------------------------------------------------------
 // extrapolate track to a given Z
 //-----------------------------------------------------------------------------
-  double s_at_given_z(const KalRep* Krep, double Z) {
+double StntupleInitTrackBlock::s_at_given_z(const mu2e::KalSeed* KSeed, double Z) {
 
-    double  ds(10.), s0, s1, s2, z0, z1, z2, dzds, sz, sz1, z01;
+  printf("ERROR in StntupleInitTrackBlock:::s_at_given_z : REIMPLEMENT! \n");
+  return -1;
 
-    // s1     = Krep->firstHit()->kalHit()->hit()->fltLen();
-    // s2     = Krep->lastHit ()->kalHit()->hit()->fltLen();
+  // double  ds(10.), s0, s1, s2, z0, z1, z2, dzds, sz, sz1, z01;
 
-    const TrkHitVector* hots = &Krep->hitVector();
-    int nh = hots->size();
+  // // s1     = Krep->firstHit()->kalHit()->hit()->fltLen();
+  // // s2     = Krep->lastHit ()->kalHit()->hit()->fltLen();
 
-    const TrkHit *first(nullptr), *last(nullptr);
+  // const TrkHitVector* hots = &Krep->hitVector();
+  // int nh = hots->size();
 
-    for (int ih=0; ih<nh; ++ih) {
-      const TrkHit* hit = hots->at(ih);
-      if (hit  != nullptr) {
-	if (first == nullptr) first = hit;
-	last = hit;
-      }
-    }
+  // const TrkHit *first(nullptr), *last(nullptr);
 
-    s1 = first->fltLen();
-    s2 = last ->fltLen();
+  // for (int ih=0; ih<nh; ++ih) {
+  //   const TrkHit* hit = hots->at(ih);
+  //   if (hit  != nullptr) {
+  //     if (first == nullptr) first = hit;
+  //     last = hit;
+  //   }
+  // }
 
-    z1     = Krep->position(s1).z();
-    z2     = Krep->position(s2).z();
+  // s1 = first->fltLen();
+  // s2 = last ->fltLen();
 
-    dzds   = (z2-z1)/(s2-s1);
+  // z1     = Krep->position(s1).z();
+  // z2     = Krep->position(s2).z();
+
+  // dzds   = (z2-z1)/(s2-s1);
+  // //-----------------------------------------------------------------------------
+  // // iterate once, choose the closest point
+  // //-----------------------------------------------------------------------------
+  // if (fabs(Z-z1) > fabs(Z-z2)) {
+  //   z0 = z2;
+  //   s0 = s2;
+  // }
+  // else {
+  //   z0 = z1;
+  //   s0 = s1;
+  // }
+
+  // sz    = s0+(Z-z0)/dzds;
+
+  // z0     = Krep->position(sz).z();     // z0 has to be close to Z(TT_FrontPA)
+  // z01    = Krep->position(sz+ds).z();
+
+  // dzds   = (z01-z0)/ds;
+  // sz1    = sz+(Z-z0)/dzds;	          // should be good enough
+
+  // return sz1;
+}
+
+
 //-----------------------------------------------------------------------------
-// iterate once, choose the closest point
-//-----------------------------------------------------------------------------
-    if (fabs(Z-z1) > fabs(Z-z2)) {
-      z0 = z2;
-      s0 = s2;
-    }
-    else {
-      z0 = z1;
-      s0 = s1;
-    }
-
-    sz    = s0+(Z-z0)/dzds;
-
-    z0     = Krep->position(sz).z();     // z0 has to be close to Z(TT_FrontPA)
-    z01    = Krep->position(sz+ds).z();
-
-    dzds   = (z01-z0)/ds;
-    sz1    = sz+(Z-z0)/dzds;	          // should be good enough
-
-    return sz1;
-  }
-
-};
-
-
-//-----------------------------------------------------------------------------
-Int_t StntupleInitMu2eTrackBlock  (TStnDataBlock* Block, AbsEvent* AnEvent, Int_t Mode) {
+int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent, Int_t Mode) {
   const char*               oname = {"InitMu2eTrackBlock"};
 //-----------------------------------------------------------------------------
 // cached pointers, owned by the StntupleMaker_module
 //-----------------------------------------------------------------------------
   static int                          initialized(0);
-  static mu2e::DoubletAmbigResolver* _dar;
-  static mu2e::KalDiag*              _kalDiag;
   
   int                       ntrk(0), ev_number, rn_number;
   TStnTrack*                track;
   TStnTrackBlock            *data(0);   
-
-  static  ZMap_t            zmap;
-
-  const mu2e::Tracker*     tracker;
-
-  mu2e::AlgorithmIDCollection*             list_of_algs               (0);
-  const mu2e::KalRepPtrCollection*         list_of_kreps              (0);
-  const mu2e::TrkQualCollection*           list_of_trkqual            (0);
-  const mu2e::StrawDigiMCCollection*       list_of_mc_straw_hits      (0);
-  const mu2e::ComboHitCollection*          list_of_combo_hits         (0);
-  const mu2e::TrkCaloIntersectCollection*  list_of_extrapolated_tracks(0);
-  const mu2e::PIDProductCollection*        list_of_pidp               (0);
-
-  char   algs_module_label[100], algs_description[100];
-  char   krep_module_label[100], krep_description[100];
-  char   trex_module_label[100], trex_description[100];
-  char   trcl_module_label[100], trcl_description[100];
-
-  char   trkq_coll_tag[100];
-
-  char   cmbh_module_label[100], cmbh_description[100];
-  char   sdmc_module_label[100], sdmc_description[100];
-  //  char   stmc_module_label[100], stmc_description[100];
-  char   calo_module_label[100], calo_description[100];
-  char   pidp_module_label[100], pidp_description[100];
-  char   spmc_module_label[100], spmc_description[100];
-
-  char   module_name      [100], dar_name        [100], kaldiag_name[100];
 
   ev_number = AnEvent->event();
   rn_number = AnEvent->run();
@@ -253,108 +211,48 @@ Int_t StntupleInitMu2eTrackBlock  (TStnDataBlock* Block, AbsEvent* AnEvent, Int_
     initialized = 1;
 
     InitTrackerZMap(tracker,&zmap);
-
-    data->GetModuleLabel("DarHandle",module_name);
-    data->GetDescription("DarHandle",dar_name   );
-
-    THistModule*  m;
-    TNamedHandle* nh;
-
-    m    = static_cast<THistModule*>  (THistModule::GetListOfModules()->FindObject(module_name));
-    nh   = static_cast<TNamedHandle*> (m->GetFolder()->FindObject(dar_name));
-    _dar = static_cast<mu2e::DoubletAmbigResolver*> (nh->Object());
-
-    data->GetModuleLabel("KalDiagHandle",module_name );
-    data->GetDescription("KalDiagHandle",kaldiag_name);
-
-    m        = static_cast<THistModule*>  (THistModule::GetListOfModules()->FindObject(module_name));
-    nh       = static_cast<TNamedHandle*> (m->GetFolder()->FindObject(kaldiag_name));
-    _kalDiag = static_cast<mu2e::KalDiag*> (nh->Object());
   }
 
-  data->GetModuleLabel("mu2e::AlgorithmIDCollection",algs_module_label);
-  data->GetDescription("mu2e::AlgorithmIDCollection",algs_description );
-
-  data->GetModuleLabel("mu2e::KalRepCollection",krep_module_label);
-  data->GetDescription("mu2e::KalRepCollection",krep_description );
-
-  data->GetModuleLabel("mu2e::TrkCaloIntersectCollection",trex_module_label);
-  data->GetDescription("mu2e::TrkCaloIntersectCollection",trex_description );
-
-  data->GetModuleLabel("mu2e::TrackClusterMatchCollection",trcl_module_label);
-  data->GetDescription("mu2e::TrackClusterMatchCollection",trcl_description );
-
-  data->GetModuleLabel("mu2e::ComboHitCollection",cmbh_module_label);
-  data->GetDescription("mu2e::ComboHitCollection",cmbh_description );
-  
-  data->GetModuleLabel("mu2e::StrawDigiMCCollection",sdmc_module_label);
-  data->GetDescription("mu2e::StrawDigiMCCollection",sdmc_description );
-
-  data->GetModuleLabel("mu2e::CaloClusterCollection",calo_module_label);
-  data->GetDescription("mu2e::CaloClusterCollection",calo_description );
-
-  data->GetModuleLabel("mu2e::PIDProductCollection",pidp_module_label);
-  data->GetDescription("mu2e::PIDProductCollection",pidp_description );
-
-  data->GetModuleLabel("mu2e::StepPointMCCollection",spmc_module_label);
-  data->GetDescription("mu2e::StepPointMCCollection",spmc_description );
-
-  data->GetModuleLabel("mu2e::TrkQualCollection",trkq_coll_tag);
-
+  list_of_algs = 0;
   art::Handle<mu2e::AlgorithmIDCollection> algsHandle;
-  strcpy(algs_module_label, krep_module_label);
-  strcpy(algs_description , krep_description);
-  if (algs_module_label[0] != 0) {
-    if (algs_description[0] == 0) AnEvent->getByLabel(algs_module_label,algsHandle);
-    else                          AnEvent->getByLabel(algs_module_label,algs_description, algsHandle);
-    if (algsHandle.isValid()) list_of_algs = (mu2e::AlgorithmIDCollection*) algsHandle.product();
+  AnEvent->getByLabel(fAlgorithmIDCollTag, algsHandle);
+  if (algsHandle.isValid()) list_of_algs = (mu2e::AlgorithmIDCollection*) algsHandle.product();
+
+  list_of_kreps = 0;
+  art::Handle<mu2e::KalSeedCollection> krepsHandle;
+  AnEvent->getByLabel(fKalSeedCollTag,krepsHandle);
+  if (krepsHandle.isValid())    { 
+    list_of_kreps = krepsHandle.product();
+    ntrk          = list_of_kreps->size();
   }
 
-  art::Handle<mu2e::KalRepPtrCollection> krepsHandle;
-  if (krep_module_label[0] != 0) {
-    AnEvent->getByLabel(krep_module_label,krepsHandle);
-    if (krepsHandle.isValid())    { 
-      list_of_kreps = krepsHandle.product();
-      ntrk          = list_of_kreps->size();
-    }
-  }
-
+  list_of_trk_qual = 0;
   art::Handle<mu2e::TrkQualCollection> trkQualHandle;
-  if (trkq_coll_tag[0] != 0) {
-    AnEvent->getByLabel(trkq_coll_tag,trkQualHandle);
-    if (trkQualHandle.isValid()) list_of_trkqual = trkQualHandle.product();
-  }
+  AnEvent->getByLabel(fTrkQualCollTag,trkQualHandle);
+  if (trkQualHandle.isValid()) list_of_trk_qual = trkQualHandle.product();
 
+  list_of_combo_hits = 0;
   art::Handle<mu2e::ComboHitCollection> shHandle;
-  if (cmbh_module_label[0] != 0) {
-    if (cmbh_description[0] == 0) AnEvent->getByLabel(cmbh_module_label,shHandle);
-    else                          AnEvent->getByLabel(cmbh_module_label,cmbh_description,shHandle);
-    if (shHandle.isValid()) list_of_combo_hits = shHandle.product();
-  }
+  AnEvent->getByLabel(fComboHitCollTag,shHandle);
+  if (shHandle.isValid()) list_of_combo_hits = shHandle.product();
 
+  list_of_mc_straw_hits = 0;
   art::Handle<mu2e::StrawDigiMCCollection> sdmcHandle;
-  if (sdmc_module_label[0] != 0) {
-    AnEvent->getByLabel(sdmc_module_label,sdmcHandle);
-    if (sdmcHandle.isValid()) list_of_mc_straw_hits = sdmcHandle.product();
-  }
+  AnEvent->getByLabel(fStrawDigiMCCollTag,sdmcHandle);
+  if (sdmcHandle.isValid()) list_of_mc_straw_hits = sdmcHandle.product();
 
+  list_of_extrapolated_tracks = 0;
   art::Handle<mu2e::TrkCaloIntersectCollection>  texHandle;
-  if (trex_module_label[0] != 0) {
-    AnEvent->getByLabel(trex_module_label,texHandle);
-    if (texHandle.isValid()) list_of_extrapolated_tracks = texHandle.product();
-  }
+  AnEvent->getByLabel(fTciCollTag,texHandle);
+  if (texHandle.isValid()) list_of_extrapolated_tracks = texHandle.product();
 
   art::Handle<mu2e::TrackClusterMatchCollection>  tcmH;
-  if (trcl_module_label[0] != 0) {
-    if (trcl_description[0] == 0) AnEvent->getByLabel(trcl_module_label,tcmH);
-    else                          AnEvent->getByLabel(trcl_module_label,trcl_description,tcmH);
-  }
-
+  AnEvent->getByLabel(fTcmCollTag,tcmH);
+  
+  list_of_pidp = 0;
   art::Handle<mu2e::PIDProductCollection>  pidpHandle;
-  if (pidp_module_label[0] != 0) {
-    AnEvent->getByLabel(pidp_module_label,pidp_description,pidpHandle);
-    if (pidpHandle.isValid()) list_of_pidp = pidpHandle.product();
-  }
+  AnEvent->getByLabel(fPIDProductCollTag,pidpHandle);
+  if (pidpHandle.isValid()) list_of_pidp = pidpHandle.product();
 
   art::ServiceHandle<mu2e::GeometryService>   geom;
   mu2e::GeomHandle<mu2e::DetectorSystem>      ds;
@@ -372,9 +270,9 @@ Int_t StntupleInitMu2eTrackBlock  (TStnDataBlock* Block, AbsEvent* AnEvent, Int_
 
   for (int itrk=0; itrk<ntrk; itrk++) {
     track          = data->NewTrack();
-    art::Handle<mu2e::KalRepCollection> handle;
-    art::Ptr<KalRep> const& ptr = list_of_kreps->at(itrk);
-    AnEvent->get(ptr.id(), handle);
+    // art::Handle<mu2e::KalSeedCollection> handle;
+    const mu2e::KalSeed* krep = &list_of_kreps->at(itrk);
+    // AnEvent->get(ptr.id(), handle);
 //-----------------------------------------------------------------------------
 // track-only-based particle ID, initialization ahs already happened in the constructor
 //-----------------------------------------------------------------------------
@@ -386,8 +284,8 @@ Int_t StntupleInitMu2eTrackBlock  (TStnDataBlock* Block, AbsEvent* AnEvent, Int_
       track->fRSlopeErr    = pidp->GetResidualsSlopeError();
     }
 
-    const KalRep* krep = ptr.get();
-    track->fKalRep[0] = (KalRep*) krep;
+    // const KalRep* krep = ptr.get();
+    track->fKalRep[0] = (mu2e::KalSeed*) krep;
     mask = (0x0001 << 16) | 0x0000;
 
     if (list_of_algs) {
@@ -400,30 +298,54 @@ Int_t StntupleInitMu2eTrackBlock  (TStnDataBlock* Block, AbsEvent* AnEvent, Int_
 // in all cases define momentum at lowest Z - ideally, at the tracker entrance
 // 'entlen' - trajectory length, corresponding to the first point in Z (?) 
 //-----------------------------------------------------------------------------
-    double  h1_fltlen(1.e6), hn_fltlen(1.e6), entlen;
-    const TrkHit *first(nullptr), *last(nullptr);
+    double  h1_fltlen(1.e6), hn_fltlen(1.e6), sent, sexit;
+    const mu2e::TrkStrawHitSeed *first(nullptr), *last(nullptr);
 
-    const TrkHitVector* hots = &krep->hitVector();
-    int nh = hots->size();
+    const std::vector<mu2e::TrkStrawHitSeed>* hots = &krep->hits();
+    int n_krep_hits = hots->size();
 
     // const TrkHit* first = krep->firstHit()->kalHit()->hit();
     // const TrkHit* last  = krep->lastHit ()->kalHit()->hit();
 
-    for (int ih=0; ih<nh; ++ih) {
-      const TrkHit* hit =  hots->at(ih);
-      if (hit   != nullptr) {
+    for (int ih=0; ih<n_krep_hits; ++ih) {
+      const mu2e::TrkStrawHitSeed* hit =  &hots->at(ih);
+      if ((hit != nullptr) and (hit->flag().hasAnyProperty(mu2e::StrawHitFlagDetail::active))) {
 	if (first == nullptr) first = hit;
 	last = hit;
       }
     }
 
-    if (first) h1_fltlen = first->fltLen();
-    if (last ) hn_fltlen = last->fltLen();
+    if (first) h1_fltlen = first->trkLen();
+    if (last ) hn_fltlen = last->trkLen();
 
-    entlen         = std::min(h1_fltlen,hn_fltlen);
+    sent        = std::min(h1_fltlen,hn_fltlen);
+    sexit       = std::max(h1_fltlen,hn_fltlen);
+//-----------------------------------------------------------------------------
+// find segments corresponding to entry and exit points
+//-----------------------------------------------------------------------------
+    const mu2e::KalSegment *kseg(nullptr), *kseg_exit(nullptr);
 
-    CLHEP::Hep3Vector fitmom = krep->momentum(entlen);
-    HepPoint   pos           = krep->position(entlen);
+    double min_ds1(1.e6), min_ds2(1.e6);
+
+    for(auto const& ks : krep->segments() ) {
+      double smin = ks.timeToFlt(ks.tmin());
+      double smax = ks.timeToFlt(ks.tmax());
+
+      double ds1 = fabs(sent-(smin+smax)/2);
+      if (ds1 < min_ds1) {
+	kseg    = &ks;
+	min_ds1 = ds1;
+      }
+
+      double ds2 = fabs(sexit-(smin+smax)/2);
+      if (ds2 < min_ds2) {
+	kseg_exit = &ks;
+	min_ds2   = ds2;
+      }
+    }
+
+    KinKal::VEC3 fitmom = kseg->momentum3();
+    KinKal::VEC3 pos    = kseg->position3();
 
     track->fX1 = pos.x();
     track->fY1 = pos.y();
@@ -437,115 +359,101 @@ Int_t StntupleInitMu2eTrackBlock  (TStnDataBlock* Block, AbsEvent* AnEvent, Int_
 // track parameters in the first point
 //-----------------------------------------------------------------------------
     track->Momentum()->SetXYZM(px,py,pz,0.511);
-    track->fP         = fitmom.mag();
+    track->fP         = kseg->mom();
     track->fPt        = track->Momentum()->Pt();
-    track->fChi2      = krep->chisq();
-    track->fFitCons   = krep->chisqConsistency().consistency();
+    track->fChi2      = krep->chisquared();
+    track->fFitCons   = krep->fitConsistency();
     track->fT0        = krep->t0().t0();
     track->fT0Err     = krep->t0().t0Err();
 //-----------------------------------------------------------------------------
 // momentum error in the first point
 //-----------------------------------------------------------------------------
-    CLHEP::Hep3Vector momdir = fitmom.unit();
-    BbrVectorErr      momerr = krep->momentumErr(entlen);
+//    ROOT::Math::XYZVector  momdir = fitmom.unit();
     
-    CLHEP::HepVector momvec(3);
-    for (int i=0; i<3; i++) momvec[i] = momdir[i];
-
-    track->fFitMomErr = sqrt(momerr.covMatrix().similarity(momvec));
+    track->fFitMomErr = kseg->momerr();
 //-----------------------------------------------------------------------------
 // determine, approximately, 'sz0' - flight length corresponding to the 
 // virtual detector at the tracker front
 //-----------------------------------------------------------------------------
-    Hep3Vector tfront = ds->toDetector(vdet->getGlobal(mu2e::VirtualDetectorId::TT_FrontPA));
-    double     zfront = tfront.z();
-    double     sz0    = s_at_given_z(krep,zfront);
+    // Hep3Vector tfront = ds->toDetector(vdet->getGlobal(mu2e::VirtualDetectorId::TT_FrontPA));
+    // double     zfront = tfront.z();
+    // double     sz0    = s_at_given_z(krep,zfront);
 //-----------------------------------------------------------------------------
-// fP0 - track momentum value at Z(TT_FrontPA)
+// fP0 : track momentum value at Z(TT_FrontPA) - the same as in the first point
+// fP2 : track momentum at Z(TT_Back), just for fun, should not be used for anything
 //-----------------------------------------------------------------------------
-    CLHEP::Hep3Vector fitmom2 = krep->momentum(sz0);
-    track->fP0 = fitmom2.mag();
+    track->fP0        = track->fP; // can reuse , if needed
+    track->fP2        = kseg_exit->mom();
 //-----------------------------------------------------------------------------
 // helical parameters at Z(TT_FrontPA)
 //-----------------------------------------------------------------------------
-    HelixParams helx  = krep->helix(sz0);
+    KinKal::CentralHelix helx  = kseg->centralHelix();
     track->fC0        = helx.omega(); // old
     track->fD0        = helx.d0();
     track->fZ0        = helx.z0();
     track->fPhi0      = helx.phi0();
     track->fTanDip    = helx.tanDip(); // old
-
-    track->fCharge    = krep->charge();
+    track->fCharge    = helx.charge();
 //-----------------------------------------------------------------------------
 // virtual detector at the tracker exit: Time at Z(TT_Back)
 //-----------------------------------------------------------------------------
-    Hep3Vector vd_tt_back = ds->toDetector(vdet->getGlobal(mu2e::VirtualDetectorId::TT_Back));
-    double     zback      = vd_tt_back.z();
-    double     szb        = s_at_given_z(krep,zback);
-    double     tback      = krep->arrivalTime(szb);
+//    Hep3Vector vd_tt_back = ds->toDetector(vdet->getGlobal(mu2e::VirtualDetectorId::TT_Back));
+    // double     zback      = vd_tt_back.z();
+    // double     szb        = s_at_given_z(krep,zback);
+
+    double     tback      = -1; // FIXME krep->arrivalTime(szb);
 					// rename later
     track->fTBack         = tback;
 //-----------------------------------------------------------------------------
-// fP2 : track momentum at Z(TT_Back), just for fun, should not be used for anything
+// the total number of planes is 36, use 40 for simplicity
 //-----------------------------------------------------------------------------
-    track->fP2 = krep->momentum(szb).mag();
-//-----------------------------------------------------------------------------
-    const mu2e::TrkStrawHit  *hit, *closest_hit(NULL);
-    const TrkHitVector*       krep_hits = &krep->hitVector();
+    const mu2e::TrkStrawHitSeed  *hit; // , *closest_hit(NULL);
+
+    //const TrkHitVector*       krep_hits = &krep->hitVector();
     
     for (int j=0; j<40; j++) {
       track->fNHPerStation[j] = 0;
     }
     
-    int     loc, nhits, n_straw_hits, found, ntrkhits(0), nhitsambig0(0); // , pdg_code;
+    int     loc, n_straw_hits, found, ntrkhits(0), nhitsambig0(0); // , pdg_code;
     int     ipart;
     int     id(-1),  npart(0), part_nh[100], part_id[100];
     int     part_pdg_code[100]; 
     int     nwrong = 0;
     double  mcdoca;
 
-    const mu2e::ComboHit      *s_hit0(nullptr);
-    const mu2e::ComboHit      *s_hit (nullptr); 
     const mu2e::SimParticle   *sim   (nullptr); 
     const mu2e::StrawGasStep  *stgs  (nullptr);
-    const mu2e::Straw         *straw (nullptr);
 
     n_straw_hits = list_of_combo_hits->size();
 
     if (n_straw_hits <= 0) {
-      printf(">>> ERROR in StntupleInitMu2eTrackBlock: ComboHitCollection by module %s is empty, NHITS = %i\n",
-	     cmbh_module_label,n_straw_hits);
+      printf(">>> ERROR in StntupleInitMu2eTrackBlock: ComboHitCollection by module XXXX is empty, NHITS = %i\n",
+	     n_straw_hits);
     }
     else {
-      s_hit0 = &list_of_combo_hits->at(0);
-
-      for (auto it=krep_hits->begin(); it!=krep_hits->end(); it++) {
+      for (int it=0; it<n_krep_hits; it++) {
+	hit = &hots->at(it);
+	mu2e::StrawId sid = hit->strawId();
+	const mu2e::Straw* straw = &tracker->straw(sid);
 	++ntrkhits;
-	hit   = dynamic_cast<const mu2e::TrkStrawHit*> (*it);
 //-----------------------------------------------------------------------------
 // skip calorimeter hit
 //-----------------------------------------------------------------------------
 	if (! hit) continue;
-	straw = &hit->straw();
 //-----------------------------------------------------------------------------
 // the rest makes sense only for active hits
+// all KalSeed hits are "active", figuring out non-active ones 
+// now requires comparing the outputs of a seed fit and a full fit
 //-----------------------------------------------------------------------------
-	if (hit->isActive()) {
-	  s_hit = &hit->comboHit();
-	  loc   = s_hit-s_hit0;
+	if (1) { // hit->isActive()) { // all KalSeed hits are active 
+	  loc   = hit->index();
 	  if ((loc >= 0) && (loc < n_straw_hits)) {
 	    if ((list_of_mc_straw_hits != NULL) && (list_of_mc_straw_hits->size() > 0)) {
 
 	      const mu2e::StrawDigiMC* mcdigi = &list_of_mc_straw_hits->at(loc);
 
-	      //	      printf("StntupleInitTrackBlock : no StrawDigiMC::stepPointMC any more. Ask Dave Brown.\n");
-
-	      if (mcdigi->wireEndTime(mu2e::StrawEnd::cal) < mcdigi->wireEndTime(mu2e::StrawEnd::hv)) {
-		stgs = mcdigi->strawGasStep(mu2e::StrawEnd::cal).get();
-	      }
-	      else {
-		stgs = mcdigi->strawGasStep(mu2e::StrawEnd::hv ).get();
-	      }
+	      stgs = mcdigi->earlyStrawGasStep().get();
 //-----------------------------------------------------------------------------
 // count number of active hits with R > 200 um and misassigned drift signs
 //-----------------------------------------------------------------------------
@@ -618,19 +526,20 @@ Int_t StntupleInitMu2eTrackBlock  (TStnDataBlock* Block, AbsEvent* AnEvent, Int_
 //-----------------------------------------------------------------------------
 // Dave's variables calculated by KalDiag
 //-----------------------------------------------------------------------------
-    _kalDiag->kalDiag(krep,false);
+    // printf("InitTrackBlock: ERROR: kalDiag is gone, FIXIT\n");
+    // _kalDiag->kalDiag(krep,false);
 //-----------------------------------------------------------------------------
 // total number of hits associated with the trackand the number of bend sites
 //-----------------------------------------------------------------------------
-    track->fNHits     = ntrkhits | (_kalDiag->_trkinfo._nbend << 16);
-    track->fNMatSites = _kalDiag->_trkinfo._nmat | (_kalDiag->_trkinfo._nmatactive << 16);
+    track->fNHits     = ntrkhits; // ntrkhits | (_kalDiag->_trkinfo._nbend << 16);
+    track->fNMatSites = 0; // _kalDiag->_trkinfo._nmat | (_kalDiag->_trkinfo._nmatactive << 16);
 
-    if (list_of_trkqual) track->fTrkQual = list_of_trkqual->at(itrk).MVAOutput();//_kalDiag->_trkinfo._trkqual;
-    else                 track->fTrkQual = -1.e6;
+    if (list_of_trk_qual) track->fTrkQual = list_of_trk_qual->at(itrk).MVAOutput();
+    else                  track->fTrkQual = -1.e6;
 //-----------------------------------------------------------------------------
 // defined bit-packed fNActive word
 //-----------------------------------------------------------------------------
-    track->fNActive   = krep->nActive() | (nwrong << 16);
+    track->fNActive   = krep->hits().size() | (nwrong << 16);
     
     mu2e::Doublet*                     d;
     mu2e::DoubletAmbigResolver::Data_t r;
@@ -638,7 +547,7 @@ Int_t StntupleInitMu2eTrackBlock  (TStnDataBlock* Block, AbsEvent* AnEvent, Int_
     int   nd, nd_tot(0), nd_os(0), nd_ss(0), ns;
     vector<mu2e::Doublet> list_of_doublets;
 
-    _dar->findDoublets(krep,&list_of_doublets);
+    //    _dar->findDoublets(krep,&list_of_doublets);
 
     nd = list_of_doublets.size();
 //-----------------------------------------------------------------------------
@@ -669,11 +578,11 @@ Int_t StntupleInitMu2eTrackBlock  (TStnDataBlock* Block, AbsEvent* AnEvent, Int_
       }
     }
 
-  track->fNDoublets = nd_os | (nd_ss << 8) | (nhitsambig0 << 16) | (nad << 24);
+    track->fNDoublets = nd_os | (nd_ss << 8) | (nhitsambig0 << 16) | (nad << 24);
 //-----------------------------------------------------------------------------
 // given track parameters, build the expected hit mask
 //-----------------------------------------------------------------------------
-  double z, closest_z(-1.e6), dz, zw, dz_min, s, s0;
+    double z, zw, dz, dz_min; //  s0, closest_z(-1.e6), s;
     int    iplane, offset;
     int    nz(88);
 
@@ -681,29 +590,31 @@ Int_t StntupleInitMu2eTrackBlock  (TStnDataBlock* Block, AbsEvent* AnEvent, Int_
       z = zmap.fZ[iz];
 					// find the track hit closest to that Z
       dz_min = 1.e10;
-      for(auto it=krep_hits->begin(); it!=krep_hits->end(); it++) {
+      for (auto it : *hots) {
 
-	hit = dynamic_cast<const mu2e::TrkStrawHit*> (*it);
+	hit = &it;
 	if (! hit) continue;
 
-	s_hit = &hit->comboHit();
-	loc   = s_hit-s_hit0;
-	zw    = hit->straw().getMidPoint().z();
+	// s_hit = &hit->comboHit();
+	loc   = hit->index(); // s_hit-s_hit0;
+	mu2e::StrawId sid = hit->strawId();
+	const mu2e::Straw* straw = &tracker->straw(sid);
+	zw    = straw->getMidPoint().z();
 	dz    = z-zw;
 
 	if (fabs(dz) < dz_min) {
 	  dz_min      = fabs(dz);
-	  closest_hit = hit;
-	  closest_z   = zw;
+	  // closest_hit = hit;
+	  // closest_z   = zw;
 	}
       }
 //-----------------------------------------------------------------------------
 // found closest hit and the extrapolation length, then extrapolate track
 //-----------------------------------------------------------------------------
-      s0  = closest_hit->fltLen();
-      s   = (z-track->fZ0)/(closest_z-track->fZ0)*s0;
+      // s0  = closest_hit->trkLen();
+      //      s   = (z-track->fZ0)/(closest_z-track->fZ0)*s0;
 
-      HepPoint    pz    = krep->position(s);
+      HepPoint    pz(0.,0.,0.); // FIXME      = krep->position(s);
 
       get_station(tracker,&zmap,z,&iplane,&offset);
 
@@ -753,18 +664,18 @@ Int_t StntupleInitMu2eTrackBlock  (TStnDataBlock* Block, AbsEvent* AnEvent, Int_
 // identify track with the particle which produced most hits
 //-----------------------------------------------------------------------------
     ipart = 0;
-    nhits = part_nh[0];
+    int nh0 = part_nh[0];
 
     for (int ip=1; ip<npart; ip++) {
-      if (part_nh[ip] > nhits) {
-	nhits = part_nh[ip];
+      if (part_nh[ip] > nh0) {
+	nh0 = part_nh[ip];
 	ipart = ip;
       }
     }
 
     track->fPdgCode     = part_pdg_code[ipart];
     track->fPartID      = part_id      [ipart];
-    track->fNGoodMcHits = nhits;
+    track->fNGoodMcHits = nh0;
 //-----------------------------------------------------------------------------
 // particle parameters at virtual detectors
 //-----------------------------------------------------------------------------
@@ -776,11 +687,14 @@ Int_t StntupleInitMu2eTrackBlock  (TStnDataBlock* Block, AbsEvent* AnEvent, Int_
     track->fPStOut = -1.;
 
     if (vdg->nDet() > 0) {
+//-----------------------------------------------------------------------------
+// no more step point MC's in the tracker - straw gas steps there
+//-----------------------------------------------------------------------------
       art::Handle<mu2e::StepPointMCCollection> vdhits;
-      AnEvent->getByLabel(spmc_module_label,spmc_description,vdhits);
+      AnEvent->getByLabel(fSpmcCollTag,vdhits);
       if (!vdhits.isValid()) {
 	char warning[500];
-	snprintf(warning,500,"WARNING: StepPointMCCollection %s:virtualdetector not found\n",spmc_module_label);
+	snprintf(warning,500,"WARNING: StepPointMCCollection %s:virtualdetector not found\n",fSpmcCollTag.encode().data());
 	mf::LogWarning(oname) << warning;
       }
       else {
@@ -864,119 +778,119 @@ Int_t StntupleInitMu2eTrackBlock  (TStnDataBlock* Block, AbsEvent* AnEvent, Int_
 //-----------------------------------------------------------------------------
 // consider half-ready case when can't use the extrapolator yet; turn it off softly
 //-----------------------------------------------------------------------------
-    const mu2e::TrkCaloIntersect*  extrk;
+//    const mu2e::TrkCaloIntersect*  extrk;
     //    const KalRep *                 krep;
     CLHEP::Hep3Vector                     x1, x2;
     HepPoint                       extr_point;
     CLHEP::Hep3Vector                     extr_mom;
-    int                            iv, next;
-    TStnTrack::InterData_t*        vint;
+    // int                            iv, next;
+    // TStnTrack::InterData_t*        vint;
 
-    if (list_of_extrapolated_tracks != NULL) next = list_of_extrapolated_tracks->size();
-    else                                     next = 0;
+    // if (list_of_extrapolated_tracks != NULL) next = list_of_extrapolated_tracks->size();
+    // else                                     next = 0;
   
-    for (int iext=0; iext<next; iext++) {
-      extrk = &list_of_extrapolated_tracks->at(iext);
-      krep  = extrk->trk().get();
-      if (krep == track->fKalRep[0]) {
-	if (track->fExtrk == 0) {
-	  track->fExtrk = (const mu2e::TrkToCaloExtrapol*) extrk;
-	}
-	if (bc) { 
-//-----------------------------------------------------------------------------
-// store coordinates of the best intersection in a plane
-//-----------------------------------------------------------------------------
-	  iv   = extrk->diskId();
-	  vint = &(track->fDisk[iv]);
+//     for (int iext=0; iext<next; iext++) {
+//       extrk = &list_of_extrapolated_tracks->at(iext);
+//       krep  = extrk->trk().get();
+//       if (krep == track->fKalRep[0]) {
+// 	if (track->fExtrk == 0) {
+// 	  track->fExtrk = (const mu2e::TrkToCaloExtrapol*) extrk;
+// 	}
+// 	if (bc) { 
+// //-----------------------------------------------------------------------------
+// // store coordinates of the best intersection in a plane
+// //-----------------------------------------------------------------------------
+// 	  iv   = extrk->diskId();
+// 	  vint = &(track->fDisk[iv]);
 
-	  if (vint->fID == -1) {
-	    vint->fID        = iv;
-	    vint->fExtrk     = (const mu2e::TrkToCaloExtrapol*) extrk;
-	    vint->fChi2Match = 1.e6;
-	  }
-	  else {
-	    printf("Run:Event: %i:%i %s : ADDITIONAL EXTR POINT for track %i on vane = %i\n", 
-		   rn_number,ev_number,oname,itrk,iv);
-	  }
-	}
-      }
-    }
+// 	  if (vint->fID == -1) {
+// 	    vint->fID        = iv;
+// 	    vint->fExtrk     = (const mu2e::TrkToCaloExtrapol*) extrk;
+// 	    vint->fChi2Match = 1.e6;
+// 	  }
+// 	  else {
+// 	    printf("Run:Event: %i:%i %s : ADDITIONAL EXTR POINT for track %i on vane = %i\n", 
+// 		   rn_number,ev_number,oname,itrk,iv);
+// 	  }
+// 	}
+//       }
+//    }
 //-----------------------------------------------------------------------------
 // now loop over track-cluster matches and find the right ones to associate 
 // with the track
 //-----------------------------------------------------------------------------
-    unsigned int nm (0);
+//    unsigned int nm (0);
 
-    const mu2e::TrackClusterMatchCollection* tcmcoll;
+    // const mu2e::TrackClusterMatchCollection* tcmcoll;
 
-    if (tcmH.isValid()) {
-      tcmcoll = tcmH.product();
-      nm      = tcmcoll->size();
-    }
+    // if (tcmH.isValid()) {
+    //   tcmcoll = tcmH.product();
+    //   nm      = tcmcoll->size();
+    // }
 
-    const mu2e::TrackClusterMatch* tcm;
+    // const mu2e::TrackClusterMatch* tcm;
 
-    double best_chi2_match(1.e6);
+    // double best_chi2_match(1.e6);
 
-    for (size_t im=0; im<nm; im++) {
-      tcm   = &tcmcoll->at(im);
-      extrk = tcm->textrapol();
-      krep  = extrk->trk().get();
-      if (krep == track->fKalRep[0]) {
-	const mu2e::CaloCluster* cl = tcm->caloCluster();
-	iv   = cl->diskId();
-	vint = &track->fDisk[iv];
-	if (bc == 0) {
-	  printf(">>> ERROR: %s VANE calorimeter is not defined \n",oname);
-	  continue;
-	}
-
-	x1   = bc->geomUtil().mu2eToDisk(iv,cl->cog3Vector());//toSectionFrame(iv,cl->cog3Vector());
-
-	if ((track->fClosestCaloCluster == NULL) || (tcm->chi2() < best_chi2_match )) {
-//-----------------------------------------------------------------------------
-// if closest cluster has not been defined or the energy of the new one is higher
-// depending on the calorimeter geometry choice either DX or DZ is meaningful
-//-----------------------------------------------------------------------------
-	  track->fClosestCaloCluster = cl;
-	  track->fExtrk              = (const mu2e::TrkToCaloExtrapol*) extrk;
-	  best_chi2_match            = tcm->chi2();
-	}
-
-	vint->fXTrk  = tcm->xtrk();
-	vint->fYTrk  = tcm->ytrk();
-	vint->fZTrk  = tcm->ztrk();
-	vint->fTime  = tcm->ttrk();
-	
-	vint->fNxTrk = tcm->nx();
-	vint->fNyTrk = tcm->ny();
-	vint->fNzTrk = tcm->nz();
-
-	if (vint->fCluster == 0) {
-	  vint->fCluster      = cl;
-	  vint->fClusterIndex = tcm->icl();
-	  vint->fEnergy       = cl->energyDep();
-	  vint->fXCl          = x1.x();
-	  vint->fYCl          = x1.y();
-	  vint->fZCl          = x1.z();
-	  vint->fDt           = tcm->dt();
-	  vint->fDx           = tcm->dx();
-	  vint->fDy           = tcm->dy();
-	  vint->fDz           = tcm->dz();
-	  vint->fDu           = tcm->du();
-	  vint->fDv           = tcm->dv();
-	  vint->fChi2Match    = tcm->chi2();
-	  vint->fChi2Time     = tcm->chi2_time();
-	  vint->fIntDepth     = tcm->int_depth();
-	  vint->fPath         = tcm->ds();
-	  vint->fDr           = tcm->dr();
-	  vint->fSInt         = tcm->sint();
-	}
-	else {
-	  printf("%s : ADDITIONAL MATCH for track %i on vane = %i\n", oname,itrk,iv);
-	}
-      }
-    }
+//    for (size_t im=0; im<nm; im++) {
+//      tcm   = &tcmcoll->at(im);
+//      extrk = tcm->textrapol();
+//      krep  = extrk->trk().get();
+//      if (krep == track->fKalRep[0]) {
+//	const mu2e::CaloCluster* cl = tcm->caloCluster();
+//	iv   = cl->diskID();
+//	vint = &track->fDisk[iv];
+//	if (bc == 0) {
+//	  printf(">>> InitTrackBlock ERROR: %s calorimeter is not defined \n",oname);
+//	  continue;
+//	}
+//
+//	x1   = bc->geomUtil().mu2eToDisk(iv,cl->cog3Vector());
+//
+//	if ((track->fClosestCaloCluster == NULL) || (tcm->chi2() < best_chi2_match )) {
+////-----------------------------------------------------------------------------
+//// if closest cluster has not been defined or the energy of the new one is higher
+//// depending on the calorimeter geometry choice either DX or DZ is meaningful
+////-----------------------------------------------------------------------------
+//	  track->fClosestCaloCluster = cl;
+//	  track->fExtrk              = (const mu2e::TrkToCaloExtrapol*) extrk;
+//	  best_chi2_match            = tcm->chi2();
+//	}
+//
+//	vint->fXTrk  = tcm->xtrk();
+//	vint->fYTrk  = tcm->ytrk();
+//	vint->fZTrk  = tcm->ztrk();
+//	vint->fTime  = tcm->ttrk();
+//	
+//	vint->fNxTrk = tcm->nx();
+//	vint->fNyTrk = tcm->ny();
+//	vint->fNzTrk = tcm->nz();
+//
+//	if (vint->fCluster == 0) {
+//	  vint->fCluster      = cl;
+//	  vint->fClusterIndex = tcm->icl();
+//	  vint->fEnergy       = cl->energyDep();
+//	  vint->fXCl          = x1.x();
+//	  vint->fYCl          = x1.y();
+//	  vint->fZCl          = x1.z();
+//	  vint->fDt           = tcm->dt();
+//	  vint->fDx           = tcm->dx();
+//	  vint->fDy           = tcm->dy();
+//	  vint->fDz           = tcm->dz();
+//	  vint->fDu           = tcm->du();
+//	  vint->fDv           = tcm->dv();
+//	  vint->fChi2Match    = tcm->chi2();
+//	  vint->fChi2Time     = tcm->chi2_time();
+//	  vint->fIntDepth     = tcm->int_depth();
+//	  vint->fPath         = tcm->ds();
+//	  vint->fDr           = tcm->dr();
+//	  vint->fSInt         = tcm->sint();
+//	}
+//	else {
+//	  printf("%s : ADDITIONAL MATCH for track %i on vane = %i\n", oname,itrk,iv);
+//	}
+//      }
+//    }
 //-----------------------------------------------------------------------------
 // find intersections to use for electron ID, 
 // in this version both VMinS and VMaxEp are the same
@@ -1036,57 +950,60 @@ Int_t StntupleInitMu2eTrackBlock  (TStnDataBlock* Block, AbsEvent* AnEvent, Int_
     }
 
     track->fEp = track->fClusterE/track->fP2;
-      
-    //--------------------------------------------------------------------------------
-    // now set the parameters associated with the TrkCaloHit
-    //--------------------------------------------------------------------------------
-    const mu2e::TrkCaloHit*    tch;
-    TStnTrack::InterData_t*    vtch;
+//--------------------------------------------------------------------------------
+// now set the parameters associated with the TrkCaloHit
+//--------------------------------------------------------------------------------
+    const mu2e::TrkCaloHitSeed*  tch;
+    TStnTrack::InterData_t*      vtch;
 
-    for (auto it=krep_hits->begin(); it!=krep_hits->end(); it++) {
-      tch   = dynamic_cast<const mu2e::TrkCaloHit*> (*it);
-      //-----------------------------------------------------------------------------
-      // skip TrkStrawHit hit
-      //-----------------------------------------------------------------------------
-      if (! tch) continue;
+    tch = &krep->caloHit();
+    // for (auto it : hots) {
+    //   tch   = itdynamic_cast<const mu2e::TrkCaloHit*> (*it);
+    //-----------------------------------------------------------------------------
+    // skip TrkStrawHit hit
+    //-----------------------------------------------------------------------------
+    if (tch) { 
       vtch = &(track->fTrkCaloHit);
-      const mu2e::CaloCluster*cl = &(tch->caloCluster());
-      XYZVec cpos = Geom::toXYZVec(bc->geomUtil().mu2eToTracker(bc->geomUtil().diskFFToMu2e( cl->diskId(), cl->cog3Vector())));
+      const mu2e::CaloCluster* cl = tch->caloCluster().get();
+      
+      if (cl) {
+	CLHEP::Hep3Vector cpos = bc->geomUtil().mu2eToTracker(bc->geomUtil().diskFFToMu2e( cl->diskID(), cl->cog3Vector()));
     
-      CLHEP::Hep3Vector pos;
-      tch->hitPosition(pos);
-
-      vtch->fID           = cl->diskId();		// 
-      vtch->fClusterIndex = -1;         // cluster index in the list of clusters
+	CLHEP::Hep3Vector pos;
+	// tch->hitPosition(pos);
+      
+	vtch->fID           = cl->diskID();		// 
+	vtch->fClusterIndex = -1;         // cluster index in the list of clusters
 
       // the following includes the (Calibrated) light-propagation time delay.  It should eventually be put in the reconstruction FIXME!
       // This velocity should come from conditions FIXME!
 
-      vtch->fTime         = tch->hitT0().t0();          // extrapolated track time, not corrected by _dtOffset
-      vtch->fEnergy       = cl->energyDep();            // cluster energy
-      vtch->fXTrk         = pos.x();
-      vtch->fYTrk         = pos.y();
-      vtch->fZTrk         = pos.z();
-      // vtch->fNxTrk        = -9999.;		// track direction cosines in the intersection point
-      // vtch->fNyTrk        = -9999.;
-      // vtch->fNzTrk        = -9999.;
-      vtch->fXCl          = cpos.x();			// cluster coordinates
-      vtch->fYCl          = cpos.y();
-      vtch->fZCl          = cpos.z();
-      vtch->fDx           = vtch->fXTrk - vtch->fXCl;	// TRK-CL
-      vtch->fDy           = vtch->fYTrk - vtch->fYCl;	// TRK-CL
-      vtch->fDz           = vtch->fZTrk - vtch->fZCl;	// TRK-CL
-      vtch->fDt           = tch->hitT0().t0() - tch->time();
-      // vtch->fDu           = -9999.;			// ** added in V6
-      // vtch->fDv           = -9999.;			// ** added in V6
-      // vtch->fChi2Match    = -9999.;		// track-cluster match chi&^2 (coord)
-      // vtch->fChi2Time     = -9999.;		// track-cluster match chi&^2 (time)
-      vtch->fPath         = tch->hitLen();			// track path in the disk
-      vtch->fIntDepth     = -9999.;                     // ** added in V6 :assumed interaction depth
-      vtch->fDr           = tch->poca().doca();         // distance of closest approach
-      // vtch->fSInt         = -9999.;                 // ** added in V10: interaction length, calculated
-      vtch->fCluster      = cl;
-      //    vtch->fExtrk        = NULL;
+	vtch->fTime         = tch->t0().t0();          // extrapolated track time, not corrected by _dtOffset
+	vtch->fEnergy       = cl->energyDep();            // cluster energy
+	vtch->fXTrk         = pos.x();
+	vtch->fYTrk         = pos.y();
+	vtch->fZTrk         = pos.z();
+	// vtch->fNxTrk        = -9999.;		// track direction cosines in the intersection point
+	// vtch->fNyTrk        = -9999.;
+	// vtch->fNzTrk        = -9999.;
+	vtch->fXCl          = cpos.x();			// cluster coordinates
+	vtch->fYCl          = cpos.y();
+	vtch->fZCl          = cpos.z();
+	vtch->fDx           = vtch->fXTrk - vtch->fXCl;	// TRK-CL
+	vtch->fDy           = vtch->fYTrk - vtch->fYCl;	// TRK-CL
+	vtch->fDz           = vtch->fZTrk - vtch->fZCl;	// TRK-CL
+	vtch->fDt           = tch->t0().t0() - tch->time();
+	// vtch->fDu           = -9999.;			// ** added in V6
+	// vtch->fDv           = -9999.;			// ** added in V6
+	// vtch->fChi2Match    = -9999.;		// track-cluster match chi&^2 (coord)
+	// vtch->fChi2Time     = -9999.;		// track-cluster match chi&^2 (time)
+	vtch->fPath         = tch->hitLen();			// track path in the disk
+	vtch->fIntDepth     = -9999.;                     // ** added in V6 :assumed interaction depth
+	vtch->fDr           = tch->clusterAxisDOCA(); // tch->poca().doca();         // distance of closest approach
+	// vtch->fSInt         = -9999.;                 // ** added in V10: interaction length, calculated
+	vtch->fCluster      = cl;
+	//    vtch->fExtrk        = NULL;
+      }
     }
   }
 					// on return set event and run numbers
@@ -1100,7 +1017,7 @@ Int_t StntupleInitMu2eTrackBlock  (TStnDataBlock* Block, AbsEvent* AnEvent, Int_
 //-----------------------------------------------------------------------------
 // 2015-04-02: this routine is not finished yet
 //-----------------------------------------------------------------------------
-Int_t StntupleInitMu2eTrackBlockLinks(TStnDataBlock* Block, AbsEvent* AnEvent, int Mode) 
+Int_t StntupleInitTrackBlock::ResolveLinks(TStnDataBlock* Block, AbsEvent* AnEvent, int Mode) 
 {
   // Mu2e version, do nothing
 

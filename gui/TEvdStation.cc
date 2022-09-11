@@ -18,8 +18,8 @@
 #include "art/Framework/Principal/Event.h"
 #include "art/Framework/Principal/Handle.h"
 
-#include "GeometryService/inc/GeometryService.hh"
-#include "GeometryService/inc/GeomHandle.hh"
+#include "Offline/GeometryService/inc/GeometryService.hh"
+#include "Offline/GeometryService/inc/GeomHandle.hh"
 
 #include "Stntuple/gui/TEvdPlane.hh"
 #include "Stntuple/gui/TEvdStation.hh"
@@ -50,7 +50,7 @@ TEvdStation::TEvdStation(int ID, const mu2e::Tracker* Tracker): TObject() {
     id = 2*ID+i;
     const mu2e::Plane* plane = &Tracker->getPlane(id);
 
-    evd_plane = new TEvdPlane(id,plane,this);
+    evd_plane = new TEvdPlane(id,plane,this,Tracker);
 
     fListOfPlanes->Add(evd_plane);
   }
@@ -70,8 +70,8 @@ void TEvdStation::Paint(Option_t* option) {
 
   int view = TVisManager::Instance()->GetCurrentView()->Type();
 
-  if      (view == TStnView::kXY) PaintXY (option);
-  else if (view == TStnView::kRZ) PaintRZ (option);
+  if      (view == TStnVisManager::kXY) PaintXY (option);
+  else if (view == TStnVisManager::kRZ) PaintRZ (option);
   else {
     // what is the default?
     //    Warning("Paint",Form("Unknown option %s",option));

@@ -14,14 +14,11 @@
 
 #ifndef __CINT__
 
-//#include "CalorimeterGeom/inc/CaloSection.hh"
-#include "RecoDataProducts/inc/CaloCluster.hh"
-#include "RecoDataProducts/inc/CaloClusterCollection.hh"
-#include "RecoDataProducts/inc/CaloCrystalHitCollection.hh"
-#include "RecoDataProducts/inc/TimeCluster.hh"
-#include "CalorimeterGeom/inc/Disk.hh"
-#include "CalorimeterGeom/inc/DiskCalorimeter.hh"
-
+#include "Offline/RecoDataProducts/inc/CaloCluster.hh"
+#include "Offline/RecoDataProducts/inc/CaloHit.hh"
+#include "Offline/RecoDataProducts/inc/TimeCluster.hh"
+#include "Offline/CalorimeterGeom/inc/Disk.hh"
+#include "Offline/CalorimeterGeom/inc/DiskCalorimeter.hh"
 
 #else
 
@@ -50,7 +47,7 @@ protected:
   //  TObjArray**    fListOfClusters;
 
   const mu2e::CaloClusterCollection**     fListOfClusters;
-  const mu2e::CaloCrystalHitCollection**  fListOfCrystalHits;
+  const mu2e::CaloHitCollection**         fListOfCrystalHits;
 
   const mu2e::TimeClusterCollection**     fTimeClusterColl;  //
 
@@ -106,7 +103,7 @@ public:
     fListOfClusters  = List; 
   }
 
-  void  SetListOfCrystalHits(const mu2e::CaloCrystalHitCollection** List) { 
+  void  SetListOfCrystalHits(const mu2e::CaloHitCollection** List) { 
     fListOfCrystalHits  = List; 
   }
 

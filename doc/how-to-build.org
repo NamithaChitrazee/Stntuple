@@ -1,5 +1,26 @@
-# 
-* _Building Stntuple libraries in a full test release_                       
+#+startup:fold
+* _Building Stntuple libraries under muse_                                   
+
+- assume $MUSE_WORK_DIR is the working directory
+- start from building in debug mode 
+- To save space on /mu2e/app, it might make sense to redirect $MUSE_WORK_DIR/build 
+  to /mu2e/data/users/...)
+
+#+begin_src  
+git clone https://www.github.com/Mu2e/Stntuple.git 
+cd Stntuple
+git checkout muse
+cd ..
+muse -v setup -q debug            # setup muse in debug mode
+#+end_src 
+
+- run muse to build libraries :
+
+#+begin_src
+muse build [-j 2]  # for example..
+#+end_src
+
+* _Building Stntuple libraries in a full test release_ (su2020)              
 
 - check out Mu2e Offline into dev directory
 

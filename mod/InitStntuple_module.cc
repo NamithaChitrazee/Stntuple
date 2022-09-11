@@ -139,7 +139,7 @@ int InitStntuple::InitTriggerTable() {
 }
 
 //------------------------------------------------------------------------------
-Int_t InitStntuple::ProcessNewRun(art::Run* ARun) {
+Int_t InitStntuple::ProcessNewRun(const art::Run* ARun) {
 
   // InitRunSummary     ();
   InitTriggerTable   ();
@@ -151,7 +151,7 @@ Int_t InitStntuple::ProcessNewRun(art::Run* ARun) {
 }
 
 //------------------------------------------------------------------------------
-bool InitStntuple::beginRun(art::Run&  aRun) {
+void InitStntuple::beginRun(const art::Run&  aRun) {
   // fetch calibration constants for a new run
 
   THistModule::beforeBeginRun(aRun);
@@ -165,12 +165,10 @@ bool InitStntuple::beginRun(art::Run&  aRun) {
   }
 
   THistModule::afterBeginRun(aRun);
-
-  return 1;
 }
 
 //------------------------------------------------------------------------------
-bool InitStntuple::filter(AbsEvent& AnEvent) {
+void InitStntuple::analyze(const AbsEvent& AnEvent) {
   // event entry point: initialize all the registered data blocks with the event 
   // data
   // it is assumed that the tree itself is filled in FillStntupleModule
@@ -197,7 +195,7 @@ bool InitStntuple::filter(AbsEvent& AnEvent) {
 // initialization
 //-----------------------------------------------------------------------------
   unsigned long etime = (unsigned long)(gSystem->Now());
-  Event()->Init(&AnEvent,0);
+  Event()->Init((AbsEvent*) &AnEvent,0);
   etime = (unsigned long)(gSystem->Now()) - etime;
 
   //compute avg inst lum
@@ -224,15 +222,12 @@ bool InitStntuple::filter(AbsEvent& AnEvent) {
 // 		     this,"LogError(const char*)");
 
   THistModule::afterEvent(AnEvent);
-
-  return 1;
 }
 
 //------------------------------------------------------------------------------
-bool InitStntuple::endRun(art::Run& ARun) {
+void InitStntuple::endRun(const art::Run& ARun) {
   THistModule::beforeEndRun(ARun);
   THistModule::afterEndRun (ARun);
-  return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -252,6 +247,5 @@ void InitStntuple::endJob() {
 }
 
 } //end namespace mu2e
-using mu2e::InitStntuple;
 
-DEFINE_ART_MODULE(InitStntuple);
+DEFINE_ART_MODULE(mu2e::InitStntuple);

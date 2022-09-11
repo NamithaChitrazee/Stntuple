@@ -11,21 +11,21 @@
 #include "art/Framework/Principal/Event.h"
 #include "art/Framework/Principal/Handle.h"
 
-#include "GeometryService/inc/GeometryService.hh"
-#include "GeometryService/inc/GeomHandle.hh"
+#include "Offline/GeometryService/inc/GeometryService.hh"
+#include "Offline/GeometryService/inc/GeomHandle.hh"
 
 #include "Stntuple/gui/TCrvVisNode.hh"
 #include "Stntuple/gui/TStnVisManager.hh"
 #include "Stntuple/gui/TEvdCrvBar.hh"
 
-#include "CosmicRayShieldGeom/inc/CosmicRayShield.hh"
-#include "CosmicRayShieldGeom/inc/CRSScintillatorShield.hh"
-#include "CosmicRayShieldGeom/inc/CRSScintillatorModule.hh"
-#include "CosmicRayShieldGeom/inc/CRSScintillatorLayer.hh"
-#include "CosmicRayShieldGeom/inc/CRSScintillatorBar.hh"
-#include "DataProducts/inc/CRSScintillatorBarIndex.hh"
+#include "Offline/CosmicRayShieldGeom/inc/CosmicRayShield.hh"
+#include "Offline/CosmicRayShieldGeom/inc/CRSScintillatorShield.hh"
+#include "Offline/CosmicRayShieldGeom/inc/CRSScintillatorModule.hh"
+#include "Offline/CosmicRayShieldGeom/inc/CRSScintillatorLayer.hh"
+#include "Offline/CosmicRayShieldGeom/inc/CRSScintillatorBar.hh"
+#include "Offline/DataProducts/inc/CRSScintillatorBarIndex.hh"
 
-#include "RecoDataProducts/inc/CrvRecoPulseCollection.hh"
+#include "Offline/RecoDataProducts/inc/CrvRecoPulse.hh"
 
 
 ClassImp(TCrvVisNode)
@@ -254,7 +254,7 @@ int TCrvVisNode::InitEvent() {
       //   } // Loop over SiPMs
     }
   }
-  printf("Finished TCrvVisNode::InitEvent() for section %i \n", fSectionID);
+  //  printf("Finished TCrvVisNode::InitEvent() for section %i \n", fSectionID);
   
   return 0;
 }

@@ -14,11 +14,11 @@
 #include "Stntuple/base/TStnShape.hh"
 
 #ifndef __CINT__
-#include "CalorimeterGeom/inc/Crystal.hh"
-#include "RecoDataProducts/inc/CaloCluster.hh"
-#include "RecoDataProducts/inc/CaloHit.hh"
-#include "RecoDataProducts/inc/CaloCrystalHit.hh"
-#include "CalorimeterGeom/inc/Disk.hh"
+#include "Offline/CalorimeterGeom/inc/Crystal.hh"
+#include "Offline/RecoDataProducts/inc/CaloCluster.hh"
+#include "Offline/RecoDataProducts/inc/CaloHit.hh"
+// #include "Offline/RecoDataProducts/inc/CaloCrystalHit.hh"
+#include "Offline/CalorimeterGeom/inc/Disk.hh"
 #else
 namespace mu2e {
   class CaloCluster;
@@ -36,7 +36,7 @@ public:
   
 protected:
   const mu2e::Crystal*  fCrystal;
-  mu2e::CaloCrystalHit* fCrystalHit;
+  mu2e::CaloHit*        fCrystalHit;
 
   TClonesArray*         fListOfHits;
 					// display in XY view
@@ -80,7 +80,7 @@ public:
   void  SetLineColor(int Color) { fShape->fLineColor = Color; }
   void  SetLineWidth(int Width) { fShape->fLineWidth = Width; }
 
-  void   AddHit(const mu2e::CaloCrystalHit* CrystalHit);
+  void   AddHit(const mu2e::CaloHit* CrystalHit);
 
   //  virtual void  Draw    (Option_t* option = "");
 

@@ -21,12 +21,12 @@
 #include "Stntuple/gui/TMcTruthVisNode.hh"
 #include "Stntuple/gui/TStnVisManager.hh"
 
-#include "Mu2eUtilities/inc/SortedStepPoints.hh"
-#include "Mu2eUtilities/inc/TrackTool.hh"
+#include "Offline/Mu2eUtilities/inc/SortedStepPoints.hh"
+#include "Offline/Mu2eUtilities/inc/TrackTool.hh"
 
-#include "MCDataProducts/inc/GenParticleCollection.hh"
-#include "MCDataProducts/inc/SimParticleCollection.hh"
-#include "MCDataProducts/inc/StepPointMCCollection.hh"
+#include "Offline/MCDataProducts/inc/GenParticle.hh"
+#include "Offline/MCDataProducts/inc/SimParticle.hh"
+#include "Offline/MCDataProducts/inc/StepPointMC.hh"
 
 #include <vector>
 
@@ -61,8 +61,8 @@ void TMcTruthVisNode::Paint(Option_t* option) {
 				// parse option list
   int view = TVisManager::Instance()->GetCurrentView()->Type();
 
-  if      (view == TStnView::kXY ) PaintXY (option);
-  else if (view == TStnView::kCal) PaintCal(option);
+  if      (view == TStnVisManager::kXY ) PaintXY (option);
+  else if (view == TStnVisManager::kCal) PaintCal(option);
   else {
 				// what is the default?
     //    Warning("Paint",Form("Unknown option %s",option));

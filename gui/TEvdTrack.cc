@@ -38,12 +38,11 @@
 #include "BTrk/TrkBase/HelixParams.hh"
 #include "BTrk/TrkBase/HelixTraj.hh"
 
-#include "GeometryService/inc/GeometryService.hh"
-#include "GeometryService/inc/GeomHandle.hh"
+#include "Offline/GeometryService/inc/GeometryService.hh"
+#include "Offline/GeometryService/inc/GeomHandle.hh"
+#include "Offline/BTrkData/inc/TrkStrawHit.hh"
 
-#include "BTrkData/inc/TrkStrawHit.hh"
-
-#include "TrackerGeom/inc/Tracker.hh"
+#include "Offline/TrackerGeom/inc/Tracker.hh"
 
 #include "Stntuple/gui/TEvdTrack.hh"
 #include "Stntuple/gui/TStnVisManager.hh"
@@ -94,9 +93,9 @@ void TEvdTrack::Paint(Option_t* Option) {
 
   int view = TVisManager::Instance()->GetCurrentView()->Type();
 
-  if      (view == TStnView::kXY ) PaintXY (Option);
-  else if (view == TStnView::kRZ ) PaintRZ (Option);
-  else if (view == TStnView::kCal) {
+  if      (view == TStnVisManager::kXY ) PaintXY (Option);
+  else if (view == TStnVisManager::kRZ ) PaintRZ (Option);
+  else if (view == TStnVisManager::kCal) {
 //-----------------------------------------------------------------------------
 // calorimeter-specific view: do not draw tracks
 //-----------------------------------------------------------------------------

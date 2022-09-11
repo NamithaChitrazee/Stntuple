@@ -15,10 +15,10 @@
 #include "art/Framework/Principal/Handle.h"
 #include "art/Framework/Principal/Event.h"
 
-#include "GeometryService/inc/GeometryService.hh"
-#include "GeometryService/inc/GeomHandle.hh"
+#include "Offline/GeometryService/inc/GeometryService.hh"
+#include "Offline/GeometryService/inc/GeomHandle.hh"
 
-#include "RecoDataProducts/inc/AvikPIDNewProductCollection.hh"
+#include "Offline/RecoDataProducts/inc/AvikPIDNewProduct.hh"
 //-----------------------------------------------------------------------------
 // assume that the collection name is set, so we could grab it from the event
 //-----------------------------------------------------------------------------

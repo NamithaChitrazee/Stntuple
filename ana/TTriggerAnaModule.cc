@@ -24,7 +24,7 @@
 #include "Stntuple/loop/TStnAna.hh"
 #include "Stntuple/obj/TStnHeaderBlock.hh"
 #include "Stntuple/alg/TStntuple.hh"
-#include "Stntuple/obj/TStrawHitData.hh"
+//#include "Stntuple/obj/TStrawHit.hh"
 #include "Stntuple/val/stntuple_val_functions.hh"
 
 using stntuple::HistBase_t;

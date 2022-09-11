@@ -12,6 +12,7 @@
 
 namespace mu2e {
   class Plane;
+  class Tracker;
 };
 
 namespace  stntuple {
@@ -35,7 +36,7 @@ public:
 // constructors and destructor
 //-----------------------------------------------------------------------------
   TEvdPlane();
-  TEvdPlane(int Number, const mu2e::Plane* Sector, TEvdStation* Station); 
+  TEvdPlane(int Number, const mu2e::Plane* Sector, TEvdStation* Station, const mu2e::Tracker* Tracker); 
 
   virtual ~TEvdPlane();
 //-----------------------------------------------------------------------------

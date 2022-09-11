@@ -18,18 +18,18 @@
 
 #include "art/Framework/Principal/Handle.h"
 
-#include "GeometryService/inc/GeometryService.hh"
-#include "GeometryService/inc/GeomHandle.hh"
+#include "Offline/GeometryService/inc/GeometryService.hh"
+#include "Offline/GeometryService/inc/GeomHandle.hh"
 
 #include "Stntuple/gui/TEvdCluster.hh"
 #include "Stntuple/gui/TStnVisManager.hh"
 #include "Stntuple/base/TStnShape.hh"
 
 //#include "CalorimeterGeom/inc/VaneCalorimeter.hh"
-#include "CalorimeterGeom/inc/Crystal.hh"
-#include "CalorimeterGeom/inc/Disk.hh"
-#include "CalorimeterGeom/inc/DiskCalorimeter.hh"
-#include "CalorimeterGeom/inc/Calorimeter.hh"
+#include "Offline/CalorimeterGeom/inc/Crystal.hh"
+#include "Offline/CalorimeterGeom/inc/Disk.hh"
+#include "Offline/CalorimeterGeom/inc/DiskCalorimeter.hh"
+#include "Offline/CalorimeterGeom/inc/Calorimeter.hh"
 
 ClassImp(TEvdCluster)
 
@@ -58,7 +58,7 @@ TEvdCluster::TEvdCluster(const mu2e::CaloCluster* Cl): TObject() {
   //   color = 2;
   // } else 
     if(geom->hasElement<mu2e::DiskCalorimeter>()){
-    color = module_color[Cl->diskId()];
+    color = module_color[Cl->diskID()];
   }
 
   fTrkEllipse->SetFillColor(color);
@@ -84,10 +84,10 @@ void TEvdCluster::Paint(Option_t* Option) {
 
   int view = TVisManager::Instance()->GetCurrentView()->Type();
 
-  if      (view == TStnView::kXY ) PaintXY(Option);
-  else if (view == TStnView::kCal) {
+  if      (view == TStnVisManager::kXY ) PaintXY(Option);
+  else if (view == TStnVisManager::kCal) {
     int index = TVisManager::Instance()->GetCurrentView()->Index();
-    if (index == fCluster->diskId()) PaintCal(Option);
+    if (index == fCluster->diskID()) PaintCal(Option);
   }
   else {
     printf("[%s] >>> ERROR: unknown view: %i, DO NOTHING\n",oname,view);

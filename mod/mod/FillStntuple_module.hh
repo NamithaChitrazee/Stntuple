@@ -41,13 +41,13 @@ public:
 //-----------------------------------------------------------------------------
 // functions of the module
 //-----------------------------------------------------------------------------
-  Int_t     ProcessNewRun      (int RunNumber);
+  Int_t     ProcessNewRun      (const art::Run* aRun);
 //-----------------------------------------------------------------------------
 // overloaded virtual functions of EDFilter
 //-----------------------------------------------------------------------------
-  virtual bool beginRun(art::Run&   r);
-  virtual bool endRun  (art::Run&   r);
-  virtual bool filter  (AbsEvent&   e);
+  virtual void beginRun(const art::Run&   r);
+  virtual void endRun  (const art::Run&   r);
+  virtual void analyze (const AbsEvent&   e);
 
   //  ClassDef(FillStntuple,0)
 };

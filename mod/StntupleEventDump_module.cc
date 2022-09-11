@@ -91,8 +91,8 @@ namespace mu2e {
 // overloaded virtual methods of the base class
 //-----------------------------------------------------------------------------
     virtual void     beginJob();
-    virtual bool     beginRun(art::Run& aRun);
-    virtual bool     filter(art::Event& Evt);
+    virtual void     beginRun(const art::Run& aRun);
+    virtual void     analyze (const art::Event& Evt);
   };
 
 
@@ -123,8 +123,7 @@ namespace mu2e {
   }
 
 //-----------------------------------------------------------------------------
-  bool StntupleEventDump::beginRun(art::Run& Run) {
-    return true;
+  void StntupleEventDump::beginRun(const art::Run& Run) {
   }
 
 //-----------------------------------------------------------------------------
@@ -136,13 +135,12 @@ namespace mu2e {
   }
 
 //-----------------------------------------------------------------------------
-  bool StntupleEventDump::filter(art::Event& Evt) {
+  void StntupleEventDump::analyze(const art::Event& Evt) {
     //    const char* oname = "StntupleEventDump::filter";
 //-----------------------------------------------------------------------------
 // go into interactive mode, till '.q' is pressed
 //-----------------------------------------------------------------------------
-    TModule::filter(Evt);
-    return true;
+    TModule::analyze(Evt);
   } 
 }
 

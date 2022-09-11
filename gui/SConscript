@@ -28,7 +28,8 @@ def local_build():
 
     list_of_cc_files =  local_env.Glob('*.cc', strings=True);
     skip_list        = []
-    libs             = [ 'Stntuple_obj',
+    libs             = [ 'Stntuple_print',
+                         'Stntuple_obj',
                          'Stntuple_geom',
                          'Stntuple_base',
                          'mu2e_BTrkData',

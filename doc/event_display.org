@@ -1,0 +1,82 @@
+#
+
+* STNTUPLE event display                                                     
+** how to run:                                                                
+#+begin_src
+mu2e -c Stntuple/fcl/display.fcl -s dig.mu2e.CeEndpointDigiTriggered.MDC2020n_10pc.001210_00000000.art 
+#+end_src
+** event display module: [[file:../mod/MuHitDisplay_module.cc]]                   
+** straw hit colors : see [[file:../gui/TEvdComboHit.cc::69]] (around line 69)    
+
+|-----------+------------+-----------------|
+| color     | point size | meaning         |
+|-----------+------------+-----------------|
+| red       |            | e-              |
+|           |        0.8 | e- P>20 MeV/c   |
+|           |        0.4 | e- P<20 MeV/c   |
+|-----------+------------+-----------------|
+| blue      |        0.8 | positrons       |
+| dark blue |        1.0 | protons         |
+| green     |            | muons           |
+| magenta   |            | everything else |
+|-----------+------------+-----------------|
+
+** commands:                                                                  
+
+  - process next event: type ".q" at the ROOT prompt
+
+  - exit: type .qqqqqq at the ROOT prompt
+           
+  - right-click on an object pops-up the object's context-sensitive menu
+
+  - Left, Right, Up, and Down arrow keys move the scene
+
+  - mouse weel (Up, and Down) changes the scale
+
+** display of SimParticles                 
+   - if *primaryParticleTag* is set to an empty string, 
+     all particles with E>Emin and hits in the straw tracker will be saved
+     and displayed
+   - if, however, *primaryParticleTag* is set not non-empty string, 
+     saved in STNTUPLE and displayed will be only particles pre-selected 
+     from that list , still with N(straw hits) > 0 and E > Emin
+** plugins:                                                                   
+   the following FCL parameter of a STNTUPLE module (any module class inheriting from TModule)
+
+#+begin_src
+   interactiveMode : 2
+   rootMacro       : "Stntuple/mod/scripts/display_001.C"
+#+end_src
+
+   makes the module to execute an interpreted function "display_001(int MOde, TModule* Module)" 
+   each time the module is called, assuming the module calls proper hooks of the TModule
+   search the source of [[file:../mod/MuHitDisplay_module.cc][Stntuple/mod/MuHitDisplay_module.cc]]   for "TModule"
+
+   see example: [[file:../mod/scripts/display_001.C][Stntuple/mod/scripts/display_001.C]] 
+#+begin_src
+   Parameters
+   ----------
+   Mode = 0: begin job (run)
+        = 1: event
+        = 2: end job (run)
+
+   Module  : pointer to the calling module, if the module dictionary exists, could call its functions
+
+   interactiveMode = 1 : stop at a ROOT prompt after processing each event
+                   = 2 : stop only in the end of run
+#+end_src
+    
+** quick notes about internals                                                
+
+  - Several views : derived from TStnView - XYView, RZView, TZView....
+  - each view displays geometry and several nodes 
+  - a node controls interactive cbehavior - DistanceToPrimitive
+  - each note "knows" how to paint itself in each view PaintXY, PaintRZ, etc 
+
+
+  - 3D views: need a simplified geometry, work in progress 
+* ------------------------------------------------------------------------------
+* [1/1] TODO's                                                               
+** DONE add a SimParticle node ? or just add a list of SimParticles to XY view ?
+   added a list of SimParticles to TStnTrackNode
+* ------------------------------------------------------------------------------

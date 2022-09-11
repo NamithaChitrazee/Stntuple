@@ -2,24 +2,13 @@
 #define TStnVisManager_hh
 
 #include "TObjArray.h"
-#include "Stntuple/base/TVisManager.hh"
-
 #include "TGDoubleSlider.h"
 #include "TGButton.h"
 #include "TGTextEntry.h"
 #include "TGTextBuffer.h"
 
-#ifndef __CINT__
-
-#include "art/Framework/Principal/Event.h"
-
-#else
-
-namespace art {
-  class Event;
-}
-
-#endif
+#include "Stntuple/obj/AbsEvent.hh"
+#include "Stntuple/base/TVisManager.hh"
 
 class TControlBar;
 class TGMenuBar;
@@ -28,11 +17,6 @@ class TGLayoutHints;
 class TGMainFrame;
 
 class TStnView;
-class TTrkXYView;
-class TTrkRZView;
-
-#include "Stntuple/gui/TCalView.hh"
-#include "Stntuple/gui/TCrvView.hh"
 
 class TSubdetector;
 class TExtrapolator;
@@ -40,6 +24,17 @@ class TExtrapolator;
 //-----------------------------------------------------------------------------
 class TStnVisManager : public TVisManager {
 public:
+					// different view types
+  enum {
+    kUndefined = -1,
+    kXY        =  1,
+    kRZ        =  2,
+    kTZ        =  3,
+    kCal       =  4,
+    kCrv       =  5,
+    kVST       =  6			// VST view
+  };
+
 //-----------------------------------------------------------------------------
 // command codes
 //-----------------------------------------------------------------------------
@@ -101,8 +96,10 @@ protected:
 					// later those can be redefined individually
   float               fTMin;
   float               fTMax;
+  float               fMbTime;
 
   int                 fDisplayStrawDigiMC;
+  int                 fDisplayStrawHitsXY;
 //-----------------------------------------------------------------------------
 //  functions
 //-----------------------------------------------------------------------------
@@ -139,38 +136,52 @@ public:
   int            MaxStation() { return fMaxStation; }
   int            TimeCluster() { return fTimeCluster; }
 
-  double         TMin() { return fTMin; }
-  double         TMax() { return fTMax; }
+  float          TMin() { return fTMin; }
+  float          TMax() { return fTMax; }
+
+  float          MbTime() { return fMbTime; }
 
   void           GetTimeWindow(float& TMin, float& TMax) {
     TMin = fTMin;
     TMax = fTMax;
   }
+
+  int DisplayStrawHitsXY() { return fDisplayStrawHitsXY; }
   //-----------------------------------------------------------------------------
   // modifiers
   //-----------------------------------------------------------------------------
-  void SetEvent(art::Event& Evt) { fEvent = &Evt; }
+  void SetEvent(const art::Event* Evt) { fEvent = Evt; }
 
   void SetDisplayStrawDigiMC(int Display) {
     fDisplayStrawDigiMC = Display;
   }
 
-  void SetStations(int IMin, int IMax);
-  void SetTimeCluster(int I);
+  void SetDisplayStrawHitsXY(int Flag) {
+    fDisplayStrawHitsXY = Flag;
+  }
+
+  void SetStations(int IMin, int IMax) override;
+  void SetTimeCluster(int I) override;
   
-  void   SetTimeWindow(float TMin, float TMax) {
+  void   SetTimeWindow(float TMin, float TMax) override {
     fTMin = TMin;
     fTMax = TMax;
   }
 
-  void UpdateViews();
+  void  SetMbTime(float MbTime) { fMbTime = MbTime; }
+
+  void  UpdateViews();
+
+  virtual int EndRun() override ;
 
   virtual TCanvas*  NewCanvas(const char* Name,
 			      const char* Title,
 			      Int_t       SizeX,
-			      Int_t       SizeY);
+			      Int_t       SizeY) override;
 
-  virtual void OpenView(TStnView* Mother, int Px1, int Py, int Px2, int Py2);
+  virtual int GetViewID(const char* View) override;
+
+  virtual void OpenView(TStnView* Mother, int Px1, int Py, int Px2, int Py2) override;
 
   Int_t   OpenTrkXYView();
   Int_t   OpenTrkXYView(TStnView* Mother, Axis_t x1, Axis_t y1, Axis_t x2, Axis_t y2);
@@ -187,8 +198,17 @@ public:
   Int_t   OpenCrvView();
   Int_t   OpenCrvView  (TStnView* Mother, Axis_t x1, Axis_t y1, Axis_t x2, Axis_t y2);
   
-  void    CloseWindow();
+  Int_t   OpenVSTView();
+  Int_t   OpenVSTView  (TStnView* Mother, Axis_t x1, Axis_t y1, Axis_t x2, Axis_t y2);
   
-  ClassDef(TStnVisManager, 0)
+  void    CloseWindow();
+//-----------------------------------------------------------------------------
+// commands associated with buttons
+//-----------------------------------------------------------------------------
+  void    NextEvent        ();   //
+  void    PrintColls(const char* Tag);
+  void    Quit             ();   //
+  
+  // ClassDef(TStnVisManager, 0)
 };
 #endif

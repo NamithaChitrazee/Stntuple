@@ -14,7 +14,7 @@
 ClassImp(TCalView)
 
 //_____________________________________________________________________________
-TCalView::TCalView(int Section): TStnView(TStnView::kCal,Section,"CalView","CalView") {
+TCalView::TCalView(int Section): TStnView(TStnVisManager::kCal,Section,"CalView","CalView") {
 }
 
 //-----------------------------------------------------------------------------

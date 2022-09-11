@@ -6,7 +6,7 @@
 #pragma link C++ nestedclasses;
 #pragma link C++ nestedtypedefs;
 
-#pragma link C++ class TComboHitVisNode;
+#pragma link C++ class stntuple::TEvdSimParticle;
 
 #endif
 

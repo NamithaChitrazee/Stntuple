@@ -7,7 +7,8 @@
 #------------------------------------------------------------------------------
 BEGIN_PROLOG
   INPUT_MODULE  @protect_ignore: RootInput      # EmptyEvent/RootInput
-  TRIGGER_PATHS @protect_ignore: [ stntuple_p42_dar ]
+  TRIGGER_PATHS @protect_ignore: [ ]
+  TRIGGER_PATHS @protect_ignore: [ stntuple_p0 ]
 
   PROCESS_NAME  @protect_ignore: RecoStn
   GEN_ID        @protect_ignore: "CeLeadingLog"
@@ -15,7 +16,7 @@ BEGIN_PROLOG
   TIME_MAPS     @protect_ignore: [ "compressDigiMCs:protonTimeMap", "compressDigiMCs:muonTimeMap", "compressDigiMCs:cosmicTimeMap" ]
 END_PROLOG
 
-#include "Stntuple/fcl/stnmaker.fcl"
+#include "Stntuple/fcl/stntuple.fcl"
 
 process_name                              : @local::PROCESS_NAME
 outputs                                   : { @table::Stntuple.outputs }  
@@ -30,5 +31,5 @@ outputs.defaultOutput.SelectEvents        : [ @sequence::TRIGGER_PATHS  ]
 #------------------------------------------------------------------------------
 services.GeometryService.inputFile        : "su2020/common/geom_baseline.txt"
 services.TFileService.fileName            : "nts._USER_.cele0s81b0.su2020.001000_00000000.root"
-physics.filters.InitStntuple.histFileName : "nts._USER_.cele0s81b2.su2020.001000_00000000.stn"
+physics.analyzers.InitStntuple.histFileName : "nts._USER_.cele0s81b2.su2020.001000_00000000.stn"
 outputs.defaultOutput.fileName            : "mcs._USER_.cele0s81b2.su2020.001000_00000000.art"

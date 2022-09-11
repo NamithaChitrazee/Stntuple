@@ -16,7 +16,7 @@
 #include "Stntuple/obj/TStnTrackBlock.hh"
 #include "Stntuple/obj/TStnClusterBlock.hh"
 #include "Stntuple/obj/TCalDataBlock.hh"
-#include "Stntuple/obj/TStrawDataBlock.hh"
+// #include "Stntuple/obj/TStrawHitBlock.hh"
 #include "Stntuple/obj/TGenpBlock.hh"
 #include "Stntuple/obj/TSimpBlock.hh"
 

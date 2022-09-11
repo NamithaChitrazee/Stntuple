@@ -6,5 +6,5 @@
 #pragma link C++  nestedclasses;
 #pragma link C++  nestedtypedefs;
 #
-#pragma link C++  class  TTrackStrawHitData-;
+#pragma link C++  class  TStrawHit-;
 #endif

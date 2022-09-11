@@ -9,19 +9,19 @@ BEGIN_PROLOG
   GEN_ID           @protect_ignore: "unknown"                            # ignore GEN_ID check
 END_PROLOG
 
-#include "Stntuple/fcl/stnmaker.fcl"
+#include "Stntuple/fcl/stntuple.fcl"
 
 process_name : S1G4MubeamStn
 
 source       : { module_type : RootInput fileNames : ["undefined", "undefined"] }
 
 outputs      : { @table::Stntuple.outputs   }
-filters      : { @table::Stntuple.filters   }
+analyzers      : { @table::Stntuple.analyzers   }
 
 physics : { @table::Stntuple.physics 
     
-    filters  : { @table::filters 
-	StntupleMaker: { @table::filters.StntupleMaker
+    analyzers  : { @table::analyzers 
+	StntupleMaker: { @table::analyzers.StntupleMaker
 #------------------------------------------------------------------------------
 # disable everything, enable StepPointMC's, VDET block is just yet another StepPointMC block
 #------------------------------------------------------------------------------
@@ -53,5 +53,5 @@ physics : { @table::Stntuple.physics
 # outputs.detectorOutput.SelectEvents       : [ path_gen_digi_reco_stn_dem_dmm ]
 
 services.TFileService.fileName            : "nts.user.s1_g4mubeam_stn.project.sequencer.hist"
-physics.filters.InitStntuple.histFileName : "nts.user.s1_g4mubeam_stn.project.sequencer.stn"
+physics.analyzers.InitStntuple.histFileName : "nts.user.s1_g4mubeam_stn.project.sequencer.stn"
 outputs.detectorOutput.fileName           : "sim.user.s1_g4mubeam_stn.project.sequencer.art"

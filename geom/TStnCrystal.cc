@@ -66,10 +66,12 @@ void TStnCrystal::Paint(Option_t* Option) {
 
   //  int   iv;
 
-  int view = TVisManager::Instance()->GetCurrentView()->Type();
+  TVisManager* vm = TVisManager::Instance();
 
-  if      (view == TStnView::kXY ) PaintXY (Option);
-  else if (view == TStnView::kCal) PaintCal(Option);
+  int view = vm->GetCurrentView()->Type();
+
+  if      (view == vm->GetViewID("xy" )) PaintXY (Option);
+  else if (view == vm->GetViewID("cal")) PaintCal(Option);
   else {
     printf("[%s] >>> ERROR: unknown view: %i, DO NOTHING\n",oname,view);
   }

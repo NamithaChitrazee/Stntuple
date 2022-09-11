@@ -6,12 +6,18 @@ BEGIN_PROLOG
 # initialization template
 # 
 # they can be redefined 
-# see example of redefining GEN_ID in Stntuple/test/read_reco_stnmaker.fcl
-# to be included by Stntuple/fcl/stnmaker.fcl
+# see example of redefining GEN_ID in Stntuple/test/read_reco_stntuple.fcl
+# to be included by Stntuple/fcl/stntuple.fcl
 #------------------------------------------------------------------------------
-StntupleModuleFclDefaults : {
-    interactiveMode : 0
-    maxFileSize     : 2000   # in MBytes
+StntupleTModuleFclDefaults : {
+    interactiveMode     : 0
+    maxFileSize         : 2000   # in MBytes
+#------------------------------------------------------------------------------
+# if rootMacro is non-empty, it defines the name of a ROOT macro to be executed 
+# in interpreted mode in the art event loop
+# see https://github.com/Mu2e/Stntuple/blob/muse/doc/event_display.org#plugins
+#------------------------------------------------------------------------------
+    rootMacro           : ""
 #------------------------------------------------------------------------------
 # unlike everywhere else, TAnaDump sets mcTruth to 1 by default
 #------------------------------------------------------------------------------
@@ -31,7 +37,7 @@ StntupleModuleFclDefaults : {
 # default configuration of StntupleMaker
 #------------------------------------------------------------------------------
 StntupleMakerTemplate : { module_type:StntupleMaker
-    @table::StntupleModuleFclDefaults                   # defaults of the base class
+    @table::StntupleTModuleFclDefaults                  # defaults of the base class
     module_name          : StntupleMaker
     processName          : undefined
 #------------------------------------------------------------------------------
@@ -46,18 +52,18 @@ StntupleMakerTemplate : { module_type:StntupleMaker
     makePid              : 1
     makeSimp             : 1  # 0: dont write
     makeStepPointMC      : 1
-    makeStrawData        : 0
+    makeStrawHits        : 0
     makeTracks           : 1
     makeTrackStrawHits   : 0
     makeTrackSeeds       : 0
     makeTimeClusters     : 0
     makeTrigger          : 1
     
-    KalDiag              : { @table::KalDiagDirect    }
-    DoubletAmbigResolver : { @table::TrkReco.DoubletAmbigResolver }
+    KalDiag                      : { @table::KalDiagDirect    }
+    DoubletAmbigResolver         : { @table::TrkReco.DoubletAmbigResolver }
 
-    caloCrystalHitsMaker : "CaloCrystalHitFromHit"
-    caloClusterMaker     : "CaloClusterFromProtoCluster"
+    caloCrystalHitsMaker         : "CaloHitMaker"
+    caloClusterMaker             : "CaloClusterMaker"
 #------------------------------------------------------------------------------
 # default tags for CRV reco collections
 #------------------------------------------------------------------------------
@@ -69,39 +75,49 @@ StntupleMakerTemplate : { module_type:StntupleMaker
 # by default, always run MergePatRec, which, in case only one track reconstruction
 # module is running upstream, simply copies its output
 # 'spmc' stands for 'StepPointMC'
+# STN_COMPRESS_MCS is ddefined in 'Stntuple/fcl/stntuple.fcl' and can be redefined 
+# in the job config file
 #------------------------------------------------------------------------------
     comboHitCollTag      : "makePH"
     strawHitCollTag      : "makeSH"
-    strawDigiMCCollTag   : "compressDigiMCs"                     # was "makeSD"
+    strawDigiMCCollTag   : @local::STN_COMPRESS_MCS              # was "makeSD"
 #------------------------------------------------------------------------------
 # TSimpBlock initialization parameters
 # vdHitsCollTag is used by TStnTrackBlock and TSimpBlock, hits on virtual detectors 
 # are stored in SpmcBlockVDet block, so all three have to be consistent
 #------------------------------------------------------------------------------
-    simpCollTag          : "compressDigiMCs"                     # was "g4run" before
+    simpCollTag          : @local::STN_COMPRESS_MCS              # was "g4run" before
+    primaryParticleTag   : @local::STN_COMPRESS_MCS              # this is new, to be passed to InitSimpBlock
     triggerResultsTag    : "TriggerResults"                      # assume TriggerResults produced at digi step
     vdHitsCollTag        : @local::STN_VDHITS_COLL_TAG           # was "g4run" before
-    simpMinEnergy        : 5.0                                   # MeV , simpMinEnergy < 0: store all
-    simpMaxZ             : 11800.0                               # not used
-    simpUseTimeOffsets   : 1                                     # legacy default 
+    minSimpMomentum      : 40.0                                  # MeV , minSimpMomentum < 0: store all with straw hits
+    simpMaxZ             : 1800.0                                # not used
 
-    genpCollTag          : "compressDigiMCs"                     # save signal-only: "generate" 
-    genId                : @local::GEN_ID                        # defined in Stntuple/fcl/stnmaker.fcl, by default, store all simparticles
-    pdgId                : @local::PDG_ID                        # defined in Stntuple/fcl/stnmaker.fcl, by default, don't check PDG ID
-    
-    timeClusterBlockName : ["TimeClusterBlock"   ]               # to be renamed, *FIXME*
-    timeClusterCollTag   : ["TimeClusterFinderDe"]               # 
-
-    helixBlockName       : []
-    helixCollTag         : []
+    genpCollTag          : @local::STN_COMPRESS_MCS              # save signal-only: "generate" 
+    genId                : @local::GEN_ID                        # defined in Stntuple/fcl/stntuple.fcl, by default, store all simparticles
+    pdgId                : @local::PDG_ID                        # defined in Stntuple/fcl/stntuple.fcl, by default, don't check PDG ID
+#------------------------------------------------------------------------------
+# time clusters
+#------------------------------------------------------------------------------
+    timeClusterBlockName : [ "TimeClusterBlock"   ]              # to be renamed, *FIXME*
+    timeClusterCollTag   : [ "TimeClusterFinderDe"]              # 
+    tcShCollTag          : [ "makeSH"             ]              # time clusters could be searched for using straw hits
+    tcChCollTag          : [ "makePH"             ]              # only
+#------------------------------------------------------------------------------
+# ultimately all downstream helices will be in one block, upstream ones - in another
+#------------------------------------------------------------------------------
+    helixBlockName       : [ "MHDeM"      ]
+    helixCollTag         : [ "HelixBlock" ]
 
     trackSeedBlockName   : []
     trackSeedCollTag     : []
-
+#------------------------------------------------------------------------------
+# default - negative particles... need to redo merging of opposite signs
+#------------------------------------------------------------------------------
     trackBlockName       : [ "TrackBlock"   ]
-    trackCollTag         : [ "MergePatRec"  ]
-    trackTsBlockName     : [                ]
-    trackTsCollTag       : [                ]
+    trackCollTag         : [ "KFFDeM"       ]
+    trackTsBlockName     : [ "TSBlock"      ]
+    trackTsCollTag       : [ "KSFDeM"       ]
     tciCollTag           : [ "TrkExtrapol"  ]
     tcmCollTag           : [ "CaloMatching" ]
     trkQualCollTag       : [ "TrackQual"    ]
@@ -130,48 +146,45 @@ StntupleMakerTemplate : { module_type:StntupleMaker
 #------------------------------------------------------------------------------
 # 
 #------------------------------------------------------------------------------
-MuHitDisplay: { module_type:MuHitDisplay                 # the class name;
-    @table::StntupleModuleFclDefaults                    # defaults of the base class
+MuHitDisplay: { module_type:MuHitDisplay                 # class name;
+    @table::StntupleTModuleFclDefaults                   # defaults of the base class
 
-    interactiveMode              : 1
+    interactiveMode              : 1                                # 1:stop  after each event 2: stop at end-of-job
     
-    crvRecoPulsesCollTag         : CrvRecoPulses
+    crvRecoPulsesCollTag         : "CrvRecoPulses"
     showCRVOnly 		 : false
     showTracks                   : true
     
-    genpCollTag                  : generate
-    spmcCollTag                  : "compressDigiMCs" # was g4run
-    statuG4Tag                   : "g4run"           # 
+    genpCollTag                  : "generate"
+    comboHitCollTag              : "makePH"                          # comboHits
     strawHitCollTag              : "makeSH"
-    strawDigiMCCollTag           : "compressDigiMCs" #  was "makeSD"
-    strawHitFlagCollTag          : "DeltaFinder:StrawHits"
-    comboHitCollTag              : makePH
+    sdCollTag                    : "FromTrackerPrototypeData"        # tracker VST
+    swCollTag                    : "FromTrackerPrototypeData"        # tracker VST
+    sdmcCollTag                  : "compressDigiMCs"                 #  was "makeSD"
+    shfCollTag                   : "DeltaFinder:StrawHits"           # straw hit flags
+    spmcCollTag                  : "compressDigiMCs:virtualdetector" # was g4run
+    simpCollTag                  : "compressDigiMCs"                 # was g4run
 
-    caloCrystalHitsCollTag       : CaloCrystalHitFromHit
-    caloClusterCollTag           : CaloClusterFromProtoCluster
+    caloHitCollTag               : "CaloHitMaker"
+    caloClusterCollTag           : "CaloClusterMaker"
 
-    timeClusterCollTag           : CalTimePeakFinder
+    timeClusterCollTag           : "CalTimePeakFinder"
     trackCollTag                 : "KFFDeMHDar"
 
-    trkExtrapol                  : TrackCaloIntersection
-    trkCalMatch                  : TrackCaloMatching
+    trkExtrapol                  : "TrackCaloIntersection"
+    trkCalMatch                  : "TrackCaloMatching"
 
-    pidCollTag                   : ParticleID
+    pidCollTag                   : "ParticleID"
+    primaryParticleTag           : "compressDigiMCs"                 # this is new, to be passed to InitSimpBlock
+    vdHitsCollTag                : "compressDigiMCs"                 # this is new, to be passed to InitSimpBlock
     
-    # if set to true, all hits will be displayed unconditionally
-    # otherwise, display only hits with right flags
-    displayBackgroundHits        : true
-
     #      goodHitMask                 : ["EnergySelection","RadiusSelection","TimeSelection"]
     goodHitMask                  : ["EnergySelection", "RadiusSelection"]
     badHitMask                   : ["Background"] 
     
-    trackerStepPoints            : tracker
     minHits                      : 5
-    clickToAdvance               : true
-    printHits                    : false
+    minSimpMomentum              : 40. # MeV
     timeWindow                   : 100000.
-    #      timeWindow           : 50.
 #------------------------------------------------------------------------------
 # kalDiag and Doublet Resolver
 #------------------------------------------------------------------------------
@@ -181,9 +194,17 @@ MuHitDisplay: { module_type:MuHitDisplay                 # the class name;
 # configuration of the underlying visualization manager 
 #------------------------------------------------------------------------------
     visManager: {
-	debugLevel         : 0
+	defaultView        : "xy"     # view open by default
 	displayStrawDigiMC : 1
+	displayStrawHitsXY : 1
+	debugLevel         : 0
     }
+#------------------------------------------------------------------------------
+# plugin configuration, plugin is a name of the script to be loaded
+# it is assumed that if the name of the script is "/s/../b/a.C", a call to void "a()" 
+# should be executed once per event
+#------------------------------------------------------------------------------
+    rootMacro              : ""
 }
 
 #------------------------------------------------------------------------------
@@ -191,24 +212,25 @@ MuHitDisplay: { module_type:MuHitDisplay                 # the class name;
 #------------------------------------------------------------------------------
 Stntuple : {
     producers : {}  # empty table
-
-    analyzers : {}  # empty table
-
-    filters : {
+    filters   : {}  # empty table
+#------------------------------------------------------------------------------
+# STNTUPLE modules become analyzers - need to deal with the trigger intormation
+#------------------------------------------------------------------------------
+    analyzers : {
 	InitStntuple : { module_type:InitStntuple
-	    @table::StntupleModuleFclDefaults                   # defaults of the base class
+	    @table::StntupleTModuleFclDefaults                  # defaults of the base class
 	    module_name       : InitStntuple
 	    histFileName      : "default.stn"
-	    splitLevel        : 0
+	    splitLevel        : 99
 	}
 
 	FillStntuple : { module_type:FillStntuple
-	    @table::StntupleModuleFclDefaults                   # defaults of the base class
+	    @table::StntupleTModuleFclDefaults                  # defaults of the base class
 	    module_name       : FillStntuple
 	}
 
 	StntupleEventDump : { module_type:StntupleEventDump 
-	    @table::StntupleModuleFclDefaults                   # defaults of the base class
+	    @table::StntupleTModuleFclDefaults                  # defaults of the base class
 	    module_name       : StntupleEventDump
 	}
 #------------------------------------------------------------------------------
@@ -662,71 +684,32 @@ Stntuple : {
 	}
 
 	MuHitDisplay    : { @table::MuHitDisplay }
-
-	MuHitDisplayDe : { @table::MuHitDisplay 
-	    trackCollTag           : "KFFDeMHDar"
-	    trkExtrapol            : "TciDeMHDar"
-	    trkCalMatch            : "TcmDeMHDar"
-	}
-	
-	MuHitDisplayDeDar : { @table::MuHitDisplay 
-	    trackCollTag           : "KFFDeMHDar"
-	    trkExtrapol            : "TciDeMHDar"
-	    trkCalMatch            : "TcmDeMHDar"
-	}
-	
-	MuHitDisplayDpp : { @table::MuHitDisplay 
-	    trackCollTag           : MergePatRecDpp
-	    strawHitFlagCollTag    : "FlagBkgHits:StrawHits"    # run TrkPatRec only
-	    trkExtrapol            : TrackCaloIntersectionDpp
-	    trkCalMatch            : TrackCaloMatchingDpp
-	}
-
-	MuHitDisplayDmm : { @table::MuHitDisplay 
-	    trackCollTag           : MergePatRecDmm
-	    trkExtrapol            : TrackCaloIntersectionDmm
-	    trkCalMatch            : TrackCaloMatchingDmm
-	}
-
-	MuHitDisplayDeMHPar : { @table::MuHitDisplay 
-	    trackCollTag           : KFFDeMHPar
-	    trkExtrapol            : TciDeMHPar
-	    trkCalMatch            : TcmDeMHPar
-	}
-
-	MuHitDisplayDeMHDar : { @table::MuHitDisplay 
-	    trackCollTag           : "KFFDeMHDar"
-	    trkExtrapol            : "TciDeMHDar"
-	    trkCalMatch            : "TcmDeMHDar"
-	}
     }
 }
 #------------------------------------------------------------------------------
-# sequences
+# sequences, all of them go to end_path
 #------------------------------------------------------------------------------
 Stntuple.stnmaker         : [ InitStntuple, StntupleMaker   ,                   FillStntuple ]
-Stntuple.stnmaker_cpr     : [ InitStntuple, StntupleMakerCpr,                   FillStntuple ]
-# Stntuple.stnmaker_dem     : [ InitStntuple, StntupleMakerDem,                   FillStntuple ]
-# Stntuple.stnmaker_dep     : [ InitStntuple, StntupleMakerDep,                   FillStntuple ]
-Stntuple.stnmaker_dmm     : [ InitStntuple, StntupleMakerDmm,                   FillStntuple ]
-Stntuple.stnmaker_ump     : [ InitStntuple, StntupleMakerUmp,                   FillStntuple ]
-Stntuple.stnmaker_dpp     : [ InitStntuple, StntupleMakerDpp,                   FillStntuple ]
-Stntuple.stnmaker_dem_dep : [ InitStntuple, StntupleMakerDemDep,                FillStntuple ]
-Stntuple.stnmaker_dem_dmm : [ InitStntuple, StntupleMakerDem, StntupleMakerDmm, FillStntuple ]
-Stntuple.stnmaker_dem_umm : [ InitStntuple, StntupleMakerDem, StntupleMakerUmm, FillStntuple ]
-Stntuple.stnmaker_dem_ump : [ InitStntuple, StntupleMakerDem, StntupleMakerUmp, FillStntuple ]
-Stntuple.stnmaker_tcm     : [ InitStntuple, StntupleMakerTcm,                   FillStntuple ]
-Stntuple.stnmaker_tcm_dem : [ InitStntuple, StntupleMakerTcmDem,                FillStntuple ]
-Stntuple.stnmaker_tcm_dep : [ InitStntuple, StntupleMakerTcmDep,                FillStntuple ]
+# Stntuple.stnmaker_cpr     : [ InitStntuple, StntupleMakerCpr,                   FillStntuple ]
+# Stntuple.stnmaker_dmm     : [ InitStntuple, StntupleMakerDmm,                   FillStntuple ]
+# Stntuple.stnmaker_ump     : [ InitStntuple, StntupleMakerUmp,                   FillStntuple ]
+# Stntuple.stnmaker_dpp     : [ InitStntuple, StntupleMakerDpp,                   FillStntuple ]
+# Stntuple.stnmaker_dem_dep : [ InitStntuple, StntupleMakerDemDep,                FillStntuple ]
+# Stntuple.stnmaker_dem_dmm : [ InitStntuple, StntupleMakerDem, StntupleMakerDmm, FillStntuple ]
+# Stntuple.stnmaker_dem_umm : [ InitStntuple, StntupleMakerDem, StntupleMakerUmm, FillStntuple ]
+# Stntuple.stnmaker_dem_ump : [ InitStntuple, StntupleMakerDem, StntupleMakerUmp, FillStntuple ]
+# Stntuple.stnmaker_tcm     : [ InitStntuple, StntupleMakerTcm,                   FillStntuple ]
+# Stntuple.stnmaker_tcm_dem : [ InitStntuple, StntupleMakerTcmDem,                FillStntuple ]
+# Stntuple.stnmaker_tcm_dep : [ InitStntuple, StntupleMakerTcmDep,                FillStntuple ]
 Stntuple.stnmaker_trig    : [ InitStntuple, StntupleMakerTrig,                  FillStntuple ]
 #------------------------------------------------------------------------------
 # new sequences
 #------------------------------------------------------------------------------
-Stntuple.stnmaker_De      : [ InitStntuple, StntupleMakerDe  ,                  FillStntuple ]
-Stntuple.stnmaker_Dmu     : [ InitStntuple, StntupleMakerDmu ,                  FillStntuple ]
-Stntuple.stnmaker_De_Dmu  : [ InitStntuple, StntupleMakerDeDmu,                 FillStntuple ]
-
-Stntuple.stnmaker_De_Dmu_dar : [ InitStntuple, StntupleMakerDeDmuDar,           FillStntuple ]
-Stntuple.stnmaker_De_Ue_dar  : [ InitStntuple, StntupleMakerDeUeDar,            FillStntuple ]
+# Stntuple.stnmaker_De      : [ InitStntuple, StntupleMakerDe  ,                  FillStntuple ]
+# Stntuple.stnmaker_Dmu     : [ InitStntuple, StntupleMakerDmu ,                  FillStntuple ]
+# Stntuple.stnmaker_De_Dmu  : [ InitStntuple, StntupleMakerDeDmu,                 FillStntuple ]
+# 
+# Stntuple.stnmaker_De_Dmu_dar : [ InitStntuple, StntupleMakerDeDmuDar,           FillStntuple ]
+# Stntuple.stnmaker_De_Ue_dar  : [ InitStntuple, StntupleMakerDeUeDar,            FillStntuple ]
 
 END_PROLOG

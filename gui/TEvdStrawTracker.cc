@@ -18,10 +18,10 @@
 #include "art/Framework/Principal/Event.h"
 #include "art/Framework/Principal/Handle.h"
 
-#include "DataProducts/inc/StrawId.hh"
+#include "Offline/DataProducts/inc/StrawId.hh"
 
-#include "GeometryService/inc/GeometryService.hh"
-#include "GeometryService/inc/GeomHandle.hh"
+#include "Offline/GeometryService/inc/GeometryService.hh"
+#include "Offline/GeometryService/inc/GeomHandle.hh"
 
 #include "Stntuple/gui/TEvdStraw.hh"
 #include "Stntuple/gui/TEvdPlane.hh"
@@ -32,10 +32,10 @@
 #include "Stntuple/gui/TStnVisManager.hh"
 
 // #include "CalorimeterGeom/inc/VaneCalorimeter.hh"
-#include "CalorimeterGeom/inc/Crystal.hh"
-#include "CalorimeterGeom/inc/Disk.hh"
-#include "CalorimeterGeom/inc/DiskCalorimeter.hh"
-#include "CalorimeterGeom/inc/Calorimeter.hh"
+#include "Offline/CalorimeterGeom/inc/Crystal.hh"
+#include "Offline/CalorimeterGeom/inc/Disk.hh"
+#include "Offline/CalorimeterGeom/inc/DiskCalorimeter.hh"
+#include "Offline/CalorimeterGeom/inc/Calorimeter.hh"
 
 
 ClassImp(stntuple::TEvdStrawTracker)
@@ -79,8 +79,9 @@ void TEvdStrawTracker::Paint(Option_t* option) {
 
   int view = TVisManager::Instance()->GetCurrentView()->Type();
 
-  if      (view == TStnView::kXY) PaintXY (option);
-  else if (view == TStnView::kRZ) PaintRZ (option);
+  if      (view == TStnVisManager::kXY ) PaintXY (option);
+  else if (view == TStnVisManager::kRZ ) PaintRZ (option);
+  else if (view == TStnVisManager::kVST) PaintVST(option);
   else {
     // what is the default?
     //    Warning("Paint",Form("Unknown option %s",option));
@@ -130,6 +131,12 @@ void TEvdStrawTracker::PaintRZ(Option_t* option) {
 }
 
 //_____________________________________________________________________________
+void TEvdStrawTracker::PaintVST(Option_t* Option) {
+  printf("TEvdStrawTracker::%s is not implemented yet.\n",__func__);
+}
+
+
+//_____________________________________________________________________________
 Int_t TEvdStrawTracker::DistancetoPrimitive(Int_t px, Int_t py) {
   return 9999;
 }
@@ -151,6 +158,11 @@ Int_t TEvdStrawTracker::DistancetoPrimitiveXY(Int_t px, Int_t py) {
 
 //_____________________________________________________________________________
 Int_t TEvdStrawTracker::DistancetoPrimitiveRZ(Int_t px, Int_t py) {
+  return 9999;
+}
+
+//_____________________________________________________________________________
+Int_t TEvdStrawTracker::DistancetoPrimitiveVST(Int_t px, Int_t py) {
   return 9999;
 }
 

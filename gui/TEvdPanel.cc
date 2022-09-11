@@ -18,18 +18,18 @@
 #include "art/Framework/Principal/Event.h"
 #include "art/Framework/Principal/Handle.h"
 
-#include "GeometryService/inc/GeometryService.hh"
-#include "GeometryService/inc/GeomHandle.hh"
+#include "Offline/GeometryService/inc/GeometryService.hh"
+#include "Offline/GeometryService/inc/GeomHandle.hh"
 
 // #include "TrackerGeom/inc/Layer.hh"
-#include "TrackerGeom/inc/Straw.hh"
+#include "Offline/TrackerGeom/inc/Straw.hh"
 // #include "TrackerGeom/inc/Sector.hh"
 
 #include "Stntuple/gui/TEvdPanel.hh"
 #include "Stntuple/gui/TEvdStraw.hh"
 #include "Stntuple/gui/TStnVisManager.hh"
 
-#include "TrackerGeom/inc/Panel.hh"
+#include "Offline/TrackerGeom/inc/Panel.hh"
 //#include "TTrackerGeom/inc/ZLayer.hh"
 
 ClassImp(stntuple::TEvdPanel)
@@ -44,7 +44,7 @@ TEvdPanel::TEvdPanel(): TObject() {
 }
 
 //_____________________________________________________________________________
-TEvdPanel::TEvdPanel(int ID, const mu2e::Panel* Panel, TEvdPlane* Plane): TObject() {
+  TEvdPanel::TEvdPanel(int ID, const mu2e::Panel* Panel, TEvdPlane* Plane, const mu2e::Tracker* Tracker): TObject() {
 
   TEvdStraw* evd_straw;
 
@@ -80,7 +80,7 @@ TEvdPanel::TEvdPanel(int ID, const mu2e::Panel* Panel, TEvdPlane* Plane): TObjec
 	     istation, ipp, ill, iss, straw->getMidPoint().z());
     }
 
-    evd_straw = new TEvdStraw(id,straw,this);
+    evd_straw = new TEvdStraw(id,straw,this,Tracker);
     fListOfStraws[ill]->Add(evd_straw);
   }
 }
@@ -95,8 +95,8 @@ void TEvdPanel::Paint(Option_t* option) {
 
   int view = TVisManager::Instance()->GetCurrentView()->Type();
 
-  if      (view == TStnView::kXY) PaintXY (option);
-  else if (view == TStnView::kRZ) PaintRZ (option);
+  if      (view == TStnVisManager::kXY) PaintXY (option);
+  else if (view == TStnVisManager::kRZ) PaintRZ (option);
   else {
     // what is the default?
     //    Warning("Paint",Form("Unknown option %s",option));

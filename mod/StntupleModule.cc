@@ -79,13 +79,12 @@ void StntupleModule::LogError(char* Message)
 }
 
 //_____________________________________________________________________________
-TStnDataBlock* 
-StntupleModule::AddDataBlock(const char* branch_name,
-			     const char* class_name,
-			     Int_t       (*f)(TStnDataBlock*,AbsEvent*,Int_t),
-			     Int_t       buffer_size,
-			     Int_t       split,
-			     Int_t       compression) 
+TStnDataBlock* StntupleModule::AddDataBlock(const char* branch_name,
+					    const char* class_name,
+					    Int_t       (*f)(TStnDataBlock*,AbsEvent*,Int_t),
+					    Int_t       buffer_size,
+					    Int_t       split,
+					    Int_t       compression) 
 {
   // adds new branch to fgTree and registers a data block corresponding to it
 
@@ -134,11 +133,11 @@ StntupleModule::AddDataBlock(const char* branch_name,
 // use TStnInitDataBlock class for initialization
 //-----------------------------------------------------------------------------
 TStnDataBlock* StntupleModule::AddDataBlock(const char*        branch_name,
-					     const char*        class_name,
-					     TStnInitDataBlock* InitBlock,
-					     Int_t              buffer_size,
-					     Int_t              split,
-					     Int_t              compression) 
+					    const char*        class_name,
+					    TStnInitDataBlock* InitBlock,
+					    Int_t              buffer_size,
+					    Int_t              split,
+					    Int_t              compression) 
 {
 
   TBranch*       branch;

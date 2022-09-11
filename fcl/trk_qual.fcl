@@ -1,7 +1,0 @@
-#------------------------------------------------------------------------------
-# currently = choose MVA's of the right sign
-#------------------------------------------------------------------------------
-physics.producers.TrkQualDeMHPar  : { @table::TrkQualDeM  KalSeedCollection:KFFDeMHPar  }
-physics.producers.TrkQualDeMHDar  : { @table::TrkQualDeM  KalSeedCollection:KFFDeMHDar  }
-physics.producers.TrkQualDmuMHPar : { @table::TrkQualDmuM KalSeedCollection:KFFDmuMHPar }
-physics.producers.TrkQualDmuMHDar : { @table::TrkQualDmuM KalSeedCollection:KFFDmuMHDar }

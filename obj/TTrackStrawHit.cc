@@ -1,26 +1,26 @@
 ///////////////////////////////////////////////////////////////////////////////
-//  2014-01-26 P.Murat TTrackStrawHitData
+//  2014-01-26 P.Murat TTrackStrawHit
 ///////////////////////////////////////////////////////////////////////////////
 #include "TString.h"
 
-#include "Stntuple/obj/TTrackStrawHitData.hh"
+#include "Stntuple/obj/TTrackStrawHit.hh"
 
-ClassImp(TTrackStrawHitData)
+ClassImp(TTrackStrawHit)
 
 //-----------------------------------------------------------------------------
-void TTrackStrawHitData::ReadV1(TBuffer &R__b) {
-  struct TTrackStrawHitDataV1_t {
-    int     fIndex;
+void TTrackStrawHit::ReadV1(TBuffer &R__b) {
+  struct TTrackStrawHitV1_t {
+    int     fStrawID;
     float   fTime;
     float   fDt;
     float   fEnergy;
   };
 
-  TTrackStrawHitDataV1_t data;
+  TTrackStrawHitV1_t data;
 
   int nwf_v1 = 3;
 
-  R__b >> fIndex;
+  R__b >> fStrawID;
   R__b.ReadFastArray(&data.fTime,nwf_v1);
 
   fTime   = data.fTime;
@@ -31,9 +31,9 @@ void TTrackStrawHitData::ReadV1(TBuffer &R__b) {
 
 
 //_____________________________________________________________________________
-void TTrackStrawHitData::Streamer(TBuffer &R__b) {
+void TTrackStrawHit::Streamer(TBuffer &R__b) {
 
-  int nwi = ((int*) &fTime) - &fIndex;
+  int nwi = ((int*) &fTime) - &fStrawID;
   int nwf = &fMcMomentum - &fTime +1;
   
   if(R__b.IsReading()) {
@@ -42,32 +42,32 @@ void TTrackStrawHitData::Streamer(TBuffer &R__b) {
 //-----------------------------------------------------------------------------
 // curent version: V1
 //-----------------------------------------------------------------------------
-    R__b.ReadFastArray(&fIndex,nwi);
-    R__b.ReadFastArray(&fTime ,nwf);
+    R__b.ReadFastArray(&fStrawID,nwi);
+    R__b.ReadFastArray(&fTime   ,nwf);
   }
   else {
-    R__b.WriteVersion(TTrackStrawHitData::IsA());
-    R__b.WriteFastArray(&fIndex,nwi);
-    R__b.WriteFastArray(&fTime ,nwf);
+    R__b.WriteVersion(TTrackStrawHit::IsA());
+    R__b.WriteFastArray(&fStrawID,nwi);
+    R__b.WriteFastArray(&fTime   ,nwf);
   } 
 }
 
 //_____________________________________________________________________________
-TTrackStrawHitData::TTrackStrawHitData(): TObject() {
+TTrackStrawHit::TTrackStrawHit(): TObject() {
   Clear();
 }
 
 //_____________________________________________________________________________
-TTrackStrawHitData::~TTrackStrawHitData() {
+TTrackStrawHit::~TTrackStrawHit() {
 }
 
 //_____________________________________________________________________________
-void TTrackStrawHitData::Set(int Index, float Time, float Dt, float EnergyDep,
-			     int Active, int Ambig, float DriftRadius,
-			     int PdgCode, int MotherPdgCode, int GenCode, int SimID, 
-			     float McDoca, float McMomentum) 
+void TTrackStrawHit::Set(int StrawID, float Time, float Dt, float EnergyDep,
+			 int Active, int Ambig, float DriftRadius,
+			 int PdgCode, int MotherPdgCode, int GenCode, int SimID, 
+			 float McDoca, float McMomentum) 
 {
-  fIndex         = Index; 
+  fStrawID       = StrawID; 
   fTime          = Time; 
   fDt            = Dt; 
   fEnergy        = EnergyDep;
@@ -87,8 +87,8 @@ void TTrackStrawHitData::Set(int Index, float Time, float Dt, float EnergyDep,
 }
 
 //_____________________________________________________________________________
-void TTrackStrawHitData::Clear(Option_t* opt) {
-  fIndex         = -1;
+void TTrackStrawHit::Clear(Option_t* opt) {
+  fStrawID         = -1;
   fTime          = 1.e6;
   fDt            = 1.e6;
   fEnergy        = -1;
@@ -107,7 +107,7 @@ void TTrackStrawHitData::Clear(Option_t* opt) {
 }
 
 //_____________________________________________________________________________
-void TTrackStrawHitData::Print(Option_t* Option) const {
+void TTrackStrawHit::Print(Option_t* Option) const {
   // print Straw hit properties
   //  printf("Superlayer: %d, Wire: %d, Cell: %d,\n",fSuperLayer,fWire,fCell);
   
@@ -123,7 +123,7 @@ void TTrackStrawHitData::Print(Option_t* Option) const {
   if (opt == "banner") return;
   
   printf("%6i %6i %6i %10.3f %10.3f %10.3f %10.5f %8i %8i %8i %8i %10.3f %10.3f\n",
-	 fIndex, 
+	 fStrawID, 
 	 fActive,
 	 fAmbig,
 	 fDriftRadius,

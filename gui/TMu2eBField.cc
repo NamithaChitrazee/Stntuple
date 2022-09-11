@@ -4,12 +4,12 @@
 #include "Stntuple/gui/TMu2eBField.hh"
 #include "Stntuple/val/stntuple_val_functions.hh"
 
-#include "GeometryService/inc/GeometryService.hh"
-#include "GeometryService/inc/GeomHandle.hh"
-#include "GeometryService/inc/BFieldManagerMaker.hh"
-#include "GeometryService/inc/BFieldConfigMaker.hh"
-#include "GeometryService/inc/BeamlineMaker.hh"
-#include "BeamlineGeom/inc/Beamline.hh"
+#include "Offline/GeometryService/inc/GeometryService.hh"
+#include "Offline/GeometryService/inc/GeomHandle.hh"
+#include "Offline/GeometryService/inc/BFieldManagerMaker.hh"
+#include "Offline/GeometryService/inc/BFieldConfigMaker.hh"
+#include "Offline/GeometryService/inc/BeamlineMaker.hh"
+#include "Offline/BeamlineGeom/inc/Beamline.hh"
 #include "CLHEP/Vector/ThreeVector.h"
 
 #include "TBranch.h"

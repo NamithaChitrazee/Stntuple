@@ -1,0 +1,107 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+///////////////////////////////////////////////////////////////////////////////
+#ifndef __Stntuple_mod_InitTrackBlock__
+#define __Stntuple_mod_InitTrackBlock__
+
+#include <string.h>
+
+#include "canvas/Utilities/InputTag.h"
+
+#include "Stntuple/obj/TStnInitDataBlock.hh"
+#include "Stntuple/obj/TStnTrackBlock.hh"
+
+#ifndef __CINT__
+
+#include "Offline/TrkReco/inc/DoubletAmbigResolver.hh"
+#include "Offline/TrackerGeom/inc/Tracker.hh"
+#include "Offline/RecoDataProducts/inc/AlgorithmID.hh"
+#include "Offline/RecoDataProducts/inc/ComboHit.hh"
+#include "Offline/RecoDataProducts/inc/KalSeed.hh"
+#include "Offline/RecoDataProducts/inc/TrkCaloIntersect.hh"
+#include "Offline/RecoDataProducts/inc/TrkQual.hh"
+#include "Offline/RecoDataProducts/inc/PIDProduct.hh"
+#include "Offline/MCDataProducts/inc/StrawDigiMC.hh"
+#include "Offline/MCDataProducts/inc/StepPointMC.hh"
+
+#else
+namespace mu2e {
+  class AlgorithmIDCollection;
+  class DoubletAmbigResolver;
+  class Tracker;
+  class ComboHitCollection;
+  class KalSeedCollection;
+  class PIDProductCollection;
+  class StrawDigiMCCollection;
+  class StepPointMCCollection;
+  class TrkQualCollection;
+  class TrkCaloIntersectCollection;
+};
+#endif
+
+class StntupleInitTrackBlock : public TStnInitDataBlock {
+public:
+
+  struct ZMap_t {
+    int    fMap[44][6][2];		// 44 means "by plane"
+    double fZ  [88];
+  };
+
+  art::InputTag   fAlgorithmIDCollTag;
+  art::InputTag   fCaloClusterCollTag;
+  art::InputTag   fComboHitCollTag;
+  art::InputTag   fKalSeedCollTag;
+  art::InputTag   fPIDProductCollTag;
+  art::InputTag   fStrawDigiMCCollTag;
+  art::InputTag   fSpmcCollTag;
+  art::InputTag   fTciCollTag;                     // TCI = track calo    intersection
+  art::InputTag   fTcmCollTag;                     // TCM = track cluster match
+  art::InputTag   fTrkQualCollTag;
+
+  TString         fTrackTsBlockName;
+  art::InputTag   fTrackTsCollTag;
+
+  mu2e::AlgorithmIDCollection*             list_of_algs               ;
+  const mu2e::KalSeedCollection*           list_of_kreps              ;
+  const mu2e::TrkQualCollection*           list_of_trk_qual           ;
+  const mu2e::StrawDigiMCCollection*       list_of_mc_straw_hits      ;
+  const mu2e::ComboHitCollection*          list_of_combo_hits         ;
+  const mu2e::TrkCaloIntersectCollection*  list_of_extrapolated_tracks;
+  const mu2e::PIDProductCollection*        list_of_pidp               ;
+
+  const mu2e::Tracker*                     tracker;
+  ZMap_t                                   zmap;
+
+  mu2e::DoubletAmbigResolver*              _dar;
+//-----------------------------------------------------------------------------
+// functions
+//-----------------------------------------------------------------------------
+public:
+
+  void   SetAlgorithmIDCollTag      (std::string& Tag) { fAlgorithmIDCollTag   = art::InputTag(Tag); }
+  void   SetCaloClusterCollTag      (std::string& Tag) { fCaloClusterCollTag   = art::InputTag(Tag); }
+  void   SetComboHitCollTag         (std::string& Tag) { fComboHitCollTag      = art::InputTag(Tag); }
+  void   SetKalSeedCollTag          (std::string& Tag) { fKalSeedCollTag       = art::InputTag(Tag); }
+  void   SetPIDProductCollTag       (std::string& Tag) { fPIDProductCollTag    = art::InputTag(Tag); }
+  void   SetSpmcCollTag             (std::string& Tag) { fSpmcCollTag          = art::InputTag(Tag); }
+  void   SetStrawDigiMCCollTag      (std::string& Tag) { fStrawDigiMCCollTag   = art::InputTag(Tag); }
+  void   SetTciCollTag              (std::string& Tag) { fTciCollTag           = art::InputTag(Tag); }
+  void   SetTcmCollTag              (std::string& Tag) { fTcmCollTag           = art::InputTag(Tag); }
+  void   SetTrkQualCollTag          (std::string& Tag) { fTrkQualCollTag       = art::InputTag(Tag); }
+  void   SetTrackTsCollTag          (std::string& Tag) { fTrackTsCollTag       = art::InputTag(Tag); }
+
+  void   SetDoubletAmbigResolver    (mu2e::DoubletAmbigResolver* Dar) { _dar   = Dar; }
+
+  void   SetTrackTsBlockName        (const char* Name) { fTrackTsBlockName     = Name; }
+
+  void   InitTrackerZMap(const mu2e::Tracker* Tracker, ZMap_t* Map);
+  void   get_station    (const mu2e::Tracker* Tracker, ZMap_t* Map, double Z, int* Plane, int* Offset);
+  double s_at_given_z   (const mu2e::KalSeed* KSeed, double Z);
+  
+  
+  virtual int InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mode);
+  virtual int ResolveLinks (TStnDataBlock* Block, AbsEvent* Evt, int Mode);
+
+};
+
+#endif

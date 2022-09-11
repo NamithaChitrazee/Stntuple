@@ -18,8 +18,8 @@
 #include "art/Framework/Principal/Event.h"
 #include "art/Framework/Principal/Handle.h"
 
-#include "GeometryService/inc/GeometryService.hh"
-#include "GeometryService/inc/GeomHandle.hh"
+#include "Offline/GeometryService/inc/GeometryService.hh"
+#include "Offline/GeometryService/inc/GeomHandle.hh"
 
 #include "Stntuple/gui/TEvdCluster.hh"
 #include "Stntuple/gui/TEvdCrystal.hh"
@@ -28,10 +28,10 @@
 #include "Stntuple/gui/TCalView.hh"
 
 //#include "CalorimeterGeom/inc/VaneCalorimeter.hh"
-#include "CalorimeterGeom/inc/Crystal.hh"
-#include "CalorimeterGeom/inc/Disk.hh"
-#include "CalorimeterGeom/inc/DiskCalorimeter.hh"
-#include "CalorimeterGeom/inc/Calorimeter.hh"
+#include "Offline/CalorimeterGeom/inc/Crystal.hh"
+#include "Offline/CalorimeterGeom/inc/Disk.hh"
+#include "Offline/CalorimeterGeom/inc/DiskCalorimeter.hh"
+#include "Offline/CalorimeterGeom/inc/Calorimeter.hh"
 
 ClassImp(TEvdCalSection)
 
@@ -78,8 +78,8 @@ void TEvdCalSection::Paint(Option_t* option) {
 				// parse option list
   int view = TVisManager::Instance()->GetCurrentView()->Type();
 
-  if      (view == TStnView::kXY ) PaintXY (option);
-  else if (view == TStnView::kCal) {
+  if      (view == TStnVisManager::kXY ) PaintXY (option);
+  else if (view == TStnVisManager::kCal) {
     int index = TVisManager::Instance()->GetCurrentView()->Index();
     if (index == fSectionID) {
       PaintCal(option);

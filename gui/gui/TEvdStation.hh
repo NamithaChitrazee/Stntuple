@@ -11,7 +11,7 @@
 #include "TArc.h"
 
 #ifndef __CINT__
-#include "TrackerGeom/inc/Tracker.hh"
+#include "Offline/TrackerGeom/inc/Tracker.hh"
 #else
 namespace mu2e {
   class   Tracker;

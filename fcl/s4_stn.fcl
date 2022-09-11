@@ -3,24 +3,25 @@
 # S4 Sim file s- inputs for mixing
 #------------------------------------------------------------------------------
 BEGIN_PROLOG
-  TIME_MAPS        @protect_ignore: [ ]
-  TIME_OFFSET_MAPS @protect_ignore: { inputs : @local::TIME_MAPS }
-  TRIGGER_PATHS    @protect_ignore: [ stntuple_p0 ]
+  TRIGGER_PATHS                   : [ p1 ]
 END_PROLOG
 
-#include "Stntuple/fcl/stnmaker.fcl"
+#include "Stntuple/fcl/stntuple.fcl"
 
 process_name : S4Stnmaker
 
 source       : { module_type : RootInput fileNames : ["undefined", "undefined"] }
 
 outputs      : { @table::Stntuple.outputs   }
+producers    : { @table::Stntuple.producers }
 filters      : { @table::Stntuple.filters   }
+analyzers    : { @table::Stntuple.analyzers }
+paths        : { @table::Stntuple.paths     }
 
 physics : { @table::Stntuple.physics 
     
-    filters  : { @table::filters 
-	StntupleMaker: { @table::filters.StntupleMaker
+    analyzers  : { @table::analyzers 
+	StntupleMaker: { @table::analyzers.StntupleMaker
 #------------------------------------------------------------------------------
 # disable everything, enable StepPointMC's, VDET block is just yet another StepPointMC block
 #------------------------------------------------------------------------------
@@ -32,7 +33,7 @@ physics : { @table::Stntuple.physics
 	    makeTracks       : 0
 	    makeTrigger      : 0
 
-	    simpCollTag      : "g4run"
+	    simpCollTag      : "compressDigiMCs"
 
 	    spmcBlockName    : [ "SpmcBlock"     , "VDetBlock"             , "IPABlock"             ]
 	    spmcCollTag      : [ "g4run:tracker" , "g4run:virtualdetector" , "g4run:protonabsorber" ]
@@ -40,9 +41,13 @@ physics : { @table::Stntuple.physics
 	}
     }
 
+    @table::paths
+    p1 : [ @sequence::TrkHitReco.PrepareHits ]
+    
+
+    trigger_paths : [ p1 ]
     out           : [ ]                   # [defaultOutput]/[]
-#    end_paths     : [ gcl, out ]
-    end_paths     : [ out ]
+    end_paths     : [ stntuple_p0 , out ]
 }
 
 #------------------------------------------------------------------------------
@@ -52,5 +57,5 @@ physics : { @table::Stntuple.physics
 # outputs.detectorOutput.SelectEvents       : [ path_gen_digi_reco_stn_dem_dmm ]
 
 services.TFileService.fileName            : "nts.user.s4_stn.project.sequencer.hist"
-physics.filters.InitStntuple.histFileName : "nts.user.s4_stn.project.sequencer.stn"
+physics.analyzers.InitStntuple.histFileName : "nts.user.s4_stn.project.sequencer.stn"
 outputs.detectorOutput.fileName           : "sim.user.s4_stn.project.sequencer.art"

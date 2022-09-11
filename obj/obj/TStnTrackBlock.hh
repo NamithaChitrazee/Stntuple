@@ -28,7 +28,7 @@ class TStnTrack;
 
 class TStnTrackBlock: public TStnDataBlock {
 
-  friend Int_t StntupleInitMu2eTrackBlock     (TStnDataBlock*, AbsEvent*, int);
+  friend class StntupleInitTrackBlock; 
   friend Int_t StntupleInitMu2eTrackBlockLinks(TStnDataBlock*, AbsEvent*, int);
 public:
 //------------------------------------------------------------------------------

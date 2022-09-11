@@ -18,11 +18,12 @@
 #include "art/Framework/Principal/Event.h"
 #include "art/Framework/Principal/Handle.h"
 
-#include "GeometryService/inc/GeometryService.hh"
-#include "GeometryService/inc/GeomHandle.hh"
+#include "Offline/GeometryService/inc/GeometryService.hh"
+#include "Offline/GeometryService/inc/GeomHandle.hh"
 
-#include "TrackerGeom/inc/Straw.hh"
-#include "RecoDataProducts/inc/StrawDigi.hh"
+#include "Offline/TrackerGeom/inc/Straw.hh"
+#include "Offline/TrackerGeom/inc/Tracker.hh"
+#include "Offline/RecoDataProducts/inc/StrawDigi.hh"
 
 #include "Stntuple/gui/TEvdPanel.hh"
 #include "Stntuple/gui/TEvdStraw.hh"
@@ -41,7 +42,7 @@ TEvdStraw::TEvdStraw(): TObject() {
 // drawing straws makes sense only on RZ view, in any other view it is just 
 // a waste of time ... and screen space
 //-----------------------------------------------------------------------------
-TEvdStraw::TEvdStraw(int Index, const mu2e::Straw* Straw, TEvdPanel* Panel): TObject() {
+  TEvdStraw::TEvdStraw(int Index, const mu2e::Straw* Straw, TEvdPanel* Panel, const mu2e::Tracker* Tracker): TObject() {
 
   fIndex     = Index;
   fStraw     = Straw;
@@ -55,7 +56,7 @@ TEvdStraw::TEvdStraw(int Index, const mu2e::Straw* Straw, TEvdPanel* Panel): TOb
 
   z        = pos->z();
   rwire    = pos->perp();                      // radial position of the wire
-  r        = fStraw->getRadius();
+  r        = Tracker->strawProperties()._strawOuterRadius;
 
   fArc = new TArc(z,rwire,r);
 
@@ -77,8 +78,8 @@ void TEvdStraw::Paint(Option_t* option) {
 
   int view = TVisManager::Instance()->GetCurrentView()->Type();
 
-  if      (view == TStnView::kXY) PaintXY (option);
-  else if (view == TStnView::kRZ) PaintRZ (option);
+  if      (view == TStnVisManager::kXY) PaintXY (option);
+  else if (view == TStnVisManager::kRZ) PaintRZ (option);
   else {
     // what is the default?
     //    Warning("Paint",Form("Unknown option %s",option));

@@ -3,17 +3,17 @@
 
 #include "art/Framework/Principal/Handle.h"
 
-#include "GeometryService/inc/GeometryService.hh"
-#include "GeometryService/inc/GeomHandle.hh"
+#include "Offline/GeometryService/inc/GeometryService.hh"
+#include "Offline/GeometryService/inc/GeomHandle.hh"
 
 #include "Stntuple/gui/TEvdCrvBar.hh"
 #include "Stntuple/gui/TStnVisManager.hh"
 #include "Stntuple/base/TObjHandle.hh"
 
-#include "CosmicRayShieldGeom/inc/CRSScintillatorBar.hh"
-#include "CosmicRayShieldGeom/inc/CRSScintillatorShield.hh"
-#include "CosmicRayShieldGeom/inc/CosmicRayShield.hh"
-#include "RecoDataProducts/inc/CrvRecoPulse.hh"
+#include "Offline/CosmicRayShieldGeom/inc/CRSScintillatorBar.hh"
+#include "Offline/CosmicRayShieldGeom/inc/CRSScintillatorShield.hh"
+#include "Offline/CosmicRayShieldGeom/inc/CosmicRayShield.hh"
+#include "Offline/RecoDataProducts/inc/CrvRecoPulse.hh"
 
 ClassImp(TEvdCrvBar)
 
@@ -137,9 +137,9 @@ TEvdCrvBar::~TEvdCrvBar() {
 //-----------------------------------------------------------------------------
 void TEvdCrvBar::Paint(Option_t* Option) {
 
-  int type = TVisManager::Instance()->GetCurrentView()->Type();
+  int view = TVisManager::Instance()->GetCurrentView()->Type();
 
-  if (type == TStnView::kCrv) {
+  if (view == TStnVisManager::kCrv) {
     PaintCrv(Option);
     gPad->Modified();
   }
@@ -261,7 +261,7 @@ void TEvdCrvBar::Print(Option_t* Opt) const {
     tempPulse = lastPulseInWindow(SiPM);
     if (tempPulse) {
       printf("thresh %f , tL %f , tH %f , %p \n", fthreshold, ftimeLow, ftimeHigh, tempPulse);
-      printf("%i	%i	%i	%f	%i \n", barIndex.asInt(), SiPM, fSectionID, tempPulse->GetPulseTime(), tempPulse->GetPEs());
+      printf("%i	%i	%i	%f	%f \n", barIndex.asInt(), SiPM, fSectionID, tempPulse->GetPulseTime(), tempPulse->GetPEs());
     }
   }
 }

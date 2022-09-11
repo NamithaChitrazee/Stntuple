@@ -1,0 +1,65 @@
+# -*- mode:tcl -*-
+#------------------------------------------------------------------------------
+# read output of reconstruction. run event display
+#------------------------------------------------------------------------------
+BEGIN_PROLOG
+  TRIGGER_PATHS : [ p1 ]
+  TIME_MAPS     @protect_ignore: [ "compressDigiMCs:protonTimeMap", "compressDigiMCs:muonTimeMap", "compressDigiMCs:cosmicTimeMap" ]
+END_PROLOG
+
+
+#include "Stntuple/fcl/stntuple.fcl"
+
+process_name : Display
+
+source       : { module_type : RootInput   }
+
+physics : {
+    producers  : { @table::stntuple.producers }
+    filters    : { @table::stntuple.filters   }
+    analyzers  : { @table::stntuple.analyzers }
+
+    @table::stntuple.paths
+
+
+    p1 : [ @sequence::CaloReco.Reco,
+	   @sequence::CaloCluster.Reco,
+	   @sequence::TrkHitReco.PrepareHits 
+	   # , @sequence::CrvRecoPackage.CrvRecoSequence
+	   # , @sequence::production.trk_reco_de
+	  ]
+
+    end_p1 : [ 
+#		     @sequence::Stntuple.gen_g4_time_map,
+#	  @sequence::Stntuple.digis          ,
+#	  EventFilter                        , 
+#   	  @sequence::Stntuple.trk_hit_reco   ,
+#	  @sequence::Stntuple.calo_reco      ,
+# 	  @sequence::Stntuple.trk_reco_de    ,
+	  #		     @sequence::Stntuple.stnmaker_dem
+	      MuHitDisplay
+	 ]
+
+    trigger_paths : [ p1 ]
+    #    out : [detectorOutput]  # detectorOutput is defined in Stntuple/fcl/templates.fcl
+    out           : [     ]
+    end_paths     : [ end_p1, out ]
+}
+
+services.TFileService.fileName            : "nts.user.egun_stnmaker.xxx.000001.root"
+#------------------------------------------------------------------------------
+# uncomment the next 2 lines if you want the DST file to be written out
+#-----------------------------------------------------------------------------
+# physics.out                               : [ detectorOutput ]
+# outputs.detectorOutput.SelectEvents       : [ path_gen_digi_reco_stn_dem ]
+outputs.detectorOutput.fileName             : "sim.user.project.version.000000_00000000.art"
+#------------------------------------------------------------------------------
+# configure event display
+# mode=2
+# change interactive mode from 2 to 1 to stop after each event
+# see description at 
+#------------------------------------------------------------------------------
+physics.analyzers.MuHitDisplay.interactiveMode    : 1
+physics.analyzers.MuHitDisplay.minSimpMomentum    : 40
+physics.analyzers.MuHitDisplay.rootMacro          : "Stntuple/mod/scripts/display_001.C"
+physics.analyzers.MuHitDisplay.primaryParticleTag : ""  # display all particles

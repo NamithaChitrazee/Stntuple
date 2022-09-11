@@ -1,0 +1,58 @@
+# -*- mode:tcl -*-
+#------------------------------------------------------------------------------
+# stntuple VST data
+# p1 : default reconstruction path
+#------------------------------------------------------------------------------
+BEGIN_PROLOG
+  TRIGGER_PATHS    @protect_ignore: [ p1 ]
+END_PROLOG
+
+#include "Stntuple/fcl/stntuple.fcl"
+
+process_name : VstStn
+
+source       : { module_type : RootInput fileNames : ["undefined", "undefined"] }
+
+physics : { 
+    producers  : { @table::stntuple.producers }
+    filters    : { @table::stntuple.filters   }
+    
+    analyzers  : { @table::stntuple.analyzers 
+	StntupleMaker: { @table::stntuple.analyzers.StntupleMaker
+#------------------------------------------------------------------------------
+# disable everything, enable StepPointMC's, 
+# VDET block is just yet another StepPointMC block
+# set strawDigiMCCollTag to empty
+#------------------------------------------------------------------------------
+	    makeCalData        : 0
+	    makeClusters       : 0
+	    makeCrvClusters    : 0  # default: 1
+	    makeGenp           : 0
+	    makePid            : 0
+	    makeSimp           : 0
+ 	    makeStepPointMC    : 0
+	    makeStrawHits      : 1
+	    makeTimeClusters   : 0
+	    makeTracks         : 0
+	    makeTrackSeeds     : 0
+	    makeTrigger        : 0
+
+	    strawDigiMCCollTag : ""	
+	}
+    }
+
+    @table::stntuple.paths
+#------------------------------------------------------------------------------
+# just an example of a substitution in FCL
+#------------------------------------------------------------------------------
+    p1            : [    ]
+    trigger_paths : [ p1 ]
+    out           : [    ]                               # [defaultOutput]/[]
+    end_paths     : [ stntuple_p0 , out ]
+}
+#------------------------------------------------------------------------------
+# output file names
+#------------------------------------------------------------------------------
+services.TFileService.fileName              : "nts.user.vst_stn.project.sequencer.root"
+physics.analyzers.InitStntuple.histFileName : "nts.user.vst_stn.project.sequencer.stn"
+# outputs.detectorOutput.fileName            : "sim.user.vst_stn.project.sequencer.art"

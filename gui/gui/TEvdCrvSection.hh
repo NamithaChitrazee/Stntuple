@@ -11,7 +11,7 @@
 
 #ifndef __CINT__
 
-#include "CosmicRayShieldGeom/inc/CRSScintillatorShield.hh"
+#include "Offline/CosmicRayShieldGeom/inc/CRSScintillatorShield.hh"
 
 #else
 

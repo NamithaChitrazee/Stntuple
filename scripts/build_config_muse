@@ -1,0 +1,70 @@
+#!/bin/bash
+#------------------------------------------------------------------------------
+# 
+#------------------------------------------------------------------------------
+      package=$1
+  debug_level=0 ; if [ ."$2" != "." ] ; then debug_level=$2 ; fi
+#------------------------------------------------------------------------------
+f_build_config_muse() {
+
+    # echo STNUPLE/build_config_muse
+
+    local         pkg=$1
+    local debug_level=$2
+
+    base=$MUSE_WORK_DIR
+
+    if [ $debug_level != 0 ] ; then echo ${pkg}::build_config_muse:001: $\0:$0 : \$PWD=$PWD  \$base=$base ; fi
+
+            pkg_dir=$MUSE_WORK_DIR/$pkg
+    pkg_include_dir=$base/include/$pkg
+
+    if [ $debug_level != 0 ] ; then echo ${pkg}::build_config_muse: package=$pkg \$pwd=`pwd`  :: pkg_dir=$pkg_dir ; fi
+
+    x1=`find $pkg_dir -name SConscript -print`
+    list_of_subpackages=`for nm in $x1 ; do echo $nm | grep -v $pkg/SConscript | awk -F / '{print $(NF-1)}' ; done`
+
+    if [ $debug_level != 0 ] ; then echo $pkg::build_config_muse: list_of_subpackages=$list_of_subpackages ; fi
+#------------------------------------------------------------------------------
+# package and its subpackages
+#------------------------------------------------------------------------------
+    if [ ! -d $pkg_include_dir ] ; then
+	if [ $debug_level != 0 ] ; then echo ${pkg}::build_config_muse: pwd=$pwd creating $base/include/$pkg ; fi
+	mkdir -p $pkg_include_dir
+    fi
+#------------------------------------------------------------------------------
+# make symbolic links local, as they are 
+#------------------------------------------------------------------------------
+    for d in $list_of_subpackages ; do
+	if [[ -e $base/include/$pkg ]] && [[ ! -e $base/include/$pkg/$d ]] ; then 
+	    cmd="ln -s ../../$pkg/$d/$d $pkg_include_dir/$d"
+	    if [ $debug_level != 0 ] ; then echo `pwd`$0 : executing: $cmd ; fi
+	    $cmd
+	fi
+    done
+#------------------------------------------------------------------------------
+# make sure $WORK_DIR/site_scons directory exists
+# SCons-related things: executed from Stntuple
+# execution in Stntuple
+#------------------------------------------------------------------------------
+#    pushd $MUSE_WORK_DIR ; 
+    cd $MUSE_WORK_DIR ; 
+    if [ ! -d site_scons ] ; then mkdir site_scons ; fi
+    cp -u Stntuple/scripts/stntuple_site_init.py       site_scons/.
+    cp -u Stntuple/scripts/stntuple_helper.py          site_scons/.
+#------------------------------------------------------------------------------
+# .rootrc and rootlogon.C could be modified by the user, copy them just once
+#------------------------------------------------------------------------------
+    if [ ! -f .rootrc     ] ; then cp Stntuple/scripts/.rootrc     . ; fi
+    if [ ! -f rootlogon.C ] ; then cp Stntuple/scripts/rootlogon.C . ; fi
+#    popd ;
+    cd ~- ;
+
+    # echo STNUPLE/build_config_muse END
+}
+
+#------------------------------------------------------------------------------
+# do what is needed
+#------------------------------------------------------------------------------
+if [ $debug_level != 0 ] ; then echo Stntuple::build_config_muse: package=$package debug_level=$debug_level ; fi
+f_build_config_muse $package $debug_level

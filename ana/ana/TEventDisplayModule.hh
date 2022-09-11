@@ -34,7 +34,8 @@
 #include <TEveEventManager.h>
 #include <TEveBrowser.h>
 #include <TEveGeoNode.h>
-#include <TEveViewer.h>
+#include "TEveGeoShape.h"
+#include "TEveViewer.h"
 #include <TEveScene.h>
 #include <TEveProjectionManager.h>
 #include <TEveProjectionAxes.h>

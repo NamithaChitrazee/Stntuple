@@ -3,9 +3,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "Stntuple/mod/InitCrvClusterBlock.hh"
-#include "RecoDataProducts/inc/CrvRecoPulse.hh"
-#include "RecoDataProducts/inc/CrvCoincidenceCollection.hh"
-#include "RecoDataProducts/inc/CrvCoincidenceCluster.hh"
+#include "Offline/RecoDataProducts/inc/CrvRecoPulse.hh"
+#include "Offline/RecoDataProducts/inc/CrvCoincidence.hh"
+#include "Offline/RecoDataProducts/inc/CrvCoincidenceCluster.hh"
 
 //-----------------------------------------------------------------------------
 // in this case AbsEvent is just not used

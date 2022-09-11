@@ -16,15 +16,14 @@
 
 #ifndef __CINT__
 
-#include "RecoDataProducts/inc/ComboHit.hh"
-#include "MCDataProducts/inc/StrawDigiMC.hh"
-#include "MCDataProducts/inc/PtrStepPointMCVectorCollection.hh"
+#include "canvas/Persistency/Provenance/ProductID.h"
+#include "Offline/RecoDataProducts/inc/ComboHit.hh"
+#include "Offline/MCDataProducts/inc/StrawDigiMC.hh"
 
 #else
 namespace mu2e {
   class ComboHit;
   class StrawDigiMC;
-  class PtrStepPointMCVector;
 };
 #endif
 
@@ -44,7 +43,6 @@ protected:
 
   const mu2e::ComboHit*             fHit;
   const mu2e::StrawDigiMC*          fStrawDigiMC;
-  const mu2e::PtrStepPointMCVector* fListOfStepPointMCs;
 
   TEvdStraw*  fStraw;                 // pointer to the straw -  geometry
 

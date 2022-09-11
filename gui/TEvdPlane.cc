@@ -18,15 +18,15 @@
 #include "art/Framework/Principal/Event.h"
 #include "art/Framework/Principal/Handle.h"
 
-#include "GeometryService/inc/GeometryService.hh"
-#include "GeometryService/inc/GeomHandle.hh"
+#include "Offline/GeometryService/inc/GeometryService.hh"
+#include "Offline/GeometryService/inc/GeomHandle.hh"
 
 #include "Stntuple/gui/TEvdStation.hh"
 #include "Stntuple/gui/TEvdPlane.hh"
 #include "Stntuple/gui/TEvdPanel.hh"
 #include "Stntuple/gui/TStnVisManager.hh"
 
-#include "TrackerGeom/inc/Plane.hh"
+#include "Offline/TrackerGeom/inc/Plane.hh"
 
 
 ClassImp(stntuple::TEvdPlane)
@@ -40,7 +40,7 @@ TEvdPlane::TEvdPlane(): TObject() {
 }
 
 //_____________________________________________________________________________
-TEvdPlane::TEvdPlane(int ID, const mu2e::Plane* Plane, TEvdStation* Station): TObject() {
+  TEvdPlane::TEvdPlane(int ID, const mu2e::Plane* Plane, TEvdStation* Station, const mu2e::Tracker* Tracker): TObject() {
 
   int        id;
   TEvdPanel*  evd_panel;
@@ -56,7 +56,7 @@ TEvdPlane::TEvdPlane(int ID, const mu2e::Plane* Plane, TEvdStation* Station): TO
     const mu2e::Panel* panel = &fPlane->getPanel(i);
 
     id       = -1; // fNPanels*Plane->id()+i;
-    evd_panel = new TEvdPanel(id,panel,this);
+    evd_panel = new TEvdPanel(id,panel,this,Tracker);
 
     fListOfPanels->Add(evd_panel);
   }
@@ -76,8 +76,8 @@ void TEvdPlane::Paint(Option_t* option) {
 
   int view = TVisManager::Instance()->GetCurrentView()->Type();
 
-  if      (view == TStnView::kXY) PaintXY (option);
-  else if (view == TStnView::kRZ) PaintRZ (option);
+  if      (view == TStnVisManager::kXY) PaintXY (option);
+  else if (view == TStnVisManager::kRZ) PaintRZ (option);
   else {
     // what is the default?
     //    Warning("Paint",Form("Unknown option %s",option));

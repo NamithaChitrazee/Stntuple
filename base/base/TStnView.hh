@@ -38,23 +38,12 @@ protected:
 
   TObjArray*          fListOfNodes;	// list of nodes to visualize
 
-public: 
-					// different view types
-  enum {
-    kUndefined = 0,
-    kXY        = 1,
-    kRZ        = 2,
-    kTZ        = 3,
-    kCal       = 4,
-    kCrv       = 5
-  };
-
 protected:
   float     fTMin;
   float     fTMax;
 
 public:
-  TStnView(int Type = kUndefined, int Index = -1); 
+  TStnView(int Type = -1, int Index = -1); 
 
   TStnView(int Type, int Index, const char* Name, const char* Title);
 

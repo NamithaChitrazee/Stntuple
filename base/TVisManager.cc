@@ -124,6 +124,13 @@ void TVisManager::MarkModified(TPad* Pad) {
 }
 
 //-----------------------------------------------------------------------------
+// to be overloaded
+//-----------------------------------------------------------------------------
+int TVisManager::GetViewID(const char* Name) {
+  return -1;
+}
+
+//-----------------------------------------------------------------------------
 void TVisManager::OpenView(TStnView* Mother, int Px1, int Py1, int Px2, int Py2) {
 }
 
@@ -176,6 +183,12 @@ void TVisManager::DisplayEvent() {
   }
 }
 
+//-----------------------------------------------------------------------------
+// returns 1 if end-of-run and don't need to redraw
+//-----------------------------------------------------------------------------
+int TVisManager::EndRun() { 
+  return 0;
+}
 
 //_____________________________________________________________________________
 void TVisManager::Gdhead(Int_t isel, const char *name, Float_t chrsiz) { 

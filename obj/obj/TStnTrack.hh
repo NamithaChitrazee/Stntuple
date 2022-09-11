@@ -14,28 +14,6 @@
 
 // Mu2e includes.
 
-// #include "CLHEP/Geometry/HepPoint.h"
-// #include "CLHEP/Vector/ThreeVector.h"
-// #include "CLHEP/Matrix/SymMatrix.h"
-// #include "CLHEP/Matrix/Vector.h"
-// 
-// #include "TrkBase/TrkHelixUtils.hh"
-// #include "TrkBase/HelixParams.hh"
-// #include "KalmanTrack/KalHit.hh"
-// #include "KalmanTests/inc/KalRepCollection.hh"
-
-// storable objects (data products)
-// #include "RecoDataProducts/inc/StrawHitCollection.hh"
-// #include "RecoDataProducts/inc/CaloCrystalHitCollection.hh"
-// #include "RecoDataProducts/inc/CaloHitCollection.hh"
-// #include "RecoDataProducts/inc/CaloClusterCollection.hh"
-// #include "MCDataProducts/inc/GenParticleCollection.hh"
-
-
-// #include "TrackCaloMatching/inc/TrackClusterLink.hh"
-// #include "TrackCaloMatching/inc/TrkToCaloExtrapolCollection.hh"
-// #include "TrackCaloMatching/inc/TrkToCaloExtrapol.hh"
-
 // C++ includes.
 #include <iostream>
 
@@ -47,10 +25,10 @@
 // #include "TStnCluster.hh"
 
 					// 'KalRep' is a BaBar class
-class KalRep ;
 class TStnCluster;
 
 namespace mu2e {
+  class KalSeed ;
   class CaloCluster;
   class TrkToCaloExtrapol;
 }
@@ -220,7 +198,7 @@ public:
   InterData_t*                   fVMaxEp;	      //! intersection with max E/P
   InterData_t*                   fVTCH;               //! TrackCaloHit info
 
-  KalRep*                        fKalRep[4];          //! different fits, sequence: e-, e+, mu-, mu+
+  mu2e::KalSeed*                 fKalRep[4];          //! different fits, sequence: e-, e+, mu-, mu+
 
   int                            fITmp[ 5];           //!
   Float_t                        fTmp [10];           //! for temporary analysis needs
@@ -310,7 +288,7 @@ public:
   float  Pt() const { return fPt; }
   Int_t  GetMomentum  (TLorentzVector* Momentum) ;
   
-  KalRep*   GetKalRep() { return fKalRep[0]; }
+  mu2e::KalSeed*   GetKalRep() { return fKalRep[0]; }
   
   float  P0         () const { return fP0;      }
   float  P2         () const { return fP2;      }

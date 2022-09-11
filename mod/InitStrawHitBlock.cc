@@ -2,13 +2,13 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "Stntuple/mod/InitStrawDataBlock.hh"
+#include "Stntuple/mod/InitStrawHitBlock.hh"
 
-#include "RecoDataProducts/inc/ComboHit.hh"
-#include "RecoDataProducts/inc/StrawHit.hh"
+#include "Offline/RecoDataProducts/inc/ComboHit.hh"
+#include "Offline/RecoDataProducts/inc/StrawHit.hh"
 
-#include "MCDataProducts/inc/StrawDigiMC.hh"
-#include "MCDataProducts/inc/StrawGasStep.hh"
+#include "Offline/MCDataProducts/inc/StrawDigiMC.hh"
+#include "Offline/MCDataProducts/inc/StrawGasStep.hh"
 
 #include "vector"
 
@@ -16,16 +16,18 @@ using std::vector ;
 //-----------------------------------------------------------------------------
 // in this case AbsEvent is just not used
 //-----------------------------------------------------------------------------
-int StntupleInitStrawDataBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int Mode) {
+namespace stntuple {
+int InitStrawHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int Mode) {
 
-  int ev_number, rn_number, nhits(0);
+  int ev_number, rn_number, mc_flag(0), nhits(0);
 
   ev_number = Event->event();
   rn_number = Event->run();
+  if (rn_number < 100000) mc_flag = 1;
 
   if (Block->Initialized(ev_number,rn_number)) return 0;
 
-  TStrawDataBlock* data = (TStrawDataBlock*) Block;
+  TStrawHitBlock* data = (TStrawHitBlock*) Block;
   data->Clear();
 //-----------------------------------------------------------------------------
 //  straw hit information
@@ -50,32 +52,33 @@ int StntupleInitStrawDataBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Ev
       shc   = shch.product();
       nhits = shc->size();
     }
+    else {
+      printf(" >>> ERROR in StntupleInitMu2eStrawDataBlock: no StrawHitCollection with tag: %s. BAIL OUT\n",fStrawHitCollTag.encode().data());
+      return -1;
+    }
   }
   
   if (! fStrawDigiMCCollTag.empty() != 0) {
     bool ok = Event->getByLabel(fStrawDigiMCCollTag,sdmcch);
     if (ok) sdmcc = sdmcch.product();
-  }
-  
-  if (shc == nullptr) {
-    printf(" >>> ERROR in StntupleInitMu2eStrawDataBlock: no StrawHitCollection with tag: %s. BAIL OUT\n",fStrawHitCollTag.encode().data());
-    return -1;
-  }
-  else if (sdmcc == nullptr) {
-    printf(" >>> ERROR in StntupleInitMu2eStrawDataBlock: no StrawDigiMCCollection with tag: %s. BAIL OUT\n",fStrawDigiMCCollTag.encode().data());
-    return -1;
+
+    if (sdmcc == nullptr) {
+      printf(" >>> ERROR in StntupleInitMu2eStrawDataBlock: no StrawDigiMCCollection with tag: %s. BAIL OUT\n",fStrawDigiMCCollTag.encode().data());
+      return -1;
+    }
   }
 //-----------------------------------------------------------------------------
-//
+// MC data may not be present ...
 //-----------------------------------------------------------------------------
   const mu2e::StrawGasStep* step (nullptr);
   const mu2e::SimParticle* sim;
 
-  TStrawHitData*           hit; 
+  TStrawHit*           hit; 
 
   int   pdg_id, mother_pdg_id, sim_id, gen_index;
   float mc_mom;
 
+  if (rn_number < 100000) mc_flag = 1;
 
   if (nhits > 0) {
 
@@ -89,13 +92,10 @@ int StntupleInitStrawDataBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Ev
       vector<StrawDigiIndex> shids;
       chc->fillStrawDigiIndices((const art::Event&)*Event,ih,shids);
 
-      const mu2e::StrawDigiMC* mcdigi = &sdmcc->at(shids[0]);
-
-      if (mcdigi->wireEndTime(mu2e::StrawEnd::cal) < mcdigi->wireEndTime(mu2e::StrawEnd::hv)) {
-	step = mcdigi->strawGasStep(mu2e::StrawEnd::cal).get();
-      }
-      else {
-	step = mcdigi->strawGasStep(mu2e::StrawEnd::hv ).get();
+      step = nullptr;
+      if (sdmcc) {  
+	const mu2e::StrawDigiMC* mcdigi = &sdmcc->at(shids[0]);
+	step = mcdigi->earlyStrawGasStep().get();
       }
 
       hit = data->NewHit();
@@ -125,8 +125,24 @@ int StntupleInitStrawDataBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Ev
 	mc_mom        = -1.;
       }
 
-      hit->Set(sh->strawId().asUint16(), sh->time(), sh->dt(), sh->energyDep(),
-	       pdg_id, mother_pdg_id, gen_index, sim_id, mc_mom);
+      int sid = sh->strawId().asUint16() | (mc_flag << 16);
+
+      // straw hit time is an integer (in ns)
+
+      int time [2], tot, itot[2];
+
+      time[0] = (int) sh->time(mu2e::StrawEnd::cal);
+      time[1] = (int) sh->time(mu2e::StrawEnd::hv );
+
+      itot[0] = (int) sh->TOT(mu2e::StrawEnd::cal);
+      itot[1] = (int) sh->TOT(mu2e::StrawEnd::hv );
+      
+      tot     = itot[0] | (itot[1] << 16) ; 
+
+      hit->Set(sid, time, tot, 
+	       gen_index, sim_id, 
+	       pdg_id, mother_pdg_id, 
+	       sh->energyDep(), mc_mom);
     }
   }
 
@@ -138,3 +154,4 @@ int StntupleInitStrawDataBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Ev
 }
 
 
+}

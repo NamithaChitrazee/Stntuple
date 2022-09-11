@@ -2,6 +2,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 #include "TObjArray.h"
+#include "TVirtualX.h"
 
 #include "Stntuple/gui/TCrvVisNode.hh"
 #include "Stntuple/gui/TCrvView.hh"
@@ -9,7 +10,7 @@
 
 ClassImp(TCrvView)
 
-TCrvView::TCrvView(int Section) : TStnView(TStnView::kCrv,Section,"CrvView", "CrvView") {
+TCrvView::TCrvView(int Section) : TStnView(TStnVisManager::kCrv,Section,"CrvView", "CrvView") {
 }
 
 //-----------------------------------------------------------------------------

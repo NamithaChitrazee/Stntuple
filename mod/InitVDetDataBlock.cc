@@ -2,22 +2,24 @@
 // 2014-01-26 P.Murat
 ///////////////////////////////////////////////////////////////////////////////
 
+#include "messagefacility/MessageLogger/MessageLogger.h"
+
 // conditions
-#include "ConditionsService/inc/ConditionsHandle.hh"
-#include "ConditionsService/inc/AcceleratorParams.hh"
+#include "Offline/ConditionsService/inc/ConditionsHandle.hh"
+#include "Offline/ConditionsService/inc/AcceleratorParams.hh"
 
 #include "Stntuple/mod/InitStntupleDataBlocks.hh"
 #include "Stntuple/obj/TVDetDataBlock.hh"
 
-#include "MCDataProducts/inc/SimParticle.hh"
-#include "MCDataProducts/inc/StepPointMC.hh"
-#include "MCDataProducts/inc/StepPointMCCollection.hh"
-#include "MCDataProducts/inc/PtrStepPointMCVectorCollection.hh"
+#include "Offline/MCDataProducts/inc/SimParticle.hh"
+#include "Offline/MCDataProducts/inc/StepPointMC.hh"
+#include "Offline/MCDataProducts/inc/StepPointMC.hh"
+// #include "Offline/MCDataProducts/inc/PtrStepPointMCVectorCollection.hh"
 
-#include "GlobalConstantsService/inc/GlobalConstantsHandle.hh"
-#include "GlobalConstantsService/inc/ParticleDataTable.hh"
+#include "Offline/GlobalConstantsService/inc/GlobalConstantsHandle.hh"
+#include "Offline/GlobalConstantsService/inc/ParticleDataList.hh"
 
-#include "Mu2eUtilities/inc/SimParticleTimeOffset.hh"
+#include "Offline/Mu2eUtilities/inc/SimParticleTimeOffset.hh"
 
 #include "Stntuple/mod/THistModule.hh"
 #include "Stntuple/base/TNamedHandle.hh"
@@ -62,8 +64,7 @@ Int_t StntupleInitMu2eVDetDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent, int
   art::Handle<mu2e::StepPointMCCollection>       step_handle;
   const mu2e::StepPointMCCollection*             list_of_hits(0);
 
-  static mu2e::GlobalConstantsHandle<mu2e::ParticleDataTable> pdt;
-  mu2e::ParticleDataTable::maybe_ref info;
+  static mu2e::GlobalConstantsHandle<mu2e::ParticleDataList> pdt;
 
   mu2e::ConditionsHandle<mu2e::AcceleratorParams> accPar("ignored");
   double _mbtime = accPar->deBuncherPeriod;
@@ -104,6 +105,7 @@ Int_t StntupleInitMu2eVDetDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent, int
   float mc_posX, mc_posY, mc_posZ;
 
   float min_energy(40.);
+  const mu2e::ParticleData* info(nullptr);
 
   for (int i=0; i<nhits; i++) {
     step  = &list_of_hits->at(i);
@@ -122,9 +124,9 @@ Int_t StntupleInitMu2eVDetDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent, int
     else              time =  step->time();
 
     pdg_id    = sim->pdgId();
-    info      = pdt->particle(pdg_id);    
+    info = &pdt->particle(pdg_id);
     
-    mass      = info.ref().mass();
+    mass      = info->mass();
     energy    = sqrt(step->momentum().mag2() + mass*mass);
     energyKin = energy - mass;
     if (energy < min_energy) goto NEXT_VHIT;

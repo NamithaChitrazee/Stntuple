@@ -19,11 +19,13 @@
 
 #include "art/Framework/Principal/Handle.h"
 
-#include "GeometryService/inc/GeometryService.hh"
-#include "GeometryService/inc/GeomHandle.hh"
+#include "Offline/GeometryService/inc/GeometryService.hh"
+#include "Offline/GeometryService/inc/GeomHandle.hh"
 
-#include "TrackerGeom/inc/Straw.hh"
+#include "Offline/TrackerGeom/inc/Straw.hh"
 //#include "TrackerConditions/inc/Types.hh"
+
+#include "Stntuple/print/TAnaDump.hh"
 
 #include "Stntuple/gui/TEvdStraw.hh"
 #include "Stntuple/gui/TEvdStrawHit.hh"
@@ -41,12 +43,12 @@ TEvdStrawHit::TEvdStrawHit(const mu2e::ComboHit*    Hit,
 			   TEvdStraw*               Straw,
 			   const mu2e::StrawDigiMC* StrawDigiMC,
 			   double X, double Y, double Z, 
-			   double                Wx,
-			   double                Wy,
-			   double                SigW,
-			   double                SigR,
-			   int                   Mask, 
-			   int                   Color): 
+			   double                   Wx,
+			   double                   Wy,
+			   double                   SigW,
+			   double                   SigR,
+			   int                      Mask, 
+			   int                      Color): 
   TObject(),
   fHit(Hit),
   fStrawDigiMC(StrawDigiMC),
@@ -60,6 +62,9 @@ TEvdStrawHit::TEvdStrawHit(const mu2e::ComboHit*    Hit,
   fSigW  = SigW;
   fSigR  = SigR;
   fMask  = Mask;
+//-----------------------------------------------------------------------------
+// style and color
+//-----------------------------------------------------------------------------
   fColor = Color;
 //-----------------------------------------------------------------------------
 // define lines
@@ -109,9 +114,9 @@ void TEvdStrawHit::Paint(Option_t* Option) {
 
   int view = TVisManager::Instance()->GetCurrentView()->Type();
 
-  if      (view == TStnView::kXY ) PaintXY (Option);
-  else if (view == TStnView::kRZ ) PaintRZ (Option);
-  else if (view == TStnView::kCal) PaintCal(Option);
+  if      (view == TStnVisManager::kXY ) PaintXY (Option);
+  else if (view == TStnVisManager::kRZ ) PaintRZ (Option);
+  else if (view == TStnVisManager::kCal) PaintCal(Option);
   else {
     printf("[%s] >>> ERROR: unknown view: %i, DO NOTHING\n",oname,view);
   }
@@ -165,6 +170,24 @@ Int_t TEvdStrawHit::DistancetoPrimitiveRZ(Int_t px, Int_t py) {
 
 //-----------------------------------------------------------------------------
 void TEvdStrawHit::Print(Option_t* Option) const {
+
+  TAnaDump* ad = TAnaDump::Instance();
+
+  const mu2e::StrawGasStep* step(nullptr);
+
+  if (fStrawDigiMC->wireEndTime(mu2e::StrawEnd::cal) < fStrawDigiMC->wireEndTime(mu2e::StrawEnd::hv)) {
+    step = fStrawDigiMC->strawGasStep(mu2e::StrawEnd::cal).get();
+  }
+  else {
+    step = fStrawDigiMC->strawGasStep(mu2e::StrawEnd::hv ).get();
+  }
+
+  int flags = *((int*) &fHit->flag());
+
+  TString opt = Option;
+  opt.ToLower();
+  if (opt == "") ad->printComboHit(fHit, step, "banner+data", -1, flags);
+  else           ad->printComboHit(fHit, step, Option       , -1, flags);
 }
 
 }

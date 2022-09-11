@@ -21,11 +21,6 @@
 #include "TH1.h"
 #include "TRandom.h"
 
-// Mu2e includes
-// #include "GlobalConstantsService/inc/GlobalConstantsHandle.hh"
-// #include "GlobalConstantsService/inc/PhysicsParams.hh"
-// #include "GlobalConstantsService/inc/ParticleDataTable.hh"
-
 class KrollWadaJosephInternalRadiativeCapture {
 
 public :

@@ -2,14 +2,14 @@
 // 2014-01-27 P.Murat
 //
 
-#include "Stntuple/obj/TStrawDataBlock.hh"
+#include "Stntuple/obj/TStrawHitBlock.hh"
 
-ClassImp(TStrawDataBlock)
+ClassImp(TStrawHitBlock)
 
 //-----------------------------------------------------------------------------
 // R_v is so far unused
 //-----------------------------------------------------------------------------
-  void TStrawDataBlock::Streamer(TBuffer &R__b) {
+  void TStrawHitBlock::Streamer(TBuffer &R__b) {
   if(R__b.IsReading()) {
     //    Version_t R__v = R__b.ReadVersion();
     R__b.ReadVersion();
@@ -17,27 +17,27 @@ ClassImp(TStrawDataBlock)
     fListOfHits->Streamer(R__b);
   }
   else {
-    R__b.WriteVersion(TStrawDataBlock::IsA());
+    R__b.WriteVersion(TStrawHitBlock::IsA());
     R__b << fNHits;
     fListOfHits->Streamer(R__b);
   }
 }
 
 //______________________________________________________________________________
-TStrawDataBlock::TStrawDataBlock() {
-  fListOfHits = new TClonesArray("TStrawHitData",30240);
+TStrawHitBlock::TStrawHitBlock() {
+  fListOfHits = new TClonesArray("TStrawHit",30240);
   fListOfHits->BypassStreamer(kFALSE);
   Clear();
 }
 
 //______________________________________________________________________________
-TStrawDataBlock::~TStrawDataBlock() {
+TStrawHitBlock::~TStrawHitBlock() {
   fListOfHits->Delete();
   delete fListOfHits;
 }
 
 //______________________________________________________________________________
-void TStrawDataBlock::Clear(Option_t* opt) {
+void TStrawHitBlock::Clear(Option_t* opt) {
   fListOfHits->Clear();
   fNHits=0;
 
@@ -50,12 +50,12 @@ void TStrawDataBlock::Clear(Option_t* opt) {
 //-----------------------------------------------------------------------------
 //  print all hits in the straw tracker
 //-----------------------------------------------------------------------------
-void TStrawDataBlock::Print(Option_t* opt) const {
-  TStrawDataBlock* blk = (TStrawDataBlock*) this;
+void TStrawHitBlock::Print(Option_t* opt) const {
+  TStrawHitBlock* blk = (TStrawHitBlock*) this;
   int banner_printed = 0;
   printf(" *** total number of straw hits: %d\n",fNHits);
   for(int i=0; i<fNHits; i++) {
-    TStrawHitData* hit = blk->Hit(i);
+    TStrawHit* hit = blk->Hit(i);
     if (banner_printed == 0) {
       hit->Print("banner");
       banner_printed = 1;
@@ -63,4 +63,3 @@ void TStrawDataBlock::Print(Option_t* opt) const {
     hit->Print("data");
   }
 }
-

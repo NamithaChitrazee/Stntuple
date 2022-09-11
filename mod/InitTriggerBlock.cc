@@ -6,7 +6,7 @@
 #include "Stntuple/obj/TStnDBManager.hh"
 #include "Stntuple/obj/TStnTriggerTable.hh"
 
-#include "Mu2eUtilities/inc/TriggerResultsNavigator.hh"
+#include "Offline/Mu2eUtilities/inc/TriggerResultsNavigator.hh"
 
 //-----------------------------------------------------------------------------
 // in this case AbsEvent is just not used

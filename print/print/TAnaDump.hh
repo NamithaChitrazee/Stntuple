@@ -17,16 +17,14 @@
 
 #include "art/Framework/Principal/Event.h"
 
-#include "MCDataProducts/inc/CaloClusterMCTruthAssn.hh"
-#include "MCDataProducts/inc/CaloHitMCTruthAssn.hh"
-#include "MCDataProducts/inc/StrawDigiMCCollection.hh"
+#include "Offline/MCDataProducts/inc/CaloMCTruthAssns.hh"
+#include "Offline/MCDataProducts/inc/StrawDigiMC.hh"
 
-#include "RecoDataProducts/inc/ComboHit.hh"
-#include "RecoDataProducts/inc/HelixHit.hh"
-#include "RecoDataProducts/inc/StrawHitPositionCollection.hh"
-#include "DataProducts/inc/XYZVec.hh"
+#include "Offline/RecoDataProducts/inc/ComboHit.hh"
+#include "Offline/RecoDataProducts/inc/HelixHit.hh"
+// #include "Offline/DataProducts/inc/XYZVec.hh"
 
-#include "TrkReco/inc/TrkPrintUtils.hh"
+#include "Offline/TrkReco/inc/TrkPrintUtils.hh"
 
 #else
 
@@ -110,21 +108,21 @@ public:
   void   AddObject      (const char* Name, void* Object);
   void*  FindNamedObject(const char* Name);
 
-  void   SetEvent(art::Event& Evt) { fEvent = &Evt; }
+  void   SetEvent(const art::Event* Evt) { fEvent = Evt; }
 
   void   SetFlagBgrHitsModuleLabel(const char* Tag) { fFlagBgrHitsModuleLabel = Tag; }
   void   SetStrawDigiMCCollTag    (const char* Tag) { fStrawDigiMCCollTag     = Tag; }
 
-  double evalWeight(const mu2e::ComboHit* Hit   ,
-		    XYZVec& StrawDir ,
-		    XYZVec& HelCenter, 
-		    double             Radius   ,
-		    int                WeightMode,
-		    fhicl::ParameterSet const& Pset);
+  double evalWeight(const mu2e::ComboHit*      Hit       ,
+		    CLHEP::Hep3Vector&         StrawDir  ,
+		    CLHEP::Hep3Vector&         HelCenter , 
+		    double                     Radius    ,
+		    int                        WeightMode,
+		    fhicl::ParameterSet const& Pset      );
 
-  void   evalHelixInfo(const mu2e::HelixSeed*         Helix,
-		     int   &NLoops,
-		     int   &NHitsLoopFailed);
+  void   evalHelixInfo(const mu2e::HelixSeed*  Helix,
+		       int&                    NLoops,
+		       int&                    NHitsLoopFailed);
 
   void   printEventHeader();
 //-----------------------------------------------------------------------------
@@ -150,7 +148,7 @@ public:
 
   void printCaloCluster          (const mu2e::CaloCluster* Cluster ,
 				  const char*              Opt = "",
-				  const mu2e::CaloHitMCTruthAssns* CaloHitTruth=NULL);
+				  const mu2e::CaloHitMCTruthAssn* CaloHitTruth=NULL);
   
   void printCaloClusterCollection (const char* ModuleLabel, 
 				   const char* ProductName= "",
@@ -243,14 +241,12 @@ public:
 			   int                       INit  = -1,
 			   int                       Flags = -1);
   
-  void printTrkCaloHit(const KalRep* Krep, mu2e::TrkCaloHit* CaloHit);
-
-  void printTrackSeed          (const mu2e::KalSeed* TrkSeed                      , 
+  void printKalSeed            (const mu2e::KalSeed* TrkSeed                      , 
 				const char* Opt                = ""               ,
 				const char* StrawHitCollTag    = "makeSH"         ,
 				const char* StrawDigiMCCollTag = "compressDigiMCs");
 
-  void printTrackSeedCollection(const char* CollTag                               ,
+  void printKalSeedCollection  (const char* CollTag                               ,
 				int         hitOpt             = 0                ,
 				const char* StrawHitCollTag    = "makeSH"         ,
 				const char* StrawDigiMCCollTag = "compressDigiMCs");
@@ -260,19 +256,6 @@ public:
   void printKalRepCollection(const char* KalRepCollTag               , 
 			     int         hitOpt             = 0      , 
 			     const char* StrawDigiMCCollTag = nullptr); 
-//-----------------------------------------------------------------------------
-// time clusters
-//-----------------------------------------------------------------------------
-  void printTimeCluster   (const mu2e::TimeCluster* TimePeak, const char* Opt = "", 
-			   const mu2e::ComboHitCollection* ChColl=0,
-			   const char*StrawDigiMCModuleLabel = "makeSD");
-
-  void printTimeClusterCollection(const char* ModuleLabel        , 
-				  const char* ComboHitModuleLabel,
-				  const char* ProductName = ""   , 
-				  const char* ProcessName = ""   ,
-				  int         PrintHits   = 0    ,
-				  const char* StrawDigiMCModuleLabel = "makeSD");
 //-----------------------------------------------------------------------------
 // MC truth: gen and sim particles
 //-----------------------------------------------------------------------------
@@ -295,6 +278,21 @@ public:
 				   const char* ProductName = "", 
 				   const char* ProcessName = "");
 //-----------------------------------------------------------------------------
+// time clusters
+//-----------------------------------------------------------------------------
+  void printTimeCluster   (const mu2e::TimeCluster* TimePeak, const char* Opt = "", 
+			   const mu2e::ComboHitCollection* ChColl=0,
+			   const char*StrawDigiMCModuleLabel = "makeSD");
+
+  void printTimeClusterCollection(const char* TcCollTag             ,    // time cluster collection tag
+				  const char* ChCollTag             ,    // combo hit collection tag
+				  int         PrintHits   = 0       ,
+				  const char* SdmcCollTag = "makeSD");   // straw digi mc coll tag
+//-----------------------------------------------------------------------------
+// calorimeter cluster added to the track fit
+//-----------------------------------------------------------------------------
+  void printTrkCaloHit(const KalRep* Krep, mu2e::TrkCaloHit* CaloHit);
+//-----------------------------------------------------------------------------
 // extrapolation and track-to-calorimeter matching
 //-----------------------------------------------------------------------------
   void printTrkToCaloExtrapol           (const mu2e::TrkToCaloExtrapol*extrk,
@@ -303,7 +301,9 @@ public:
   void printTrkToCaloExtrapolCollection (const char* ModuleLabel, 
 					 const char* ProductName = "", 
 					 const char* ProcessName = "");
-  void printTrackClusterMatch          (const mu2e::TrackClusterMatch* TcMatch, const char* Option);
+
+  void printTrackClusterMatch           (const mu2e::TrackClusterMatch* TcMatch, const char* Option);
+
 
   void printTrackClusterMatchCollection(const char* ModuleLabel     , 
 					const char* ProductName = "", 
