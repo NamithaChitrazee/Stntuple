@@ -137,9 +137,9 @@ TEvdCrvBar::~TEvdCrvBar() {
 //-----------------------------------------------------------------------------
 void TEvdCrvBar::Paint(Option_t* Option) {
 
-  int type = TVisManager::Instance()->GetCurrentView()->Type();
+  int view = TVisManager::Instance()->GetCurrentView()->Type();
 
-  if (type == TStnView::kCrv) {
+  if (view == TStnVisManager::kCrv) {
     PaintCrv(Option);
     gPad->Modified();
   }

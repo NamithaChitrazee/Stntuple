@@ -33,6 +33,7 @@ public:
   virtual void  PaintTZ (Option_t* option = "");
   virtual void  PaintCal(Option_t* option = "");
   virtual void  PaintCrv(Option_t* option = "");
+  virtual void  PaintVST(Option_t* option = "");
 
   virtual int   DistancetoPrimitive   (Int_t px, Int_t py);
   virtual int   DistancetoPrimitiveXY (Int_t px, Int_t py);
@@ -40,6 +41,7 @@ public:
   virtual int   DistancetoPrimitiveTZ (Int_t px, Int_t py);
   virtual int   DistancetoPrimitiveCal(Int_t px, Int_t py);
   virtual int   DistancetoPrimitiveCrv(Int_t px, Int_t py);
+  virtual int   DistancetoPrimitiveVST(Int_t px, Int_t py);
 
   // void SetSectionToDisplay(int Section) { fSectionToDisplay= Section; }
 

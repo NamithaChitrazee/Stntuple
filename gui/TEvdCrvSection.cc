@@ -91,7 +91,7 @@ void TEvdCrvSection::Paint(Option_t* option) {
 
   int view = TVisManager::Instance()->GetCurrentView()->Type();
   
-  if (view == TStnView::kCrv) {
+  if (view == TStnVisManager::kCrv) {
     int index = TVisManager::Instance()->GetCurrentView()->Index();
     if (index == fSectionID) PaintCrv(option);
   }

@@ -124,6 +124,13 @@ void TVisManager::MarkModified(TPad* Pad) {
 }
 
 //-----------------------------------------------------------------------------
+// to be overloaded
+//-----------------------------------------------------------------------------
+int TVisManager::GetViewID(const char* Name) {
+  return -1;
+}
+
+//-----------------------------------------------------------------------------
 void TVisManager::OpenView(TStnView* Mother, int Px1, int Py1, int Px2, int Py2) {
 }
 

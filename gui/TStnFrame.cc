@@ -66,6 +66,7 @@ enum TGeantCommandIdentifiers {
   M_OPEN_TZ,
   M_OPEN_CAL,
   M_OPEN_CRV,
+  M_OPEN_VST,
 
   M_PRINT_STRAW_H,
   M_PRINT_COMBO_H
@@ -158,6 +159,7 @@ TStnFrame::TStnFrame(const char* Name,
   fMenuOpen->AddEntry("&TZ View",            M_OPEN_TZ);
   fMenuOpen->AddEntry("&Cal View",           M_OPEN_CAL);
   fMenuOpen->AddEntry("&CRV View",           M_OPEN_CRV);
+  fMenuOpen->AddEntry("&VST View",           M_OPEN_VST);
 //-----------------------------------------------------------------------------
 // PRINT menu item on top 
 //-----------------------------------------------------------------------------
@@ -549,15 +551,17 @@ Bool_t TStnFrame::ProcessMessage(Long_t msg, Long_t parm1, Long_t parm2) {
 //  OPEN menu
 //-----------------------------------------------------------------------------
       case M_OPEN_XY:
-	
-	printf(" *** TStnFrame::ProcessMessage M_OPEN_XY: msg = %li parm1 = %li parm2 = %li\n", 
-	       msg,parm1,parm2);
+	if (vm->DebugLevel() > 0) {
+	  printf(" *** TStnFrame::ProcessMessage M_OPEN_XY: msg = %li parm1 = %li parm2 = %li\n", 
+		 msg,parm1,parm2);
+	}
 	TStnVisManager::Instance()->OpenTrkXYView();
 	break;
       case M_OPEN_RZ:
-	
-	printf(" *** TStnFrame::ProcessMessage M_OPEN_RZ: msg = %li parm1 = %li parm2 = %li\n", 
-	       msg,parm1,parm2);
+	if (vm->DebugLevel() > 0) {
+	  printf(" *** TStnFrame::ProcessMessage M_OPEN_RZ: msg = %li parm1 = %li parm2 = %li\n", 
+		 msg,parm1,parm2);
+	}
 	TStnVisManager::Instance()->OpenTrkRZView();
 	break;
       case M_OPEN_TZ:
@@ -568,15 +572,27 @@ Bool_t TStnFrame::ProcessMessage(Long_t msg, Long_t parm1, Long_t parm2) {
 	break;
       case M_OPEN_CAL:
 	
-	printf(" *** TStnFrame::ProcessMessage M_OPEN_CAL: msg = %li parm1 = %li parm2 = %li\n", 
-	       msg,parm1,parm2);
+	if (vm->DebugLevel() > 0) {
+	  printf(" *** TStnFrame::ProcessMessage M_OPEN_CAL: msg = %li parm1 = %li parm2 = %li\n", 
+		 msg,parm1,parm2);
+	}
 	TStnVisManager::Instance()->OpenCalView();
 	break;
       case M_OPEN_CRV:
 	
-	printf(" *** TStnFrame::ProcessMessage M_OPEN_CRV: msg = %li parm1 = %li parm2 = %li\n", 
-	       msg,parm1,parm2);
+	if (vm->DebugLevel() > 0) {
+	  printf(" *** TStnFrame::ProcessMessage M_OPEN_CRV: msg = %li parm1 = %li parm2 = %li\n", 
+		 msg,parm1,parm2);
+	}
 	TStnVisManager::Instance()->OpenCrvView();
+	break;
+      case M_OPEN_VST:
+	
+	if (vm->DebugLevel() > 0) {
+	  printf(" *** TStnFrame::ProcessMessage M_OPEN_VST: msg = %li parm1 = %li parm2 = %li\n", 
+		 msg,parm1,parm2);
+	}
+	TStnVisManager::Instance()->OpenVSTView();
 	break;
 //-----------------------------------------------------------------------------
 //  default

@@ -78,8 +78,8 @@ void TEvdCalSection::Paint(Option_t* option) {
 				// parse option list
   int view = TVisManager::Instance()->GetCurrentView()->Type();
 
-  if      (view == TStnView::kXY ) PaintXY (option);
-  else if (view == TStnView::kCal) {
+  if      (view == TStnVisManager::kXY ) PaintXY (option);
+  else if (view == TStnVisManager::kCal) {
     int index = TVisManager::Instance()->GetCurrentView()->Index();
     if (index == fSectionID) {
       PaintCal(option);

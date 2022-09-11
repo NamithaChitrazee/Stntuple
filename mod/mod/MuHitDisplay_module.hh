@@ -60,12 +60,6 @@
 
 #include "Stntuple/base/TNamedHandle.hh"
 #include "Stntuple/gui/TStnVisManager.hh"
-#include "Stntuple/gui/THeaderVisNode.hh"
-#include "Stntuple/gui/TCalVisNode.hh"
-#include "Stntuple/gui/TCrvVisNode.hh"
-#include "Stntuple/gui/TTrkVisNode.hh"
-
-#include "Stntuple/gui/TMcTruthVisNode.hh"
 
 #include "Stntuple/alg/TStnTrackID.hh"
 

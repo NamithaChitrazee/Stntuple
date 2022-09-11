@@ -569,6 +569,16 @@ void TTrkVisNode::PaintTZ(Option_t* Option) {
 }
 
 //-----------------------------------------------------------------------------
+// VST view : display all straws 
+//-----------------------------------------------------------------------------
+void TTrkVisNode::PaintVST(Option_t* Option) {
+
+  fTracker->PaintVST(Option);
+
+  gPad->Modified();
+}
+
+//-----------------------------------------------------------------------------
 int TTrkVisNode::DistancetoPrimitiveXY(Int_t px, Int_t py) {
   static TVector3 global;
   global.SetXYZ(gPad->AbsPixeltoX(px),gPad->AbsPixeltoY(py),0);

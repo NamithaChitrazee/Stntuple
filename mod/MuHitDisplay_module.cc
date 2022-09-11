@@ -9,6 +9,15 @@
 ///////////////////////////////////////////////////////////////////////////////
 #include <boost/algorithm/string.hpp>
 
+#include "Stntuple/gui/THeaderVisNode.hh"
+#include "Stntuple/gui/TCalVisNode.hh"
+#include "Stntuple/gui/TCrvVisNode.hh"
+#include "Stntuple/gui/TTrkVisNode.hh"
+
+#include "Stntuple/gui/TMcTruthVisNode.hh"
+#include "Stntuple/gui/TCalView.hh"
+#include "Stntuple/gui/TCrvView.hh"
+
 #include "Stntuple/mod/MuHitDisplay_module.hh"
 
 #include "Stntuple/obj/AbsEvent.hh"
@@ -281,7 +290,7 @@ void MuHitDisplay::InitVisManager() {
 //-----------------------------------------------------------------------------
 // XY view : tracker + calorimeter
 //-----------------------------------------------------------------------------
-  TStnView* vxy = new TStnView(TStnView::kXY,-1,"XYView","XY View");
+  TStnView* vxy = new TStnView(TStnVisManager::kXY,-1,"XYView","XY View");
   vxy->AddNode(tnode);
   vxy->AddNode(cal_node[0]);
   vxy->AddNode(cal_node[1]);
@@ -289,19 +298,26 @@ void MuHitDisplay::InitVisManager() {
 //-----------------------------------------------------------------------------
 // RZ view : tracker only, so far
 //-----------------------------------------------------------------------------
-  TStnView* vrz = new TStnView(TStnView::kRZ,-1,"RZView","RZ View");
+  TStnView* vrz = new TStnView(TStnVisManager::kRZ,-1,"RZView","RZ View");
   vrz->AddNode(tnode);
   vm->AddView(vrz);
 //-----------------------------------------------------------------------------
 // TZ view : TTrkNode only, so far
 //-----------------------------------------------------------------------------
-  TStnView* vtz = new TStnView(TStnView::kTZ,-1,"TZView","TZ View");
+  TStnView* vtz = new TStnView(TStnVisManager::kTZ,-1,"TZView","TZ View");
   vtz->AddNode(tnode);
   vm->AddView(vtz);
 //-----------------------------------------------------------------------------
-// upon startup, open a window with XY view
+// VST view : TTrkNode only, so far
 //-----------------------------------------------------------------------------
-  if      (_defaultView == "xy") vm->OpenTrkXYView();
+  TStnView* vst = new TStnView(TStnVisManager::kVST,-1,"VSTView","VST View");
+  vst->AddNode(tnode);
+  vm->AddView(vst);
+//-----------------------------------------------------------------------------
+// upon startup, open either an XY or a VST view
+//-----------------------------------------------------------------------------
+  if      (_defaultView == "xy" ) vm->OpenTrkXYView();
+  else if (_defaultView == "vst") vm->OpenVSTView  ();
 }
 
 //-----------------------------------------------------------------------------

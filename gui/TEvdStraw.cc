@@ -78,8 +78,8 @@ void TEvdStraw::Paint(Option_t* option) {
 
   int view = TVisManager::Instance()->GetCurrentView()->Type();
 
-  if      (view == TStnView::kXY) PaintXY (option);
-  else if (view == TStnView::kRZ) PaintRZ (option);
+  if      (view == TStnVisManager::kXY) PaintXY (option);
+  else if (view == TStnVisManager::kRZ) PaintRZ (option);
   else {
     // what is the default?
     //    Warning("Paint",Form("Unknown option %s",option));

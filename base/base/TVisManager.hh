@@ -108,6 +108,8 @@ public:
   void  SetTitleNode (TVisNode* node) { fTitleNode = node; }
   void  SetDebugLevel(int      Level) { fDebugLevel = Level; }
 
+
+  virtual int  GetViewID     (const char* View); // to be overloaded
   virtual void SetStations   (int IMin, int IMax);
   virtual void SetTimeCluster(int I);
   virtual void SetTimeWindow (float TMin, float TMax);

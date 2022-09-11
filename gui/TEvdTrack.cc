@@ -93,9 +93,9 @@ void TEvdTrack::Paint(Option_t* Option) {
 
   int view = TVisManager::Instance()->GetCurrentView()->Type();
 
-  if      (view == TStnView::kXY ) PaintXY (Option);
-  else if (view == TStnView::kRZ ) PaintRZ (Option);
-  else if (view == TStnView::kCal) {
+  if      (view == TStnVisManager::kXY ) PaintXY (Option);
+  else if (view == TStnVisManager::kRZ ) PaintRZ (Option);
+  else if (view == TStnVisManager::kCal) {
 //-----------------------------------------------------------------------------
 // calorimeter-specific view: do not draw tracks
 //-----------------------------------------------------------------------------

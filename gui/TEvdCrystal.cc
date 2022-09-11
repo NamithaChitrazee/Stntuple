@@ -70,8 +70,8 @@ void TEvdCrystal::Paint(Option_t* Option) {
 
   int view = TVisManager::Instance()->GetCurrentView()->Type();
 
-  if      (view == TStnView::kXY ) PaintXY(Option);
-  else if (view == TStnView::kCal) {
+  if      (view == TStnVisManager::kXY ) PaintXY(Option);
+  else if (view == TStnVisManager::kCal) {
     PaintCal(Option);
   }
   else {

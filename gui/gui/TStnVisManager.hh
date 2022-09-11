@@ -17,11 +17,6 @@ class TGLayoutHints;
 class TGMainFrame;
 
 class TStnView;
-class TTrkXYView;
-class TTrkRZView;
-
-#include "Stntuple/gui/TCalView.hh"
-#include "Stntuple/gui/TCrvView.hh"
 
 class TSubdetector;
 class TExtrapolator;
@@ -29,6 +24,17 @@ class TExtrapolator;
 //-----------------------------------------------------------------------------
 class TStnVisManager : public TVisManager {
 public:
+					// different view types
+  enum {
+    kUndefined = -1,
+    kXY        =  1,
+    kRZ        =  2,
+    kTZ        =  3,
+    kCal       =  4,
+    kCrv       =  5,
+    kVST       =  6			// VST view
+  };
+
 //-----------------------------------------------------------------------------
 // command codes
 //-----------------------------------------------------------------------------
@@ -173,6 +179,8 @@ public:
 			      Int_t       SizeX,
 			      Int_t       SizeY) override;
 
+  virtual int GetViewID(const char* View) override;
+
   virtual void OpenView(TStnView* Mother, int Px1, int Py, int Px2, int Py2) override;
 
   Int_t   OpenTrkXYView();
@@ -189,6 +197,9 @@ public:
   
   Int_t   OpenCrvView();
   Int_t   OpenCrvView  (TStnView* Mother, Axis_t x1, Axis_t y1, Axis_t x2, Axis_t y2);
+  
+  Int_t   OpenVSTView();
+  Int_t   OpenVSTView  (TStnView* Mother, Axis_t x1, Axis_t y1, Axis_t x2, Axis_t y2);
   
   void    CloseWindow();
 //-----------------------------------------------------------------------------

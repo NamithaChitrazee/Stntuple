@@ -61,8 +61,8 @@ void TMcTruthVisNode::Paint(Option_t* option) {
 				// parse option list
   int view = TVisManager::Instance()->GetCurrentView()->Type();
 
-  if      (view == TStnView::kXY ) PaintXY (option);
-  else if (view == TStnView::kCal) PaintCal(option);
+  if      (view == TStnVisManager::kXY ) PaintXY (option);
+  else if (view == TStnVisManager::kCal) PaintCal(option);
   else {
 				// what is the default?
     //    Warning("Paint",Form("Unknown option %s",option));

@@ -1,5 +1,5 @@
-#ifndef Stntuple_gui_TTrkVstView_hh
-#define Stntuple_gui_TTrkVstView_hh
+#ifndef Stntuple_gui_TVstView_hh
+#define Stntuple_gui_TVstView_hh
 
 
 #include "TNamed.h"
@@ -7,14 +7,14 @@
 #include "Stntuple/base/TStnView.hh"
 
 
-class TTrkVstView: public TStnView {
+class TVstView: public TStnView {
 protected:
   //  Int_t               fSectionToDisplay;	// a disk or vane number
   //  TVirtualPad*        fPad;
 public:
 
-  TTrkVstView();
-  virtual ~TTrkVstView();
+  TVstView();
+  virtual ~TVstView();
 
   //  TVirtualPad*  GetPad() { return fPad; }
 
@@ -35,7 +35,7 @@ public:
   // virtual void  ExecuteEvent       (Int_t event, Int_t px, Int_t py);
   //  virtual Int_t DistancetoPrimitive(Int_t px, Int_t py);
 
-  ClassDef(TTrkVstView,0)
+  ClassDef(TVstView,0)
 };
 
 #endif
