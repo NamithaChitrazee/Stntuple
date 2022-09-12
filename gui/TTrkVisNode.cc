@@ -117,7 +117,7 @@ int TTrkVisNode::InitEvent() {
 
   int                               n_straw_hits, color, nl, ns; // , ipeak, ihit;
   bool                              isFromConversion, intime;
-  double                            sigw, /*vnorm, v,*/ sigr; 
+  double                            sigw(1000.), /*vnorm, v,*/ sigr; 
   CLHEP::Hep3Vector                 vx0, vx1, vx2;
 //-----------------------------------------------------------------------------
 // first, clear the cached hit information from the previous event

@@ -157,7 +157,8 @@ int TBeltLH::construct_interval(double MuB, double MuS, int NObs) {
       if (mus+MuB < NObs) fBelt.fLlhInterval[5*i+3] = -log(fProb[fIxMax])+log(lhmax);
       else                fBelt.fLlhInterval[5*i+3] = -log(fProb[fIxMin])+log(lhmax);
 
-      fBelt.fLlhInterval[5*i+4] = -log(fProb[NObs])+log(lhmax);
+      printf(" FIXME: fBelt.fLlhInterval[5*i+4] = -log(fProb[NObs])+log(lhmax);\n");
+      // fBelt.fLlhInterval[5*i+4] = -log(fProb[NObs])+log(lhmax);
     }
   }
 
