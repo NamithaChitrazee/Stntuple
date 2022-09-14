@@ -48,7 +48,7 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
 
   const mu2e::SimParticleCollection*       simp_coll(0);
   const mu2e::SimParticle*                 sim(0);
-  const mu2e::StrawHitCollection*          list_of_straw_hits(0);
+  const mu2e::StrawHitCollection*          list_of_straw_hits(nullptr);
   const mu2e::StrawDigiMCCollection*       mcdigis(nullptr);
 
   double        px, py, pz, energy;
@@ -67,9 +67,8 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
       n_straw_hits      = list_of_straw_hits->size();
     }
     else {
-      printf(" ERROR in InitSimpBlock: cant find StrawHitColl %s. BAIL OUT\n",
-	     fStrawHitCollTag.encode().data());
-      return -1;
+      mf::LogWarning(oname) << " WARNING: no StrawHitCollection tag=" 
+			    << fStrawHitCollTag.encode().data() <<  " found";
     }
   }
 
@@ -79,9 +78,8 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
     bool ok = AnEvent->getByLabel(fStrawDigiMCCollTag,mcdH);
     if (ok) mcdigis = mcdH.product();
     else {
-      printf(" ERROR in InitSimpBlock: cant find StrawDigiMCColl %s. BAIL OUT\n",
-	     fStrawDigiMCCollTag.encode().data());
-      return -1;
+      mf::LogWarning(oname) << " WARNING: no StrawDigiMCCollection tag=" 
+			    << fStrawHitCollTag.encode().data() <<  " found";
     }
   }
 
@@ -91,8 +89,9 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
   if (! fSimpCollTag.empty()) {
     bool ok = AnEvent->getByLabel(fSimpCollTag,simp_handle);
     if (! ok) {
-      printf(" ERROR in InitSimpBlock: cant find SimpCollColl %s. BAIL OUT\n",
-	     fSimpCollTag.encode().data());
+      mf::LogWarning(oname) << " WARNING in " << oname << ":" << __LINE__ 
+			    << ": SimpCollection:" 
+			    << fSimpCollTag.encode().data() << " NOT FOUND";
       return -1;
     }
   }
@@ -114,7 +113,7 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
     vshid[i] = nullptr;
   }
 
-  if (n_straw_hits > 0) {
+  if ((n_straw_hits > 0) and (mcdigis != nullptr)) {
 
     const mu2e::StrawGasStep* step(nullptr);
 
@@ -261,9 +260,9 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
 	art::Handle<mu2e::StepPointMCCollection> vdhits;
 	AnEvent->getByLabel(fVDHitsCollTag,vdhits);
 	if (!vdhits.isValid()) {
-	  char warning[100];
-	  sprintf(warning,"StepPointMCCollection %s NOT FOUND\n",fVDHitsCollTag.encode().data());
-	  mf::LogWarning(oname) << warning;
+	  mf::LogWarning(oname) << " WARNING in " << oname << ":" << __LINE__ 
+				<< ": StepPointMCCollection:" 
+				<< fVDHitsCollTag.encode().data() << " NOT FOUND";
 	}
 	else {
 	  int nvdhits = vdhits->size();
@@ -314,8 +313,9 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
 //-----------------------------------------------------------------------------
 // no SIMP collection
 //-----------------------------------------------------------------------------
-    mf::LogWarning(oname) << " WARNING in " << oname << ": SimParticleCollection " 
-			  << fSimpCollTag.encode() << " not found, BAIL OUT\n";
+    mf::LogWarning(oname) << " WARNING in " << oname << ":" << __LINE__ 
+			  << " : SimParticleCollection " 
+			  << fSimpCollTag.encode() << " not found";
     return -1;
   }
 
