@@ -25,9 +25,6 @@
 #include "Stntuple/geom/TStnCrystal.hh"
 #include "Stntuple/geom/TDiskCalorimeter.hh"
 
-#include "Stntuple/alg/TStnTrackID.hh"
-#include "Stntuple/alg/TEmuLogLH.hh"
-
 namespace  stntuple {
 class THelixAnaModule: public TStnModule {
 public:
@@ -60,10 +57,10 @@ public:
     TH1F*    fEleMom;
     TH1F*    fEleCosTh;
     TH1F*    fNTimeClusters[2];
-    TH1F*    fNHelices[3];
-    TH1F*    fNHelPos[3];		// N(helices) with helicity > 0
-    TH1F*    fNHelNeg[3];		// N(helices) with helicity < 0
-    TH1F*    fNGenp;                    // N(particles in GENP block)
+    TH1F*    fNHelices;
+    TH1F*    fNHelPos;		       // N(helices) with helicity > 0
+    TH1F*    fNHelNeg;		       // N(helices) with helicity < 0
+    TH1F*    fNGenp;                   // N(particles in GENP block)
   };
 
   struct TimeClusterHist_t {
@@ -136,12 +133,12 @@ public:
 					// 0: TPR, 1: CPR
 
   TStnTimeClusterBlock*  fTimeClusterBlock[2];
-  TStnHelixBlock*        fHelixBlock[3]; // [0]: merged [1]:tpr [2]:cpr
+  TStnHelixBlock*        fHelixBlock;                 // 
   TStrawHitBlock*        fStrawHitBlock;
   TGenpBlock*            fGenpBlock;
   TSimpBlock*            fSimpBlock;
 
-  TString                fHelixBlockName[3];
+  TString                fHelixBlockName;
 
 					// additional track parameters (assume ntracks < 20)
   TrackPar_t             fTrackPar[20];
@@ -160,9 +157,9 @@ public:
   int               fNClusters;
   int               fNTimeClusters[2];
 
-  int               fNHelices[3];	// 0: TPR, 1: CPR, 2: merged
-  int               fNHelPos [3];
-  int               fNHelNeg [3];
+  int               fNHelices;	// 0: TPR, 1: CPR, 2: merged
+  int               fNHelPos ;
+  int               fNHelNeg ;
 
   int               fNStrawHits;
   int               fNGenp;		// N(generated particles)
@@ -187,7 +184,7 @@ public:
 //-----------------------------------------------------------------------------
   void     SetPdgCode    (int Code ) { fPdgCode     = Code ; }
   void     SetProcessCode(int Code ) { fProcessCode = Code ; }
-  void     SetHelixBlockName(int I, const char* Name) { fHelixBlockName[I] = Name; }
+  void     SetHelixBlockName(const char* Name) { fHelixBlockName = Name; }
 //-----------------------------------------------------------------------------
 // overloaded methods of TStnModule
 //-----------------------------------------------------------------------------

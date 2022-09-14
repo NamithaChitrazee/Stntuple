@@ -18,9 +18,7 @@ void  stn_helix_ana(int DebugBit = -1) {
 void  stn_helix_ana_old(int DebugBit = -1) {
   stntuple::m_hel = (stntuple::THelixAnaModule*) g.x->AddModule("stntupel::THelixAnaModule",0);
 
-  stntuple::m_hel->SetHelixBlockName(0,"HelixBlockTpr");
-  stntuple::m_hel->SetHelixBlockName(1,"HelixBlockCpr");
-  stntuple::m_hel->SetHelixBlockName(2,"HelixBlock"   );
+  stntuple::m_hel->SetHelixBlockName("HelixBlock");
 
   if (DebugBit >= 0) stntuple::m_hel->SetDebugBit(DebugBit,1);
 }

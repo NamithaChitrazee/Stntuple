@@ -44,10 +44,7 @@ THelixAnaModule::THelixAnaModule(const char* name, const char* title):
 // default names of the helix block branches correspond to settings of StntupleMakerDe 
 // configuration in Stntuple/fcl/prolog.fcl
 //-----------------------------------------------------------------------------
-
-  fHelixBlockName[0] = "HelixBlockTpr";
-  fHelixBlockName[1] = "HelixBlockCpr";
-  fHelixBlockName[2] = "HelixBlock";
+  fHelixBlockName = "HelixBlock";
 }
 
 //-----------------------------------------------------------------------------
@@ -111,17 +108,17 @@ void THelixAnaModule::BookEventHistograms(EventHist_t* Hist, const char* Folder)
   HBook1F(Hist->fZv         ,"zv"      ,Form("%s: Z(Vertex)"                       ,Folder), 300, 0,15000,Folder);
   HBook1F(Hist->fNGenp      ,"ngenp"   ,Form("%s: N(Gen Particles)"                ,Folder),500,0,500,Folder);
 
-  HBook1F(Hist->fNHelices[0],"nhel_0"  ,Form("%s: N(helices)[0]"                   ,Folder), 10,0, 10,Folder);
-  HBook1F(Hist->fNHelices[1],"nhel_1"  ,Form("%s: N(helices)[2]"                   ,Folder), 10,0, 10,Folder);
-  HBook1F(Hist->fNHelices[2],"nhel_2"  ,Form("%s: N(helices)[3]"                   ,Folder), 10,0, 10,Folder);
+  HBook1F(Hist->fNHelices,"nhel_0"  ,Form("%s: N(helices)"                   ,Folder), 10,0, 10,Folder);
+  // HBook1F(Hist->fNHelices[1],"nhel_1"  ,Form("%s: N(helices)[2]"                   ,Folder), 10,0, 10,Folder);
+  // HBook1F(Hist->fNHelices[2],"nhel_2"  ,Form("%s: N(helices)[3]"                   ,Folder), 10,0, 10,Folder);
 
-  HBook1F(Hist->fNHelPos [0],"nhp_0"   ,Form("%s: N(helices)[0] hel > 0"           ,Folder), 10,0, 10,Folder);
-  HBook1F(Hist->fNHelPos [1],"nhp_1"   ,Form("%s: N(helices)[2] hel > 0"           ,Folder), 10,0, 10,Folder);
-  HBook1F(Hist->fNHelPos [2],"nhp_2"   ,Form("%s: N(helices)[3] hel > 0"           ,Folder), 10,0, 10,Folder);
+  HBook1F(Hist->fNHelPos ,"nhp_0"   ,Form("%s: N(helices) hel > 0"           ,Folder), 10,0, 10,Folder);
+  // HBook1F(Hist->fNHelPos [1],"nhp_1"   ,Form("%s: N(helices)[2] hel > 0"           ,Folder), 10,0, 10,Folder);
+  // HBook1F(Hist->fNHelPos [2],"nhp_2"   ,Form("%s: N(helices)[3] hel > 0"           ,Folder), 10,0, 10,Folder);
 
-  HBook1F(Hist->fNHelNeg [0],"nhn_0"   ,Form("%s: N(helices)[0] hel < 0"           ,Folder), 10,0, 10,Folder);
-  HBook1F(Hist->fNHelNeg [1],"nhn_1"   ,Form("%s: N(helices)[2] hel < 0"           ,Folder), 10,0, 10,Folder);
-  HBook1F(Hist->fNHelNeg [2],"nhn_2"   ,Form("%s: N(helices)[3] hel < 0"           ,Folder), 10,0, 10,Folder);
+  HBook1F(Hist->fNHelNeg,"nhn_0"   ,Form("%s: N(helices) hel < 0"           ,Folder), 10,0, 10,Folder);
+  // HBook1F(Hist->fNHelNeg [1],"nhn_1"   ,Form("%s: N(helices)[2] hel < 0"           ,Folder), 10,0, 10,Folder);
+  // HBook1F(Hist->fNHelNeg [2],"nhn_2"   ,Form("%s: N(helices)[3] hel < 0"           ,Folder), 10,0, 10,Folder);
 
   HBook1F(Hist->fNTimeClusters[0],"ntcl_0"  ,Form("%s: N(time clusters)[0]"        ,Folder),100,0,100,Folder);
   HBook1F(Hist->fNTimeClusters[1],"ntcl_1"  ,Form("%s: N(time clusters)[1]"        ,Folder),100,0,100,Folder);
@@ -176,14 +173,8 @@ void THelixAnaModule::BookHistograms() {
   int book_helix_histset[kNHelixHistSets];
   for (int i=0; i<kNHelixHistSets; ++i)  book_helix_histset[i] = 0;
 
-  book_helix_histset[  0] = 1;   // all TPR    helices
-  book_helix_histset[  1] = 1;   //     TPR    helices  with P > 80
-
-  book_helix_histset[100] = 1;   // all CPR    helices
-  book_helix_histset[101] = 1;   //     CPR    helices  with P > 80
-
-  book_helix_histset[200] = 1;   // all merged helices
-  book_helix_histset[201] = 1;   //     merged helices  with P > 80
+  book_helix_histset[  0] = 1;   // all    helices
+  book_helix_histset[  1] = 1;   //        helices  with P > 80
 
   for (int i=0; i<kNHelixHistSets; i++) {
     if (book_helix_histset[i] != 0) {
@@ -273,9 +264,9 @@ void THelixAnaModule::FillEventHistograms(EventHist_t* Hist) {
   Hist->fZv->Fill(zv);
 
   for (int i=0; i<3; i++) {
-    Hist->fNHelices[i]->Fill(fNHelices[i]);
-    Hist->fNHelPos [i]->Fill(fNHelPos [i]);
-    Hist->fNHelNeg [i]->Fill(fNHelNeg [i]);
+    Hist->fNHelices->Fill(fNHelices);
+    // Hist->fNHelPos [i]->Fill(fNHelPos [i]);
+    // Hist->fNHelNeg [i]->Fill(fNHelNeg [i]);
   }
 
   Hist->fNTimeClusters[0]->Fill(fNTimeClusters[0]);
@@ -385,12 +376,10 @@ int THelixAnaModule::BeginJob() {
 //-----------------------------------------------------------------------------
 // register data blocks, 'HelixBlock' - OR of TPR and CPR
 //-----------------------------------------------------------------------------
-  RegisterDataBlock(fHelixBlockName[0].Data(), "TStnHelixBlock" ,&fHelixBlock[0]);
-  RegisterDataBlock(fHelixBlockName[1].Data(), "TStnHelixBlock" ,&fHelixBlock[1]);
-  RegisterDataBlock(fHelixBlockName[2].Data(), "TStnHelixBlock" ,&fHelixBlock[2]);
+  RegisterDataBlock(fHelixBlockName.Data(), "TStnHelixBlock" ,&fHelixBlock);
 
-  RegisterDataBlock("TimeClusterBlockTpr","TStnTimeClusterBlock",&fTimeClusterBlock[0]);
-  RegisterDataBlock("TimeClusterBlockCpr","TStnTimeClusterBlock",&fTimeClusterBlock[1]);
+  RegisterDataBlock("TimeClusterBlock","TStnTimeClusterBlock",&fTimeClusterBlock[0]);
+  RegisterDataBlock("PhClusterBlock"  ,"TStnTimeClusterBlock",&fTimeClusterBlock[1]);
 
   RegisterDataBlock("GenpBlock"       ,"TGenpBlock"          ,&fGenpBlock       );
   RegisterDataBlock("SimpBlock"       ,"TSimpBlock"          ,&fSimpBlock       );
@@ -422,8 +411,8 @@ void THelixAnaModule::FillHistograms() {
 //-----------------------------------------------------------------------------
   FillEventHistograms(fHist.fEvent[0]);
 
-  if (fNHelices[2] > 0) FillEventHistograms(fHist.fEvent[1]);
-  else                  FillEventHistograms(fHist.fEvent[2]);
+  if (fNHelices > 0) FillEventHistograms(fHist.fEvent[1]);
+  else               FillEventHistograms(fHist.fEvent[2]);
 //-----------------------------------------------------------------------------
 // fill GENP histograms
 // GEN_0: all particles
@@ -459,26 +448,24 @@ void THelixAnaModule::FillHistograms() {
   TStnHelix* helix;
   double     mm2MeV{3/10.};
 
-  for (int ib=0; ib<3; ib++) {
-    int hist_offset = 100*ib;
+  int hist_offset = 0;
 
-    for (int i=0; i<fNHelices[ib]; ++i){
+  for (int i=0; i<fNHelices; ++i){
     
-      helix = fHelixBlock[ib]->Helix(i);
+    helix = fHelixBlock->Helix(i);
     
-      FillHelixHistograms(fHist.fHelix[hist_offset+0], helix);
+    FillHelixHistograms(fHist.fHelix[hist_offset+0], helix);
     
-      // int         nhits    = helix->NHits();
-      double      radius   = helix->Radius();
-      double      lambda   = helix->Lambda();
-      double      tanDip   = lambda/radius;
-      double      p        = radius*mm2MeV/cos(atan(tanDip));
+    // int         nhits    = helix->NHits();
+    double      radius   = helix->Radius();
+    double      lambda   = helix->Lambda();
+    double      tanDip   = lambda/radius;
+    double      p        = radius*mm2MeV/cos(atan(tanDip));
     
-      // double      chi2xy   = helix->Chi2XY();
-      // double      chi2zphi = helix->Chi2ZPhi();
-   
-      if (p >  80.) FillHelixHistograms(fHist.fHelix[hist_offset+1], helix);
-    }
+    // double      chi2xy   = helix->Chi2XY();
+    // double      chi2zphi = helix->Chi2ZPhi();
+    
+    if (p >  80.) FillHelixHistograms(fHist.fHelix[hist_offset+1], helix);
   }
 
   //  first_entry = 0;
@@ -499,9 +486,7 @@ int THelixAnaModule::Event(int ientry) {
 
   //  TDiskCalorimeter::GeomData_t disk_geom;
 
-  fHelixBlock[0]  ->GetEntry(ientry);
-  fHelixBlock[1]  ->GetEntry(ientry);
-  fHelixBlock[2]  ->GetEntry(ientry);
+  fHelixBlock->GetEntry(ientry);
 
   fGenpBlock->GetEntry(ientry);
   fSimpBlock->GetEntry(ientry);
@@ -543,23 +528,19 @@ int THelixAnaModule::Event(int ientry) {
   fNTimeClusters[0] = fTimeClusterBlock[0]->NTimeClusters();
   fNTimeClusters[1] = fTimeClusterBlock[1]->NTimeClusters();
   
-  fNHelices[0] = fHelixBlock[0]->NHelices();
-  fNHelices[1] = fHelixBlock[1]->NHelices();
-  fNHelices[2] = fHelixBlock[2]->NHelices();
+  fNHelices = fHelixBlock->NHelices();
 
-  for (int ib=0; ib<3; ib++) {
-    fNHelPos[ib] = 0;
-    fNHelNeg[ib] = 0;
-    for (int i=0; i<fNHelices[ib]; i++) {
-      TStnHelix* h = fHelixBlock[ib]->Helix(i);
-      if      (h->Helicity() > 0) fNHelPos[ib]++;
-      else if (h->Helicity() < 0) fNHelNeg[ib]++;
-      else {
-	printf("ERROR 001 in THelixAnaModule: helix with helicity=0\n");
-      }
+  fNHelPos = 0;
+  fNHelNeg = 0;
+  for (int i=0; i<fNHelices; i++) {
+    TStnHelix* h = fHelixBlock->Helix(i);
+    if      (h->Helicity() > 0) fNHelPos++;
+    else if (h->Helicity() < 0) fNHelNeg++;
+    else {
+      printf("ERROR 001 in THelixAnaModule: helix with helicity=0\n");
     }
   }
-
+  
   FillHistograms();
 
   Debug();
@@ -571,14 +552,14 @@ int THelixAnaModule::Event(int ientry) {
 void THelixAnaModule::Debug() {
 
   if (GetDebugBit(3) == 1) {
-    if (fNHelPos[1] > 0) {
-      GetHeaderBlock()->Print(Form("N(CalHelixFinder helices hel > 0) = %2i",fNHelPos[1]));
+    if (fNHelPos > 0) {
+      GetHeaderBlock()->Print(Form("N(CalHelixFinder helices hel > 0) = %2i",fNHelPos));
     }
   }
 
   if (GetDebugBit(4) == 1) {
-    if (fNHelNeg[1] > 0) {
-      GetHeaderBlock()->Print(Form("N(CalHelixFinder helices hel < 0) = %2i",fNHelNeg[1]));
+    if (fNHelNeg > 0) {
+      GetHeaderBlock()->Print(Form("N(CalHelixFinder helices hel < 0) = %2i",fNHelNeg));
     }
   }
 }
