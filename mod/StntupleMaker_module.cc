@@ -178,7 +178,7 @@ protected:
   double                   fMinECrystal  ;  // 
   double                   fMinSimpMomentum; // min tot momentum of a particle to be stored in SIMP block
   double                   fSimpMaxZ     ; // max Z of a particle to be stored in SIMP block
-  int                      fSimpUseTimeOffsets; // default=0
+  //  int                      fSimpUseTimeOffsets; // default=0
 
   string                   fCutHelixSeedCollTag; // helix collection to cut on
   int                      fMinNHelices    ; // min number of helices (for cosmics)
@@ -291,7 +291,7 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
   , fMinECrystal             (PSet.get<double>        ("minECrystal"         ))
   , fMinSimpMomentum         (PSet.get<double>        ("minSimpMomentum"     ))
   , fSimpMaxZ                (PSet.get<double>        ("simpMaxZ"            ))
-  , fSimpUseTimeOffsets      (PSet.get<int>           ("simpUseTimeOffsets"  ))
+  //  , fSimpUseTimeOffsets      (PSet.get<int>           ("simpUseTimeOffsets"  ))
   , fCutHelixSeedCollTag     (PSet.get<string>        ("cutHelixSeedCollTag" ))
   , fMinNHelices             (PSet.get<int>           ("minNHelices"         ))
 {
