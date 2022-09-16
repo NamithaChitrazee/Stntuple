@@ -40,6 +40,10 @@ public:
     float   fDpFSt;
     double  fDioWt;
 
+    double  fXc;			// X,Y coordinates of the track helix center
+    double  fYc;
+    double  fPhic;			// phi angle defined by XXc and Yx
+
     double  fEcl;
     double  fEp;
     double  fDx;
@@ -54,7 +58,9 @@ public:
 
   struct EventHist_t {
     TH1F*    fRv;			// MC truth information
-    TH1F*    fZv;
+    TH1F*    fVx;
+    TH1F*    fVy;
+    TH1F*    fVz;
     TH1F*    fEleMom;
     TH1D*    fDioMom;
     TH1F*    fEleCosTh;
@@ -98,6 +104,10 @@ public:
     TH1F*    fTanDip;
     TH1F*    fResid;
     TH1F*    fAlgMask;
+
+    TH1F*    fXc;
+    TH1F*    fYc;
+    TH1F*    fPhic;
 					// matching histograms
     TH1F*    fNClusters;
     TH1F*    fVaneID;
@@ -219,6 +229,8 @@ public:
   TStnTrackBlock*        fTrackBlock;
   TGenpBlock*            fGenpBlock;
   TSimpBlock*            fSimpBlock;
+
+  TString           fTrackBlockName;
 					// additional track parameters (assume ntracks < 20)
   TrackPar_t        fTrackPar[20];
 					// histograms filled
@@ -226,11 +238,10 @@ public:
 					// cut values
   double            fPtMin;
 
-  TGenParticle*     fParticle;		// electron or muon
+  TSimParticle*     fParticle;		// electron or muon
   int               fPdgCode;		// determines which one
   int               fGeneratorCode;      
 
-  TSimParticle*     fSimp;
   double            fEleE;		// electron energy
 
   int               fNTrackSeeds[5];
@@ -238,6 +249,7 @@ public:
   int               fNGoodTracks;
   int               fNMatchedTracks;
   int               fNGenp;		// N(generated particles)
+  int               fNSimp;		// N(simulated particles)
 
   int               fNHyp;
   int               fBestHyp[10];
@@ -253,6 +265,7 @@ public:
   TEmuLogLH*        fLogLH;
 
   double            fMinT0;
+  double            fBField;
 //-----------------------------------------------------------------------------
 //  functions
 //-----------------------------------------------------------------------------
@@ -267,12 +280,17 @@ public:
 
   TStnTrackID*       GetTrackID     () { return fTrackID; }
   TEmuLogLH*         GetLogLH       () { return fLogLH; }
+
+  double             BField         () { return fBField ; }
 //-----------------------------------------------------------------------------
 // accessors
 //-----------------------------------------------------------------------------
+  void               SetBField       (double BField) { fBField   = BField; }
+
   void               SetFillDioHist  (int YesNo) { fFillDioHist   = YesNo; }
   void               SetPdgCode      (int Code ) { fPdgCode       = Code ; }
   void               SetGeneratorCode(int Code ) { fGeneratorCode = Code ; }
+  void               SetTrackBlockName(const char* Name) { fTrackBlockName = Name; }
 //-----------------------------------------------------------------------------
 // overloaded methods of TStnModule
 //-----------------------------------------------------------------------------

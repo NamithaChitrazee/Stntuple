@@ -62,8 +62,10 @@ TTrackAnaModule::TTrackAnaModule(const char* name, const char* title):
 //-----------------------------------------------------------------------------
 // MC truth: define which MC particle to consider as signal
 //-----------------------------------------------------------------------------
-  fPdgCode       = 11;
-  fGeneratorCode = 2;			// conversionGun, 28:StoppedParticleReactionGun
+  fTrackBlockName = "TrackBlock";
+  fPdgCode        = 11;
+  fGeneratorCode  = 56;			// stopped mu+ decay
+  fBField         = 1.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -124,6 +126,10 @@ void TTrackAnaModule::BookTrackHistograms(TrackHist_t* Hist, const char* Folder)
   HBook1F(Hist->fTanDip     ,"tdip"     ,Form("%s: track tan(dip)"    ,Folder), 200, 0.0 ,2.0,Folder);
   HBook1F(Hist->fResid      ,"resid"    ,Form("%s: hit residuals"     ,Folder), 500,-0.5 ,0.5,Folder);
   HBook1F(Hist->fAlgMask    ,"alg"      ,Form("%s: algorithm mask"    ,Folder),  10,  0, 10,Folder);
+
+  HBook1F(Hist->fXc         ,"xc"       ,Form("%s: track Xc      "    ,Folder), 100,-1000,1000,Folder);
+  HBook1F(Hist->fYc         ,"yc"       ,Form("%s: track Yc      "    ,Folder), 100,-1000,1000,Folder);
+  HBook1F(Hist->fPhic       ,"phic"     ,Form("%s: track Phic    "    ,Folder), 128,  -3.2,  3.2,Folder);
 
   HBook1F(Hist->fDt         ,"dt"       ,Form("%s: track delta(T)"    ,Folder), 200,-20  ,20 ,Folder);
   HBook1F(Hist->fChi2Match  ,"chi2tcm"  ,Form("%s: chi2(t-c match)"   ,Folder), 250,  0  ,250 ,Folder);
@@ -193,7 +199,9 @@ void TTrackAnaModule::BookEventHistograms(EventHist_t* Hist, const char* Folder)
   HBook1F(Hist->fEleMom    ,"ce_mom"   ,Form("%s: Conversion Electron Momentum"    ,Folder),1000,  0,200,Folder);
   HBook1D(Hist->fDioMom    ,"dio_mom"  ,Form("%s: DIO momentum"                    ,Folder),1000, 50,150,Folder);
   HBook1F(Hist->fRv         ,"rv"      ,Form("%s: R(Vertex)"                       ,Folder), 100, 0, 1000,Folder);
-  HBook1F(Hist->fZv         ,"zv"      ,Form("%s: Z(Vertex)"                       ,Folder), 300, 0,15000,Folder);
+  HBook1F(Hist->fVx         ,"vx"      ,Form("%s: X(Vertex)"                       ,Folder), 300,-150,150,Folder);
+  HBook1F(Hist->fVy         ,"vy"      ,Form("%s: Y(Vertex)"                       ,Folder), 300,-150,150,Folder);
+  HBook1F(Hist->fVz         ,"vz"      ,Form("%s: Z(Vertex)"                       ,Folder), 300, 0,15000,Folder);
   //  HBook1F(Hist->fNClusters ,"ncl"      ,Form("%s: Number of Reconstructed Clusters",Folder),200,0,200,Folder);
   HBook1F(Hist->fNTracks   ,"ntrk"     ,Form("%s: Number of Reconstructed Tracks"  ,Folder),100,0,100,Folder);
   HBook1F(Hist->fNStrawHits[0],"nsh_0" ,Form("%s: Number of Straw Hits [0]"        ,Folder),250,0,250,Folder);
@@ -281,6 +289,7 @@ void TTrackAnaModule::BookHistograms() {
 
   book_track_histset[  0] = 1;		// all tracks e-
   book_track_histset[  1] = 1;		// all tracks e- passing Set C cuts 
+  book_track_histset[  2] = 1;		// tracks  N<30 hits
 
   for (int i=0; i<kNTrackHistSets; i++) {
     if (book_track_histset[i] != 0) {
@@ -316,18 +325,18 @@ void TTrackAnaModule::BookHistograms() {
 // need MC truth branch
 //-----------------------------------------------------------------------------
 void TTrackAnaModule::FillEventHistograms(EventHist_t* Hist) {
-  double            cos_th(-2), dio_wt(-1.), xv(-1.e6), yv(-1.e6), rv(-1.e6), zv(-1.e6), p(-1.);
+  double            cos_th(-2), dio_wt(-1.), vx(-1.e6), vy(-1.e6), rv(-1.e6), vz(-1.e6), p(-1.);
   //  double            e, m, r;
-  TLorentzVector    mom;
+  const TLorentzVector*    mom;
 
   if (fParticle) {
-    fParticle->Momentum(mom);
-    p      = mom.P();
-    cos_th = mom.Pz()/p;
-    xv     = fParticle->Vx()+3904.;
-    yv     = fParticle->Vy();
-    rv     = sqrt(xv*xv+yv*yv);
-    zv     = fParticle->Vz();
+    mom = fParticle->StartMom();
+    p      = mom->P();
+    cos_th = mom->Pz()/p;
+    vx     = fParticle->StartPos()->X();
+    vy     = fParticle->StartPos()->Y();
+    rv     = sqrt(vx*vx+vy*vy);
+    vz     = fParticle->StartPos()->Z();
     dio_wt = TStntuple::DioWeightAl(p);
   }
 
@@ -335,7 +344,9 @@ void TTrackAnaModule::FillEventHistograms(EventHist_t* Hist) {
   Hist->fDioMom->Fill(p,dio_wt);
   Hist->fEleCosTh->Fill(cos_th);
   Hist->fRv->Fill(rv);
-  Hist->fZv->Fill(zv);
+  Hist->fVx->Fill(vx);
+  Hist->fVy->Fill(vy);
+  Hist->fVz->Fill(vz);
 
   // Hist->fNClusters->Fill(fNClusters);
   Hist->fNTracks->Fill  (fNTracks[0]);
@@ -443,6 +454,9 @@ void TTrackAnaModule::FillTrackHistograms(TrackHist_t* Hist, TStnTrack* Track) {
   Hist->fTanDip->Fill(Track->fTanDip);
   Hist->fAlgMask->Fill(Track->AlgMask());
 
+  Hist->fXc->Fill(tp->fXc);
+  Hist->fYc->Fill(tp->fYc);
+  Hist->fPhic->Fill(tp->fPhic);
 //-----------------------------------------------------------------------------
 // track-cluster matching part: 
 // - for residuals, determine intersection with the most energetic cluster
@@ -477,7 +491,7 @@ void TTrackAnaModule::FillTrackHistograms(TrackHist_t* Hist, TStnTrack* Track) {
 // assign muon mass
 //-----------------------------------------------------------------------------
   double ekin(-1.);
-  if (fSimp) {
+  if (fParticle) {
     double p, m;
     //    p    = fSimp->fStartMom.P();
     p = Track->fP;
@@ -569,7 +583,7 @@ int TTrackAnaModule::BeginJob() {
 //-----------------------------------------------------------------------------
 // register data blocks
 //-----------------------------------------------------------------------------
-  RegisterDataBlock("TrackBlockDar"       ,"TStnTrackBlock"      ,&fTrackBlock      );
+  RegisterDataBlock(fTrackBlockName.Data(),"TStnTrackBlock"      ,&fTrackBlock      );
   RegisterDataBlock("GenpBlock"           ,"TGenpBlock"          ,&fGenpBlock       );
   RegisterDataBlock("SimpBlock"           ,"TSimpBlock"          ,&fSimpBlock       );
 //-----------------------------------------------------------------------------
@@ -621,8 +635,8 @@ void TTrackAnaModule::FillHistograms() {
 //-----------------------------------------------------------------------------
 // Simp histograms
 //-----------------------------------------------------------------------------
-  if (fSimp) {
-    FillSimpHistograms(fHist.fSimp[0],fSimp);
+  if (fParticle) {
+    FillSimpHistograms(fHist.fSimp[0],fParticle);
   }
 //-----------------------------------------------------------------------------
 // track histograms, fill them only for the downstream e- hypothesis
@@ -636,11 +650,8 @@ void TTrackAnaModule::FillHistograms() {
 
     FillTrackHistograms(fHist.fTrack[0],trk);
 
-    if (trk->fIDWord == 0) {
-					// track passes selection "C" 
-
-      FillTrackHistograms(fHist.fTrack[1],trk);
-    }
+    if (trk->NActive() >= 20) FillTrackHistograms(fHist.fTrack[1],trk);
+    if (trk->NActive() <  30) FillTrackHistograms(fHist.fTrack[2],trk);
   }
 //-----------------------------------------------------------------------------
 // fill GENP histograms
@@ -678,34 +689,27 @@ int TTrackAnaModule::Event(int ientry) {
 // be changed
 //-----------------------------------------------------------------------------
   fNGenp    = fGenpBlock->NParticles();
+  fNSimp    = fSimpBlock->NParticles();
 
-  TGenParticle* genp;
+  TSimParticle* simp;
   int           pdg_code, generator_code;
 
   fParticle = NULL;
-  for (int i=fNGenp-1; i>=0; i--) {
-    genp           = fGenpBlock->Particle(i);
-    pdg_code       = genp->GetPdgCode();
-    generator_code = genp->GetStatusCode();
-    if ((abs(pdg_code) == fPdgCode) && (generator_code == fGeneratorCode)) {
-      fParticle = genp;
+  for (int i=fNSimp-1; i>=0; i--) {
+    simp           = fSimpBlock->Particle(i);
+    pdg_code       = simp->PDGCode();
+    generator_code = simp->GeneratorID();
+    if ((pdg_code == fPdgCode) && (generator_code == fGeneratorCode)) {
+      fParticle = simp;
       break;
     }
   }
-					// may want to revisit the definition of fSimp
-  fSimp     = fSimpBlock->Particle(0);
 
-  if (fParticle) {
-    fParticle->Momentum(mom);
-    p         = mom.P();
-  }
-  else p = 0.;
+  if (fParticle) p = fParticle->StartMom()->P();
+  else           p = 0.;
 
-  fEleE     = sqrt(p*p+0.511*0.511);
-
-
+  fEleE       = sqrt(p*p+0.511*0.511);
   fNTracks[0] = fTrackBlock->NTracks();
-
   fNHyp       = -1;
   fBestHyp[0] = -1;
   fBestHyp[1] = -1;
@@ -758,6 +762,18 @@ int TTrackAnaModule::Event(int ientry) {
     tp->fDp2   = track->fP2    -track->fPFront;
     tp->fDpFSt = track->fPFront-track->fPStOut;
 
+    double r  = track->fPt/2.9979*10/fBField;
+//-----------------------------------------------------------------------------
+// this is the Mu2e D0 sign convention 
+//-----------------------------------------------------------------------------
+    double rho = r+track->D0()*track->Charge()*(-1);
+
+    double pt = track->Momentum()->Pt();
+
+    tp->fXc   = rho*(-1)*track->Momentum()->Py()/pt;
+    tp->fYc   = rho*track->Momentum()->Px()/pt;
+    tp->fPhic = atan2(tp->fYc,tp->fXc);
+
     if (fFillDioHist == 0) tp->fDioWt = 1.;
     else                   tp->fDioWt = TStntuple::DioWeightAl(fEleE);
 //-----------------------------------------------------------------------------
@@ -799,10 +815,6 @@ int TTrackAnaModule::Event(int ientry) {
       tp->fChi2Match = vr->fChi2Match;
       tp->fPath      = vr->fPath;
     }
-
-    //    if ((tp->fEp > 0) && (track->fEp > 0) && (fabs(tp->fEp-track->fEp) > 1.e-6)) {
-    //      GetHeaderBlock()->Print(Form(" TTrackAnaModule ERROR: tp->fEp = %10.5f  track->fEp = %10.5f",tp->fEp,track->fEp));
-    //    }
 //-----------------------------------------------------------------------------
 // PID likelihoods
 //-----------------------------------------------------------------------------

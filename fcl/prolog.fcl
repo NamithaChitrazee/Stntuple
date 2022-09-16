@@ -198,6 +198,7 @@ MuHitDisplay: { module_type:MuHitDisplay                 # class name;
 	displayStrawDigiMC : 1
 	displayStrawHitsXY : 1
 	debugLevel         : 0
+	bField             : 1.0      # in Tesla
     }
 #------------------------------------------------------------------------------
 # plugin configuration, plugin is a name of the script to be loaded

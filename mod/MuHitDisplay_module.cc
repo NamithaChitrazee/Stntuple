@@ -235,6 +235,9 @@ void MuHitDisplay::InitVisManager() {
   int display_straw_hits_xy = _vmConfig.get<int>("displayStrawHitsXY");
   vm->SetDisplayStrawHitsXY(display_straw_hits_xy);
 
+  float bfield = _vmConfig.get<float>("bField");
+  vm->SetBField(bfield);
+
   _defaultView = _vmConfig.get<string>("defaultView");
   boost::algorithm::to_lower(_defaultView);
 //-----------------------------------------------------------------------------
