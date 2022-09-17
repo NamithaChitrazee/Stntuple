@@ -1,12 +1,24 @@
 #
 
 * STNTUPLE event display                                                     
-** how to run:                                                                
+** how to run:                                                               
 #+begin_src
 mu2e -c Stntuple/fcl/display.fcl -s dig.mu2e.CeEndpointDigiTriggered.MDC2020n_10pc.001210_00000000.art 
 #+end_src
-** event display module: [[file:../mod/MuHitDisplay_module.cc]]                   
-** straw hit colors : see [[file:../gui/TEvdComboHit.cc::69]] (around line 69)    
+** event display module:                                                     
+   [[file:../mod/MuHitDisplay_module.cc]]                   
+
+   TStnVisManager-specific settings: file:../fcl/prolog.fcl::/visManager/
+
+   - visManager.defaultView : view opened in teh first window, "xy", "vst", etc
+                              defautl: "xy"
+
+   - visManager.displayStrawDigiMC
+   - visManager.bField      : used to display trajectories in the tracker,
+                              default = 1.0 (in Tesla)
+   - visManager.debugLevel  : debugging optioin, default = 0
+
+** straw hit colors : see [[file:../gui/TEvdComboHit.cc::69]] (around line 69)   
 
 |-----------+------------+-----------------|
 | color     | point size | meaning         |
@@ -21,7 +33,7 @@ mu2e -c Stntuple/fcl/display.fcl -s dig.mu2e.CeEndpointDigiTriggered.MDC2020n_10
 | magenta   |            | everything else |
 |-----------+------------+-----------------|
 
-** commands:                                                                  
+** commands:                                                                 
 
   - process next event: type ".q" at the ROOT prompt
 
@@ -33,14 +45,14 @@ mu2e -c Stntuple/fcl/display.fcl -s dig.mu2e.CeEndpointDigiTriggered.MDC2020n_10
 
   - mouse weel (Up, and Down) changes the scale
 
-** display of SimParticles                 
+** display of SimParticles                                                   
    - if *primaryParticleTag* is set to an empty string, 
      all particles with E>Emin and hits in the straw tracker will be saved
      and displayed
    - if, however, *primaryParticleTag* is set not non-empty string, 
      saved in STNTUPLE and displayed will be only particles pre-selected 
      from that list , still with N(straw hits) > 0 and E > Emin
-** plugins:                                                                   
+** plugins:                                                                  
    the following FCL parameter of a STNTUPLE module (any module class inheriting from TModule)
 
 #+begin_src
@@ -66,7 +78,7 @@ mu2e -c Stntuple/fcl/display.fcl -s dig.mu2e.CeEndpointDigiTriggered.MDC2020n_10
                    = 2 : stop only in the end of run
 #+end_src
     
-** quick notes about internals                                                
+** quick notes about internals                                               
 
   - Several views : derived from TStnView - XYView, RZView, TZView....
   - each view displays geometry and several nodes 

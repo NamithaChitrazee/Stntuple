@@ -102,7 +102,7 @@ TEvdSimParticle::TEvdSimParticle(): TObject() {
 					// rely on particle traveling along the Z axis
   p  = fS1->momentum().R  ();
   pt = fS1->momentum().Rho();
-  r  = pt/2.9979*10;			//    10^10/c, in mm
+  r  = pt/2.9979*10/vm->BField();       //    10^10/c, in mm
 
   phi0 = fS1->momentum().Phi();
 

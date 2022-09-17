@@ -97,6 +97,7 @@ protected:
   float               fTMin;
   float               fTMax;
   float               fMbTime;
+  float               fBField;          // by defautl , 1 T, but could be less
 
   int                 fDisplayStrawDigiMC;
   int                 fDisplayStrawHitsXY;
@@ -140,6 +141,7 @@ public:
   float          TMax() { return fTMax; }
 
   float          MbTime() { return fMbTime; }
+  float          BField() { return fBField; }
 
   void           GetTimeWindow(float& TMin, float& TMax) {
     TMin = fTMin;
@@ -169,6 +171,7 @@ public:
   }
 
   void  SetMbTime(float MbTime) { fMbTime = MbTime; }
+  void  SetBField(float BField) { fBField = BField; }
 
   void  UpdateViews();
 

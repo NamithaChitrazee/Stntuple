@@ -52,6 +52,7 @@ TStnVisManager::TStnVisManager(const char* Name, const char* Title): TVisManager
   fTMax        = 1.e5;
   fTimeCluster = -1;
   fEvent       = nullptr;
+  fBField      = 1.0;                   // in Tesla
 }
 
 //_____________________________________________________________________________

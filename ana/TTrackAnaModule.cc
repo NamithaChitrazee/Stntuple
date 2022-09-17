@@ -129,7 +129,7 @@ void TTrackAnaModule::BookTrackHistograms(TrackHist_t* Hist, const char* Folder)
 
   HBook1F(Hist->fXc         ,"xc"       ,Form("%s: track Xc      "    ,Folder), 100,-1000,1000,Folder);
   HBook1F(Hist->fYc         ,"yc"       ,Form("%s: track Yc      "    ,Folder), 100,-1000,1000,Folder);
-  HBook1F(Hist->fPhic       ,"phic"     ,Form("%s: track Phic    "    ,Folder), 128,  -3.2,  3.2,Folder);
+  HBook1F(Hist->fPhic       ,"phic"     ,Form("%s: track Phic    "    ,Folder), 130,  0,  6.5,Folder);
 
   HBook1F(Hist->fDt         ,"dt"       ,Form("%s: track delta(T)"    ,Folder), 200,-20  ,20 ,Folder);
   HBook1F(Hist->fChi2Match  ,"chi2tcm"  ,Form("%s: chi2(t-c match)"   ,Folder), 250,  0  ,250 ,Folder);
@@ -288,8 +288,10 @@ void TTrackAnaModule::BookHistograms() {
   for (int i=0; i<kNTrackHistSets; i++) book_track_histset[i] = 0;
 
   book_track_histset[  0] = 1;		// all tracks e-
-  book_track_histset[  1] = 1;		// all tracks e- passing Set C cuts 
-  book_track_histset[  2] = 1;		// tracks  N<30 hits
+  book_track_histset[  1] = 1;		// tracks  Na > 20 hits
+  book_track_histset[  2] = 1;		// tracks  Na > 30 hits
+  book_track_histset[  3] = 1;		// tracks  tdip > 0.8 hits
+  book_track_histset[  4] = 1;		// tracks  Na > 30 tdip > 0.8 hits
 
   for (int i=0; i<kNTrackHistSets; i++) {
     if (book_track_histset[i] != 0) {
@@ -333,7 +335,7 @@ void TTrackAnaModule::FillEventHistograms(EventHist_t* Hist) {
     mom = fParticle->StartMom();
     p      = mom->P();
     cos_th = mom->Pz()/p;
-    vx     = fParticle->StartPos()->X();
+    vx     = fParticle->StartPos()->X()+3904;
     vy     = fParticle->StartPos()->Y();
     rv     = sqrt(vx*vx+vy*vy);
     vz     = fParticle->StartPos()->Z();
@@ -650,8 +652,12 @@ void TTrackAnaModule::FillHistograms() {
 
     FillTrackHistograms(fHist.fTrack[0],trk);
 
-    if (trk->NActive() >= 20) FillTrackHistograms(fHist.fTrack[1],trk);
-    if (trk->NActive() <  30) FillTrackHistograms(fHist.fTrack[2],trk);
+    if (trk->NActive() >= 20)   FillTrackHistograms(fHist.fTrack[1],trk);
+    if (trk->NActive() >= 30)   FillTrackHistograms(fHist.fTrack[2],trk);
+    if (trk->TanDip()  > 0.8) { 
+                                FillTrackHistograms(fHist.fTrack[3],trk);
+      if (trk->NActive() >= 30) FillTrackHistograms(fHist.fTrack[4],trk);
+    }
   }
 //-----------------------------------------------------------------------------
 // fill GENP histograms
@@ -766,13 +772,18 @@ int TTrackAnaModule::Event(int ientry) {
 //-----------------------------------------------------------------------------
 // this is the Mu2e D0 sign convention 
 //-----------------------------------------------------------------------------
-    double rho = r+track->D0()*track->Charge()*(-1);
+    double    nx, ny;
 
-    double pt = track->Momentum()->Pt();
+    double qu  = -track->Charge();
+    double rho = r+track->D0()*qu;
 
-    tp->fXc   = rho*(-1)*track->Momentum()->Py()/pt;
-    tp->fYc   = rho*track->Momentum()->Px()/pt;
+    nx        = cos(track->fPhi0);
+    ny        = sin(track->fPhi0);
+    tp->fXc   =  rho*ny;
+    tp->fYc   = -rho*nx;
     tp->fPhic = atan2(tp->fYc,tp->fXc);
+
+    if (tp->fPhic < 0) tp->fPhic += 2*M_PI;
 
     if (fFillDioHist == 0) tp->fDioWt = 1.;
     else                   tp->fDioWt = TStntuple::DioWeightAl(fEleE);
@@ -780,7 +791,6 @@ int TTrackAnaModule::Event(int ientry) {
 // track residuals
 //-----------------------------------------------------------------------------
     TStnTrack::InterData_t*  vr = track->fVMaxEp; 
-    double    nx, ny;
 
     tp->fEcl       = -1.e6;
     tp->fEp        = -1.e6;
