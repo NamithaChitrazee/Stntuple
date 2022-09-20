@@ -774,13 +774,13 @@ int TTrackAnaModule::Event(int ientry) {
 //-----------------------------------------------------------------------------
     double    nx, ny;
 
-    double qu  = -track->Charge();
+    double qu  = (-1)*track->Charge();
     double rho = r+track->D0()*qu;
 
     nx        = cos(track->fPhi0);
     ny        = sin(track->fPhi0);
-    tp->fXc   =  rho*ny;
-    tp->fYc   = -rho*nx;
+    tp->fXc   =  -rho*ny*qu;
+    tp->fYc   =   rho*nx*qu;
     tp->fPhic = atan2(tp->fYc,tp->fXc);
 
     if (tp->fPhic < 0) tp->fPhic += 2*M_PI;
