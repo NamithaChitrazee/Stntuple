@@ -56,8 +56,10 @@ TStrawHitBlock::~TStrawHitBlock() {
   fListOfHits->Delete();
   delete fListOfHits;
 
-  fListOfWaveforms->Delete();
-  delete fListOfWaveforms;
+  if (fListOfWaveforms) {
+    fListOfWaveforms->Delete();
+    delete fListOfWaveforms;
+  }
 }
 
 //______________________________________________________________________________
