@@ -53,6 +53,7 @@ StntupleMakerTemplate : { module_type:StntupleMaker
     makeSimp             : 1  # 0: dont write
     makeStepPointMC      : 1
     makeStrawHits        : 0
+    makeStrawWaveforms   : 0
     makeTracks           : 1
     makeTrackStrawHits   : 0
     makeTrackSeeds       : 0
@@ -79,6 +80,7 @@ StntupleMakerTemplate : { module_type:StntupleMaker
 # in the job config file
 #------------------------------------------------------------------------------
     comboHitCollTag      : "makePH"
+    sdwfCollTag          : "makeSD"
     strawHitCollTag      : "makeSH"
     strawDigiMCCollTag   : @local::STN_COMPRESS_MCS              # was "makeSD"
 #------------------------------------------------------------------------------

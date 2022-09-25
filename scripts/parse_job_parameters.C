@@ -96,6 +96,7 @@ int parse_job_parameters(TString& Parameters, StnAnaGlobals_t& Glob) {
 // calibration pass - set reasonable defaults, which can be explicitly redefined
 // if calib_pass has not been specified via environment, set defaults.
 // default pass is '05' for the data and '05.mc' for MC
+// keys : "calib_pass" or simply "pass"
 //-----------------------------------------------------------------------------
   if (g.CalibPass == "") {
     if (g.DoMc > 0) g.CalibPass = "05.mc";
@@ -111,6 +112,7 @@ int parse_job_parameters(TString& Parameters, StnAnaGlobals_t& Glob) {
     loc2 = Parameters.Index("/",loc+1);
     if (loc2 < 0) loc2 = len;
     g.CalibPass = Parameters(loc1,loc2-loc1);
+    printf("  %-15s : %s\n","CALIB_PASS",g.CalibPass.Data());
   }
   else {
     loc = Parameters.Index("/pass=");
@@ -119,6 +121,7 @@ int parse_job_parameters(TString& Parameters, StnAnaGlobals_t& Glob) {
       loc2 = Parameters.Index("/",loc+1);
       if (loc2 < 0) loc2 = len;
       g.CalibPass = Parameters(loc1,loc2-loc1);
+      printf("  %-15s : %s\n","CALIB_PASS",g.CalibPass.Data());
     }
   }
 //-----------------------------------------------------------------------------

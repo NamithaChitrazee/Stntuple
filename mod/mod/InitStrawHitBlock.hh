@@ -16,6 +16,8 @@ class InitStrawHitBlock : public TStnInitDataBlock {
 public:
   art::InputTag   fStrawHitCollTag;
   art::InputTag   fStrawDigiMCCollTag;
+  art::InputTag   fSdwfCollTag;
+  int             fWriteSdwf;
 //-----------------------------------------------------------------------------
 // functions
 //-----------------------------------------------------------------------------
@@ -23,6 +25,8 @@ public:
 
   void   SetStrawHitCollTag    (std::string& Tag) { fStrawHitCollTag    = art::InputTag(Tag); }
   void   SetStrawDigiMCCollTag (std::string& Tag) { fStrawDigiMCCollTag = art::InputTag(Tag); }
+  void   SetSdwfCollTag        (std::string& Tag) { fSdwfCollTag        = art::InputTag(Tag); }
+  void   SetWriteSdwf          (int         Flag) { fWriteSdwf          = Flag              ; }
   
   virtual int InitDataBlock  (TStnDataBlock* Block, AbsEvent* Evt, int Mode);
   //  virtual int ResolveLinks   (TStnDataBlock* Block, AbsEvent* Evt, int Mode);

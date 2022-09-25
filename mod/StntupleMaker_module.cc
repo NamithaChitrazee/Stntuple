@@ -97,6 +97,7 @@ protected:
   int                      fMakeSimp;         // 0:dont store, 1:all;
   int                      fMakeStepPointMC;
   int                      fMakeStrawHits;
+  int                      fMakeStrWaveforms;
   int                      fMakeTracks;
   int                      fMakeTrackStrawHits;
   int                      fMakeTimeClusters;
@@ -114,6 +115,7 @@ protected:
 
   string                   fComboHitCollTag;
   string                   fStrawHitCollTag;
+  string                   fSdwfCollTag;
   string                   fStrawDigiMCCollTag;
 
   string                   fCrvRecoPulseCollTag;            //
@@ -234,6 +236,7 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
   , fMakeSimp                (PSet.get<int>           ("makeSimp"            ))
   , fMakeStepPointMC         (PSet.get<int>           ("makeStepPointMC"     ))
   , fMakeStrawHits           (PSet.get<int>           ("makeStrawHits"       ))
+  , fMakeStrWaveforms        (PSet.get<int>           ("makeStrWaveforms"    ))
   , fMakeTracks              (PSet.get<int>           ("makeTracks"          ))
   , fMakeTrackStrawHits      (PSet.get<int>           ("makeTrackStrawHits"  ))
   , fMakeTimeClusters        (PSet.get<int>           ("makeTimeClusters"    ))
@@ -248,6 +251,7 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
 
   , fComboHitCollTag         (PSet.get<string>        ("comboHitCollTag"     ))
   , fStrawHitCollTag         (PSet.get<string>        ("strawHitCollTag"     ))
+  , fSdwfCollTag             (PSet.get<string>        ("sdwfCollTag"         ))
   , fStrawDigiMCCollTag      (PSet.get<string>        ("strawDigiMCCollTag"  ))
 
   , fCrvRecoPulseCollTag         (PSet.get<string>    ("crvRecoPulseCollTag"         ))
@@ -615,8 +619,13 @@ void StntupleMaker::beginJob() {
   if (fMakeStrawHits) {
     fInitStrawHitBlock = new stntuple::InitStrawHitBlock();
 
-    fInitStrawHitBlock->SetStrawHitCollTag (fStrawHitCollTag);
+    fInitStrawHitBlock->SetStrawHitCollTag   (fStrawHitCollTag   );
     fInitStrawHitBlock->SetStrawDigiMCCollTag(fStrawDigiMCCollTag);
+
+    if (fMakeStrWaveforms) { 
+      fInitStrawHitBlock->SetWriteSdwf(1);
+      fInitStrawHitBlock->SetSdwfCollTag(fSdwfCollTag);
+    }
 
     AddDataBlock("StrawHitBlock","TStrawHitBlock",fInitStrawHitBlock,buffer_size,split_mode,compression_level);
   }

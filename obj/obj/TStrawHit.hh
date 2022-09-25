@@ -58,7 +58,7 @@ protected:
 
 public:
                                         // constructors and destructors
-  TStrawHit();
+  TStrawHit(int I = -1);
   virtual ~TStrawHit();
 //-----------------------------------------------------------------------------
 // accessors
@@ -98,9 +98,9 @@ public:
 //-----------------------------------------------------------------------------
 // schema evolution
 //-----------------------------------------------------------------------------
-//  void ReadV1(TBuffer &R__b);
+  void ReadV1(TBuffer& R__b);
 
-  ClassDef (TStrawHit,1)
+  ClassDef (TStrawHit,2)
 };
 
 #endif

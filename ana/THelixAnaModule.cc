@@ -7,6 +7,7 @@
 //  2  : rejected events
 //  3  : N(CalHelixFinder helices hel>0) > 0
 //  4  : N(CalHelixFinder helices hel<0) > 0
+//  5  : N(helices) > 1
 // 
 ///////////////////////////////////////////////////////////////////////////////
 #include "TF1.h"
@@ -560,6 +561,12 @@ void THelixAnaModule::Debug() {
   if (GetDebugBit(4) == 1) {
     if (fNHelNeg > 0) {
       GetHeaderBlock()->Print(Form("N(CalHelixFinder helices hel < 0) = %2i",fNHelNeg));
+    }
+  }
+
+  if (GetDebugBit(5) == 1) {
+    if (fNHelNeg+fNHelPos > 1) {
+      GetHeaderBlock()->Print(Form("N(helices = 0) = %2i",fNHelNeg+fNHelPos));
     }
   }
 }

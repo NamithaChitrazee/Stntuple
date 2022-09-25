@@ -1,16 +1,18 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
 ///////////////////////////////////////////////////////////////////////////////
+#include "messagefacility/MessageLogger/MessageLogger.h"
 
 #include "Stntuple/mod/InitStrawHitBlock.hh"
 
 #include "Offline/RecoDataProducts/inc/ComboHit.hh"
 #include "Offline/RecoDataProducts/inc/StrawHit.hh"
+#include "Offline/RecoDataProducts/inc/StrawDigi.hh"
 
 #include "Offline/MCDataProducts/inc/StrawDigiMC.hh"
 #include "Offline/MCDataProducts/inc/StrawGasStep.hh"
 
-#include "vector"
+#include <vector>
 
 using std::vector ;
 //-----------------------------------------------------------------------------
@@ -31,15 +33,16 @@ int InitStrawHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int 
   data->Clear();
 //-----------------------------------------------------------------------------
 //  straw hit information
+// combo hits are needed for 
 //-----------------------------------------------------------------------------
-  art::Handle<mu2e::ComboHitCollection> chch;
-  const mu2e::ComboHitCollection*       chc (nullptr);
+  art::Handle<mu2e::ComboHitCollection>             chch;
+  const mu2e::ComboHitCollection*                   chc (nullptr);
 
-  art::Handle<mu2e::StrawHitCollection> shch;
-  const mu2e::StrawHitCollection*       shc (nullptr);
+  art::Handle<mu2e::StrawHitCollection>             shch;
+  const mu2e::StrawHitCollection*                   shc (nullptr);
 
-  art::Handle<mu2e::StrawDigiMCCollection> sdmcch;
-  const mu2e::StrawDigiMCCollection*       sdmcc (nullptr);
+  art::Handle<mu2e::StrawDigiMCCollection>          sdmcch;
+  const mu2e::StrawDigiMCCollection*                sdmcc (nullptr);
 
   //  int   nhits(0);
 
@@ -67,6 +70,7 @@ int InitStrawHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int 
       return -1;
     }
   }
+
 //-----------------------------------------------------------------------------
 // MC data may not be present ...
 //-----------------------------------------------------------------------------
@@ -98,7 +102,7 @@ int InitStrawHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int 
 	step = mcdigi->earlyStrawGasStep().get();
       }
 
-      hit = data->NewHit();
+      hit = data->NewHit(i);
 
       if (step) {
 	art::Ptr<mu2e::SimParticle> const& simptr = step->simParticle(); 
@@ -143,6 +147,37 @@ int InitStrawHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int 
 	       gen_index, sim_id, 
 	       pdg_id, mother_pdg_id, 
 	       sh->energyDep(), mc_mom);
+    }
+
+    if (fWriteSdwf != 0) {
+      if (! fSdwfCollTag.empty() != 0) {
+
+	art::Handle<mu2e::StrawDigiADCWaveformCollection> sdwfch;
+	const mu2e::StrawDigiADCWaveformCollection*       sdwfc(nullptr);
+
+	bool ok = Event->getByLabel(fSdwfCollTag,sdwfch);
+	if (ok) sdwfc = sdwfch.product();
+
+	if (sdwfc == nullptr) {
+	  mf::LogWarning(__func__) << " WARNING in InitStrawHitBlock::" << __func__ << ":" << __LINE__ 
+				   << ": StrawDigiADCWaveformCollection:" 
+				   << fSdwfCollTag.encode().data() << " NOT FOUND, rc = -1";
+	  return -1;
+	}
+
+	int nwf = sdwfc->size();
+	for (int i=0; i<nwf; i++) {
+	  const mu2e::StrawDigiADCWaveform* sdwf = &sdwfc->at(i);
+
+	  TStrWaveform* wf = data->NewWaveform(i);
+	  wf->Set(sdwf->samples().size(), sdwf->samples().data());
+	}
+      }
+      else {
+	mf::LogWarning(__func__) << " WARNING in InitStrawHitBlock::" << __func__ << ":" << __LINE__ 
+				 << ": StrawDigiADCWaveformCollection coll tag IS EMPTY, rc = -2" ;
+	return -2;
+      }
     }
   }
 

@@ -4,7 +4,9 @@
 #include "TClonesArray.h"
 
 #include "Stntuple/obj/TStnDataBlock.hh"
+
 #include "Stntuple/obj/TStrawHit.hh"
+#include "Stntuple/obj/TStrWaveform.hh"
 
 #include "Stntuple/mod/InitStntupleDataBlocks.hh"
 
@@ -13,7 +15,9 @@ class TStrawHitBlock: public TStnDataBlock {
 
 public:
   Int_t          fNHits;	        // number of hits in the straw tracker
+  int            fNWaveforms;		// added in V2
   TClonesArray*  fListOfHits;		// list of hits
+  TClonesArray*  fListOfWaveforms;      // added in V2, list of waveforms, 
 //-----------------------------------------------------------------------------
 //  functions
 //-----------------------------------------------------------------------------
@@ -23,23 +27,32 @@ public:
   virtual ~TStrawHitBlock();
 					// accessors
 
-  Int_t          NHits    () { return fNHits; }
-  TStrawHit* Hit (int i) { return (TStrawHit*) fListOfHits->UncheckedAt(i); }
+  int           NHits     () { return fNHits     ; }
+  int           NWaveforms() { return fNWaveforms; }
+
+  TStrawHit*    Hit      (int I) { return (TStrawHit*   ) fListOfHits->UncheckedAt     (I); }
+  TStrWaveform* Waveform (int I) { return (TStrWaveform*) fListOfWaveforms->UncheckedAt(I); }
   
-  TClonesArray* GetListOfHits () { return fListOfHits; }
+  TClonesArray* GetListOfHits     () { return fListOfHits     ; }
+  TClonesArray* GetListOfWaveforms() { return fListOfWaveforms; }
 //-----------------------------------------------------------------------------
 // modifiers
 //-----------------------------------------------------------------------------
                                         //Create hit, increse number of hits
 
-  TStrawHit* NewHit() { return new ((*fListOfHits)[fNHits++]) TStrawHit(); } 
+  TStrawHit*    NewHit     (int I) { return new ((*fListOfHits)[fNHits++])           TStrawHit   (I); } 
+  TStrWaveform* NewWaveform(int I) { return new ((*fListOfWaveforms)[fNWaveforms++]) TStrWaveform(I); } 
+//-----------------------------------------------------------------------------
+// schema evolution
+//-----------------------------------------------------------------------------
+  void ReadV1(TBuffer& R__b);
 //-----------------------------------------------------------------------------
 // overloaded methods of TObject
 //-----------------------------------------------------------------------------
   void Clear(Option_t* opt="");
   void Print(Option_t* opt="") const;
 
-  ClassDef(TStrawHitBlock,1)	// straw hit data block
+  ClassDef(TStrawHitBlock,2)	// straw hit data block
 };
 
 
