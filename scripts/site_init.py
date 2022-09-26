@@ -36,6 +36,10 @@ def stntuple_gen_rootcint(source, target, env, for_signature):
     base_dir = os.environ.get('MUSE_WORK_DIR');
 
     includes = '-I'+base_dir+'/include';
+
+    if (os.getenv('MUSE_BACKING') != None) : 
+        includes = includes + ' -I'+os.environ['MUSE_BACKING' ];
+
     includes = includes + ' -I'+os.environ['MUSE_BUILD_BASE'  ];
     includes = includes + ' -I'+os.environ['ART_INC'     ];
     includes = includes + ' -I'+os.environ['ART_ROOT_IO_INC'];
