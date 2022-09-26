@@ -40,8 +40,9 @@ class stntuple_helper:
         self._env.StntupleCodegen(cc,script);
         obj = cc.replace(".cc",".o");
         self._env.SharedObject(obj,cc)
-        if (obj.find("_module") < 0):
-            self._list_of_object_files.append(obj);
+# don't need this any more
+#        if (obj.find("_module") < 0):
+#            self._list_of_object_files.append(obj);
 
     def handle_dictionaries(self,suffix = ".hh",skip_list = []):
         self.suffix = suffix ;
