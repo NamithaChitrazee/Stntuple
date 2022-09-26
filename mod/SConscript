@@ -27,7 +27,7 @@ def local_build():
     if (os.getenv('MUSE_VERBOSE')) : print("cc_file = "+cc_file);
 
     script  = '#Stntuple/scripts/create_print_header_routine.sh';
-### FIXME    helper.do_codegen(cc_file,script);
+    helper.do_codegen(cc_file,script);
 
     helper.handle_dictionaries();
 
