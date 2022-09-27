@@ -11,6 +11,7 @@ class TGPopupMenu;
 class TGLayoutHints;
 class TGStatusBar;
 class TGGroupFrame;
+class TGCheckButton;
 class TGTextButton;
 class TGRadioButton;
 
@@ -21,6 +22,12 @@ class TStnFrame: public TGMainFrame, public TCanvasImp {
 public:
 
   enum { fGroupFrameWidth = 150 };
+					// checkbutton ID's
+  enum { 
+    kDisplayHelices      = 5,
+    kDisplayTracks       = 6,
+    kDisplaySimParticles = 7
+  };
 
 protected:
 
@@ -50,6 +57,8 @@ protected:
 
   TGRadioButton       *fRb[2];             // ! [0]: SH [1]: CH 
 
+  TGCheckButton*      fDisplayHelices;     // ! 
+
   TStnVisManager*     fVisManager;	   // !
   int                 fView;		   // !
 
@@ -75,6 +84,7 @@ public:
   void DoTab(Int_t id);
 
   void DoRadio();
+  void DoCheckButtons();
 
   void HandleButtons(Int_t id = -1);
   void EditorBar();

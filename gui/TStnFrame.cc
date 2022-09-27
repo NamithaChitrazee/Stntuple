@@ -269,6 +269,20 @@ TStnFrame::TStnFrame(const char* Name,
   fRb[1]->Connect("Clicked()", "TStnFrame", this, "DoRadio()");
   frame->AddFrame(fRb[1], new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
 
+  TGCheckButton* cbtn;
+
+  cbtn = new TGCheckButton(frame, "Helices", kDisplayHelices);
+  cbtn->Connect("Clicked()", "TStnFrame", this, "DoCheckButtons()");
+  frame->AddFrame(cbtn, new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
+
+  cbtn = new TGCheckButton(frame, "Tracks", kDisplayTracks);
+  cbtn->Connect("Clicked()", "TStnFrame", this, "DoCheckButtons()");
+  frame->AddFrame(cbtn, new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
+
+  cbtn = new TGCheckButton(frame, "SimParticles", kDisplaySimParticles);
+  cbtn->Connect("Clicked()", "TStnFrame", this, "DoCheckButtons()");
+  frame->AddFrame(cbtn, new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
+
   shutter->AddItem(sh_item);
 //-----------------------------------------------------------------------------
 // "print" : print different collections
@@ -711,4 +725,25 @@ void TStnFrame::DoRadio() {
       if (fRb[i]->WidgetId() != id) fRb[i]->SetState(kButtonUp);
     }
   }
+}
+
+//-----------------------------------------------------------------------------
+// TGCheckButton changes its state on its own
+//-----------------------------------------------------------------------------
+void TStnFrame::DoCheckButtons() {
+   // Handle radio buttons.
+
+  TGButton *btn = (TGButton *) gTQSender;
+  Int_t id = btn->WidgetId();
+
+  printf(" TStnFrame::DoCheckButtons check button ID: %i state: %i\n",id,btn->IsOn());
+  
+  TStnVisManager* vm = TStnVisManager::Instance();
+
+  int doit = (int) btn->IsOn(); 
+
+  if      (id == kDisplayHelices     ) vm->SetDisplayHelices     (doit);
+  else if (id == kDisplayTracks      ) vm->SetDisplayTracks      (doit);
+  else if (id == kDisplaySimParticles) vm->SetDisplaySimParticles(doit);
+
 }

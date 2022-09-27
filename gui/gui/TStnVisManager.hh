@@ -101,6 +101,9 @@ protected:
 
   int                 fDisplayStrawDigiMC;
   int                 fDisplayStrawHitsXY;
+  int                 fDisplayHelices; 
+  int                 fDisplayTracks; 
+  int                 fDisplaySimParticles; 
 //-----------------------------------------------------------------------------
 //  functions
 //-----------------------------------------------------------------------------
@@ -148,22 +151,23 @@ public:
     TMax = fTMax;
   }
 
-  int DisplayStrawHitsXY() { return fDisplayStrawHitsXY; }
+  int            DisplayStrawHitsXY () { return fDisplayStrawHitsXY ; }
+  int            DisplayHelices     () { return fDisplayHelices     ; }
+  int            DisplayTracks      () { return fDisplayTracks      ; }
+  int            DisplaySimParticles() { return fDisplaySimParticles; }
   //-----------------------------------------------------------------------------
   // modifiers
   //-----------------------------------------------------------------------------
-  void SetEvent(const art::Event* Evt) { fEvent = Evt; }
+  void           SetEvent(const art::Event* Evt) { fEvent = Evt; }
 
-  void SetDisplayStrawDigiMC(int Display) {
-    fDisplayStrawDigiMC = Display;
-  }
+  void           SetDisplayStrawDigiMC (int Flag) { fDisplayStrawDigiMC  = Flag; }
+  void           SetDisplayStrawHitsXY (int Flag) { fDisplayStrawHitsXY  = Flag; }
+  void           SetDisplayHelices     (int Flag) { fDisplayHelices      = Flag; }
+  void           SetDisplayTracks      (int Flag) { fDisplayTracks       = Flag; }
+  void           SetDisplaySimParticles(int Flag) { fDisplaySimParticles = Flag; }
 
-  void SetDisplayStrawHitsXY(int Flag) {
-    fDisplayStrawHitsXY = Flag;
-  }
-
-  void SetStations(int IMin, int IMax) override;
-  void SetTimeCluster(int I) override;
+  void           SetStations(int IMin, int IMax) override;
+  void           SetTimeCluster(int I) override;
   
   void   SetTimeWindow(float TMin, float TMax) override {
     fTMin = TMin;

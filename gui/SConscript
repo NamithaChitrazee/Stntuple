@@ -60,6 +60,7 @@ def local_build():
                          'cetlib_except',
                          'xerces-c',
                          rootlibs ,
+                         'MF_MessageLogger',
                          'CLHEP',
                          'boost_system',
                          'boost_filesystem',

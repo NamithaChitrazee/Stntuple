@@ -445,26 +445,30 @@ void TTrkVisNode::PaintXY(Option_t* Option) {
 //-----------------------------------------------------------------------------
 // now - tracks
 //-----------------------------------------------------------------------------
-  stntuple::TEvdTrack* evd_trk;
+  if (vm->DisplayTracks()) {
+    stntuple::TEvdTrack* evd_trk;
   //  TAnaDump::Instance()->printKalRep(0,"banner");
 
-  if ( (fListOfTracks) != 0 )  ntrk = fListOfTracks->GetEntriesFast();
+    if ( (fListOfTracks) != 0 )  ntrk = fListOfTracks->GetEntriesFast();
 
-  for (int i=0; i<ntrk; i++ ) {
-    evd_trk = GetEvdTrack(i);
-    evd_trk->Paint(Option);
+    for (int i=0; i<ntrk; i++ ) {
+      evd_trk = GetEvdTrack(i);
+      evd_trk->Paint(Option);
+    }
   }
-
 //-----------------------------------------------------------------------------
 // SimParticle's
 //-----------------------------------------------------------------------------
-  stntuple::TEvdSimParticle* esp;
+  if (vm->DisplaySimParticles()) {
 
-  int nsim = fListOfSimParticles->GetEntriesFast();
+    stntuple::TEvdSimParticle* esp;
 
-  for (int i=0; i<nsim; i++ ) {
-    esp = GetEvdSimParticle(i);
-    esp->Paint(Option);
+    int nsim = fListOfSimParticles->GetEntriesFast();
+
+    for (int i=0; i<nsim; i++ ) {
+      esp = GetEvdSimParticle(i);
+      esp->Paint(Option);
+    }
   }
 //-----------------------------------------------------------------------------
 // seedfit, if requested - not implemented yet
@@ -487,7 +491,7 @@ void TTrkVisNode::PaintRZ(Option_t* Option) {
   int             ntrk(0), nhits;
   stntuple::TEvdTrack*      evd_trk;
 
-  //  TStnVisManager* vm = TStnVisManager::Instance();
+  TStnVisManager* vm = TStnVisManager::Instance();
 
   fTracker->PaintRZ(Option);
 //-----------------------------------------------------------------------------
@@ -505,30 +509,33 @@ void TTrkVisNode::PaintRZ(Option_t* Option) {
 //-----------------------------------------------------------------------------
 // display tracks and track hits
 //-----------------------------------------------------------------------------
-  if (fListOfTracks != 0)  ntrk = fListOfTracks->GetEntriesFast();
+  if (vm->DisplayTracks()) {
+    if (fListOfTracks != 0)  ntrk = fListOfTracks->GetEntriesFast();
 
-  for (int i=0; i<ntrk; i++ ) {
-    evd_trk = (stntuple::TEvdTrack*) fListOfTracks->At(i);
-    evd_trk->Paint(Option);
+    for (int i=0; i<ntrk; i++ ) {
+      evd_trk = (stntuple::TEvdTrack*) fListOfTracks->At(i);
+      evd_trk->Paint(Option);
 
-    nhits = evd_trk->NHits();
-    for (int ih=0; ih<nhits; ih++) {
-      stntuple::TEvdTrkStrawHit* hit = evd_trk->Hit(ih);
-      hit->PaintRZ(Option);
+      nhits = evd_trk->NHits();
+      for (int ih=0; ih<nhits; ih++) {
+	stntuple::TEvdTrkStrawHit* hit = evd_trk->Hit(ih);
+	hit->PaintRZ(Option);
+      }
     }
   }
-
 //-----------------------------------------------------------------------------
 // SimParticle's : pT at  the ST is too large, need to use parameters at the tracker entrance ?
 //-----------------------------------------------------------------------------
-  stntuple::TEvdSimParticle* esim;
-  int nsim(0);
+  if (vm->DisplaySimParticles()) {
+    stntuple::TEvdSimParticle* esim;
+    int nsim(0);
 
-  if ( (fListOfSimParticles) != 0 )  nsim = fListOfSimParticles->GetEntriesFast();
+    if ( (fListOfSimParticles) != 0 )  nsim = fListOfSimParticles->GetEntriesFast();
 
-  for (int i=0; i<nsim; i++ ) {
-    esim = (stntuple::TEvdSimParticle*) fListOfSimParticles->At(i);
-    esim->PaintRZ(Option);
+    for (int i=0; i<nsim; i++ ) {
+      esim = (stntuple::TEvdSimParticle*) fListOfSimParticles->At(i);
+      esim->PaintRZ(Option);
+    }
   }
 
   gPad->Modified();
@@ -540,6 +547,8 @@ void TTrkVisNode::PaintRZ(Option_t* Option) {
 // display reconstructed tracks and combo hits 
 //-----------------------------------------------------------------------------
 void TTrkVisNode::PaintTZ(Option_t* Option) {
+
+  TStnVisManager* vm = TStnVisManager::Instance();
 
   int nhits = fListOfComboHits->GetEntries();
   for (int i=0; i<nhits; i++) {
@@ -555,14 +564,16 @@ void TTrkVisNode::PaintTZ(Option_t* Option) {
 //-----------------------------------------------------------------------------
 // SimParticle's
 //-----------------------------------------------------------------------------
-  stntuple::TEvdSimParticle* esim;
-  int nsim(0);
+  if (vm->DisplaySimParticles()) {
+    stntuple::TEvdSimParticle* esim;
+    int nsim(0);
 
-  if ( (fListOfSimParticles) != 0 )  nsim = fListOfSimParticles->GetEntriesFast();
+    if ( (fListOfSimParticles) != 0 )  nsim = fListOfSimParticles->GetEntriesFast();
 
-  for (int i=0; i<nsim; i++ ) {
-    esim = (stntuple::TEvdSimParticle*) fListOfSimParticles->At(i);
-    esim->PaintTZ(Option);
+    for (int i=0; i<nsim; i++ ) {
+      esim = (stntuple::TEvdSimParticle*) fListOfSimParticles->At(i);
+      esim->PaintTZ(Option);
+    }
   }
 
   gPad->Modified();
@@ -626,30 +637,33 @@ int TTrkVisNode::DistancetoPrimitiveXY(Int_t px, Int_t py) {
 //-----------------------------------------------------------------------------
 // tracks are represented by ellipses
 //-----------------------------------------------------------------------------
-  int ntracks = fListOfTracks->GetEntries();
-  for (int i=0; i<ntracks; i++) {
-    stntuple::TEvdTrack* trk = GetEvdTrack(i);
+  if (vm->DisplayTracks()) {
+    int ntracks = fListOfTracks->GetEntries();
+    for (int i=0; i<ntracks; i++) {
+      stntuple::TEvdTrack* trk = GetEvdTrack(i);
 
-    dist = trk->DistancetoPrimitiveXY(px,py);
+      dist = trk->DistancetoPrimitiveXY(px,py);
 
-    if (dist < min_dist) {
-      min_dist = dist;
-      closest  = trk;
+      if (dist < min_dist) {
+	min_dist = dist;
+	closest  = trk;
+      }
     }
   }
-
 //-----------------------------------------------------------------------------
 // simparticles are represented by ellipses
 //-----------------------------------------------------------------------------
-  int nsim = fListOfSimParticles->GetEntries();
-  for (int i=0; i<nsim; i++) {
-    stntuple::TEvdSimParticle* sim = GetEvdSimParticle(i);
+  if (vm->DisplaySimParticles()) {
+    int nsim = fListOfSimParticles->GetEntries();
+    for (int i=0; i<nsim; i++) {
+      stntuple::TEvdSimParticle* sim = GetEvdSimParticle(i);
 
-    dist = sim->DistancetoPrimitiveXY(px,py);
+      dist = sim->DistancetoPrimitiveXY(px,py);
 
-    if (dist < min_dist) {
-      min_dist = dist;
-      closest  = sim;
+      if (dist < min_dist) {
+	min_dist = dist;
+	closest  = sim;
+      }
     }
   }
   SetClosestObject(closest,min_dist);
@@ -673,6 +687,8 @@ Int_t TTrkVisNode::DistancetoPrimitiveTZ(Int_t px, Int_t py) {
 
   int  x1, y1, dx1, dy1, min_dist(9999), dist;
 
+  TStnVisManager* vm = TStnVisManager::Instance();
+
   int nhits = fListOfComboHits->GetEntries();
   for (int i=0; i<nhits; i++) {
     stntuple::TEvdComboHit* hit = (stntuple::TEvdComboHit*) fListOfComboHits->At(i);
@@ -690,15 +706,17 @@ Int_t TTrkVisNode::DistancetoPrimitiveTZ(Int_t px, Int_t py) {
 //-----------------------------------------------------------------------------
 // simparticles are represented by lines
 //-----------------------------------------------------------------------------
-  int nsim = fListOfSimParticles->GetEntries();
-  for (int i=0; i<nsim; i++) {
-    stntuple::TEvdSimParticle* esp = GetEvdSimParticle(i);
+  if (vm->DisplaySimParticles()) {
+    int nsim = fListOfSimParticles->GetEntries();
+    for (int i=0; i<nsim; i++) {
+      stntuple::TEvdSimParticle* esp = GetEvdSimParticle(i);
 
-    dist = esp->DistancetoPrimitiveTZ(px,py);
+      dist = esp->DistancetoPrimitiveTZ(px,py);
 
-    if (dist < min_dist) {
-      min_dist = dist;
-      closest  = esp;
+      if (dist < min_dist) {
+	min_dist = dist;
+	closest  = esp;
+      }
     }
   }
 

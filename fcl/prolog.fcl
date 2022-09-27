@@ -159,6 +159,7 @@ MuHitDisplay: { module_type:MuHitDisplay                 # class name;
     
     genpCollTag                  : "generate"
     comboHitCollTag              : "makePH"                          # comboHits
+    helixSeedCollTag             : "MHFinderDe"                      # helices
     strawHitCollTag              : "makeSH"
     sdCollTag                    : "FromTrackerPrototypeData"        # tracker VST
     swCollTag                    : "FromTrackerPrototypeData"        # tracker VST

@@ -69,7 +69,6 @@ protected:
   TArc*                     fArc;
   const mu2e::TimeCluster*  fTimeCluster;
 
-  Int_t                     fDisplayBackgroundHits;
   Int_t                     fTimeWindow;
   Int_t                     fPickMode;
   Int_t                     fUseStereoHits;
@@ -122,7 +121,6 @@ public:
   //   return *fStrawHitFlagColl;
   // }
 
-  int DisplayBackgroundHits() { return fDisplayBackgroundHits; }
 //-----------------------------------------------------------------------------
 // modifiers
 //-----------------------------------------------------------------------------
@@ -173,8 +171,6 @@ public:
   }
 
   void  SetPickMode   (Int_t Mode) { fPickMode    = Mode; }
-
-  void  SetDisplayBackgroundHits(Int_t Mode) { fDisplayBackgroundHits = Mode; }
 //-----------------------------------------------------------------------------
 // overloaded methods of TVisNode
 //-----------------------------------------------------------------------------
