@@ -13,6 +13,7 @@
 #include "Stntuple/gui/TCalVisNode.hh"
 #include "Stntuple/gui/TCrvVisNode.hh"
 #include "Stntuple/gui/TTrkVisNode.hh"
+#include "Stntuple/gui/TEvdHelixVisNode.hh"
 
 #include "Stntuple/gui/TMcTruthVisNode.hh"
 #include "Stntuple/gui/TCalView.hh"
@@ -43,6 +44,7 @@ MuHitDisplay::MuHitDisplay(fhicl::ParameterSet const& pset) :
   _shfCollTag                  (pset.get<string>("shfCollTag")),
   _swCollTag                   (pset.get<string>("swCollTag")),
   
+  _helixSeedCollTag            (pset.get<string>("helixSeedCollTag")),
   _trackCollTag                (pset.get<string>("trackCollTag")),
   _simpCollTag                 (pset.get<string>("simpCollTag")),
   _timeClusterCollTag          (pset.get<string>("timeClusterCollTag")),
@@ -116,7 +118,6 @@ MuHitDisplay::~MuHitDisplay() {
 //-----------------------------------------------------------------------------
 void MuHitDisplay::beginJob() {
 
-  //     const char oname[] = "MuHitDisplay::beginJob";
   int    tmp_argc(0);
   char** tmp_argv(0);
 //-----------------------------------------------------------------------------
@@ -127,7 +128,7 @@ void MuHitDisplay::beginJob() {
 
   init_block->SetSimpCollTag       (_simpCollTag);
   init_block->SetStrawHitCollTag   (_strawHitCollTag);
-  init_block->SetStrawDigiMCCollTag(_sdmcCollTag);
+  init_block->SetSdmcCollTag       (_sdmcCollTag);
   init_block->SetVDHitsCollTag     (_vdHitsCollTag);
   init_block->SetPrimaryParticleTag(_ppTag);
   init_block->SetMinSimpMomentum   (_minSimpMomentum);         // in MeV
@@ -291,10 +292,19 @@ void MuHitDisplay::InitVisManager() {
 //-----------------------------------------------------------------------------
   tnode->SetSimpBlock       (fSimpBlock       );
 //-----------------------------------------------------------------------------
+// HelixVisNode: one helix collection - lets see how it plays out
+// add helix node to only one view - XY
+//-----------------------------------------------------------------------------
+  TEvdHelixVisNode* hnode = new TEvdHelixVisNode ("HelixVisNode", NULL);
+  hnode->SetHelixSeedCollTag(_helixSeedCollTag);
+  hnode->SetSdmcCollTag     (_sdmcCollTag);
+  hnode->SetShCollTag       (_strawHitCollTag );
+//-----------------------------------------------------------------------------
 // XY view : tracker + calorimeter
 //-----------------------------------------------------------------------------
   TStnView* vxy = new TStnView(TStnVisManager::kXY,-1,"XYView","XY View");
   vxy->AddNode(tnode);
+  vxy->AddNode(hnode);
   vxy->AddNode(cal_node[0]);
   vxy->AddNode(cal_node[1]);
   vm->AddView(vxy);
@@ -406,6 +416,14 @@ int MuHitDisplay::getData(const art::Event* Evt) {
 
       if (simpHandle.isValid()) _simpColl = simpHandle.product();
       else                      _simpColl = NULL;
+//-----------------------------------------------------------------------------
+// HelixSeed's
+//-----------------------------------------------------------------------------
+      art::Handle<mu2e::HelixSeedCollection> hscH;
+      Evt->getByLabel(_helixSeedCollTag, hscH);
+
+      if (hscH.isValid()) _hsColl = hscH.product();
+      else                _hsColl = NULL;
 //-----------------------------------------------------------------------------
 //  straw hit information
 //-----------------------------------------------------------------------------

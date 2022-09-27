@@ -54,6 +54,8 @@
 #include "Offline/BTrkData/inc/TrkStrawHit.hh"
 #include "Offline/RecoDataProducts/inc/KalRepPtrCollection.hh"
 
+#include "Offline/RecoDataProducts/inc/HelixSeed.hh"
+
 #include "Offline/TrkReco/inc/DoubletAmbigResolver.hh"
 
 #include "TApplication.h"
@@ -95,6 +97,7 @@ private:
   string        _shfCollTag;            // straw hit flags
   string        _swCollTag;
   
+  string        _helixSeedCollTag;	// helix seed collection tag
   string        _trackCollTag;
   string        _simpCollTag;
   string        _timeClusterCollTag;
@@ -142,6 +145,8 @@ private:
   
   const mu2e::CaloHitCollection*              _caloHitColl;      //
   const mu2e::CaloClusterCollection*          _caloClusterColl;  //
+
+  const mu2e::HelixSeedCollection*            _hsColl;
   
   const mu2e::StepPointMCCollection*          _spmcColl;         // on virtual detectors
   const mu2e::SimParticleCollection*          _simpColl;         //
@@ -188,6 +193,7 @@ public:
   const mu2e::GenParticleCollection*            GetGenppColl      () { return _genpColl       ; }
   const mu2e::KalRepPtrCollection*              GetKalRepPtrColl  () { return _kalRepPtrColl  ; }
   const mu2e::SimParticleCollection*            GetSimpColl       () { return _simpColl       ; }
+  const mu2e::HelixSeedCollection*              GetHelSeedColl    () { return _hsColl         ; }
   const mu2e::StepPointMCCollection*            GetSpmcColl       () { return _spmcColl       ; }
   const mu2e::StrawDigiCollection*              GetSdColl         () { return _sdColl         ; }
   const mu2e::StrawDigiADCWaveformCollection*   GetSwColl         () { return _swColl         ; }
