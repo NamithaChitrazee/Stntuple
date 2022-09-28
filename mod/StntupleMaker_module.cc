@@ -576,7 +576,7 @@ void StntupleMaker::beginJob() {
 
     fInitSimpBlock->SetSimpCollTag       (fSimpCollTag);
     fInitSimpBlock->SetStrawHitCollTag   (fStrawHitCollTag);
-    fInitSimpBlock->SetStrawDigiMCCollTag(fStrawDigiMCCollTag);
+    fInitSimpBlock->SetSdmcCollTag       (fStrawDigiMCCollTag);
     fInitSimpBlock->SetVDHitsCollTag     (fVDHitsCollTag);
     fInitSimpBlock->SetPrimaryParticleTag(fPrimaryParticleTag);
     fInitSimpBlock->SetMinSimpMomentum   (fMinSimpMomentum);
