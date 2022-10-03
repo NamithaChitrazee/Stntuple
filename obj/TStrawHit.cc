@@ -130,23 +130,24 @@ void TStrawHit::Print(Option_t* Option) const {
   opt.ToLower();
 
   if ((opt == "") || (opt.Index("banner") >= 0)) {
-    printf("------------------------------------------------------------------------------\n");
-    printf("MC Index    Time    TOT  GenID  SimID   PdgID    PdgID_M     EDep        McMom\n");
-    printf("------------------------------------------------------------------------------\n");
+    printf("----------------------------------------------------------------------------------------\n");
+    printf("MC Index      Time          TOT       EDep  Flag GenID SimID      PdgID    PdgID_M      McMom\n");
+    printf("----------------------------------------------------------------------------------------\n");
   }
 
   if (opt.Index("data") < 0) return;
   
-  printf("%2i %5i %6i %6i %5i %5i %5i %5i %10i %10i %10.3f %8.3f\n",
+  printf("%2i %5i %6i %6i %5i %5i %8.5f 0x%02x %5i %5i %10i %10i %10.3f\n",
 	 MCFlag(), 
 	 StrawID(),  
 	 fTime[0], fTime[1], // ## format
 	 TOT(0)  , TOT(1)  ,
-	 fGenID,
+	 fEDep,
+	 StrawDigiFlag(),
+	 GenID(),
 	 fSimID,
 	 fPdgID,
 	 fMotherPdgID,
-	 fEDep,
 	 fMcMom);
   
 }

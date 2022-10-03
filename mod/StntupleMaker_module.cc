@@ -115,6 +115,7 @@ protected:
 
   string                   fComboHitCollTag;
   string                   fStrawHitCollTag;
+  string                   fStrawDigiCollTag;
   string                   fSdwfCollTag;
   string                   fStrawDigiMCCollTag;
 
@@ -251,6 +252,7 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
 
   , fComboHitCollTag         (PSet.get<string>        ("comboHitCollTag"     ))
   , fStrawHitCollTag         (PSet.get<string>        ("strawHitCollTag"     ))
+  , fStrawDigiCollTag        (PSet.get<string>        ("strawDigiCollTag"    ))
   , fSdwfCollTag             (PSet.get<string>        ("sdwfCollTag"         ))
   , fStrawDigiMCCollTag      (PSet.get<string>        ("strawDigiMCCollTag"  ))
 
@@ -620,6 +622,7 @@ void StntupleMaker::beginJob() {
     fInitStrawHitBlock = new stntuple::InitStrawHitBlock();
 
     fInitStrawHitBlock->SetStrawHitCollTag   (fStrawHitCollTag   );
+    fInitStrawHitBlock->SetStrawDigiCollTag  (fStrawDigiCollTag  );
     fInitStrawHitBlock->SetStrawDigiMCCollTag(fStrawDigiMCCollTag);
 
     if (fMakeStrWaveforms) { 
@@ -691,6 +694,7 @@ void StntupleMaker::beginJob() {
 
       init_block->SetStrawHitCollTag    (fStrawHitCollTag   );
       init_block->SetKalSeedCollTag     (fTrackCollTag[i]   );  // tracks saved as lists of KalSeeds
+      init_block->SetStrawDigiCollTag   (fStrawDigiCollTag  );
       init_block->SetStrawDigiMCCollTag (fStrawDigiMCCollTag);
 
       AddDataBlock(block_name,"TTrackStrawHitBlock",init_block,buffer_size,

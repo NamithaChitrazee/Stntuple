@@ -8,6 +8,7 @@
 #include "Stntuple/obj/AbsEvent.hh"
 
 #include "Offline/RecoDataProducts/inc/StrawHit.hh"
+#include "Offline/RecoDataProducts/inc/StrawDigi.hh"
 
 #include "Offline/RecoDataProducts/inc/KalRepPtrCollection.hh"
 #include "Offline/RecoDataProducts/inc/KalSeed.hh"
@@ -44,6 +45,9 @@ int InitTrackStrawHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* _Event
   art::Handle<mu2e::ComboHitCollection> shcH;
   const mu2e::ComboHitCollection*       sh_coll(nullptr);
 
+  art::Handle<mu2e::StrawDigiCollection> sdcH;
+  const mu2e::StrawDigiCollection*       sd_coll(nullptr);
+
   art::Handle<mu2e::StrawDigiMCCollection> sdmccH;
   const mu2e::StrawDigiMCCollection*       sdmc_coll(nullptr);
 
@@ -67,6 +71,15 @@ int InitTrackStrawHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* _Event
     }
   }
 
+  if (! fStrawDigiCollTag.empty() != 0) {
+    bool ok = _Event->getByLabel(fStrawDigiCollTag,sdcH);
+    if (ok) sd_coll = sdcH.product();
+    else {
+      printf(" >>> WARNING in InitTrackStrawHitBlock: no StrawDigiColl with tag: %s.\n",
+	     fStrawDigiCollTag.encode().data());
+    }
+  }
+
   if (! fStrawDigiMCCollTag.empty() != 0) {
     bool ok = _Event->getByLabel(fStrawDigiMCCollTag,sdmccH);
     if (ok) sdmc_coll = sdmccH.product();
@@ -86,7 +99,7 @@ int InitTrackStrawHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* _Event
     
   TTrackStrawHit*      hit; 
 
-  int   pdg_id, mother_pdg_id, sim_id, gen_index;
+  int   pdg_id, mother_pdg_id, sim_id, gen_id;
   float mcdoca, mc_mom;
 
   data->fNTracks = ntracks;
@@ -114,6 +127,9 @@ int InitTrackStrawHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* _Event
 	int ind = tsh->index(); // in the list of straw hits
 	sh      = &sh_coll->at(ind);
 
+	int sd_flag = 0;
+	if (sd_coll) sd_flag = *((int*) &sd_coll->at(ind).digiFlag());
+
 	mu2e::StrawId const& sid = tsh->strawId();
 
 	straw = &tracker->getStraw(sid);
@@ -133,8 +149,8 @@ int InitTrackStrawHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* _Event
 	  pdg_id        = simptr->pdgId();
 	  mother_pdg_id = sim->pdgId();
 	
-	  if (simptr->fromGenerator()) gen_index = simptr->genParticle()->generatorId().id();
-	  else                         gen_index = -1;
+	  if (simptr->fromGenerator()) gen_id = simptr->genParticle()->generatorId().id();
+	  else                         gen_id = 0xFF;
 	
 	  sim_id        = simptr->id().asInt();
 	  mc_mom        = step->momvec().mag();
@@ -155,17 +171,19 @@ int InitTrackStrawHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* _Event
 	else {
 	  pdg_id        = -1;
 	  mother_pdg_id = -1;
-	  gen_index     = -1;
+	  gen_id        = 0xFF;
 	  sim_id        = -1;
 	  mc_mom        = -1.;
 	  mcdoca        = 1.e6;
 	}
+
+	gen_id = gen_id | (sd_flag << 16); 
       
 	int is_active = tsh->flag().hasAnyProperty(mu2e::StrawHitFlagDetail::active);
 
 	hit->Set(sh->strawId().asUint16(), sh->time(), -1. /*sh->dt()*/, sh->energyDep(),
 		 is_active,tsh->ambig(),tsh->driftRadius(),
-		 pdg_id, mother_pdg_id, gen_index, sim_id, 
+		 pdg_id, mother_pdg_id, gen_id, sim_id, 
 		 mcdoca, mc_mom);
       }
     }

@@ -48,7 +48,7 @@ protected:
   int     fTime[2];			// 
   int     fTOT;                         // TOT[0] + TOT[1]<<16
 					// -------------------- MC info, don't write out for the data
-  int     fGenID;                       // generator ID
+  int     fGenID;                       // generator ID + StrawDigiFlag << 16
   int     fSimID;			// sim particle ID
   int     fPdgID;			// sim particle PDG ID
   int     fMotherPdgID;	                // mother PDG ID
@@ -73,14 +73,17 @@ public:
   int   Straw      () const { return (fStrawID & _strawmsk  )               ; }
   int   Preamp     () const { return (fStrawID & _preampmsk ) >> _preampsft ; }
 
-  int   Time  (int I) const { return (fTime[I]    )         ; }
-  int   TOT   (int I) const { return (fTOT >> I*16) &0xffff ; }
+  int   Time  (int I) const { return (fTime[I]    )          ; }
+  int   TOT   (int I) const { return (fTOT >> I*16) & 0XFFFF ; }
   int   Dt         () const { return fTime[1]-fTime[0]; }
 
   int   PdgID      () const { return fPdgID;       }
-  int   MotherPdgID() const { return fMotherPdgID; }
-  int   GenID      () const { return fGenID;       }
+  int   MotherPdgID() const { return fMotherPdgID   ; }
+  int   GenID      () const { return fGenID & 0XFFFF; }
   int   SimID      () const { return fSimID;       }
+
+					// just one byte
+  int   StrawDigiFlag () const { return (fGenID >> 16) & 0xFF; }
 
   float EDep       () const { return fEDep;        }
   float McMom      () const { return fMcMom;       }

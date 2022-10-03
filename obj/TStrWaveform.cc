@@ -16,8 +16,17 @@ void TStrWaveform::Streamer(TBuffer &R__b) {
 //-----------------------------------------------------------------------------
 // curent version: V1
 //-----------------------------------------------------------------------------
-    R__b >> fNWords;
-    if (fData == nullptr) fData = new ushort[fNWords];
+    int nw;
+    R__b >> nw;
+    if (fData == nullptr) {
+      fNWords = nw;
+      fData = new ushort[fNWords];
+    }
+    else if (nw != fNWords) {
+      delete fData;
+      fNWords = nw;
+      fData = new ushort[fNWords];
+    }
     R__b.ReadFastArray(fData,fNWords);
   }
   else {

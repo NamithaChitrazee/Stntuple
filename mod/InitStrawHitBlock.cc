@@ -32,7 +32,7 @@ int InitStrawHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int 
   TStrawHitBlock* data = (TStrawHitBlock*) Block;
   data->Clear();
 //-----------------------------------------------------------------------------
-//  straw hit information
+// straw hit information
 // combo hits are needed for 
 //-----------------------------------------------------------------------------
   art::Handle<mu2e::ComboHitCollection>             chch;
@@ -44,7 +44,8 @@ int InitStrawHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int 
   art::Handle<mu2e::StrawDigiMCCollection>          sdmcch;
   const mu2e::StrawDigiMCCollection*                sdmcc (nullptr);
 
-  //  int   nhits(0);
+  art::Handle<mu2e::StrawDigiCollection>            sdch;
+  const mu2e::StrawDigiCollection*                  sdc (nullptr);
 
   if (! fStrawHitCollTag.empty() != 0) {
     bool ok = Event->getByLabel(fStrawHitCollTag,chch);
@@ -56,18 +57,35 @@ int InitStrawHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int 
       nhits = shc->size();
     }
     else {
-      printf(" >>> ERROR in StntupleInitMu2eStrawDataBlock: no StrawHitCollection with tag: %s. BAIL OUT\n",fStrawHitCollTag.encode().data());
+      mf::LogWarning("InitStrawHitBlock::InitDataBlock") << " ERROR:" << __LINE__ 
+							 << " : mu2e::StrawHitCollection " 
+							 << fStrawHitCollTag.encode().data() 
+							 << " not found, BAIL OUT. rc = -1";
       return -1;
     }
   }
   
+  if (! fStrawDigiCollTag.empty() != 0) {
+    bool ok = Event->getByLabel(fStrawDigiCollTag,sdch);
+    if (ok) sdc = sdch.product();
+
+    if (sdc == nullptr) {
+      mf::LogWarning("InitStrawHitBlock::InitDataBlock") << " Warning:" << __LINE__ 
+							 << " : mu2e::StrawDigiCollection " 
+							 << fStrawDigiCollTag.encode().data() 
+							 << " not found.";
+    }
+  }
+
   if (! fStrawDigiMCCollTag.empty() != 0) {
     bool ok = Event->getByLabel(fStrawDigiMCCollTag,sdmcch);
     if (ok) sdmcc = sdmcch.product();
 
     if (sdmcc == nullptr) {
-      printf(" >>> ERROR in StntupleInitMu2eStrawDataBlock: no StrawDigiMCCollection with tag: %s. BAIL OUT\n",fStrawDigiMCCollTag.encode().data());
-      return -1;
+      mf::LogWarning("InitStrawHitBlock::InitDataBlock") << " Warning:" << __LINE__ 
+							 << " : mu2e::StrawDigiMCCollection " 
+							 << fStrawDigiMCCollTag.encode().data() 
+							 << " not found.";
     }
   }
 
@@ -79,7 +97,7 @@ int InitStrawHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int 
 
   TStrawHit*           hit; 
 
-  int   pdg_id, mother_pdg_id, sim_id, gen_index;
+  int   pdg_id, mother_pdg_id, sim_id, gen_id;
   float mc_mom;
 
   if (rn_number < 100000) mc_flag = 1;
@@ -91,6 +109,9 @@ int InitStrawHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int 
     for (int i=0; i<nhits; i++) {
       const mu2e::StrawHit* sh = &shc->at(i);
       const mu2e::ComboHit* ch = &chc->at(i);
+
+      int sd_flag = 0;
+      if (sdc) sd_flag = *((int*) &sdc->at(i).digiFlag());
 
       size_t ih  = ch-ch0;
       vector<StrawDigiIndex> shids;
@@ -115,8 +136,8 @@ int InitStrawHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int 
 	pdg_id        = simptr->pdgId();
 	mother_pdg_id = sim->pdgId();
 
-	if (simptr->fromGenerator()) gen_index = simptr->genParticle()->generatorId().id();
-	else                         gen_index = -1;
+	if (simptr->fromGenerator()) gen_id = simptr->genParticle()->generatorId().id();
+	else                         gen_id = 0xFF;
       
 	sim_id        = simptr->id().asInt();
 	mc_mom        = step->momvec().mag();
@@ -124,7 +145,7 @@ int InitStrawHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int 
       else {
 	pdg_id        = -1;
 	mother_pdg_id = -1;
-	gen_index     = -1;
+	gen_id        = 0xFF;
 	sim_id        = -1;
 	mc_mom        = -1.;
       }
@@ -143,8 +164,10 @@ int InitStrawHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int 
       
       tot     = itot[0] | (itot[1] << 16) ; 
 
+      gen_id  = gen_id | (sd_flag << 16) ;
+
       hit->Set(sid, time, tot, 
-	       gen_index, sim_id, 
+	       gen_id, sim_id, 
 	       pdg_id, mother_pdg_id, 
 	       sh->energyDep(), mc_mom);
     }
@@ -161,8 +184,8 @@ int InitStrawHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int 
 	if (sdwfc == nullptr) {
 	  mf::LogWarning(__func__) << " WARNING in InitStrawHitBlock::" << __func__ << ":" << __LINE__ 
 				   << ": StrawDigiADCWaveformCollection:" 
-				   << fSdwfCollTag.encode().data() << " NOT FOUND, rc = -1";
-	  return -1;
+				   << fSdwfCollTag.encode().data() << " NOT FOUND, rc = -2";
+	  return -2;
 	}
 
 	int nwf = sdwfc->size();
@@ -175,8 +198,8 @@ int InitStrawHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int 
       }
       else {
 	mf::LogWarning(__func__) << " WARNING in InitStrawHitBlock::" << __func__ << ":" << __LINE__ 
-				 << ": StrawDigiADCWaveformCollection coll tag IS EMPTY, rc = -2" ;
-	return -2;
+				 << ": StrawDigiADCWaveformCollection coll tag IS EMPTY, rc = -3" ;
+	return -3;
       }
     }
   }

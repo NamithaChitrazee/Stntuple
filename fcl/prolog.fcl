@@ -80,6 +80,7 @@ StntupleMakerTemplate : { module_type:StntupleMaker
 # in the job config file
 #------------------------------------------------------------------------------
     comboHitCollTag      : "makePH"
+    strawDigiCollTag     : "makeSD"
     sdwfCollTag          : "makeSD"
     strawHitCollTag      : "makeSH"
     strawDigiMCCollTag   : @local::STN_COMPRESS_MCS              # was "makeSD"

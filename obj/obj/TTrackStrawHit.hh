@@ -79,10 +79,11 @@ public:
   float   DriftRadius() { return fDriftRadius; }
   int     Active     () { return fActive; }
 
-  int     PdgCode      () { return fPdgCode;       }
-  int     MotherPdgCode() { return fMotherPdgCode; }
-  int     GeneratorCode() { return fGeneratorCode; }
-  int     SimID        () { return fSimID;         }
+  int     PdgCode      () const { return fPdgCode;       }
+  int     MotherPdgCode() const { return fMotherPdgCode; }
+  int     GeneratorCode() const { return fGeneratorCode & 0xFFFF; }
+  int     StrawDigiFlag() const { return (fGeneratorCode >> 16) & 0xFF;  }
+  int     SimID        () const { return fSimID;         }
 
   float   McDoca       () { return fMcDoca;        }
   float   McMomentum   () { return fMcMomentum;    }

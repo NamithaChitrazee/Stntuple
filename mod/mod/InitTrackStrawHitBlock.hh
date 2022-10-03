@@ -21,6 +21,7 @@ public:
   art::InputTag         fKalRepPtrCollTag;
   art::InputTag         fKalSeedCollTag;
   art::InputTag         fStrawHitCollTag;
+  art::InputTag         fStrawDigiCollTag;
   art::InputTag         fStrawDigiMCCollTag;
 
   const mu2e::Tracker*  tracker;
@@ -32,6 +33,7 @@ public:
   void   SetKalRepPtrCollTag   (std::string& Tag) { fKalRepPtrCollTag   = art::InputTag(Tag); }
   void   SetKalSeedCollTag     (std::string& Tag) { fKalSeedCollTag     = art::InputTag(Tag); }
   void   SetStrawHitCollTag    (std::string& Tag) { fStrawHitCollTag    = art::InputTag(Tag); }
+  void   SetStrawDigiCollTag   (std::string& Tag) { fStrawDigiCollTag   = art::InputTag(Tag); }
   void   SetStrawDigiMCCollTag (std::string& Tag) { fStrawDigiMCCollTag = art::InputTag(Tag); }
   
   virtual int InitDataBlock  (TStnDataBlock* Block, AbsEvent* Evt, int Mode);

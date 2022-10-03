@@ -34,7 +34,30 @@
 * [[file:stnana.org][stnana]] - STNTUPLE analysis framework                                       
 * [[file:stntuple-datasets.org][STNTUPLE datasets]]
 * STNTUPLE [[file:how-tos.org][how-to's]]    
-* [[file:event_display.org][STNTUPLE event display]]                                                     
+* [[file:event_display.org][STNTUPLE event display]]  
+* STNTUPLE modules                                                           
+** EventFilter                                                               
+   - given an event list, filters events from the list 
+   - event is defnined by three integers - (run,subrun,number) 
+   - event list does not need to be ordered
+   - example of a talk-to:
+#+begin_src 
+EventFilter.eventList : [
+ 1000,  0,  89,
+ 1000,  0, 105,
+ 1100,  1,  78
+]
+#+end_src
+** StntupleMaker                                                             
+  - defines configuration of the Stntuple making job
+** InitStntuple                                                              
+
+   Stntuple making job requires three modules: 
+   InitStntuple, StntupleMaker, and FillStntuple. 
+
+   users interact only with StntupleMaker
+** FillStntuple
+** MuHitDisplay - Stntuple event display module
 * ------------------------------------------------------------------------------
 * more technical details
 * ------------------------------------------------------------------------------
