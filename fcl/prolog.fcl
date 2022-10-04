@@ -53,7 +53,7 @@ StntupleMakerTemplate : { module_type:StntupleMaker
     makeSimp             : 1  # 0: dont write
     makeStepPointMC      : 1
     makeStrawHits        : 0
-    makeStrawWaveforms   : 0
+    makeStrWaveforms     : 0
     makeTracks           : 1
     makeTrackStrawHits   : 0
     makeTrackSeeds       : 0
