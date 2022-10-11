@@ -405,12 +405,16 @@ int TStnAna::BeginRun() {
 
   TStnRunSummary* new_rs = (TStnRunSummary*) fDBManager->GetTable("RunSummary");
 //-----------------------------------------------------------------------------
-// if use bad run list and the run is marked as bad, return...
+// if use good run list and the run is marked as bad, return...
 //-----------------------------------------------------------------------------
-  if (fGoodRunList != 0)
-    fGoodRun = fGoodRunList->GoodRun(fRunNumber,fHeaderBlock->SectionNumber());
-  else
-    fGoodRun = 1;
+  if (fGoodRunList != nullptr) {
+    int mask(0);
+    fGoodRun = fGoodRunList->GoodRun(fRunNumber,
+				     fHeaderBlock->SubrunNumber(),
+				     fHeaderBlock->EventNumber (),
+				     mask);
+  }
+  else fGoodRun = 1;
 
   if (! fGoodRun)                                         return -1;
 //-----------------------------------------------------------------------------
@@ -564,15 +568,19 @@ int TStnAna::ProcessEntry(int Entry) {
     BeginRun();
   }
 //-----------------------------------------------------------------------------
-// good/bad run check is performed at the run-section level
+// during normal data taking, good/bad run check is performed 
+// at the run-section (subrun) level
+//
+// Mu2e VST: one run, one subrun, may need to exclude event ranges
+// 
 // if BeginRun was called, the check has already been performed and 
 // fSectionNumber has been set there 
-// use it not to do this check 2 times
+// use it not to run the check twice
 //-----------------------------------------------------------------------------
-  if (fSectionNumber != rsn) {
-    if (fGoodRunList != 0) fGoodRun = fGoodRunList->GoodRun(rn,rsn);
-    else                   fGoodRun = 1;
-  }
+    //  if (fSectionNumber != rsn) {
+  if (fGoodRunList != 0) fGoodRun = fGoodRunList->GoodRun(rn,rsn,ev);
+  else                   fGoodRun = 1;
+    //}
   if (fGoodRun <= 0)                                        return -3;
 //-----------------------------------------------------------------------------
 // each module is supposed to talk to an input chain and request the data 

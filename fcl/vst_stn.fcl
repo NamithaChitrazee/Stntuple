@@ -32,6 +32,7 @@ physics : {
 	    makeSimp           : 0
  	    makeStepPointMC    : 0
 	    makeStrawHits      : 1
+	    makeStrawWaveforms : 1
 	    makeTimeClusters   : 0
 	    makeTracks         : 0
 	    makeTrackSeeds     : 0

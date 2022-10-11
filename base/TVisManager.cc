@@ -288,6 +288,24 @@ void TVisManager::Gdspec(const char *name) {
 } 
 
 //_____________________________________________________________________________
+void TVisManager::DoCheckButton(int ButtonID, int Status) { 
+} 
+
+//_____________________________________________________________________________
+void TVisManager::DoRadioButton(int ButtonID) { 
+} 
+
+//_____________________________________________________________________________
+void TVisManager::OpenView(const char* View) { 
+  printf("TVisManager::OpenView is meant to be overloaded, view=\"%s\"\n",View);
+}
+
+//_____________________________________________________________________________
+void TVisManager::Quit() { 
+  printf("TVisManager::Quit is meant to be overloaded\n");
+}
+
+//_____________________________________________________________________________
 void TVisManager::DrawOneSpec(const char *name) { 
 } 
 

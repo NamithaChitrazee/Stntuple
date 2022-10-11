@@ -26,6 +26,7 @@
 
 #include "Stntuple/gui/TStnFrame.hh"
 #include "Stntuple/gui/TStnVisManager.hh"
+#include "Stntuple/gui/TStnWidgetID.hh"
 
 #include "Stntuple/print/Stntuple_print_functions.hh"
 
@@ -204,7 +205,7 @@ int TStnVisManager::InitViews() {
 
 //_____________________________________________________________________________
 TCanvas* TStnVisManager::NewCanvas(const char* Name, const char* Title, int SizeX, int SizeY) {
-  TStnFrame* win = new TStnFrame(Name, Title, 0, SizeX, SizeY);
+  TStnFrame* win = new TStnFrame(Name, Title, this, 0, SizeX, SizeY);
   TCanvas*c = win->GetCanvas();
   DeclareCanvas(c);
   return c;
@@ -229,6 +230,23 @@ int TStnVisManager::GetViewID(const char* View) {
 }
 
 //-----------------------------------------------------------------------------
+void TStnVisManager::OpenView(const char* View) {
+
+  TString view_id = View;
+  view_id.ToLower();
+
+  if      (view_id == "xy" ) OpenTrkXYView();
+  else if (view_id == "rz" ) OpenTrkRZView();
+  else if (view_id == "tz" ) OpenTrkTZView();
+  else if (view_id == "cal") OpenCalView  ();
+  else if (view_id == "crv") OpenCrvView  ();
+  else if (view_id == "vst") OpenVSTView  ();
+  else {
+    printf("TStnVisManager::OpenView: ERROR: unknown view type : %s\n",View);
+  }
+}
+
+//-----------------------------------------------------------------------------
 void TStnVisManager::OpenView(TStnView* Mother, int Px1, int Py1, int Px2, int Py2) {
   int vtype = Mother->Type();
 
@@ -237,6 +255,7 @@ void TStnVisManager::OpenView(TStnView* Mother, int Px1, int Py1, int Px2, int P
   else if (vtype == TStnVisManager::kTZ ) OpenTrkTZView(Mother,Px1,Py1,Px2,Py2);
   else if (vtype == TStnVisManager::kCal) OpenCalView  (Mother,Px1,Py1,Px2,Py2);
   else if (vtype == TStnVisManager::kCrv) OpenCrvView  (Mother,Px1,Py1,Px2,Py2);
+  else if (vtype == TStnVisManager::kVST) OpenVSTView  (Mother,Px1,Py1,Px2,Py2);
   else {
     printf("TStnVisManager::OpenView: ERROR: unknown view type : %i\n",vtype);
   }
@@ -253,7 +272,7 @@ Int_t TStnVisManager::OpenTrkXYView() {
   sprintf(name, "xy_view_%i", n);
   sprintf(title, "XY view number %i", n);
 
-  TStnFrame* win = new TStnFrame(name, title, TStnVisManager::kXY, 750+TStnFrame::fGroupFrameWidth, 750);
+  TStnFrame* win = new TStnFrame(name, title, this, TStnVisManager::kXY, 750+TStnFrame::fGroupFrameWidth, 750);
   TCanvas* c = win->GetCanvas();
   fListOfCanvases->Add(c);
 
@@ -294,7 +313,7 @@ Int_t TStnVisManager::OpenTrkXYView(TStnView* Mother, Axis_t x1, Axis_t y1, Axis
   xsize = x2-x1;
   ysize = (int) (xsize*abs((y2 - y1)/(x2 - x1)) + 20);
 
-  TStnFrame* win = new TStnFrame(name, title, TStnVisManager::kXY, xsize+TStnFrame::fGroupFrameWidth, ysize);
+  TStnFrame* win = new TStnFrame(name, title, this, TStnVisManager::kXY, xsize+TStnFrame::fGroupFrameWidth, ysize);
   TCanvas* c = win->GetCanvas();
   fListOfCanvases->Add(c);
 
@@ -328,7 +347,7 @@ Int_t TStnVisManager::OpenTrkRZView() {
   sprintf(name, "rz_view_%i", n);
   sprintf(title, "RZ view number %i", n);
 
-  TStnFrame* win = new TStnFrame(name, title, TStnVisManager::kRZ, 1300+TStnFrame::fGroupFrameWidth, 500);
+  TStnFrame* win = new TStnFrame(name, title, this, TStnVisManager::kRZ, 1300+TStnFrame::fGroupFrameWidth, 500);
   TCanvas* c = win->GetCanvas();
   fListOfCanvases->Add(c);
 
@@ -376,7 +395,7 @@ Int_t TStnVisManager::OpenTrkRZView(TStnView* Mother, Axis_t x1, Axis_t y1, Axis
   xsize = x2-x1;
   ysize = (Int_t) (xsize*TMath::Abs((y2 - y1) / (x2 - x1)) + 20);
 
-  TStnFrame* win = new TStnFrame(name, title, TStnVisManager::kRZ, xsize+TStnFrame::fGroupFrameWidth, ysize);
+  TStnFrame* win = new TStnFrame(name, title, this, TStnVisManager::kRZ, xsize+TStnFrame::fGroupFrameWidth, ysize);
   TCanvas* c = win->GetCanvas();
   fListOfCanvases->Add(c);
 
@@ -411,7 +430,7 @@ int TStnVisManager::OpenTrkTZView() {
   sprintf(name,  "zt_view_%i", n);
   sprintf(title, "ZT view number %i", n);
 
-  TStnFrame* win = new TStnFrame(name, title, TStnVisManager::kXY, 1100+TStnFrame::fGroupFrameWidth, 760);
+  TStnFrame* win = new TStnFrame(name, title, this, TStnVisManager::kXY, 1100+TStnFrame::fGroupFrameWidth, 760);
   TCanvas* c = win->GetCanvas();
   fListOfCanvases->Add(c);
 
@@ -453,7 +472,7 @@ int TStnVisManager::OpenTrkTZView(TStnView* Mother, Axis_t x1, Axis_t y1, Axis_t
   xsize = x2-x1;
   ysize = (int) (xsize*abs((y2 - y1)/(x2 - x1)) + 20);
 
-  TStnFrame* win = new TStnFrame(name, title, TStnVisManager::kTZ, xsize+TStnFrame::fGroupFrameWidth, ysize);
+  TStnFrame* win = new TStnFrame(name, title, this, TStnVisManager::kTZ, xsize+TStnFrame::fGroupFrameWidth, ysize);
   TCanvas* c = win->GetCanvas();
   fListOfCanvases->Add(c);
 
@@ -487,7 +506,7 @@ Int_t TStnVisManager::OpenCalView() {
   sprintf(name, "cal_view_%i", n);
   sprintf(title, "CAL view number %i", n);
 
-  TStnFrame* win = new TStnFrame(name, title, TStnVisManager::kCal, 1150+TStnFrame::fGroupFrameWidth, 600);
+  TStnFrame* win = new TStnFrame(name, title, this, TStnVisManager::kCal, 1150+TStnFrame::fGroupFrameWidth, 600);
   TCanvas*   c = win->GetCanvas();
   fListOfCanvases->Add(c);
 
@@ -583,7 +602,7 @@ Int_t TStnVisManager::OpenCrvView() {
   sprintf(name, "crv_view_%i", n);
   sprintf(title, "CRV view number %i", n);
 
-  TStnFrame* win = new TStnFrame(name, title, TStnVisManager::kCrv, 1700+TStnFrame::fGroupFrameWidth, 600);
+  TStnFrame* win = new TStnFrame(name, title, this, TStnVisManager::kCrv, 1700+TStnFrame::fGroupFrameWidth, 600);
   TCanvas*   c = win->GetCanvas();
   c->SetFixedAspectRatio(kTRUE);
   fListOfCanvases->Add(c);
@@ -744,7 +763,7 @@ int TStnVisManager::OpenCrvView(TStnView* Mother, Axis_t x1, Axis_t y1, Axis_t x
   xsize = 700;
   ysize = (Int_t) (xsize*TMath::Abs((y2 - y1) / (x2 - x1)) + 20);
 
-  TStnFrame* win = new TStnFrame(name, title, TStnVisManager::kCrv, xsize+TStnFrame::fGroupFrameWidth, ysize);
+  TStnFrame* win = new TStnFrame(name, title, this, TStnVisManager::kCrv, xsize+TStnFrame::fGroupFrameWidth, ysize);
   TCanvas* c = win->GetCanvas();
   fListOfCanvases->Add(c);
 
@@ -779,7 +798,7 @@ int TStnVisManager::OpenVSTView() {
   sprintf(name,  "vst_view_%i", n);
   sprintf(title, "VST view number %i", n);
 
-  TStnFrame* win = new TStnFrame(name, title, TStnVisManager::kVST, 1100+TStnFrame::fGroupFrameWidth, 760);
+  TStnFrame* win = new TStnFrame(name, title, this, TStnVisManager::kVST, 1100+TStnFrame::fGroupFrameWidth, 760);
   TCanvas* c = win->GetCanvas();
   fListOfCanvases->Add(c);
 
@@ -820,7 +839,7 @@ int TStnVisManager::OpenVSTView(TStnView* Mother, Axis_t x1, Axis_t y1, Axis_t x
   xsize = 700;
   ysize = (Int_t) (xsize*TMath::Abs((y2 - y1) / (x2 - x1)) + 20);
 
-  TStnFrame* win = new TStnFrame(name, title, TStnVisManager::kVST, xsize+TStnFrame::fGroupFrameWidth, ysize);
+  TStnFrame* win = new TStnFrame(name, title, this, TStnVisManager::kVST, xsize+TStnFrame::fGroupFrameWidth, ysize);
   TCanvas* c = win->GetCanvas();
   fListOfCanvases->Add(c);
 
@@ -994,6 +1013,29 @@ void TStnVisManager::PrintColls(const char* Tag) {
 
   if      (tag == "sdmc_colls"   ) print_sdmc_colls   ();
   else if (tag == "kalseed_colls") print_kalseed_colls();
+
+}
+
+//_____________________________________________________________________________
+void TStnVisManager::DoCheckButton(int ButtonID, int Status) {
+
+  if      (ButtonID == kDisplayHelices     ) SetDisplayHelices     (Status);
+  else if (ButtonID == kDisplayTracks      ) SetDisplayTracks      (Status);
+  else if (ButtonID == kDisplaySimParticles) SetDisplaySimParticles(Status);
+  else {
+    printf("WARNING: TStnVisManager::DoCheckButton unknown button ID: %i\n",ButtonID);
+  }
+
+}
+
+//_____________________________________________________________________________
+void TStnVisManager::DoRadioButton(int ButtonID) {
+
+  if      (ButtonID == M_DISPLAY_SH) SetDisplayStrawHitsXY(1);
+  else if (ButtonID == M_DISPLAY_CH) SetDisplayStrawHitsXY(0);
+  else {
+    printf("WARNING: TStnVisManager::DoRadioButton unknown button ID: %i\n",ButtonID);
+  }
 
 }
 

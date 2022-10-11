@@ -97,7 +97,7 @@ protected:
   int                      fMakeSimp;         // 0:dont store, 1:all;
   int                      fMakeStepPointMC;
   int                      fMakeStrawHits;
-  int                      fMakeStrWaveforms;
+  int                      fMakeStrawWaveforms;
   int                      fMakeTracks;
   int                      fMakeTrackStrawHits;
   int                      fMakeTimeClusters;
@@ -237,7 +237,7 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
   , fMakeSimp                (PSet.get<int>           ("makeSimp"            ))
   , fMakeStepPointMC         (PSet.get<int>           ("makeStepPointMC"     ))
   , fMakeStrawHits           (PSet.get<int>           ("makeStrawHits"       ))
-  , fMakeStrWaveforms        (PSet.get<int>           ("makeStrWaveforms"    ))
+  , fMakeStrawWaveforms      (PSet.get<int>           ("makeStrawWaveforms"  ))
   , fMakeTracks              (PSet.get<int>           ("makeTracks"          ))
   , fMakeTrackStrawHits      (PSet.get<int>           ("makeTrackStrawHits"  ))
   , fMakeTimeClusters        (PSet.get<int>           ("makeTimeClusters"    ))
@@ -625,7 +625,7 @@ void StntupleMaker::beginJob() {
     fInitStrawHitBlock->SetStrawDigiCollTag  (fStrawDigiCollTag  );
     fInitStrawHitBlock->SetStrawDigiMCCollTag(fStrawDigiMCCollTag);
 
-    if (fMakeStrWaveforms) { 
+    if (fMakeStrawWaveforms) { 
       fInitStrawHitBlock->SetWriteSdwf(1);
       fInitStrawHitBlock->SetSdwfCollTag(fSdwfCollTag);
     }

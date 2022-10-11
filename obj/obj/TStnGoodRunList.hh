@@ -34,7 +34,7 @@ protected:
   Int_t             fMuonFlag;          // !
   Int_t             fSiliconFlag;       // !
 
-  Int_t            (*fGoodRunRoutine)(int RunNumber, int RunSection, int Mask); // !
+  Int_t            (*fGoodRunRoutine)(int RunNumber, int RunSection, int Event, int Mask); // !
 //------------------------------------------------------------------------------
 //  function members
 //------------------------------------------------------------------------------
@@ -73,14 +73,14 @@ public:
 //-----------------------------------------------------------------------------
 				// call with RunNumber<0 sets print level
 
-  void  SetGoodRunRoutine(Int_t (*F)(Int_t,Int_t,Int_t)) { 
+  void  SetGoodRunRoutine(Int_t (*F)(int,int,int,int)) { 
     fGoodRunRoutine = F;
-    if (fGoodRunRoutine) fGoodRunRoutine(-1,-1,0);
+    if (fGoodRunRoutine) fGoodRunRoutine(-1,-1,-1,0);
   }
 				// by default good run checking is not set
 
-  Int_t         GoodRun    (Int_t RunNumber, Int_t RunSection = -1, Int_t Mask = 0) { 
-    return (! fGoodRunRoutine) ? 1 : fGoodRunRoutine(RunNumber,RunSection,Mask);
+  Int_t         GoodRun    (Int_t Run, Int_t Subrun = -1, int Event = -1, Int_t Mask = 0) { 
+    return (! fGoodRunRoutine) ? 1 : fGoodRunRoutine(Run,Subrun,Event,Mask);
   }
 
   Int_t  ElectronFlag() { return fElectronFlag; }
@@ -90,16 +90,17 @@ public:
 // various concrete implementations of GRL
 //-----------------------------------------------------------------------------
 protected:
-  static int GoodRunListEtf       (int RunNumber, int RunSection, int Mask);
-  static int GoodRunList_WZ_PRD   (int RunNumber, int RunSection, int Mask);
-  static int GoodRunList_DQM_V6   (int RunNumber, int RunSection, int Mask);
-  static int GoodRunList_DQM_V7   (int RunNumber, int RunSection, int Mask);
-  static int GoodRunList_DQM_V13  (int RunNumber, int RunSection, int Mask);
-  static int GoodRunList_DQM_V27  (int RunNumber, int RunSection, int Mask);
-  static int GoodRunList_DQM_V32  (int RunNumber, int RunSection, int Mask);
-  static int GoodRunList_DQM_V34  (int RunNumber, int RunSection, int Mask);
-  static int GoodRunList_MC_1001  (int RunNumber, int RunSection, int Mask);
-  static int DefaultGoodRunRoutine(int RunNumber, int RunSection, int Mask);
+  static int GoodRunListEtf       (int Run, int Subrun, int Event, int Mask);
+  static int GoodRunList_WZ_PRD   (int Run, int Subrun, int Event, int Mask);
+  static int GoodRunList_DQM_V6   (int Run, int Subrun, int Event, int Mask);
+  static int GoodRunList_DQM_V7   (int Run, int Subrun, int Event, int Mask);
+  static int GoodRunList_DQM_V13  (int Run, int Subrun, int Event, int Mask);
+  static int GoodRunList_DQM_V27  (int Run, int Subrun, int Event, int Mask);
+  static int GoodRunList_DQM_V32  (int Run, int Subrun, int Event, int Mask);
+  static int GoodRunList_DQM_V34  (int Run, int Subrun, int Event, int Mask);
+  static int GoodRunList_MC_1001  (int Run, int Subrun, int Event, int Mask);
+  static int GoodRunList_VST_01   (int Run, int Subrun, int Event, int Mask);
+  static int DefaultGoodRunRoutine(int Run, int Subrun, int Event, int Mask);
 public:
 //-----------------------------------------------------------------------------
 // overloaded functions of TObject

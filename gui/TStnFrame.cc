@@ -22,56 +22,12 @@
 #include "TRootEmbeddedCanvas.h"
 #include "TCanvas.h"
 
+#include "Stntuple/base/TVisManager.hh"
+
 #include "Stntuple/gui/TStnFrame.hh"
-#include "Stntuple/gui/TStnVisManager.hh"
+#include "Stntuple/gui/TStnWidgetID.hh"
 
 ClassImp(TStnFrame)
-
-//-----------------------------------------------------------------------------
-enum TGeantCommandIdentifiers {
-  M_FILE_OPEN,
-  M_FILE_SAVE,
-  M_FILE_SAVEAS,
-  M_FILE_EXIT,
-
-  M_TEST_DLG,
-  M_TEST_MSGBOX,
-  M_TEST_SLIDER,
-  M_TEST_SHUTTER,
-  M_TEST_PROGRESS,
-
-  M_EDIT_EDITOR,
-  M_EDIT_UNDO,
-  M_EDIT_CLEARPAD,
-  M_EDIT_CLEARCANVAS,
-
-  M_OPTION_EVENT_STATUS,
-  M_OPTION_AUTO_EXEC,
-  M_OPTION_AUTO_RESIZE,
-  M_OPTION_RESIZE_CANVAS,
-  M_OPTION_MOVE_OPAQUE,
-  M_OPTION_RESIZE_OPAQUE,
-  M_OPTION_REFRESH,
-  M_OPTION_STATISTICS,
-  M_OPTION_HIST_TITLE,
-  M_OPTION_FIT_PARAMS,
-  M_OPTION_CAN_EDIT,
-
-  M_HELP_CONTENTS,
-  M_HELP_SEARCH,
-  M_HELP_ABOUT,
-
-  M_OPEN_XY,
-  M_OPEN_RZ,
-  M_OPEN_TZ,
-  M_OPEN_CAL,
-  M_OPEN_CRV,
-  M_OPEN_VST,
-
-  M_PRINT_STRAW_H,
-  M_PRINT_COMBO_H
-
-};
 
 //-----------------------------------------------------------------------------
 Int_t mb_button_id[9] = { kMBYes, kMBNo, kMBOk, kMBApply,
@@ -87,18 +43,21 @@ const char *filetypes[] = { "All files",     "*",
                             0,               0 };
 
 //-----------------------------------------------------------------------------
-TStnFrame::TStnFrame(const char* Name,
-		     const char* Title, 
-		     Int_t       View,
-		     UInt_t      w,
-		     UInt_t      h, 
-		     UInt_t      Options):
+TStnFrame::TStnFrame(const char*  Name,
+		     const char*  Title, 
+		     TVisManager* VisManager, 
+		     Int_t        View,
+		     UInt_t       w,
+		     UInt_t       h, 
+		     UInt_t       Options):
 
   TGMainFrame(gClient->GetRoot(),w, h, Options),
+  fVisManager(VisManager),
   fView(View)
 {
 
-  TStnVisManager* vm = TStnVisManager::Instance();
+  
+  TVisManager* vm = fVisManager;
 //-----------------------------------------------------------------------------
 //  create menu bar
 //-----------------------------------------------------------------------------
@@ -108,15 +67,15 @@ TStnFrame::TStnFrame(const char* Name,
   fMenuBarHelpLayout = new TGLayoutHints(kLHintsTop | kLHintsRight);
 
   fMenuFile = new TGPopupMenu(gClient->GetRoot());
-  fMenuFile->AddEntry("&Open...", M_FILE_OPEN);
-  fMenuFile->AddEntry("&Save", M_FILE_SAVE);
-  fMenuFile->AddEntry("S&ave as...", M_FILE_SAVEAS);
-  fMenuFile->AddEntry("&Close", -1);
+  fMenuFile->AddEntry("&Open..."       , M_FILE_OPEN);
+  fMenuFile->AddEntry("&Save"          , M_FILE_SAVE);
+  fMenuFile->AddEntry("S&ave as..."    , M_FILE_SAVEAS);
+  fMenuFile->AddEntry("&Close"         , -1);
   fMenuFile->AddSeparator();
-  fMenuFile->AddEntry("&Print", -1);
+  fMenuFile->AddEntry("&Print"         , -1);
   fMenuFile->AddEntry("P&rint setup...", -1);
   fMenuFile->AddSeparator();
-  fMenuFile->AddEntry("E&xit", M_FILE_EXIT);
+  fMenuFile->AddEntry("E&xit"          , M_FILE_EXIT);
 
   fMenuFile->DisableEntry(M_FILE_SAVEAS);
 
@@ -222,7 +181,7 @@ TStnFrame::TStnFrame(const char* Name,
   tb->SetWrapLength(-1);
   tb->MoveResize(10,50,120,25);
   fGroupFrame->AddFrame(tb, new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
-  tb->Connect("Pressed()", "TStnVisManager", vm, "Quit()");
+  tb->Connect("Pressed()", "TVisManager", vm, "Quit()");
 //-----------------------------------------------------------------------------
 // shutter - below the "Next Event" button
 //-----------------------------------------------------------------------------
@@ -253,7 +212,7 @@ TStnFrame::TStnFrame(const char* Name,
   // tb = new TGTextButton(frame,"test_01",-1,TGTextButton::GetDefaultGC()(),TGTextButton::GetDefaultFontStruct(),kRaisedFrame);
   // frame->AddFrame(tb, new TGLayoutHints(kLHintsNormal));
   
-  fRb[0] = new TGRadioButton(frame,"display SH", 21);
+  fRb[0] = new TGRadioButton(frame,"display SH", M_DISPLAY_SH);
   // rb->SetTextJustify(36);
   // rb->SetMargins    (0,0,0,0);
   // rb->SetWrapLength (-1);
@@ -261,7 +220,7 @@ TStnFrame::TStnFrame(const char* Name,
   fRb[0]->Connect("Clicked()", "TStnFrame", this, "DoRadio()");
   frame->AddFrame(fRb[0], new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
 
-  fRb[1] = new TGRadioButton(frame,"display CH", 22);
+  fRb[1] = new TGRadioButton(frame,"display CH", M_DISPLAY_CH);
   // rb->SetTextJustify(36);
   // rb->SetMargins    (0,0,0,0);
   // rb->SetWrapLength (-1);
@@ -497,7 +456,7 @@ Bool_t TStnFrame::ProcessMessage(Long_t msg, Long_t parm1, Long_t parm2) {
   //   double     x,y;
   //   int        px, py;
   
-  TVisManager* vm = TVisManager::Instance();
+  TVisManager* vm = fVisManager;
 
   c = GetCanvas();
 
@@ -569,20 +528,20 @@ Bool_t TStnFrame::ProcessMessage(Long_t msg, Long_t parm1, Long_t parm2) {
 	  printf(" *** TStnFrame::ProcessMessage M_OPEN_XY: msg = %li parm1 = %li parm2 = %li\n", 
 		 msg,parm1,parm2);
 	}
-	TStnVisManager::Instance()->OpenTrkXYView();
+	fVisManager->OpenView("xy");
 	break;
       case M_OPEN_RZ:
 	if (vm->DebugLevel() > 0) {
 	  printf(" *** TStnFrame::ProcessMessage M_OPEN_RZ: msg = %li parm1 = %li parm2 = %li\n", 
 		 msg,parm1,parm2);
 	}
-	TStnVisManager::Instance()->OpenTrkRZView();
+	fVisManager->OpenView("rz");
 	break;
       case M_OPEN_TZ:
 	
 	printf(" *** TStnFrame::ProcessMessage M_OPEN_TZ: msg = %li parm1 = %li parm2 = %li\n", 
 	       msg,parm1,parm2);
-	TStnVisManager::Instance()->OpenTrkTZView();
+	fVisManager->OpenView("tz");
 	break;
       case M_OPEN_CAL:
 	
@@ -590,7 +549,7 @@ Bool_t TStnFrame::ProcessMessage(Long_t msg, Long_t parm1, Long_t parm2) {
 	  printf(" *** TStnFrame::ProcessMessage M_OPEN_CAL: msg = %li parm1 = %li parm2 = %li\n", 
 		 msg,parm1,parm2);
 	}
-	TStnVisManager::Instance()->OpenCalView();
+	fVisManager->OpenView("cal");
 	break;
       case M_OPEN_CRV:
 	
@@ -598,7 +557,7 @@ Bool_t TStnFrame::ProcessMessage(Long_t msg, Long_t parm1, Long_t parm2) {
 	  printf(" *** TStnFrame::ProcessMessage M_OPEN_CRV: msg = %li parm1 = %li parm2 = %li\n", 
 		 msg,parm1,parm2);
 	}
-	TStnVisManager::Instance()->OpenCrvView();
+	fVisManager->OpenView("crv");
 	break;
       case M_OPEN_VST:
 	
@@ -606,7 +565,7 @@ Bool_t TStnFrame::ProcessMessage(Long_t msg, Long_t parm1, Long_t parm2) {
 	  printf(" *** TStnFrame::ProcessMessage M_OPEN_VST: msg = %li parm1 = %li parm2 = %li\n", 
 		 msg,parm1,parm2);
 	}
-	TStnVisManager::Instance()->OpenVSTView();
+	fVisManager->OpenView("vst");
 	break;
 //-----------------------------------------------------------------------------
 //  default
@@ -711,15 +670,15 @@ void TStnFrame::DoRadio() {
    // Handle radio buttons.
 
   TGButton *btn = (TGButton *) gTQSender;
-  Int_t id = btn->WidgetId();
+  int id = btn->WidgetId();
 
   printf(" TStnFrame::DoRadio radio button ID: %i\n",id);
   
-  TStnVisManager* vm = TStnVisManager::Instance();
-  if (id >= 21 && id <= 22) {
-
-    if (id == 21) vm->SetDisplayStrawHitsXY(1);
-    else          vm->SetDisplayStrawHitsXY(0);
+  if ((id == M_DISPLAY_SH) || (id == M_DISPLAY_CH)) {
+//-----------------------------------------------------------------------------
+// switch between displaying straw and combo hits
+//-----------------------------------------------------------------------------
+    fVisManager->DoRadioButton(id);
 
     for (int i = 0; i < 2; i++) {
       if (fRb[i]->WidgetId() != id) fRb[i]->SetState(kButtonUp);
@@ -731,19 +690,14 @@ void TStnFrame::DoRadio() {
 // TGCheckButton changes its state on its own
 //-----------------------------------------------------------------------------
 void TStnFrame::DoCheckButtons() {
-   // Handle radio buttons.
+   // Handle check buttons.
 
   TGButton *btn = (TGButton *) gTQSender;
-  Int_t id = btn->WidgetId();
+  int id = btn->WidgetId();
 
   printf(" TStnFrame::DoCheckButtons check button ID: %i state: %i\n",id,btn->IsOn());
   
-  TStnVisManager* vm = TStnVisManager::Instance();
+  int is_on = (int) btn->IsOn(); 
 
-  int doit = (int) btn->IsOn(); 
-
-  if      (id == kDisplayHelices     ) vm->SetDisplayHelices     (doit);
-  else if (id == kDisplayTracks      ) vm->SetDisplayTracks      (doit);
-  else if (id == kDisplaySimParticles) vm->SetDisplaySimParticles(doit);
-
+  fVisManager->DoCheckButton(id,is_on);
 }

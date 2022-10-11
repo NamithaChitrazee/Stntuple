@@ -12,7 +12,7 @@ void TStrawHitBlock::ReadV1(TBuffer& R__b) {
   R__b >> fNHits;
   fListOfHits->Streamer(R__b);
   fNWaveforms      = 0;
-  fListOfWaveforms = nullptr;
+  // fListOfWaveforms = nullptr;
 }
 
 

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-//  STNTUPLE implementeations of various good run lists
+//  STNTUPLE implementations of various good run lists
 //-----------------------------------------------------------------------------
 //  calculate lumi for the ETF definition of a good run list
 //  integrated luminosity:     all runs          good runs
@@ -99,6 +99,10 @@ TStnGoodRunList::TStnGoodRunList(const char* Name, const char* Filename) :
   else if (fName.Index("MC_1001") == 0) {
     SetGoodRunRoutine(GoodRunList_MC_1001);
     printf(" **** MC_1001 good run list is used\n");
+  }
+  else if (fName.Index("VST_01") == 0) {
+    SetGoodRunRoutine(GoodRunList_VST_01);
+    printf(" **** VST_01 good run list is used\n");
   }
   else {
     SetGoodRunRoutine(NULL);
@@ -339,7 +343,7 @@ Int_t TStnGoodRunList::Init(const char* Filename) {
 }
 
 //_____________________________________________________________________________
-Int_t TStnGoodRunList::GoodRunListEtf(int RunNumber, int RunSection, int Mask) {
+Int_t TStnGoodRunList::GoodRunListEtf(int RunNumber, int RunSection, int Event, int Mask) {
   // today, Jan 25 2003 ETF good run list is defined only for runs <= 154799
   // call with RunNumber < 0 sets up print level
 
@@ -459,7 +463,7 @@ Int_t TStnGoodRunList::GoodRunListEtf(int RunNumber, int RunSection, int Mask) {
 
 
 //_____________________________________________________________________________
-Int_t TStnGoodRunList::GoodRunList_WZ_PRD(int RunNumber, int RunSection, int Mask) {
+Int_t TStnGoodRunList::GoodRunList_WZ_PRD(int RunNumber, int RunSection, int Event, int Mask) {
   // frozen, runs 141544-156487, do not accept "promotions"
   // total integrated luminosity = 72 pb^-1
 
@@ -597,7 +601,7 @@ Int_t TStnGoodRunList::GoodRunList_WZ_PRD(int RunNumber, int RunSection, int Mas
 
 
 //_____________________________________________________________________________
-Int_t TStnGoodRunList::GoodRunList_DQM_V6(int RunNumber, int RunSection, int Mask) {
+Int_t TStnGoodRunList::GoodRunList_DQM_V6(int RunNumber, int RunSection, int Event, int Mask) {
   // frozen, runs 141544-183500, DQM V5 good run list
   // total integrated luminosity = ??
 
@@ -661,7 +665,7 @@ Int_t TStnGoodRunList::GoodRunList_DQM_V6(int RunNumber, int RunSection, int Mas
 }
 
 //_____________________________________________________________________________
-Int_t TStnGoodRunList::GoodRunList_DQM_V7(int RunNumber, int RunSection, int Mask) {
+Int_t TStnGoodRunList::GoodRunList_DQM_V7(int RunNumber, int RunSection, int Event, int Mask) {
   // frozen, runs 141544-186598, DQM V7 good run list (up to fall'2004)
   // total integrated luminosity = ??
 
@@ -788,7 +792,7 @@ Int_t TStnGoodRunList::GoodRunList_DQM_V7(int RunNumber, int RunSection, int Mas
 
 
 //_____________________________________________________________________________
-Int_t TStnGoodRunList::GoodRunList_DQM_V13(int RunNumber,int RunSection, int Mask) {
+Int_t TStnGoodRunList::GoodRunList_DQM_V13(int RunNumber,int RunSection, int Event, int Mask) {
   // frozen, runs 141544-212133, DQM V13 good run list (up to Feb'2006 shutdown)
   // total integrated luminosity = ??
   // missing so far: partially recovered runs
@@ -939,7 +943,7 @@ Int_t TStnGoodRunList::GoodRunList_DQM_V13(int RunNumber,int RunSection, int Mas
 
 
 //_____________________________________________________________________________
-Int_t TStnGoodRunList::GoodRunList_DQM_V27(int RunNumber,int RunSection, int Mask) {
+Int_t TStnGoodRunList::GoodRunList_DQM_V27(int RunNumber,int RunSection, int Event, int Mask) {
   // frozen, runs 141544-272114, DQM V27 good run list (up to spring 2009)
   // total integrated luminosity = ??
 
@@ -1118,7 +1122,7 @@ Int_t TStnGoodRunList::GoodRunList_DQM_V27(int RunNumber,int RunSection, int Mas
 
 
 //_____________________________________________________________________________
-Int_t TStnGoodRunList::GoodRunList_DQM_V32(int RunNumber,int RunSection, int Mask) {
+Int_t TStnGoodRunList::GoodRunList_DQM_V32(int RunNumber,int RunSection, int Event, int Mask) {
   // frozen, runs 141544-284843, DQM V32 good run list (up to Oct 25 2009)
   // total integrated luminosity = ??
 
@@ -1319,7 +1323,7 @@ Int_t TStnGoodRunList::GoodRunList_DQM_V32(int RunNumber,int RunSection, int Mas
 
 
 //_____________________________________________________________________________
-Int_t TStnGoodRunList::GoodRunList_DQM_V34(int RunNumber, int RunSection, int Mask) {
+Int_t TStnGoodRunList::GoodRunList_DQM_V34(int RunNumber, int RunSection, int Event, int Mask) {
   // frozen, runs 141544-289197, DQM V34 good run list (up to Feb 25 2010)
   // total integrated luminosity = ??
   // if Mask != 0 then it defines electron, muon and silicon bits
@@ -1528,7 +1532,7 @@ Int_t TStnGoodRunList::GoodRunList_DQM_V34(int RunNumber, int RunSection, int Ma
 
 
 //_____________________________________________________________________________
-Int_t TStnGoodRunList::GoodRunList_MC_1001(int RunNumber, int RunSection, int Mask) {
+Int_t TStnGoodRunList::GoodRunList_MC_1001(int RunNumber, int RunSection, int Event, int Mask) {
   // the reason for having this good run list is that 
   // mcProduction/base/runlist_v7goodrunlist_1001 used to generate bulk of 
   // 5.3.3 datasets included set of runs without the silicon, which, however,
@@ -1540,7 +1544,7 @@ Int_t TStnGoodRunList::GoodRunList_MC_1001(int RunNumber, int RunSection, int Ma
 
   int good_run;
 
-  good_run = GoodRunList_DQM_V34(RunNumber,RunSection,Mask);
+  good_run = GoodRunList_DQM_V34(RunNumber,RunSection,Event,Mask);
 
   if       (RunNumber  < 141572)                           good_run = 0;
   else if ((RunNumber >= 150951) && (RunNumber <= 151240)) good_run = 0;
@@ -1572,9 +1576,22 @@ Int_t TStnGoodRunList::GoodRunList_MC_1001(int RunNumber, int RunSection, int Ma
   return good_run;
 }
 
+//_____________________________________________________________________________
+Int_t TStnGoodRunList::GoodRunList_VST_01(int Run, int Subrun, int Event, int Mask) {
+  // Mu2e tracker VST - there are event ranges which need to be excluded
+
+  int good_run(0);
+
+  if      ((Run >= 100003) and (Run <= 100033)) {
+    good_run = 1;
+  }
+
+  return good_run;
+}
+
 
 //_____________________________________________________________________________
-int TStnGoodRunList::DefaultGoodRunRoutine(Int_t RunNumber, int RunSection, int Mask) {
+int TStnGoodRunList::DefaultGoodRunRoutine(Int_t RunNumber, int RunSection, int Event, int Mask) {
   // to start with assume that the constants for a given run are cached,
   // currently the interface is ahead of the implementation
 

@@ -35,7 +35,8 @@
 * [[file:stntuple-datasets.org][STNTUPLE datasets]]
 * STNTUPLE [[file:how-tos.org][how-to's]]    
 * [[file:event_display.org][STNTUPLE event display]]  
-* STNTUPLE modules                                                           
+* STNTUPLE modules      
+* copying and filtering: file:copying_and_filtering.org                                                     
 ** EventFilter                                                               
    - given an event list, filters events from the list 
    - event is defnined by three integers - (run,subrun,number) 

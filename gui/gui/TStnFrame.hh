@@ -15,19 +15,13 @@ class TGCheckButton;
 class TGTextButton;
 class TGRadioButton;
 
-class TStnVisManager;
+class TVisManager;
 
 //_____________________________________________________________________________
 class TStnFrame: public TGMainFrame, public TCanvasImp {
 public:
 
   enum { fGroupFrameWidth = 150 };
-					// checkbutton ID's
-  enum { 
-    kDisplayHelices      = 5,
-    kDisplayTracks       = 6,
-    kDisplaySimParticles = 7
-  };
 
 protected:
 
@@ -59,11 +53,12 @@ protected:
 
   TGCheckButton*      fDisplayHelices;     // ! 
 
-  TStnVisManager*     fVisManager;	   // !
+  TVisManager*        fVisManager;	   // !
   int                 fView;		   // !
 
 public:
-  TStnFrame(const char* name, const char* title, Int_t View, 
+  TStnFrame(const char* name, const char* title, 
+	    TVisManager* VisManager, Int_t View, 
 	    UInt_t w, UInt_t h,
 	    UInt_t options = kMainFrame | kVerticalFrame);
 
@@ -71,12 +66,10 @@ public:
 
 					// ****** accessors
 
-  TStnVisManager* GetVisManager() { return fVisManager; }
+  TVisManager*    GetVisManager() { return fVisManager; }
   int             GetView      () { return fView; }
 
 					// ****** setters
-
-  void SetVisManager(TStnVisManager* vm) { fVisManager = vm; }
 
 					// ****** slots
   void DoOK();

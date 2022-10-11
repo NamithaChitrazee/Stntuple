@@ -114,11 +114,14 @@ public:
   virtual void SetTimeCluster(int I);
   virtual void SetTimeWindow (float TMin, float TMax);
 //-----------------------------------------------------------------------------
-// drawing functions
+// GUI comands / drawing functions
 //-----------------------------------------------------------------------------
   virtual void DisplayEvent();
 
   virtual void DefaultRange();
+  virtual void DoCheckButton(int ButtonID, int Status);
+  virtual void DoRadioButton(int ButtonID);
+
   virtual void DrawOneSpec(const char* name);
 
 					// returns 1 if end run
@@ -131,12 +134,16 @@ public:
     return NULL;
   }
 
+  virtual void OpenView(const char* View);
   virtual void OpenView(TStnView* Mother, int Px1, int Py1, int Px2, int Py2);
 
 					// update all the open windows
 
   virtual void MarkModified(TPad* Pad);
-
+  virtual void Quit        ();   //
+//-----------------------------------------------------------------------------
+// Geant3 legacy 
+//-----------------------------------------------------------------------------
   virtual void Gdclose();
   virtual void Gdelete(Int_t view);
   virtual void Gdhead(Int_t isel, const char* name, Float_t csize=0.6);   

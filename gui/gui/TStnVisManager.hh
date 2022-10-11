@@ -176,10 +176,16 @@ public:
 
   void  SetMbTime(float MbTime) { fMbTime = MbTime; }
   void  SetBField(float BField) { fBField = BField; }
+//-----------------------------------------------------------------------------
+// GUI
+//-----------------------------------------------------------------------------
+  virtual void  DoCheckButton(int ButtonID, int Status) override;
+  virtual void  DoRadioButton(int ButtonID)             override;
+  virtual void  Quit         ()                         override;   //
+  virtual int   EndRun       ()                         override;
 
   void  UpdateViews();
 
-  virtual int EndRun() override ;
 
   virtual TCanvas*  NewCanvas(const char* Name,
 			      const char* Title,
@@ -188,6 +194,7 @@ public:
 
   virtual int GetViewID(const char* View) override;
 
+  virtual void OpenView(const char* View) override;
   virtual void OpenView(TStnView* Mother, int Px1, int Py, int Px2, int Py2) override;
 
   Int_t   OpenTrkXYView();
@@ -214,8 +221,8 @@ public:
 //-----------------------------------------------------------------------------
   void    NextEvent        ();   //
   void    PrintColls(const char* Tag);
-  void    Quit             ();   //
-  
+
+ 
   // ClassDef(TStnVisManager, 0)
 };
 #endif

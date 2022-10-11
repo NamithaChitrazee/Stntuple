@@ -1,0 +1,36 @@
+* Copying and filtering 
+
+- Every TStnModule is a filter, so every stnana job an be used 
+  to filter events of interest and write them out.
+  By default, the filtering as well as the output mode is turned off. 
+  To activate, set the filtering mode ON and define an output module, 
+  as shown in the example below. 
+
+#+begin_src 
+TStnAna* x;
+
+int test_output() {
+  x = new TStnAna("input.stntuple");
+
+  m_l3t = new TTauL3TriggerModule;
+  x->AddModule(m_l3t);
+  m_l3t->SetFilteringMode(1);   // 0: disabled (default), 1: filter, 2: veto
+      
+  // use TStnModule::SetPassed(int Passed) inside the module
+  // to report the filtering status
+
+  TStnOutputModule* m = new TStnOutputModule("output.root");
+  x->SetOutputModule(m);
+  x->Run(100);
+}
+#+end_src
+
+- A primary STNTUPLE (created by the reconstruction framework job) may 
+  contain several DB records, including the luminosity information 
+  for all the runs seen by InitStntupleModule. 
+
+  Secondary STNTUPLE's will contain the DB information  only for those runs, 
+  for which it at least one event has been written into the ntuple.
+# ------------------------------------------------------------------------------
+* back to file:Stntuple.org
+# ------------------------------------------------------------------------------
