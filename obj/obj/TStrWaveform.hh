@@ -15,6 +15,11 @@ public:
   int     fNWords;
   ushort* fData;                        // [fNWords] array of fNWords shorts
 
+  float   fBaseline;	                //! baseline (based on first 5 samples)
+  float   fQn;                          //! nsamples used to calculate the charge
+  float   fVMin;			//! min and max of the waveform
+  float   fVMax;
+
 public:
                                         // constructors and destructors
   TStrWaveform(int ID = -1);

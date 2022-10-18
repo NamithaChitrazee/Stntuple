@@ -156,39 +156,39 @@ int TCalVisNode::InitEvent() {
     for (int i=0; i<ncl; i++) {
       cl = &(*fListOfClusters)->at(i);
       if (cl->diskID() == fSectionID) {
-	//        TEvdCluster*  evd_cl = NewEvdCluster(cl);
+	TEvdCluster*  evd_cl = NewEvdCluster(cl);
 //-----------------------------------------------------------------------------
 // set colors of the crystals
 //-----------------------------------------------------------------------------
 	printf("TCalVisNode::InitEvent : need to uncomment\n");
-// 	const mu2e::CaloCluster::CaloCrystalHitPtrVector caloClusterHits = cl->caloCrystalHitsPtrVector();
-// 	int nh = caloClusterHits.size();
+ 	const mu2e::CaloHitPtrVector caloClusterHits = cl->caloHitsPtrVector();
+ 	int nh = caloClusterHits.size();
 
-// 	for (int i=0; i<nh; i++) {
-// 	  const mu2e::CaloCrystalHit* hit = &(*caloClusterHits.at(i));
-// 	  int id = hit->id();
+ 	for (int i=0; i<nh; i++) {
+ 	  const mu2e::CaloHit* hit = &(*caloClusterHits.at(i));
+ 	  int id = hit->crystalID();
 
-// 	  int loc = LocalCrystalID(id);
-// //-----------------------------------------------------------------------------
-// // find a crystal with a given ID, display it in red
-// //-----------------------------------------------------------------------------
-// 	  evd_cr = (TEvdCrystal*) fListOfEvdCrystals->At(loc);
+ 	  int loc = LocalCrystalID(id);
+//-----------------------------------------------------------------------------
+// find a crystal with a given ID, display it in red
+//-----------------------------------------------------------------------------
+ 	  evd_cr = (TEvdCrystal*) fListOfEvdCrystals->At(loc);
 
-// 	  evd_cl->AddCrystal(evd_cr);
-// //-----------------------------------------------------------------------------
-// // displayed color of the crystal is define by the max hit energy
-// //-----------------------------------------------------------------------------
-// 	  double energy = hit->energyDep();
+ 	  evd_cl->AddCrystal(evd_cr);
+//-----------------------------------------------------------------------------
+// displayed color of the crystal is define by the max hit energy
+//-----------------------------------------------------------------------------
+	  double energy = hit->energyDep();
 
-// 	  if (energy > fMinCrystalEnergy) {
-// 	    if      (energy > 100.) evd_cr->SetFillColor(kRed+ 2);
-// 	    else if (energy >  10.) evd_cr->SetFillColor(kRed   ); 
-// 	    else if (energy >   1.) evd_cr->SetFillColor(kRed- 9); 
-// 	    else                    evd_cr->SetFillColor(kRed-10); 
+ 	  if (energy > fMinCrystalEnergy) {
+ 	    if      (energy > 100.) evd_cr->SetFillColor(kRed+ 2);
+ 	    else if (energy >  10.) evd_cr->SetFillColor(kRed   ); 
+ 	    else if (energy >   1.) evd_cr->SetFillColor(kRed- 9); 
+ 	    else                    evd_cr->SetFillColor(kRed-10); 
 	    
-// 	    evd_cr->SetFillStyle(1024);
-// 	  }
-//	}
+ 	    evd_cr->SetFillStyle(1024);
+ 	  }
+	}
       }
     }
   }
