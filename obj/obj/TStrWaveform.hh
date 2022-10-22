@@ -40,11 +40,11 @@ public:
   void Clear(Option_t* opt = "");
   void Print(Option_t* opt = "") const;
 //-----------------------------------------------------------------------------
-// schema evolution
+// schema evolution - no I/O changes from v1 to v2, only transient variables added
 //-----------------------------------------------------------------------------
 //  void ReadV1(TBuffer &R__b);
 
-  ClassDef (TStrWaveform,1)
+  ClassDef (TStrWaveform,2)
 };
 
 #endif

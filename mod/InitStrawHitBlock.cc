@@ -154,16 +154,14 @@ int InitStrawHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int 
 
       // straw hit time is an integer (in ns)
 
-      int time [2], tot, itot[2];
+      float time [2], tot[2];
 
-      time[0] = (int) sh->time(mu2e::StrawEnd::cal);
-      time[1] = (int) sh->time(mu2e::StrawEnd::hv );
+      time[0] = sh->time(mu2e::StrawEnd::cal);
+      time[1] = sh->time(mu2e::StrawEnd::hv );
 
-      itot[0] = (int) sh->TOT(mu2e::StrawEnd::cal);
-      itot[1] = (int) sh->TOT(mu2e::StrawEnd::hv );
+      tot[0] = sh->TOT(mu2e::StrawEnd::cal);
+      tot[1] = sh->TOT(mu2e::StrawEnd::hv );
       
-      tot     = itot[0] | (itot[1] << 16) ; 
-
       gen_id  = gen_id | (sd_flag << 16) ;
 
       hit->Set(sid, time, tot, 

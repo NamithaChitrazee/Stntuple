@@ -45,14 +45,14 @@ public:
 protected:
 					// data
   int     fStrawID;			// sid | (mcflag << 16)
-  int     fTime[2];			// 
-  int     fTOT;                         // TOT[0] + TOT[1]<<16
 					// -------------------- MC info, don't write out for the data
   int     fGenID;                       // generator ID + StrawDigiFlag << 16
   int     fSimID;			// sim particle ID
   int     fPdgID;			// sim particle PDG ID
   int     fMotherPdgID;	                // mother PDG ID
 	  				// ----------------------------- floats
+  float   fTime[2];			// 
+  float   fTOT[2];                      // 
   float   fEDep;			// energy deposition for the hit
   float   fMcMom;			// MC particle momentum
 
@@ -73,8 +73,8 @@ public:
   int   Straw      () const { return (fStrawID & _strawmsk  )               ; }
   int   Preamp     () const { return (fStrawID & _preampmsk ) >> _preampsft ; }
 
-  int   Time  (int I) const { return (fTime[I]    )          ; }
-  int   TOT   (int I) const { return (fTOT >> I*16) & 0XFFFF ; }
+  float Time  (int I) const { return fTime[I]; }
+  float TOT   (int I) const { return fTOT [I]; }
   int   Dt         () const { return fTime[1]-fTime[0]; }
 
   int   PdgID      () const { return fPdgID;       }
@@ -90,9 +90,10 @@ public:
 //-----------------------------------------------------------------------------
 // modifiers, assume TOT = tot[0] | (tot[1] << 16
 //-----------------------------------------------------------------------------
-  void    Set(int   StrawID, int*  Time , int TOT, 
-	      int   GenID  , int   SimID, int PdgID, int MotherPdgID, 
-	      float EDep   , float McMom);
+  void    Set(int   StrawID, float* Time , float* TOT  , 
+	      int   GenID  , int    SimID, 
+	      int   PdgID  , int    MotherPdgID, 
+	      float EDep   , float  McMom);
 //-----------------------------------------------------------------------------
 // overloaded methods of TObject
 //-----------------------------------------------------------------------------
@@ -102,8 +103,9 @@ public:
 // schema evolution
 //-----------------------------------------------------------------------------
   void ReadV1(TBuffer& R__b);
+  void ReadV2(TBuffer& R__b);
 
-  ClassDef (TStrawHit,2)
+  ClassDef (TStrawHit,3)
 };
 
 #endif
