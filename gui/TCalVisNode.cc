@@ -160,7 +160,7 @@ int TCalVisNode::InitEvent() {
 //-----------------------------------------------------------------------------
 // set colors of the crystals
 //-----------------------------------------------------------------------------
-	printf("TCalVisNode::InitEvent : need to uncomment\n");
+//	printf("TCalVisNode::InitEvent : need to uncomment\n");
  	const mu2e::CaloHitPtrVector caloClusterHits = cl->caloHitsPtrVector();
  	int nh = caloClusterHits.size();
 
