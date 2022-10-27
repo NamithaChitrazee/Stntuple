@@ -111,7 +111,7 @@ public:
 
   virtual int  GetViewID     (const char* View); // to be overloaded
   virtual void SetStations   (int IMin, int IMax);
-  virtual void SetTimeCluster(int I);
+
   virtual void SetTimeWindow (float TMin, float TMax);
 //-----------------------------------------------------------------------------
 // GUI comands / drawing functions

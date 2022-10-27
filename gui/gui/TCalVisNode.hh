@@ -16,7 +16,6 @@
 
 #include "Offline/RecoDataProducts/inc/CaloCluster.hh"
 #include "Offline/RecoDataProducts/inc/CaloHit.hh"
-#include "Offline/RecoDataProducts/inc/TimeCluster.hh"
 #include "Offline/CalorimeterGeom/inc/Disk.hh"
 #include "Offline/CalorimeterGeom/inc/DiskCalorimeter.hh"
 
@@ -49,8 +48,6 @@ protected:
   const mu2e::CaloClusterCollection**     fListOfClusters;
   const mu2e::CaloHitCollection**         fListOfCrystalHits;
 
-  const mu2e::TimeClusterCollection**     fTimeClusterColl;  //
-
   TObjArray**        fListOfTracks;
   int                fSectionID;
 
@@ -60,8 +57,6 @@ protected:
   int                fNClusters;
   TObjArray*         fListOfEvdCrystals;
 
-  const mu2e::TimeCluster*  fTimeCluster;
-  
   Int_t              fDisplayHits;
   Int_t              fPickMode;
   double             fMinClusterEnergy;
@@ -105,10 +100,6 @@ public:
 
   void  SetListOfCrystalHits(const mu2e::CaloHitCollection** List) { 
     fListOfCrystalHits  = List; 
-  }
-
-  void SetTimeClusterColl(const mu2e::TimeClusterCollection** Coll) { 
-    fTimeClusterColl = Coll;
   }
 
   void SetMinClusterEnergy(float MinEnergy) { fMinClusterEnergy = MinEnergy; }

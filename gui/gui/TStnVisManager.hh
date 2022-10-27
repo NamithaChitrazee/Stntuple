@@ -21,6 +21,10 @@ class TStnView;
 class TSubdetector;
 class TExtrapolator;
 
+namespace stntuple {
+  class TEvdTimeCluster;
+}
+
 //-----------------------------------------------------------------------------
 class TStnVisManager : public TVisManager {
 public:
@@ -89,7 +93,7 @@ protected:
 
   int                 fMinStation;
   int                 fMaxStation;
-  int                 fTimeCluster;
+  stntuple::TEvdTimeCluster*    fSelectedTimeCluster;
   int                 fDebugLevel;
 					// to display all the data in a given time window 
 					// vis manager would enforces the same time limits on all views,
@@ -138,7 +142,8 @@ public:
   
   int            MinStation() { return fMinStation; }
   int            MaxStation() { return fMaxStation; }
-  int            TimeCluster() { return fTimeCluster; }
+
+  stntuple::TEvdTimeCluster*  SelectedTimeCluster() { return fSelectedTimeCluster; }
 
   float          TMin() { return fTMin; }
   float          TMax() { return fTMax; }
@@ -167,7 +172,8 @@ public:
   void           SetDisplaySimParticles(int Flag) { fDisplaySimParticles = Flag; }
 
   void           SetStations(int IMin, int IMax) override;
-  void           SetTimeCluster(int I) override;
+
+  void           SetSelectedTimeCluster(stntuple::TEvdTimeCluster* Tc) { fSelectedTimeCluster = Tc; }
   
   void   SetTimeWindow(float TMin, float TMax) override {
     fTMin = TMin;
@@ -224,5 +230,5 @@ public:
 
  
   // ClassDef(TStnVisManager, 0)
-};
+  };
 #endif

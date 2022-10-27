@@ -13,19 +13,9 @@
 #include "Offline/RecoDataProducts/inc/ComboHit.hh"
 #include "Offline/RecoDataProducts/inc/StrawDigi.hh"
 #include "Offline/RecoDataProducts/inc/StrawHit.hh"
-#include "Offline/RecoDataProducts/inc/TimeCluster.hh"
 #include "Offline/MCDataProducts/inc/StrawDigiMC.hh"
 #include "Offline/MCDataProducts/inc/SimParticle.hh"
 #include "Offline/MCDataProducts/inc/StepPointMC.hh"
-
-// // #else
-// namespace mu2e {
-//   class ComboHitCollection;
-//   class StrawDigiMCCollection;
-//   class KalRepPtrCollection;
-//   class Tracker;
-// };
-// #endif
 
 #include "Stntuple/gui/TStnVisNode.hh"
 
@@ -50,11 +40,16 @@ public:
   
 protected:
 
-  const mu2e::ComboHitCollection**             fCComboHitColl;     // several SH per CH
+  
+  const mu2e::ComboHitCollection*              fChColl;     // several SH per CH
+  std::string                                  fChCollTag;
+  
   const mu2e::ComboHitCollection**             fSComboHitColl;     // one     SH per CH
-  const mu2e::TimeClusterCollection**          fTimeClusterColl;   //
   const mu2e::StrawDigiCollection**            fSdColl;		   // straw digi coll
-  const mu2e::StrawDigiMCCollection**          fSdmcColl;          // straw digi MC coll
+
+  const mu2e::StrawDigiMCCollection*           fSdmcColl;          // straw digi MC coll
+  std::string                                  fSdmcCollTag;       // straw digi collection
+
   const mu2e::StrawHitCollection**             fShColl;            // straw hit coll
   const mu2e::StrawDigiADCWaveformCollection** fSwColl;		   // straw digi waveform coll
   const mu2e::KalRepPtrCollection**            fKalRepPtrColl;
@@ -67,7 +62,6 @@ protected:
   stntuple::TEvdStrawTracker* fTracker;
 
   TArc*                     fArc;
-  const mu2e::TimeCluster*  fTimeCluster;
 
   Int_t                     fTimeWindow;
   Int_t                     fPickMode;
@@ -114,7 +108,7 @@ public:
     return (stntuple::TEvdSimParticle*)  fListOfSimParticles->At(I); 
   }
 
-  const mu2e::ComboHitCollection* GetCComboHitColl() { return *fCComboHitColl; }
+  const mu2e::ComboHitCollection* GetCComboHitColl() { return  fChColl; }
   const mu2e::ComboHitCollection* GetSComboHitColl() { return *fSComboHitColl; }
 
   // const mu2e::StrawHitFlagCollection* GetStrawHitFlagColl() { 
@@ -134,9 +128,8 @@ public:
   void  SetListOfTracks(TObjArray*  List ) { fListOfTracks = List ; }
   void  SetTrackColor  (Color_t     Color) { fTrackColor   = Color; }
 
-  void SetCComboHitColl(const mu2e::ComboHitCollection** Coll) { 
-    fCComboHitColl = Coll;
-  }
+  void SetChCollTag        (std::string& CollTag) { fChCollTag   = CollTag; }
+  void SetSdmcCollTag      (std::string& CollTag) { fSdmcCollTag = CollTag; }
 
   void SetSComboHitColl(const mu2e::ComboHitCollection** Coll) { 
     fSComboHitColl = Coll;
@@ -154,9 +147,9 @@ public:
   //   fStrawHitFlagColl = Coll;
   // }
 
-  void SetSdmcColl(const mu2e::StrawDigiMCCollection** Coll) { 
-    fSdmcColl = Coll;
-  }
+  // void SetSdmcColl(const mu2e::StrawDigiMCCollection** Coll) { 
+  //   fSdmcColl = Coll;
+  // }
 
   void SetSimpColl(const mu2e::SimParticleCollection** Coll) { 
     fSimpColl = Coll;
@@ -164,10 +157,6 @@ public:
 
   void SetSpmcColl(const mu2e::StepPointMCCollection** Coll) { 
     fSpmcColl = Coll;
-  }
-
-  void SetTimeClusterColl(const mu2e::TimeClusterCollection** Coll) { 
-    fTimeClusterColl = Coll;
   }
 
   void  SetPickMode   (Int_t Mode) { fPickMode    = Mode; }

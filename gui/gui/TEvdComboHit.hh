@@ -77,6 +77,7 @@ public:
 
   float                        Z()           { return fPos.Z(); }
   float                        T()           { return fHit->time(); }
+  float                correctedTime()       { return fHit->correctedTime(); }
 //-----------------------------------------------------------------------------
 // modifiers
 //-----------------------------------------------------------------------------

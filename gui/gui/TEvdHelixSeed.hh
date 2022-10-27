@@ -11,9 +11,8 @@
 #include "TArc.h"
 #include "TEllipse.h"
 
-namespace mu2e {
-  class HelixSeed;
-};
+#include "art/Framework/Principal/Event.h"
+#include "Offline/RecoDataProducts/inc/HelixSeed.hh"
 
 class TStnVisNode;
 
@@ -48,6 +47,8 @@ public:
   TEvdTrkStrawHit* Hit(int I) { 
     return (TEvdTrkStrawHit*) fListOfHits->UncheckedAt(I); 
   }
+
+  double T0() { return fHelixSeed->t0().t0(); }
 //-----------------------------------------------------------------------------
 // modifiers
 //-----------------------------------------------------------------------------

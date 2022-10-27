@@ -87,6 +87,8 @@ mu2e -c Stntuple/fcl/display.fcl -s dig.mu2e.CeEndpointDigiTriggered.MDC2020n_10
 
 
   - 3D views: need a simplified geometry, work in progress 
+** views                       
+  by default, view prints a list of its nodes
 * ------------------------------------------------------------------------------
 * [1/1] TODO's                                                               
 ** DONE add a SimParticle node ? or just add a list of SimParticles to XY view ?

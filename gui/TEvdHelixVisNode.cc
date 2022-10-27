@@ -25,6 +25,7 @@
 #include "Offline/ConditionsService/inc/ConditionsHandle.hh"
 #include "Offline/TrackerConditions/inc/StrawResponse.hh"
 
+#include "Stntuple/gui/TEvdTimeCluster.hh"
 #include "Stntuple/gui/TEvdComboHit.hh"
 #include "Stntuple/gui/TEvdHelixSeed.hh"
 #include "Stntuple/gui/TEvdHelixVisNode.hh"
@@ -154,36 +155,26 @@ void TEvdHelixVisNode::PaintXY(Option_t* Option) {
 
   TStnVisManager* vm = TStnVisManager::Instance();
 
-  //   int ipeak = vm->TimeCluster();
+  stntuple::TEvdTimeCluster* tcl = vm->SelectedTimeCluster();
 
-  // if (ipeak >= 0) {
-  //   if ((*fTimeClusterColl) != NULL) {
-  //     int ntp = (*fTimeClusterColl)->size();
-  //     if (ipeak < ntp) fTimeCluster = &(*fTimeClusterColl)->at(ipeak);
-  //     else             fTimeCluster = NULL;
-  //   }
-  // }
+  double tmin(0), tmax(2000.);
 
-  // double tmin(0), tmax(2000.);
-
-  // if (fTimeCluster) {
-  //   tmin = fTimeCluster->t0().t0() - 30;//FIXME!
-  //   tmax = fTimeCluster->t0().t0() + 20;//FIXME!
-  // }
+  if (tcl) {
+    tmin = tcl->TMin();
+    tmax = tcl->TMax();
+  }
   
 //-----------------------------------------------------------------------------
 // now - helices
 //-----------------------------------------------------------------------------
   if (vm->DisplayHelices()) {
     int nhel(0);
-    stntuple::TEvdHelixSeed* hel;
-    //  TAnaDump::Instance()->printKalRep(0,"banner");
-
-    if ( (fListOfHelixSeeds) != 0 )  nhel = fListOfHelixSeeds->GetEntriesFast();
+    if (fListOfHelixSeeds)  nhel = fListOfHelixSeeds->GetEntriesFast();
 
     for (int i=0; i<nhel; i++ ) {
-      hel = GetEvdHelixSeed(i);
-      hel->Paint(Option);
+      stntuple::TEvdHelixSeed* hel = GetEvdHelixSeed(i);
+      double t0 = hel->T0();
+      if ((t0 > tmin) and (t0 < tmax)) hel->Paint(Option);
     }
   }
   gPad->Modified();

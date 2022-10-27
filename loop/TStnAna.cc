@@ -155,6 +155,10 @@ int TStnAna::Init() {
 
   fFolder = gROOT->GetRootFolder()->AddFolder("Ana","TStnAna Folder");
 
+  fFolder->AddFolder("Event","TStnAna Event Folder, communication between modules");
+//-----------------------------------------------------------------------------
+// allow histograms in different folders to have the same name
+//-----------------------------------------------------------------------------
   TH1::AddDirectory(0);
 
   //  fListOfGoodRuns = 0;

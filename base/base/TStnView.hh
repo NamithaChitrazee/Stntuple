@@ -67,7 +67,6 @@ public:
 
   void          SetTimeWindow (float TMin, float TMax);  // *MENU* 
   void          SetStations   (int I1, int I2);          // *MENU* 
-  void          SetTimeCluster(int I);                   // *MENU* 
   void          SetDebugLevel (int Level);               // *MENU*
 //-----------------------------------------------------------------------------
 // overloaded functions of TObject

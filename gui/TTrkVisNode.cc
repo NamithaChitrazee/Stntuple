@@ -15,6 +15,8 @@
 #include "TDatabasePDG.h"
 #include "TParticlePDG.h"
 
+#include "messagefacility/MessageLogger/MessageLogger.h"
+
 // #include "art/Framework/Principal/Event.h"
 // #include "art/Framework/Principal/Handle.h"
 
@@ -23,6 +25,7 @@
 #include "Offline/ConditionsService/inc/ConditionsHandle.hh"
 #include "Offline/TrackerConditions/inc/StrawResponse.hh"
 
+#include "Stntuple/gui/TEvdTimeCluster.hh"
 #include "Stntuple/gui/TEvdComboHit.hh"
 #include "Stntuple/gui/TEvdTrack.hh"
 #include "Stntuple/gui/TTrkVisNode.hh"
@@ -43,7 +46,7 @@
 #include "Offline/DataProducts/inc/StrawId.hh"
 // #include "DataProducts/inc/XYZVec.hh"
 
-// #include "Stntuple/mod/TAnaDump.hh"
+#include "Stntuple/print/TAnaDump.hh"
 
 ClassImp(TTrkVisNode)
 
@@ -63,16 +66,14 @@ TTrkVisNode::TTrkVisNode(const char* name, const mu2e::Tracker* Tracker, TStnTra
 
   fListOfStrawHits    = new TObjArray();
   fListOfComboHits    = new TObjArray();
-  fTimeCluster        = NULL;
   fUseStereoHits      = 0;
 
   fListOfTracks       = new TObjArray();
   fListOfSimParticles = new TObjArray();
 
-  fCComboHitColl      = nullptr;
+  fChColl             = nullptr;
   fSComboHitColl      = nullptr;
   fShColl             = nullptr;
-  fTimeClusterColl    = nullptr;
   fSdmcColl           = nullptr;
   fKalRepPtrColl      = nullptr;
   fSimpColl           = nullptr;
@@ -103,11 +104,10 @@ int TTrkVisNode::InitEvent() {
   mu2e::GeomHandle<mu2e::Tracker> ttHandle;
   const mu2e::Tracker* tracker = ttHandle.get();
 
-  TStnVisManager* vm = TStnVisManager::Instance();
-
+  TStnVisManager* vm      = TStnVisManager::Instance();
   const art::Event* event = vm->Event();
 
-  // Tracker calibration object.
+ // Tracker calibration object.
   //  mu2e::ConditionsHandle<mu2e::StrawResponse> srep = mu2e::ConditionsHandle<mu2e::StrawResponse>("ignored");
 
   const mu2e::ComboHit              *hit;
@@ -148,6 +148,28 @@ int TTrkVisNode::InitEvent() {
     }
   }
 //-----------------------------------------------------------------------------
+// offline collections
+//-----------------------------------------------------------------------------
+  art::Handle<mu2e::ComboHitCollection> chcH;
+  event->getByLabel(art::InputTag(fChCollTag), chcH);
+  if (chcH.isValid()) fChColl = chcH.product();
+  else {
+    mf::LogWarning("TEvdTimeClusterVisNode::InitEvent") << " WARNING:" << __LINE__ 
+							<< " : mu2e::ComboHitCollection " 
+							<< fChCollTag << " not found";
+    fChColl = nullptr;
+  }
+
+  art::Handle<mu2e::StrawDigiMCCollection> sdmccH;
+  event->getByLabel(art::InputTag(fSdmcCollTag), sdmccH);
+  if (sdmccH.isValid()) fSdmcColl = sdmccH.product();
+  else {
+    mf::LogWarning("TEvdTimeClusterVisNode::InitEvent") << " WARNING:" << __LINE__ 
+							<< " : mu2e::StrawDigiMCCollection " 
+							<< fSdmcCollTag << " not found";
+    fSdmcColl = nullptr;
+  }
+//-----------------------------------------------------------------------------
 // display hits corresponding to a given time peak, or all hits, 
 // if the time peak is not found
 //-----------------------------------------------------------------------------
@@ -169,8 +191,8 @@ int TTrkVisNode::InitEvent() {
 // deal with MC information - later
 //-----------------------------------------------------------------------------
     const mu2e::StrawDigiMC*             mcdigi(nullptr);
-    if ((*fSdmcColl) and ((*fSdmcColl)->size() > 0)) {
-      mcdigi = &(*fSdmcColl)->at(ihit);                // this seems to be wrong - is it ?
+    if (fSdmcColl and (fSdmcColl->size() > 0)) {
+      mcdigi = &fSdmcColl->at(ihit); 
     }
 
     if (mcdigi) {
@@ -247,12 +269,12 @@ int TTrkVisNode::InitEvent() {
 //-----------------------------------------------------------------------------
   fListOfComboHits->Delete();
   int nch  = 0;
-  if ((*fCComboHitColl) != nullptr) nch = (*fCComboHitColl)->size();
+  if (fChColl != nullptr) nch = fChColl->size();
 //-----------------------------------------------------------------------------
 // the rest makes sense only if nhits > 0
 //-----------------------------------------------------------------------------
   if (nch > 0) { 
-    const mu2e::ComboHit* hit0 = &(*fCComboHitColl)->at(0);
+    const mu2e::ComboHit* hit0 = &fChColl->at(0);
 
     float                     mc_mom(-1.), mc_mom_z(-1.);
     int                       mother_pdg_id(0);
@@ -261,15 +283,15 @@ int TTrkVisNode::InitEvent() {
     const mu2e::SimParticle*  sim   (nullptr);
 
     for (int ihit=0; ihit<nch; ihit++ ) {
-      const mu2e::ComboHit* hit = &(*fCComboHitColl)->at(ihit);
+      const mu2e::ComboHit* hit = &fChColl->at(ihit);
       size_t ish  = hit-hit0;
       std::vector<StrawDigiIndex> shids;
-      (*fCComboHitColl)->fillStrawDigiIndices(*event,ish,shids);
+      fChColl->fillStrawDigiIndices(*event,ish,shids);
 //-----------------------------------------------------------------------------
 // handle MC truth, if that is present
 //-----------------------------------------------------------------------------
-      if ((*fSdmcColl) != nullptr) {
-	const mu2e::StrawDigiMC* mcdigi = &(*fSdmcColl)->at(shids[0]);
+      if (fSdmcColl != nullptr) {
+	const mu2e::StrawDigiMC* mcdigi = &fSdmcColl->at(shids[0]);
 
 	step = mcdigi->earlyStrawGasStep().get();
 
@@ -355,8 +377,8 @@ int TTrkVisNode::InitEvent() {
       int first = tsimp->Shid()->front();
       int last  = tsimp->Shid()->back ();
 
-      const mu2e::StrawGasStep* s1 = (*fSdmcColl)->at(first).earlyStrawGasStep().get();
-      const mu2e::StrawGasStep* s2 = (*fSdmcColl)->at(last ).earlyStrawGasStep().get();
+      const mu2e::StrawGasStep* s1 = fSdmcColl->at(first).earlyStrawGasStep().get();
+      const mu2e::StrawGasStep* s2 = fSdmcColl->at(last ).earlyStrawGasStep().get();
 
       esim = new stntuple::TEvdSimParticle(ipp,tsimp,s1,s2);
       fListOfSimParticles->Add(esim);
@@ -384,21 +406,12 @@ void TTrkVisNode::PaintXY(Option_t* Option) {
 
   TStnVisManager* vm = TStnVisManager::Instance();
 
-  int ipeak = vm->TimeCluster();
-
-  if (ipeak >= 0) {
-    if ((*fTimeClusterColl) != NULL) {
-      int ntp = (*fTimeClusterColl)->size();
-      if (ipeak < ntp) fTimeCluster = &(*fTimeClusterColl)->at(ipeak);
-      else             fTimeCluster = NULL;
-    }
-  }
-
   double tmin(0), tmax(2000.);
 
-  if (fTimeCluster) {
-    tmin = fTimeCluster->t0().t0() - 30;//FIXME!
-    tmax = fTimeCluster->t0().t0() + 20;//FIXME!
+  stntuple::TEvdTimeCluster* etcl = vm->SelectedTimeCluster();
+  if (etcl) {
+    tmin = etcl->TMin(); // FIXME!
+    tmax = etcl->TMax(); // FIXME!
   }
   
   if (vm->DisplayStrawHitsXY()) {
@@ -433,7 +446,7 @@ void TTrkVisNode::PaintXY(Option_t* Option) {
 
       straw     = &tracker->getStraw(sh->strawId());           // first straw hit
       station   = straw->id().getStation();
-      time      = ch->time();
+      time      = ch->correctedTime();
 
       if ((station >= vm->MinStation()) && (station <= vm->MaxStation())) { 
 	if ((time >= tmin) && (time <= tmax)) {
@@ -693,7 +706,7 @@ Int_t TTrkVisNode::DistancetoPrimitiveTZ(Int_t px, Int_t py) {
   for (int i=0; i<nhits; i++) {
     stntuple::TEvdComboHit* hit = (stntuple::TEvdComboHit*) fListOfComboHits->At(i);
     x1  = gPad->XtoAbsPixel(hit->Z());
-    y1  = gPad->YtoAbsPixel(hit->T());
+    y1  = gPad->YtoAbsPixel(hit->correctedTime());
     dx1 = px-x1;
     dy1 = py-y1;
 
@@ -733,8 +746,15 @@ void TTrkVisNode::Clear(Option_t* Opt) {
 
 //-----------------------------------------------------------------------------
 void TTrkVisNode::Print(Option_t* Opt) const {
-  printf(" >>> name: %s TTrkVisNode::Print is not implemented yet\n",GetName());
 
+  TString opt = Opt;
+  opt.ToLower();
+
+  if (opt == "combo_hits") {
+    TAnaDump* ad = TAnaDump::Instance();
+    ad->printComboHitCollection(fChCollTag.data(),fSdmcCollTag.data());
+    return;
+  }
 //-----------------------------------------------------------------------------
 // print SimParticles
 //-----------------------------------------------------------------------------
@@ -769,6 +789,4 @@ void TTrkVisNode::Print(Option_t* Opt) const {
     }
     hit->Print("data");
   }
-
 }
-

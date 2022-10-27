@@ -215,7 +215,7 @@ void TStnView::ExecuteEvent(Int_t event, Int_t px, Int_t py) {
     if (vm->DebugLevel() > 0) printf(" TStnView::ExecuteEvent kButton3Down\n");
     break;
   case kButton1Up:
-    printf(" TStnView::ExecuteEvent kButton1Up\n");
+    printf(" TStnView::ExecuteEvent kButton1Up px,py= %5i %5i\n",px,py);
 //-----------------------------------------------------------------------------
 // open new window only if something has really been selected (it is a 
 // rectangle, but not a occasional click)
@@ -371,13 +371,6 @@ void    TStnView::SetStations(int I1, int I2) {
   TVisManager* vm = TVisManager::Instance();
 
   vm->SetStations(I1, I2);
-}
-
-//-----------------------------------------------------------------------------
-void    TStnView::SetTimeCluster(int I) {
-  TVisManager* vm = TVisManager::Instance();
-
-  vm->SetTimeCluster(I);
 }
 
 //-----------------------------------------------------------------------------

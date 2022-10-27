@@ -272,11 +272,53 @@ TStnFrame::TStnFrame(const char*  Name,
   tb->SetTextJustify(36);
   tb->SetMargins(0,0,0,0);
   tb->SetWrapLength(-1);
-  tb->MoveResize(5,850,120,30);
+  tb->MoveResize(5,85,120,30);
   frame->AddFrame(tb, new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
 
   tb->Connect("Pressed()", "TStnVisManager", vm, "PrintColls(=\"sdmc_colls\")");
+//-----------------------------------------------------------------------------
+// "print time clusters" button
+//-----------------------------------------------------------------------------
+  tb = new TGTextButton(frame,"tc_colls",-1,
+			TGTextButton::GetDefaultGC()(),
+			TGTextButton::GetDefaultFontStruct(),
+			kRaisedFrame);
+  tb->SetTextJustify(36);
+  tb->SetMargins(0,0,0,0);
+  tb->SetWrapLength(-1);
+  tb->MoveResize(5,120,120,30);
+  frame->AddFrame(tb, new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
 
+  tb->Connect("Pressed()", "TStnVisManager", vm, "PrintColls(=\"tc_colls\")");
+//-----------------------------------------------------------------------------
+// "print time clusters" button
+//-----------------------------------------------------------------------------
+  tb = new TGTextButton(frame,"time_clusters",-1,
+			TGTextButton::GetDefaultGC()(),
+			TGTextButton::GetDefaultFontStruct(),
+			kRaisedFrame);
+  tb->SetTextJustify(36);
+  tb->SetMargins(0,0,0,0);
+  tb->SetWrapLength(-1);
+  tb->MoveResize(5,155,120,30);
+  frame->AddFrame(tb, new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
+
+  tb->Connect("Pressed()", "TStnVisManager", vm, "PrintColls(=\"time_clusters\")");
+//-----------------------------------------------------------------------------
+// "print combo_hits" button
+//-----------------------------------------------------------------------------
+  tb = new TGTextButton(frame,"combo_hits",-1,
+			TGTextButton::GetDefaultGC()(),
+			TGTextButton::GetDefaultFontStruct(),
+			kRaisedFrame);
+  tb->SetTextJustify(36);
+  tb->SetMargins(0,0,0,0);
+  tb->SetWrapLength(-1);
+  tb->MoveResize(5,190,120,30);
+  frame->AddFrame(tb, new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
+
+  tb->Connect("Pressed()", "TStnVisManager", vm, "PrintColls(=\"combo_hits\")");
+//-----------------------------------------------------------------------------
   // TGPictureButton *fPictureButton821 = new TGPictureButton(fVerticalFrame820,gClient->GetPicture("f1_s.xpm"),-1,TGPictureButton::GetDefaultGC()(),kRaisedFrame);
   // fPictureButton821->SetToolTipText("print_straw_hits");
   // fVerticalFrame820->AddFrame(fPictureButton821, new TGLayoutHints(kLHintsCenterX | kLHintsTop,5,5,5,0));

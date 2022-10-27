@@ -14,6 +14,7 @@
 #include "Stntuple/gui/TCrvVisNode.hh"
 #include "Stntuple/gui/TTrkVisNode.hh"
 #include "Stntuple/gui/TEvdHelixVisNode.hh"
+#include "Stntuple/gui/TEvdTimeClusterVisNode.hh"
 
 #include "Stntuple/gui/TMcTruthVisNode.hh"
 #include "Stntuple/gui/TCalView.hh"
@@ -256,19 +257,17 @@ void MuHitDisplay::InitVisManager() {
   TCalView*         cal_view;
   TCalVisNode*      cal_node[2];
 
-  cal_view = new TCalView(0);
+  cal_view    = new TCalView(0);
   cal_node[0] = new TCalVisNode("CalVisNode#0", &dc->disk(0), 0);
   cal_node[0]->SetListOfClusters(&_caloClusterColl);
   cal_node[0]->SetListOfCrystalHits(&_caloHitColl);
-  cal_node[0]->SetTimeClusterColl(&_timeClusterColl);
   cal_view->AddNode(cal_node[0]);
   vm->AddView(cal_view);
   
-  cal_view = new TCalView(1);
+  cal_view    = new TCalView(1);
   cal_node[1] = new TCalVisNode("CalVisNode#1", &dc->disk(1), 1);
   cal_node[1]->SetListOfClusters   (&_caloClusterColl);
   cal_node[1]->SetListOfCrystalHits(&_caloHitColl);
-  cal_node[1]->SetTimeClusterColl  (&_timeClusterColl);
   cal_view->AddNode(cal_node[1]);
   vm->AddView(cal_view);
 //-----------------------------------------------------------------------------
@@ -278,11 +277,10 @@ void MuHitDisplay::InitVisManager() {
   TTrkVisNode* tnode = new TTrkVisNode ("TrkVisNode", fTracker, NULL);
 
   tnode->SetSComboHitColl   (&_sComboHitColl   );
-  tnode->SetCComboHitColl   (&_cComboHitColl   );
+  tnode->SetChCollTag       (_comboHitCollTag  );
   //  tnode->SetStrawHitFlagColl(&fStrawHitFlagColl);
-  tnode->SetTimeClusterColl (&_timeClusterColl );
   tnode->SetKalRepPtrColl   (&_kalRepPtrColl   );
-  tnode->SetSdmcColl        (&_sdmcColl        );
+  tnode->SetSdmcCollTag     (_sdmcCollTag      );
   tnode->SetSimpColl        (&_simpColl        );
   tnode->SetSpmcColl        (&_spmcColl        );
   tnode->SetShColl          (&_shColl          );
@@ -300,7 +298,16 @@ void MuHitDisplay::InitVisManager() {
   hnode->SetSdmcCollTag     (_sdmcCollTag);
   hnode->SetShCollTag       (_strawHitCollTag );
 //-----------------------------------------------------------------------------
-// XY view : tracker + calorimeter
+// TimeClusterVisNode: one time collection 
+// to begin with, add timecluster node to only one view - TZ
+//-----------------------------------------------------------------------------
+  TEvdTimeClusterVisNode* tc_node = new TEvdTimeClusterVisNode ("TimeClusterVisNode", NULL);
+  tc_node->SetTcCollTag  (_timeClusterCollTag);
+  tc_node->SetChCollTag  (_comboHitCollTag   );
+  tc_node->SetSdmcCollTag(_sdmcCollTag       );
+//-----------------------------------------------------------------------------
+// nodes are defined, now come views
+// 1. XY view : tracker + calorimeter
 //-----------------------------------------------------------------------------
   TStnView* vxy = new TStnView(TStnVisManager::kXY,-1,"XYView","XY View");
   vxy->AddNode(tnode);
@@ -309,19 +316,20 @@ void MuHitDisplay::InitVisManager() {
   vxy->AddNode(cal_node[1]);
   vm->AddView(vxy);
 //-----------------------------------------------------------------------------
-// RZ view : tracker only, so far
+// 2. RZ view : tracker only, so far
 //-----------------------------------------------------------------------------
   TStnView* vrz = new TStnView(TStnVisManager::kRZ,-1,"RZView","RZ View");
   vrz->AddNode(tnode);
   vm->AddView(vrz);
 //-----------------------------------------------------------------------------
-// TZ view : TTrkNode only, so far
+// 3. TZ view : TrkNode + TimeClusterNode
 //-----------------------------------------------------------------------------
   TStnView* vtz = new TStnView(TStnVisManager::kTZ,-1,"TZView","TZ View");
   vtz->AddNode(tnode);
+  vtz->AddNode(tc_node);
   vm->AddView(vtz);
 //-----------------------------------------------------------------------------
-// VST view : TTrkNode only, so far
+// 4. VST view : TTrkNode only, so far
 //-----------------------------------------------------------------------------
   TStnView* vst = new TStnView(TStnVisManager::kVST,-1,"VSTView","VST View");
   vst->AddNode(tnode);

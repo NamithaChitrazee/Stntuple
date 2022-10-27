@@ -125,7 +125,7 @@ TEvdComboHit::TEvdComboHit(const mu2e::ComboHit*      Hit,
 // TZ view
 //-----------------------------------------------------------------------------
   fTZMarker.SetX(fPos.Z());
-  fTZMarker.SetY(Hit->time());
+  fTZMarker.SetY(Hit->correctedTime());
   fTZMarker.SetMarkerStyle(style);
   fTZMarker.SetMarkerSize (size );
   fTZMarker.SetMarkerColor(color);

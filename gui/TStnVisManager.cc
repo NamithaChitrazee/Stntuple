@@ -51,11 +51,11 @@ TStnVisManager::TStnVisManager(const char* Name, const char* Title): TVisManager
 					// by default, no timing constraints
   fTMin        = 0;
   fTMax        = 1.e5;
-  fTimeCluster = -1;
-  fEvent       = nullptr;
-  fBField      = 1.0;                   // in Tesla
+  fEvent               = nullptr;
+  fBField              = 1.0;                   // in Tesla
 
-  fDisplayHelices = 0;
+  fSelectedTimeCluster = nullptr;
+  fDisplayHelices      = 0;
 }
 
 //_____________________________________________________________________________
@@ -891,11 +891,6 @@ void TStnVisManager::SetStations(int IMin, int IMax) {
   fMaxStation = IMax;
 }
 
-//-----------------------------------------------------------------------------
-void TStnVisManager::SetTimeCluster(int I) {
-  fTimeCluster = I;
-}
-
 //_____________________________________________________________________________
 void TStnVisManager::HandleButtons() {
   // Handle different buttons.
@@ -1013,6 +1008,15 @@ void TStnVisManager::PrintColls(const char* Tag) {
 
   if      (tag == "sdmc_colls"   ) print_sdmc_colls   ();
   else if (tag == "kalseed_colls") print_kalseed_colls();
+  else if (tag == "tc_colls"     ) print_tc_colls();
+  else if (tag == "time_clusters") {
+    TVisNode* vn = FindNode("TimeClusterVisNode");
+    vn->Print();
+  }
+  else if (tag == "combo_hits") {
+    TVisNode* vn = FindNode("TrkVisNode");
+    vn->Print("combo_hits");
+  }
 
 }
 

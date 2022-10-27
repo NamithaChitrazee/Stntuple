@@ -31,6 +31,7 @@
 #include "Stntuple/gui/TEvdCalSection.hh"
 #include "Stntuple/gui/TEvdCluster.hh"
 #include "Stntuple/gui/TEvdCrystal.hh"
+#include "Stntuple/gui/TEvdTimeCluster.hh"
 #include "Stntuple/gui/TStnVisManager.hh"
 
 #include "Stntuple/geom/TDisk.hh"
@@ -43,6 +44,7 @@
 
 ClassImp(TCalVisNode)
 
+using namespace stntuple;
 //-----------------------------------------------------------------------------
 // nedges = 4: square crystal, 6: hex
 //-----------------------------------------------------------------------------
@@ -71,8 +73,6 @@ TCalVisNode::TCalVisNode(const char* Name, const mu2e::Disk* Disk, int SectionID
     evd_cr = new TEvdCrystal(cr,nedges,crystal_size,Disk);
     fListOfEvdCrystals->Add(evd_cr);
   }
-
-  fTimeCluster = NULL;
 }
 
 //_____________________________________________________________________________
@@ -227,44 +227,29 @@ void TCalVisNode::PaintXY(Option_t* Option) {
 //-----------------------------------------------------------------------------
   TEvdCluster* cl;
   TString      opt;
-  int          display_cluster;
+  //  int          display_cluster;
   double       time;
    
   TStnVisManager* vm = TStnVisManager::Instance();
 
-  int ipeak = vm->TimeCluster();
-
-  if (ipeak >= 0) {
-    if ((*fTimeClusterColl) != NULL) {
-      int ntp = (*fTimeClusterColl)->size();
-      if (ipeak < ntp) fTimeCluster = &(*fTimeClusterColl)->at(ipeak);
-      else             fTimeCluster = NULL;
-    }
+  double tmin(0), tmax(2000);
+  TEvdTimeCluster* tcl = vm->SelectedTimeCluster();
+  if (tcl) {
+    tmin = tcl->TMin();
+    tmax = tcl->TMax();
   }
 
   int ncl = fListOfEvdClusters->GetEntries();
   if (ncl > 0) {
     for (int i=0; i<ncl; i++) {
-      cl = EvdCluster(i);
-
-      double tmin(0), tmax(2000);
-      if (fTimeCluster) {
-	tmin = fTimeCluster->t0().t0() - 30;//FIXME!
-	tmax = fTimeCluster->t0().t0() + 20;//FIXME!
-      }
+      cl   = EvdCluster(i);
       time = cl->Cluster()->time();
-      display_cluster = 1;
-
-      if ((time < tmin) || (time > tmax)) display_cluster = 0;
-
-      if (display_cluster) {
+      if ((time < tmin) || (time > tmax)) continue;
 //-----------------------------------------------------------------------------
 // display only clusters with E > 5 MeV
 //-----------------------------------------------------------------------------
-	if (cl->Cluster()->energyDep() > fMinClusterEnergy) {
-	  cl->Paint(Option);
-	}
-      }
+      if (cl->Cluster()->energyDep() < fMinClusterEnergy) continue;
+      cl->Paint(Option);
     }
   }
 }

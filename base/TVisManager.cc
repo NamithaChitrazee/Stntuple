@@ -139,10 +139,6 @@ void TVisManager::SetStations(int IMin, int IMax) {
 }
 
 //-----------------------------------------------------------------------------
-void TVisManager::SetTimeCluster(int I) {
-}
-
-//-----------------------------------------------------------------------------
 void TVisManager::SetTimeWindow(float TMin, float TMax) {
 }
 
