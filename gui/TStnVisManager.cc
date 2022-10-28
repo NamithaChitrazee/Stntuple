@@ -272,7 +272,7 @@ Int_t TStnVisManager::OpenTrkXYView() {
   sprintf(name, "xy_view_%i", n);
   sprintf(title, "XY view number %i", n);
 
-  TStnFrame* win = new TStnFrame(name, title, this, TStnVisManager::kXY, 750+TStnFrame::fGroupFrameWidth, 750);
+  TStnFrame* win = new TStnFrame(name, title, this, TStnVisManager::kXY, 800+TStnFrame::fGroupFrameWidth, 800);
   TCanvas* c = win->GetCanvas();
   fListOfCanvases->Add(c);
 
@@ -313,7 +313,11 @@ Int_t TStnVisManager::OpenTrkXYView(TStnView* Mother, Axis_t x1, Axis_t y1, Axis
   xsize = x2-x1;
   ysize = (int) (xsize*abs((y2 - y1)/(x2 - x1)) + 20);
 
-  TStnFrame* win = new TStnFrame(name, title, this, TStnVisManager::kXY, xsize+TStnFrame::fGroupFrameWidth, ysize);
+  // TStnFrame* win = new TStnFrame(name, title, this, TStnVisManager::kXY, xsize+TStnFrame::fGroupFrameWidth, ysize);
+
+  xsize = (800./ysize)*xsize;
+  TStnFrame* win = new TStnFrame(name, title, this, TStnVisManager::kTZ, xsize+TStnFrame::fGroupFrameWidth, 800);
+
   TCanvas* c = win->GetCanvas();
   fListOfCanvases->Add(c);
 
@@ -348,6 +352,7 @@ Int_t TStnVisManager::OpenTrkRZView() {
   sprintf(title, "RZ view number %i", n);
 
   TStnFrame* win = new TStnFrame(name, title, this, TStnVisManager::kRZ, 1300+TStnFrame::fGroupFrameWidth, 500);
+
   TCanvas* c = win->GetCanvas();
   fListOfCanvases->Add(c);
 
@@ -430,7 +435,7 @@ int TStnVisManager::OpenTrkTZView() {
   sprintf(name,  "zt_view_%i", n);
   sprintf(title, "ZT view number %i", n);
 
-  TStnFrame* win = new TStnFrame(name, title, this, TStnVisManager::kXY, 1100+TStnFrame::fGroupFrameWidth, 760);
+  TStnFrame* win = new TStnFrame(name, title, this, TStnVisManager::kXY, 1100+TStnFrame::fGroupFrameWidth, 800);
   TCanvas* c = win->GetCanvas();
   fListOfCanvases->Add(c);
 
@@ -472,7 +477,10 @@ int TStnVisManager::OpenTrkTZView(TStnView* Mother, Axis_t x1, Axis_t y1, Axis_t
   xsize = x2-x1;
   ysize = (int) (xsize*abs((y2 - y1)/(x2 - x1)) + 20);
 
-  TStnFrame* win = new TStnFrame(name, title, this, TStnVisManager::kTZ, xsize+TStnFrame::fGroupFrameWidth, ysize);
+  // TStnFrame* win = new TStnFrame(name, title, this, TStnVisManager::kTZ, xsize+TStnFrame::fGroupFrameWidth, ysize);
+  xsize = (800./ysize)*xsize;
+  TStnFrame* win = new TStnFrame(name, title, this, TStnVisManager::kTZ, xsize+TStnFrame::fGroupFrameWidth, 800);
+
   TCanvas* c = win->GetCanvas();
   fListOfCanvases->Add(c);
 
@@ -859,6 +867,14 @@ int TStnVisManager::OpenVSTView(TStnView* Mother, Axis_t x1, Axis_t y1, Axis_t x
   c->Modified();
   c->Update();
   return 0;
+}
+
+//-----------------------------------------------------------------------------
+// make sure selections made for teh current event are not applied to 
+// the next event
+//-----------------------------------------------------------------------------
+void TStnVisManager::InitEvent() {
+  fSelectedTimeCluster = nullptr;
 }
 
 //-----------------------------------------------------------------------------

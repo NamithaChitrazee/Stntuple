@@ -190,6 +190,7 @@ public:
   virtual void  Quit         ()                         override;   //
   virtual int   EndRun       ()                         override;
 
+  void  InitEvent() override ; 
   void  UpdateViews();
 
 

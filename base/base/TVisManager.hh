@@ -116,6 +116,7 @@ public:
 //-----------------------------------------------------------------------------
 // GUI comands / drawing functions
 //-----------------------------------------------------------------------------
+  virtual void InitEvent   ();		// self-initialization, called from DisplayEvent
   virtual void DisplayEvent();
 
   virtual void DefaultRange();

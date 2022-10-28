@@ -143,12 +143,21 @@ void TVisManager::SetTimeWindow(float TMin, float TMax) {
 }
 
 //-----------------------------------------------------------------------------
+// to be overloaded, if needed, and there already is a need for that
+//-----------------------------------------------------------------------------
+void TVisManager::InitEvent() { 
+}
+
+//-----------------------------------------------------------------------------
 // redraw all open windows
 //-----------------------------------------------------------------------------
 void TVisManager::DisplayEvent() { 
 //-----------------------------------------------------------------------------
 // reinitialize graphics objects in the event
+// vis manager may need some specific initialization, add a virtual function for that
 //-----------------------------------------------------------------------------
+  InitEvent();
+
   if (fTitleNode) fTitleNode->InitEvent();
 
   int nn = fListOfNodes->GetEntries();
