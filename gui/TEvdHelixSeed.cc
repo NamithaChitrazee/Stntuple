@@ -27,16 +27,16 @@
 
 #include "art/Framework/Principal/Handle.h"
 
-#include "Offline/RecoDataProducts/inc/HelixSeed.hh"
-
 #include "BTrk/TrkBase/HelixParams.hh"
 #include "BTrk/TrkBase/HelixTraj.hh"
 
 #include "Offline/GeometryService/inc/GeometryService.hh"
 #include "Offline/GeometryService/inc/GeomHandle.hh"
-#include "Offline/BTrkData/inc/TrkStrawHit.hh"
 
 #include "Offline/TrackerGeom/inc/Tracker.hh"
+
+#include "Offline/RecoDataProducts/inc/TrkStrawHitSeed.hh"
+#include "Offline/RecoDataProducts/inc/HelixSeed.hh"
 
 #include "Stntuple/print/TAnaDump.hh"
 
@@ -72,7 +72,7 @@ TEvdHelixSeed::TEvdHelixSeed(): TObject() {
 
   // fEllipse->SetFillStyle(3001);		// make it transparent
     
-  fEllipse->SetLineColor(kBlue-7);
+  fEllipse->SetLineColor(kGreen+4);
 }
 
 //-----------------------------------------------------------------------------
@@ -133,7 +133,7 @@ void TEvdHelixSeed::PaintXY(Option_t* Option) {
 
   fEllipse->SetFillStyle(0);
   fEllipse->SetFillColor(0);
-  fEllipse->SetLineColor(2);
+  fEllipse->SetLineColor(kGreen+4);
   fEllipse->PaintEllipse(x0,y0,r,r,0,2*M_PI*180,0);
   //fEllipse->Paint();
 }
@@ -151,7 +151,7 @@ void TEvdHelixSeed::PaintRZ(Option_t* Option) {
 
   const mu2e::Tracker* tracker = handle.get();
 
-  const mu2e::Straw  *hstraw, *s, *straw[2];		// first straw
+  const mu2e::Straw  *s, *straw[2];		// first straw
   
   nplanes = tracker->nPlanes();
 //-----------------------------------------------------------------------------
@@ -159,14 +159,17 @@ void TEvdHelixSeed::PaintRZ(Option_t* Option) {
 //-----------------------------------------------------------------------------
   const mu2e::RobustHelix* hel = &fHelixSeed->helix();
 
-  const mu2e::TrkStrawHit  *hit;
+  const mu2e::TrkStrawHitSeed  *hit;
 
   int nhits = NHits();
   for (int i=0; i<nhits; i++) {
-    hit = Hit(i)->TrkStrawHit();
+    hit    = Hit(i)->TrkStrawHitSeed();
     rdrift = hit->driftRadius();
 
-    hstraw = &hit->straw();
+    mu2e::StrawId sid = hit->strawId();
+
+    const mu2e::Straw* hstraw = &tracker->straw(sid);
+
     zw     = hstraw->getMidPoint().z();
     rw     = hstraw->getMidPoint().perp();
 
@@ -176,9 +179,10 @@ void TEvdHelixSeed::PaintRZ(Option_t* Option) {
     fEllipse->SetR2(rdrift);
     fEllipse->SetFillStyle(3003);
 
-    if (hit->isActive()) fEllipse->SetFillColor(kRed);
-    else                 fEllipse->SetFillColor(kBlue+3);
+    // if (hit->isActive()) fEllipse->SetFillColor(kRed);
+    // else                 fEllipse->SetFillColor(kBlue+3);
 
+    fEllipse->SetFillColor(kGreen+4);
     fEllipse->PaintEllipse(zw,rw,rdrift,0,0,2*M_PI*180,0);
   }
 //-----------------------------------------------------------------------------

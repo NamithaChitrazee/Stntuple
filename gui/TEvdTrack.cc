@@ -1,6 +1,3 @@
-
-
-
 ///////////////////////////////////////////////////////////////////////////////
 // May 04 2013 P.Murat
 // 
@@ -29,14 +26,17 @@
 #include "TObjArray.h"
 
 
-#include "BTrk/KalmanTrack/KalRep.hh"
+// #include "BTrk/KalmanTrack/KalRep.hh"
+// #include "BTrk/KalmanTrack/KalRep.hh"
 
 #include "art/Framework/Principal/Handle.h"
 
-#include "BTrk/KalmanTrack/KalRep.hh"
 
 #include "BTrk/TrkBase/HelixParams.hh"
 #include "BTrk/TrkBase/HelixTraj.hh"
+
+#include "Offline/RecoDataProducts/inc/KalSegment.hh"
+#include "Offline/RecoDataProducts/inc/KalSeed.hh"
 
 #include "Offline/GeometryService/inc/GeometryService.hh"
 #include "Offline/GeometryService/inc/GeomHandle.hh"
@@ -57,18 +57,20 @@ namespace stntuple {
 
 //-----------------------------------------------------------------------------
 TEvdTrack::TEvdTrack(): TObject() {
-  fListOfHits = NULL;
-  fEllipse = new TEllipse();
+  fKSeed      = nullptr;
+  fListOfHits = nullptr;
+  fEllipse    = nullptr;
 }
 
 //-----------------------------------------------------------------------------
 // pointer to track is just cached
 //-----------------------------------------------------------------------------
-TEvdTrack::TEvdTrack(int Number, const KalRep* Krep): TObject() {
-  fNumber = Number;
-  fKrep   = Krep;
+  TEvdTrack::TEvdTrack(int Number, const mu2e::KalSeed* KSeed): TObject() {
+  fNumber  = Number;
+  fKSeed   = KSeed;
 
   fListOfHits = new TObjArray();
+  fListOfHits->SetOwner(kTRUE);
 
   fEllipse = new TEllipse();
 
@@ -82,7 +84,6 @@ TEvdTrack::~TEvdTrack() {
   delete fEllipse;
 
   if (fListOfHits) {
-    fListOfHits->Delete();
     delete fListOfHits;
   }
 }
@@ -110,21 +111,24 @@ void TEvdTrack::Paint(Option_t* Option) {
 //-----------------------------------------------------------------------------
 // to display the reconstructed track in XY, use its parameters in the middle 
 // of the tracker, at s=0
+// display first segment 
 //-----------------------------------------------------------------------------
 void TEvdTrack::PaintXY(Option_t* Option) {
 
-  double d0, om, r, phi0, x0, y0;
+  const mu2e::KalSegment* kseg = &fKSeed->segments().at(0);
 
-  HelixParams hel = fKrep->helix(0);
+  KinKal::LoopHelix helx  = kseg->loopHelix();
 
-  d0   = hel.d0();
-  om   = hel.omega();
-  r    = fabs(1./om);
-  phi0 = hel.phi0();
-    
-  x0   =  -(1/om+d0)*sin(phi0);
-  y0   =   (1/om+d0)*cos(phi0);
+  //  KinKal::CentralHelix helx  = kseg->centralHelix();
 
+  double r    = helx.rad();
+  double x0   = helx.cx();
+  double y0   = helx.cy();
+
+  // if (helx.charge() < 0) {
+  //   x0 = -helx.cy();
+  //   y0 = -helx.cx();
+  // }
   // printf("[MuHitDispla::printHelixParams] d0 = %5.3f r = %5.3f phi0 = %5.3f x0 = %5.3f y0 = %5.3f\n",
   // 	 d0, r, phi0, x0, y0);
    
@@ -140,126 +144,157 @@ void TEvdTrack::PaintXY(Option_t* Option) {
   fEllipse->SetFillColor(0);
   fEllipse->SetLineColor(2);
   fEllipse->PaintEllipse(x0,y0,r,r,0,2*M_PI*180,0);
-  //fEllipse->Paint();
 }
 
 //-----------------------------------------------------------------------------
 void TEvdTrack::PaintRZ(Option_t* Option) {
 
-  double            flen, zwire[2], ds, rdrift, zt[4], rt[4], zw, rw;
-  CLHEP::Hep3Vector tdir;
-  HepPoint          tpos;
-  TPolyLine         pline;
-  int               nplanes, /*npanels,*/ nl;
-
-  mu2e::GeomHandle<mu2e::Tracker> handle;
-
-  const mu2e::Tracker* tracker = handle.get();
-
-  const mu2e::Straw  *hstraw, *s, *straw[2];		// first straw
-  
-  nplanes = tracker->nPlanes();
-//-----------------------------------------------------------------------------
-// first display track hits - active and not 
-//-----------------------------------------------------------------------------
-  const mu2e::TrkStrawHit  *hit;
-  //   const TrkHitVector*       hits = &fKrep->hitVector();
-
-  int nhits = NHits();
-  for (int i=0; i<nhits; i++) {
-    hit = Hit(i)->TrkStrawHit();
-    rdrift = hit->driftRadius();
-
-    hstraw = &hit->straw();
-    zw     = hstraw->getMidPoint().z();
-    rw     = hstraw->getMidPoint().perp();
-
-    fEllipse->SetX1(zw);
-    fEllipse->SetY1(rw);
-    fEllipse->SetR1(0);
-    fEllipse->SetR2(rdrift);
-    fEllipse->SetFillStyle(3003);
-
-    if (hit->isActive()) fEllipse->SetFillColor(kRed);
-    else                 fEllipse->SetFillColor(kBlue+3);
-
-    fEllipse->PaintEllipse(zw,rw,rdrift,0,0,2*M_PI*180,0);
-  }
-//-----------------------------------------------------------------------------
-// now draw the trajectory in Z-R(local) space - device is a station
-//-----------------------------------------------------------------------------
-  HelixTraj trkHel(fKrep->helix(0).params(),fKrep->helix(0).covariance());
-
-  for (int iplane=0; iplane<nplanes; iplane++) {
-    const mu2e::Plane* plane = &tracker->getPlane(iplane);
-//-----------------------------------------------------------------------------
-// a plane is made of 2 'faces' or 6 panels, panels 0 and 1 on different faces
-//-----------------------------------------------------------------------------
-//    npanels = plane->nPanels();
-//-----------------------------------------------------------------------------
-// 3 panels in the same plane have the same Z and do not overlap - 
-// no need to duplicate; panels 0 and 1 are at different Z
-//-----------------------------------------------------------------------------
-    for (int iface=0; iface<2; iface++) {
-      const mu2e::Panel* panel = &plane->getPanel(iface);
-      nl       = panel->nLayers();
-					// deal with the compiler warnings
-      zwire[0] = -1.e6;
-      zwire[1] = -1.e6;
-
-      for (int il=0; il<nl; il++) {
-//-----------------------------------------------------------------------------
-// assume all wires in a layer have the same Z, extrapolate track to the layer
-//-----------------------------------------------------------------------------
-	straw[il] = &panel->getStraw(il);
-	zwire[il] = straw[il]->getMidPoint().z();
-      }
-					// order locally in Z
-      if (zwire[0] > zwire[1]) {
-	zt[1] = zwire[1];
-	zt[2] = zwire[0];
-	//	flip  = 1.;
-      }
-      else {
-	zt[1] = zwire[0];
-	zt[2] = zwire[1];
-	//	flip  = -1.;
-      }
-					// z-step between the layers, want two more points
-      zt[0] = zt[1]-3.;
-      zt[3] = zt[2]+3.;
-
-      const CLHEP::Hep3Vector* wd;
-      double r;
-      
-      for (int ipoint=0; ipoint<4; ipoint++) {
-//-----------------------------------------------------------------------------
-// estimate flen using helix
-//-----------------------------------------------------------------------------
-	flen   = trkHel.zFlight(zt[ipoint]);
-	fKrep->traj().getInfo(flen,tpos,tdir);
-//-----------------------------------------------------------------------------
-// try to extrapolate helix to a given Z a bit more accurately 
-//-----------------------------------------------------------------------------
-	ds     = (zt[ipoint]-tpos.z())/tdir.z();
-	fKrep->traj().getInfo(flen+ds,tpos,tdir);
-//-----------------------------------------------------------------------------
-// for each face, loop over 3 panels in it
-//-----------------------------------------------------------------------------
-	rt[ipoint] = -1.e6;
-	for (int ipp=0; ipp<3; ipp++) {
-	  const mu2e::Panel* pp = &plane->getPanel(2*ipp+iface);
-	  s  = &pp->getStraw(0);
-	  wd = &s->getDirection();
-	  r  = (tpos.x()*wd->y()-tpos.y()*wd->x()); // *flip;
-	  if (r > rt[ipoint]) rt[ipoint] = r;
-	}
-      }
-      pline.SetLineWidth(2);
-      pline.PaintPolyLine(4,zt,rt);
-    }
-  }
-
+////   double            flen, zwire[2], ds, rdrift, zt[4], rt[4], zw, rw;
+////   CLHEP::Hep3Vector tdir;
+////   HepPoint          tpos;
+////   TPolyLine         pline;
+////   int               nplanes, /*npanels,*/ nl;
+//// 
+////   mu2e::GeomHandle<mu2e::Tracker> handle;
+//// 
+////   const mu2e::Tracker* tracker = handle.get();
+//// 
+////   const mu2e::Straw  *hstraw, *s, *straw[2];		// first straw
+////   
+////   nplanes = tracker->nPlanes();
+//// //-----------------------------------------------------------------------------
+//// // first display track hits - active and not 
+//// //-----------------------------------------------------------------------------
+////   const mu2e::TrkStrawHit  *hit;
+////   //   const TrkHitVector*       hits = &fKrep->hitVector();
+//// 
+////   int nhits = NHits();
+////   for (int i=0; i<nhits; i++) {
+////     hit = Hit(i)->TrkStrawHit();
+////     rdrift = hit->driftRadius();
+//// 
+////     hstraw = &hit->straw();
+////     zw     = hstraw->getMidPoint().z();
+////     rw     = hstraw->getMidPoint().perp();
+//// 
+////     fEllipse->SetX1(zw);
+////     fEllipse->SetY1(rw);
+////     fEllipse->SetR1(0);
+////     fEllipse->SetR2(rdrift);
+////     fEllipse->SetFillStyle(3003);
+//// 
+////     if (hit->isActive()) fEllipse->SetFillColor(kRed);
+////     else                 fEllipse->SetFillColor(kBlue+3);
+//// 
+////     fEllipse->PaintEllipse(zw,rw,rdrift,0,0,2*M_PI*180,0);
+////   }
+//// 
+////   for (int iplane=0; iplane<nplanes; iplane++) {
+////     const mu2e::Plane* plane = &tracker->getPlane(iplane);
+//// //-----------------------------------------------------------------------------
+//// // a plane is made of 2 'faces' or 6 panels, panels 0 and 1 on different faces
+//// //-----------------------------------------------------------------------------
+//// //    npanels = plane->nPanels();
+//// //-----------------------------------------------------------------------------
+//// // 3 panels in the same plane have the same Z and do not overlap - 
+//// // no need to duplicate; panels 0 and 1 are at different Z
+//// //-----------------------------------------------------------------------------
+////     for (int iface=0; iface<2; iface++) {
+////       const mu2e::Panel* panel = &plane->getPanel(iface);
+////       nl       = panel->nLayers();
+//// 					// deal with the compiler warnings
+////       zwire[0] = -1.e6;
+////       zwire[1] = -1.e6;
+//// 
+////       for (int il=0; il<nl; il++) {
+//// //-----------------------------------------------------------------------------
+//// // assume all wires in a layer have the same Z, extrapolate track to the layer
+//// //-----------------------------------------------------------------------------
+//// 	straw[il] = &panel->getStraw(il);
+//// 	zwire[il] = straw[il]->getMidPoint().z();
+////       }
+//// 					// order locally in Z
+////       if (zwire[0] > zwire[1]) {
+//// 	zt[1] = zwire[1];
+//// 	zt[2] = zwire[0];
+//// 	//	flip  = 1.;
+////       }
+////       else {
+//// 	zt[1] = zwire[0];
+//// 	zt[2] = zwire[1];
+//// 	//	flip  = -1.;
+////       }
+//// 					// z-step between the layers, want two more points
+////       zt[0] = zt[1]-3.;
+////       zt[3] = zt[2]+3.;
+//// 
+////       const CLHEP::Hep3Vector* wd;
+////       double r;
+////       
+//// //-----------------------------------------------------------------------------
+//// // pick the right track segment to display
+//// //-----------------------------------------------------------------------------
+////       // HelixTraj trkHel(fKrep->helix(0).params(),fKrep->helix(0).covariance());
+//// 
+//// //-----------------------------------------------------------------------------
+//// // find segments corresponding to entry and exit points
+//// //-----------------------------------------------------------------------------
+////     const mu2e::KalSegment *kseg(nullptr), *kseg_exit(nullptr);
+//// 
+////     double min_ds1(1.e6), min_ds2(1.e6);
+//// 
+////     for(auto const& ks : fKSeed->segments() ) {
+//// 
+////       KinKal::CentralHelix helx  = ks.centralHelix();
+////       double z0 = helx.z0();
+////       
+////       double smin = ks.timeToFlt(ks.tmin());
+////       double smax = ks.timeToFlt(ks.tmax());
+//// 
+////       double ds1 = fabs(sent-(smin+smax)/2);
+////       if (ds1 < min_ds1) {
+//// 	kseg    = &ks;
+//// 	min_ds1 = ds1;
+////       }
+//// 
+////       double ds2 = fabs(sexit-(smin+smax)/2);
+////       if (ds2 < min_ds2) {
+//// 	kseg_exit = &ks;
+//// 	min_ds2   = ds2;
+////       }
+//// 
+//// 
+//// 
+//// 
+//// 
+////       for (int ipoint=0; ipoint<4; ipoint++) {
+//// //-----------------------------------------------------------------------------
+//// // estimate flen using helix
+//// //-----------------------------------------------------------------------------
+//// 	flen   = trkHel.zFlight(zt[ipoint]);
+//// 	fKrep->traj().getInfo(flen,tpos,tdir);
+//// //-----------------------------------------------------------------------------
+//// // try to extrapolate helix to a given Z a bit more accurately 
+//// //-----------------------------------------------------------------------------
+//// 	ds     = (zt[ipoint]-tpos.z())/tdir.z();
+//// 	fKrep->traj().getInfo(flen+ds,tpos,tdir);
+//// //-----------------------------------------------------------------------------
+//// // for each face, loop over 3 panels in it
+//// //-----------------------------------------------------------------------------
+//// 	rt[ipoint] = -1.e6;
+//// 	for (int ipp=0; ipp<3; ipp++) {
+//// 	  const mu2e::Panel* pp = &plane->getPanel(2*ipp+iface);
+//// 	  s  = &pp->getStraw(0);
+//// 	  wd = &s->getDirection();
+//// 	  r  = (tpos.x()*wd->y()-tpos.y()*wd->x()); // *flip;
+//// 	  if (r > rt[ipoint]) rt[ipoint] = r;
+//// 	}
+////       }
+////       pline.SetLineWidth(2);
+////       pline.PaintPolyLine(4,zt,rt);
+////     }
+////   }
+//// 
 }
 
 //-----------------------------------------------------------------------------
@@ -274,16 +309,20 @@ Int_t TEvdTrack::DistancetoPrimitive(Int_t px, Int_t py) {
 //_____________________________________________________________________________
 Int_t TEvdTrack::DistancetoPrimitiveXY(Int_t px, Int_t py) {
 
-  Int_t dist = 9999;
+  int dist(9999);
 
   static TVector3 global;
-//   static TVector3 local;
-
-//   Double_t    dx1, dx2, dy1, dy2, dx_min, dy_min, dr;
 
   global.SetXYZ(gPad->AbsPixeltoX(px),gPad->AbsPixeltoY(py),0);
 
-  return dist;
+  double dx = global.X()-fEllipse->GetX1();
+  double dy = global.Y()-fEllipse->GetY1();
+
+  double dr = sqrt(dx*dx+dy*dy)-fEllipse->GetR1();
+
+  dist = gPad->XtoAbsPixel(global.x()+dr)-px;
+
+  return abs(dist);
 }
 
 //_____________________________________________________________________________
@@ -306,26 +345,11 @@ void TEvdTrack::Clear(Option_t* Opt) {
 //-----------------------------------------------------------------------------
 void TEvdTrack::Print(Option_t* Opt) const {
 
-//   TObjHandle*                  h;
-//   const mu2e::CaloCrystalHit*  hit;
+  TStnVisManager* vm = TStnVisManager::Instance();
 
-//   printf (" X0 = %10.3f Y0 = %10.3f  E = %10.3f  njits = %5i\n",
-// 	  X0(),Y0(),fEnergy,fNHits);
+  TVisNode* vn = vm->FindNode("TrkVisNode");
 
-//   printf("----------------------------------------------------------------\n");
-//   printf("CrystalID      Time   Energy    EnergyTot  NRoids               \n");
-//   printf("----------------------------------------------------------------\n");
-//   for (int i=0; i<fNHits; i++) {
-
-//     h   = (TObjHandle*) fListOfHits->At(i);
-//     hit = (const mu2e::CaloCrystalHit*) h->Object();
-
-//     printf("%7i  %10.3f %10.3f %10.3f %5i\n",
-// 	   hit->id(),
-// 	   hit->time(),
-// 	   hit->energyDep(),
-// 	   hit->energyDepTotal(),
-// 	   hit->numberOfROIdsUsed());
-//   }
+  vn->NodePrint(fKSeed,"KalSeed");
 }
+
 }

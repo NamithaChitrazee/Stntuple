@@ -25,12 +25,12 @@ def local_build():
     skip_list        = []
     libs             = ['Stntuple_base', 
                         'Stntuple_geom',
-                            'mu2e_CalPatRec',
+                        'mu2e_CalPatRec',
                         'mu2e_CaloCluster',
                         'mu2e_TrkDiag',
                         'mu2e_TrkReco',
                         
-                            'mu2e_CalorimeterGeom',
+                        'mu2e_CalorimeterGeom',
                         'mu2e_GeometryService',
                         'mu2e_SeedService_SeedService_service',
                         'mu2e_GlobalConstantsService',
@@ -40,7 +40,7 @@ def local_build():
                         'mu2e_Mu2eUtilities',
                         'mu2e_GeneralUtilities',
                         
-                            'mu2e_MCDataProducts',
+                        'mu2e_MCDataProducts',
                         'mu2e_RecoDataProducts',
                         'mu2e_DataProducts',
                         'mu2e_CaloMC',
@@ -50,9 +50,9 @@ def local_build():
 #                            'HepPDT',
 #                        'HepPID',
                         
-                            babarlibs,
+                        babarlibs,
                         
-                            'art_Framework_Core',
+                        'art_Framework_Core',
                         'art_Framework_Principal',
                         'art_Framework_Services_Registry',
                         'art_root_io_tfile_support',
@@ -63,12 +63,14 @@ def local_build():
                         
                             rootlibs, 
 
-                            'fhiclcpp',
+                        'fhiclcpp',
                         'MF_MessageLogger.so',
                         'hep_concurrency',
                         'canvas',
                         'cetlib',
                         'cetlib_except',
+                        'KinKal_Trajectory',
+                        'KinKal_General',
                         'xerces-c',
                         'boost_filesystem',
                         'boost_system'

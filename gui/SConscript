@@ -58,6 +58,8 @@ def local_build():
                          'canvas',
                          'cetlib',
                          'cetlib_except',
+                         'KinKal_Trajectory',
+                         'KinKal_General',
                          'xerces-c',
                          rootlibs ,
                          'MF_MessageLogger',

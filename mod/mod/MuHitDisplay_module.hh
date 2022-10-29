@@ -124,34 +124,26 @@ private:
   bool				_showCRVOnly;
   bool				_showTracks;
 
-  fhicl::ParameterSet          _vmConfig;
+  fhicl::ParameterSet           _vmConfig;
 //-----------------------------------------------------------------------------
 // end of input parameters
 // Options to control the display
 // hit flag bits which should be ON and OFF
 //-----------------------------------------------------------------------------
-  TApplication*                         fApplication;
+  TApplication*                               fApplication;
 
-  const mu2e::GenParticleCollection*    _genpColl;        // 
-
-  const mu2e::ComboHitCollection*             _sComboHitColl;   // 
-  const mu2e::ComboHitCollection*             _cComboHitColl;   // 
+  const mu2e::GenParticleCollection*          _genpColl;        // 
 
   const mu2e::StrawDigiCollection*            _sdColl;   //
   const mu2e::StrawDigiMCCollection*          _sdmcColl; //
   const mu2e::StrawDigiADCWaveformCollection* _swColl;   //
-  const mu2e::StrawHitCollection*             _shColl;   //
   const mu2e::StrawHitFlagCollection*         _shfColl;  //
   
   const mu2e::CaloHitCollection*              _caloHitColl;      //
   const mu2e::CaloClusterCollection*          _caloClusterColl;  //
 
-  const mu2e::HelixSeedCollection*            _hsColl;
-  
   const mu2e::StepPointMCCollection*          _spmcColl;         // on virtual detectors
   const mu2e::SimParticleCollection*          _simpColl;         //
-
-  const mu2e::TimeClusterCollection*          _timeClusterColl;  //
 
   mu2e::CrvRecoPulseCollection*		      fCrvPulseColl_Right;
   mu2e::CrvRecoPulseCollection*		      fCrvPulseColl_Left;
@@ -160,11 +152,9 @@ private:
   mu2e::CrvRecoPulseCollection*		      fCrvPulseColl_Dwnstrm;
   mu2e::CrvRecoPulseCollection*		      fCrvPulseColl_Upstrm;
   
-  const mu2e::KalRepPtrCollection*            _kalRepPtrColl;
-
   std::unique_ptr<McUtilsToolBase>            _mcUtils;
 //-----------------------------------------------------------------------------
-// need to detect teh first call to initialize fVisManager
+// need to detect the first call to initialize fVisManager
 //-----------------------------------------------------------------------------
   int                                         _firstCall;    
   TStnVisManager*                             fVisManager;
@@ -188,18 +178,12 @@ public:
   int      getData      (const art::Event* Evt);
   int      getCRVSection(int   shieldNumber   );
 
-  const mu2e::ComboHitCollection*               GetCComboHitColl  () { return _cComboHitColl  ; }
-  const mu2e::ComboHitCollection*               GetSComboColl     () { return _sComboHitColl  ; }
   const mu2e::GenParticleCollection*            GetGenppColl      () { return _genpColl       ; }
-  const mu2e::KalRepPtrCollection*              GetKalRepPtrColl  () { return _kalRepPtrColl  ; }
   const mu2e::SimParticleCollection*            GetSimpColl       () { return _simpColl       ; }
-  const mu2e::HelixSeedCollection*              GetHelSeedColl    () { return _hsColl         ; }
   const mu2e::StepPointMCCollection*            GetSpmcColl       () { return _spmcColl       ; }
   const mu2e::StrawDigiCollection*              GetSdColl         () { return _sdColl         ; }
   const mu2e::StrawDigiADCWaveformCollection*   GetSwColl         () { return _swColl         ; }
-  const mu2e::StrawHitCollection*               GetShColl         () { return _shColl         ; }
   const mu2e::StrawDigiMCCollection*            GetSdmcColl       () { return _sdmcColl       ; }
-  const mu2e::TimeClusterCollection*            GetTimeClusterColl() { return _timeClusterColl; }
 
   TSimpBlock*                                   GetSimpBlock      () { return fSimpBlock      ; }
 

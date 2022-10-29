@@ -44,6 +44,7 @@ def stntuple_gen_rootcint(source, target, env, for_signature):
     if (os.getenv('MUSE_BACKING') and (os.getenv('MUSE_BACKING') != '')) : 
         includes = includes + ' -I'+os.environ['MUSE_BACKING' ];
 
+    includes = includes + ' -I'+os.environ['KINKAL_INC'  ];
     includes = includes + ' -I'+os.environ['ART_INC'     ];
     includes = includes + ' -I'+os.environ['ART_ROOT_IO_INC'];
     includes = includes + ' -I'+os.environ['BTRK_INC'    ];

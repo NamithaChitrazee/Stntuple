@@ -215,12 +215,6 @@ int parse_job_parameters(TString& Parameters, StnAnaGlobals_t& Glob) {
   g.GoodRunList.ToUpper();
   printf("  GOOD RUN LIST   : \"%s\" with run range %i-%i\n"
 	 ,g.GoodRunList.Data(),g.MinRun,g.MaxRun);
-//-----------------------------------------------------------------------------
-// Steve's "newcuts" flag
-//-----------------------------------------------------------------------------
-  loc = Parameters.Index("/newcuts");
-  if (loc > 0) g.IDMode = 2;   // use the new cuts
-  else         g.IDMode = 1;   // use the old cuts
 
   return 0;
 }

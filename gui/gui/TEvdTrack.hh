@@ -11,7 +11,9 @@
 #include "TArc.h"
 #include "TEllipse.h"
 
-class KalRep;
+namespace mu2e {
+  class KalSeed;
+}
 
 namespace stntuple {
 
@@ -22,19 +24,19 @@ class TEvdTrack: public TObject {
 public:
   
 protected:
-  int                fNumber;
-  const KalRep*      fKrep;
+  int                   fNumber;
+  const mu2e::KalSeed*  fKSeed;
 
-  TObjArray*         fListOfHits;
+  TObjArray*            fListOfHits;
 
-  TEllipse*          fEllipse;
+  TEllipse*             fEllipse;
 public:
 //-----------------------------------------------------------------------------
 // constructors and destructor
 //-----------------------------------------------------------------------------
   TEvdTrack();
 
-  TEvdTrack(int Number, const KalRep* Krep);
+  TEvdTrack(int Number, const mu2e::KalSeed* KSeed);
 
   virtual ~TEvdTrack();
 //-----------------------------------------------------------------------------

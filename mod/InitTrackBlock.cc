@@ -999,7 +999,7 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 	// vtch->fChi2Time     = -9999.;		// track-cluster match chi&^2 (time)
 	vtch->fPath         = tch->hitLen();			// track path in the disk
 	vtch->fIntDepth     = -9999.;                     // ** added in V6 :assumed interaction depth
-	vtch->fDr           = tch->clusterAxisDOCA(); // tch->poca().doca();         // distance of closest approach
+	vtch->fDr           = tch->_udoca; // clusterAxisDOCA(); // tch->poca().doca();         // distance of closest approach
 	// vtch->fSInt         = -9999.;                 // ** added in V10: interaction length, calculated
 	vtch->fCluster      = cl;
 	//    vtch->fExtrk        = NULL;

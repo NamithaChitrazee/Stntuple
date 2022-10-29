@@ -60,7 +60,7 @@ StntupleMakerTemplate : { module_type:StntupleMaker
     makeTimeClusters     : 0
     makeTrigger          : 1
     
-    KalDiag                      : { @table::KalDiagDirect    }
+#    KalDiag                      : { @table::KalDiagDirect    }
     DoubletAmbigResolver         : { @table::TrkReco.DoubletAmbigResolver }
 
     caloCrystalHitsMaker         : "CaloHitMaker"
@@ -192,7 +192,7 @@ MuHitDisplay: { module_type:MuHitDisplay                 # class name;
 #------------------------------------------------------------------------------
 # kalDiag and Doublet Resolver
 #------------------------------------------------------------------------------
-    KalDiag                 : { @table::KalDiagDirect    }
+#    KalDiag                 : { @table::KalDiagDirect    }
     DoubletAmbigResolver    : { @table::TrkReco.DoubletAmbigResolver }
 #------------------------------------------------------------------------------
 # configuration of the underlying visualization manager 

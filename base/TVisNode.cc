@@ -16,3 +16,7 @@ TVisNode::TVisNode(const char* name):
 TVisNode::~TVisNode() {
 }
 
+//_____________________________________________________________________________
+void TVisNode::NodePrint(const void* Object, const char* ClassName) {
+}
+

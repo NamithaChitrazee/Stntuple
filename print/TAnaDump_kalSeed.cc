@@ -24,11 +24,11 @@ void TAnaDump::printKalSeed(const mu2e::KalSeed* KalSeed           ,
   
   if ((opt == "") || (opt == "banner")) {
     printf("------------------------------------------------------------------------------");
-    printf("---------------------------------------------------------------------------\n");
-    printf("  TrkID       Address    N      P      pT       T0     T0err    fmin      fmax");
-    printf("       D0       Z0    Phi0   TanDip    radius      Ecl      chi2   FitCon  \n");
+    printf("----------------------------------------------------------------------------\n");
+    printf("  TrkID       Address    N  Q       P      pT       T0     T0err    fmin      fmax");
+    printf("       D0       Z0     Phi0   TanDip    radius      Ecl      chi2   FitCon  \n");
     printf("------------------------------------------------------------------------------");
-    printf("---------------------------------------------------------------------------\n");
+    printf("----------------------------------------------------------------------------\n");
   }
 
   if ((opt == "") || (opt.Index("data") >= 0)) {
@@ -47,21 +47,22 @@ void TAnaDump::printKalSeed(const mu2e::KalSeed* KalSeed           ,
       double mom    = kalSeg.mom();
       double pt     = mom*cos(atan(tandip));
       double radius = pt/mm2MeV;
+      double q      = kalSeg.centralHelix().charge();
 
 
       const mu2e::CaloCluster*cluster = KalSeed->caloCluster().get();
       double clusterEnergy(-1);
       if (cluster != 0) clusterEnergy = cluster->energyDep();
-      printf("%5i %16p %3i %8.3f %8.5f %7.3f %6.3f %9.3f %9.3f",
+      printf("%5i %16p %3i %2.0f %8.3f %8.5f %7.3f %6.3f %9.3f %9.3f",
 	     -1,
 	     KalSeed,
-	     nhits,
+	     nhits,q,
 	     mom, pt, t0, t0err, kalSeg.fmin(), kalSeg.fmax() );
 
       float chi2    = KalSeed->chisquared()/double(nhits - 5.);
       float fitCons = KalSeed->fitConsistency();
       
-      printf(" %8.3f %8.3f %6.3f %8.4f %10.4f %8.3f %8.3f %10.3e\n",
+      printf(" %8.3f %9.3f %6.3f %8.4f %10.4f %8.3f %8.3f %10.3e\n",
 	     d0,z0,phi0,tandip,radius,clusterEnergy,chi2,fitCons);
     }
   }

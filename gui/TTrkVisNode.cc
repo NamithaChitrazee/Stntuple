@@ -22,8 +22,15 @@
 
 #include "Offline/GeometryService/inc/GeometryService.hh"
 #include "Offline/GeometryService/inc/GeomHandle.hh"
+
 #include "Offline/ConditionsService/inc/ConditionsHandle.hh"
 #include "Offline/TrackerConditions/inc/StrawResponse.hh"
+
+#include "Offline/DataProducts/inc/StrawId.hh"
+
+#include "Offline/RecoDataProducts/inc/StrawHit.hh"
+#include "Offline/RecoDataProducts/inc/KalSeed.hh"
+#include "Offline/RecoDataProducts/inc/KalSegment.hh"
 
 #include "Stntuple/gui/TEvdTimeCluster.hh"
 #include "Stntuple/gui/TEvdComboHit.hh"
@@ -41,9 +48,7 @@
 
 #include "Stntuple/obj/TSimpBlock.hh"
 
-#include "Offline/RecoDataProducts/inc/StrawHit.hh"
 
-#include "Offline/DataProducts/inc/StrawId.hh"
 // #include "DataProducts/inc/XYZVec.hh"
 
 #include "Stntuple/print/TAnaDump.hh"
@@ -72,10 +77,10 @@ TTrkVisNode::TTrkVisNode(const char* name, const mu2e::Tracker* Tracker, TStnTra
   fListOfSimParticles = new TObjArray();
 
   fChColl             = nullptr;
-  fSComboHitColl      = nullptr;
+  fSchColl            = nullptr;
   fShColl             = nullptr;
   fSdmcColl           = nullptr;
-  fKalRepPtrColl      = nullptr;
+  fKsColl             = nullptr;
   fSimpColl           = nullptr;
   fSpmcColl           = nullptr;
 					// owned externally (by MuHitDisplay)
@@ -160,6 +165,26 @@ int TTrkVisNode::InitEvent() {
     fChColl = nullptr;
   }
 
+  art::Handle<mu2e::ComboHitCollection> schcH;
+  event->getByLabel(art::InputTag(fShCollTag), schcH);
+  if (schcH.isValid()) fSchColl = schcH.product();
+  else {
+    mf::LogWarning("TEvdTimeClusterVisNode::InitEvent") << " WARNING:" << __LINE__ 
+							<< " : mu2e::ComboHitCollection " 
+							<< fShCollTag << " not found";
+    fSchColl = nullptr;
+  }
+
+  art::Handle<mu2e::StrawHitCollection> shcH;
+  event->getByLabel(art::InputTag(fShCollTag), shcH);
+  if (shcH.isValid()) fShColl = shcH.product();
+  else {
+    mf::LogWarning("TEvdTimeClusterVisNode::InitEvent") << " WARNING:" << __LINE__ 
+							<< " : mu2e::StrawHitCollection " 
+							<< fShCollTag << " not found";
+    fShColl = nullptr;
+  }
+
   art::Handle<mu2e::StrawDigiMCCollection> sdmccH;
   event->getByLabel(art::InputTag(fSdmcCollTag), sdmccH);
   if (sdmccH.isValid()) fSdmcColl = sdmccH.product();
@@ -168,6 +193,16 @@ int TTrkVisNode::InitEvent() {
 							<< " : mu2e::StrawDigiMCCollection " 
 							<< fSdmcCollTag << " not found";
     fSdmcColl = nullptr;
+  }
+					
+  art::Handle<mu2e::KalSeedCollection> kscH;
+  event->getByLabel(art::InputTag(fKsCollTag), kscH);
+  if (kscH.isValid()) fKsColl = kscH.product();
+  else {
+    mf::LogWarning("TEvdTimeClusterVisNode::InitEvent") << " WARNING:" << __LINE__ 
+							<< " : mu2e::KalSeedCollection " 
+							<< fKsCollTag << " not found";
+    fKsColl = nullptr;
   }
 //-----------------------------------------------------------------------------
 // display hits corresponding to a given time peak, or all hits, 
@@ -178,11 +213,11 @@ int TTrkVisNode::InitEvent() {
   stntuple::TEvdStraw* evd_straw;
 
   n_straw_hits = 0;
-  if ((*fSComboHitColl) != nullptr) n_straw_hits = (*fSComboHitColl)->size();
+  if (fSchColl != nullptr) n_straw_hits = fSchColl->size();
 
   for (int ihit=0; ihit<n_straw_hits; ihit++ ) {
 
-    hit              = &(*fSComboHitColl)->at(ihit);
+    hit              = &fSchColl->at(ihit);
     straw            = &tracker->getStraw(hit->strawId());
     color            = kBlack;
     intime           = 0;
@@ -325,26 +360,32 @@ int TTrkVisNode::InitEvent() {
 // now initialize tracks
 //-----------------------------------------------------------------------------
   stntuple::TEvdTrack      *trk;
-  const KalRep             *krep;  
-  const mu2e::TrkStrawHit  *track_hit;
+  const mu2e::KalSeed      *kseed;  
+  // const mu2e::TrkStrawHit  *track_hit;
 
   fListOfTracks->Delete();
   int ntrk = 0;
 
-  if ((*fKalRepPtrColl) != 0) ntrk = (*fKalRepPtrColl)->size();
+  if (fKsColl) ntrk = fKsColl->size();
   
   for (int i=0; i<ntrk; i++) {
-    krep = (*fKalRepPtrColl)->at(i).get();
-    trk  = new stntuple::TEvdTrack(i,krep);
+    kseed = &fKsColl->at(i);
+    trk  = new stntuple::TEvdTrack(i,kseed);
 //-----------------------------------------------------------------------------
 // add hits, skip calorimeter clusters (TrkCaloHit's)
 //-----------------------------------------------------------------------------
-    const TrkHitVector* hits = &krep->hitVector();
+    //    const TrkHitVector* hits = &kseed->hitVector();
+    const std::vector<mu2e::TrkStrawHitSeed>* hits = &kseed->hits();
+
     for (auto it=hits->begin(); it!=hits->end(); it++) {
-      track_hit = dynamic_cast<mu2e::TrkStrawHit*> (*it);
-      if (track_hit == nullptr) continue;
-      stntuple::TEvdTrkStrawHit* h = new stntuple::TEvdTrkStrawHit(track_hit);
-      trk->AddHit(h);
+      const mu2e::TrkStrawHitSeed* hit =  &(*it);
+      // track_hit = dynamic_cast<mu2e::TrkStrawHit*> (*it);
+      if (hit == nullptr) continue;
+      // need to find this hit in the list of TEvdStrawHits (already existing) ... later
+
+      const mu2e::Straw* straw = &tracker->straw(hit->strawId());
+      stntuple::TEvdTrkStrawHit* evd_hit = new stntuple::TEvdTrkStrawHit(hit,straw);
+      trk->AddHit(evd_hit);
     }
 
     fListOfTracks->Add(trk);
@@ -442,7 +483,7 @@ void TTrkVisNode::PaintXY(Option_t* Option) {
       stntuple::TEvdComboHit* evd_ch = (stntuple::TEvdComboHit*) fListOfComboHits->At(i);
       const mu2e::ComboHit*   ch     = evd_ch->ComboHit();
       int index = ch->index(0);
-      const mu2e::ComboHit* sh = &(*fSComboHitColl)->at(index);
+      const mu2e::ComboHit* sh = &fSchColl->at(index);
 
       straw     = &tracker->getStraw(sh->strawId());           // first straw hit
       station   = straw->id().getStation();
@@ -788,5 +829,21 @@ void TTrkVisNode::Print(Option_t* Opt) const {
       banner_printed = 1;
     }
     hit->Print("data");
+  }
+}
+
+
+//-----------------------------------------------------------------------------
+void TTrkVisNode::NodePrint(const void* Object, const char* ClassName) {
+  TString class_name(ClassName);
+
+  TAnaDump* ad = TAnaDump::Instance();
+
+  if (class_name == "KalSeed") {
+    const mu2e::KalSeed* ks = (const mu2e::KalSeed*) Object;
+    ad->printKalSeed(ks,"",fShCollTag.data(),fSdmcCollTag.data());
+  }
+  else {
+    printf("WARNING in TTrkVisNode::Print: print for %s not implemented yet\n",ClassName);
   }
 }

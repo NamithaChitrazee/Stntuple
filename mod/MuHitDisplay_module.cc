@@ -92,7 +92,6 @@ MuHitDisplay::MuHitDisplay(fhicl::ParameterSet const& pset) :
 
   fFolder->Add(fDarHandle);
 
-  _kalRepPtrColl        = nullptr;
   _firstCall            = 1;
 
   fSimpBlock     = new TSimpBlock;
@@ -273,17 +272,17 @@ void MuHitDisplay::InitVisManager() {
 //-----------------------------------------------------------------------------
 // TrkVisNode: tracker, tracks and straw hits
 // add tracker node to two views - RZ and XY
+// tracks are KalSeed's
 //-----------------------------------------------------------------------------
   TTrkVisNode* tnode = new TTrkVisNode ("TrkVisNode", fTracker, NULL);
 
-  tnode->SetSComboHitColl   (&_sComboHitColl   );
+  tnode->SetShCollTag       (_strawHitCollTag  );
   tnode->SetChCollTag       (_comboHitCollTag  );
   //  tnode->SetStrawHitFlagColl(&fStrawHitFlagColl);
-  tnode->SetKalRepPtrColl   (&_kalRepPtrColl   );
+  tnode->SetKsCollTag       ( _trackCollTag    );
   tnode->SetSdmcCollTag     (_sdmcCollTag      );
   tnode->SetSimpColl        (&_simpColl        );
   tnode->SetSpmcColl        (&_spmcColl        );
-  tnode->SetShColl          (&_shColl          );
   tnode->SetSwColl          (&_swColl          );
 //-----------------------------------------------------------------------------
 // SimpBlock is initialized in the module, a node references it via the pointer
@@ -345,303 +344,216 @@ void MuHitDisplay::InitVisManager() {
 // get data from the event record
 //-----------------------------------------------------------------------------
 int MuHitDisplay::getData(const art::Event* Evt) {
-    char oname[100];
-    sprintf(oname,"%s::%s",moduleDescription().moduleLabel().data(),"getData");
-
+  char oname[100];
+  sprintf(oname,"%s::%s",moduleDescription().moduleLabel().data(),"getData");
 //-----------------------------------------------------------------------------
 //  CRV pulse information
 //-----------------------------------------------------------------------------
-    art::Handle<CrvRecoPulseCollection> pulsesHandle;
-    Evt->getByLabel(_crvRecoPulseCollTag, pulsesHandle);
+  art::Handle<CrvRecoPulseCollection> pulsesHandle;
+  Evt->getByLabel(_crvRecoPulseCollTag, pulsesHandle);
     
-    if (pulsesHandle.isValid()) {
-      const mu2e::CrvRecoPulseCollection* fCrvPulseColl = (CrvRecoPulseCollection*) pulsesHandle.product();
+  if (pulsesHandle.isValid()) {
+    const mu2e::CrvRecoPulseCollection* fCrvPulseColl = (CrvRecoPulseCollection*) pulsesHandle.product();
       
-      // Clear the map pointers in preperation to (re)fill them with new information
-      fCrvPulseColl_Right->clear();
-      fCrvPulseColl_Left->clear();
-      fCrvPulseColl_TopDS->clear();
-      fCrvPulseColl_TopTS->clear();
-      fCrvPulseColl_Dwnstrm->clear();
-      fCrvPulseColl_Upstrm->clear();
-      printf(">>> Section-collections cleared\n");
+    // Clear the map pointers in preperation to (re)fill them with new information
+    fCrvPulseColl_Right->clear();
+    fCrvPulseColl_Left->clear();
+    fCrvPulseColl_TopDS->clear();
+    fCrvPulseColl_TopTS->clear();
+    fCrvPulseColl_Dwnstrm->clear();
+    fCrvPulseColl_Upstrm->clear();
+    printf(">>> Section-collections cleared\n");
       
-      mu2e::GeomHandle<mu2e::CosmicRayShield> CRS;
+    mu2e::GeomHandle<mu2e::CosmicRayShield> CRS;
       
-      // Loop over the RecoPulses in the collection and sort each pulse/bar into its appropriate section
-      int    crvCollSize = fCrvPulseColl->size();
-      for (int ic=0; ic < crvCollSize; ++ic) {
-	mu2e::CrvRecoPulse                   icprc       = fCrvPulseColl->at(ic);
-	const mu2e::CRSScintillatorBarIndex &CRVBarIndex = icprc.GetScintillatorBarIndex();
-	
-	int shield = CRS->getBar(CRVBarIndex).id().getShieldNumber();
-
-	if      (shield == 0) fCrvPulseColl_Right->  push_back(icprc);
-	else if (shield == 1) fCrvPulseColl_Left->   push_back(icprc);
-	else if (shield == 2) fCrvPulseColl_TopDS->  push_back(icprc);
-	else if (shield == 3) fCrvPulseColl_Dwnstrm->push_back(icprc);
-	else if (shield == 4) fCrvPulseColl_Upstrm-> push_back(icprc);
-	else if (shield == 8) fCrvPulseColl_TopTS->  push_back(icprc);
-      }
+    // Loop over the RecoPulses in the collection and sort each pulse/bar into its appropriate section
+    int    crvCollSize = fCrvPulseColl->size();
+    for (int ic=0; ic < crvCollSize; ++ic) {
+      mu2e::CrvRecoPulse                   icprc       = fCrvPulseColl->at(ic);
+      const mu2e::CRSScintillatorBarIndex &CRVBarIndex = icprc.GetScintillatorBarIndex();
+      
+      int shield = CRS->getBar(CRVBarIndex).id().getShieldNumber();
+      
+      if      (shield == 0) fCrvPulseColl_Right->  push_back(icprc);
+      else if (shield == 1) fCrvPulseColl_Left->   push_back(icprc);
+      else if (shield == 2) fCrvPulseColl_TopDS->  push_back(icprc);
+      else if (shield == 3) fCrvPulseColl_Dwnstrm->push_back(icprc);
+      else if (shield == 4) fCrvPulseColl_Upstrm-> push_back(icprc);
+      else if (shield == 8) fCrvPulseColl_TopTS->  push_back(icprc);
+    }
 								
-      printf(">>> Section-collections filled\n");
-    }
-    else {
-      printf(">>> [MuHitDisplay::%s] WARNING: CrvRecoPulsesCollection by %s is missing. CONTINUE.\n",
-	     __func__, _crvRecoPulseCollTag.data());
-    }
+    printf(">>> Section-collections filled\n");
+  }
+  else {
+    printf(">>> [MuHitDisplay::%s] WARNING: CrvRecoPulsesCollection by %s is missing. CONTINUE.\n",
+	   __func__, _crvRecoPulseCollTag.data());
+  }
     
-    if (_showCRVOnly) { //If only displaying the CRV, skip everything else
-      printf("!!!!! ONLY SHOWING THE CRV\n");
-      return 0;
-    }
-    else {
+  if (_showCRVOnly) { //If only displaying the CRV, skip everything else
+    printf("!!!!! ONLY SHOWING THE CRV\n");
+    return 0;
+  }
+  else {
 //-----------------------------------------------------------------------------
 //  MC truth - gen particles
 //-----------------------------------------------------------------------------
-      art::Handle<GenParticleCollection> gensHandle;
-      Evt->getByLabel(_genpCollTag, gensHandle);
+    art::Handle<GenParticleCollection> gensHandle;
+    Evt->getByLabel(_genpCollTag, gensHandle);
 
-      if (gensHandle.isValid()) _genpColl = gensHandle.product();
-      else {
-	_genpColl = 0;
-	printf(">>> [%s] WARNING: GenParticleCollection by %s is missing. CONTINUE\n",
-	       oname, _genpCollTag.data());
-      }
+    if (gensHandle.isValid()) _genpColl = gensHandle.product();
+    else {
+      _genpColl = 0;
+      printf(">>> [%s] WARNING: GenParticleCollection by %s is missing. CONTINUE\n",
+	     oname, _genpCollTag.data());
+    }
 //-----------------------------------------------------------------------------
 //  StepPointMCs - on virtual detectors
 //-----------------------------------------------------------------------------
-      art::Handle<StepPointMCCollection> vdStepsHandle;
-      Evt->getByLabel(_spmcCollTag, vdStepsHandle);
-
-      if (vdStepsHandle.isValid()) _spmcColl = vdStepsHandle.product();
-      else                         _spmcColl = NULL;
+    art::Handle<StepPointMCCollection> vdStepsHandle;
+    Evt->getByLabel(_spmcCollTag, vdStepsHandle);
+    
+    if (vdStepsHandle.isValid()) _spmcColl = vdStepsHandle.product();
+    else                         _spmcColl = NULL;
 //-----------------------------------------------------------------------------
 // SimParticle's
 //-----------------------------------------------------------------------------
-      art::Handle<mu2e::SimParticleCollection> simpHandle;
-      Evt->getByLabel(_simpCollTag, simpHandle);
+    art::Handle<mu2e::SimParticleCollection> simpHandle;
+    Evt->getByLabel(_simpCollTag, simpHandle);
 
-      if (simpHandle.isValid()) _simpColl = simpHandle.product();
-      else                      _simpColl = NULL;
-//-----------------------------------------------------------------------------
-// HelixSeed's
-//-----------------------------------------------------------------------------
-      art::Handle<mu2e::HelixSeedCollection> hscH;
-      Evt->getByLabel(_helixSeedCollTag, hscH);
-
-      if (hscH.isValid()) _hsColl = hscH.product();
-      else                _hsColl = NULL;
+    if (simpHandle.isValid()) _simpColl = simpHandle.product();
+    else                      _simpColl = NULL;
 //-----------------------------------------------------------------------------
 //  straw hit information
 //-----------------------------------------------------------------------------
-      art::Handle<ComboHitCollection> chH;
+    art::Handle<StrawDigiCollection> sdcH;
+    Evt->getByLabel(_sdCollTag, sdcH);
+    if (sdcH.isValid()) _sdColl = sdcH.product();
+    else {
+      printf(">>> [%s] WARNING: StrawDigiCollection by %s is missing.\n",
+	     oname, _strawHitCollTag.data());
+      _sdColl = nullptr;
+    }
 
-      Evt->getByLabel(_comboHitCollTag, chH);
-      if (chH.isValid()) _cComboHitColl = chH.product();
-      else {
-	printf(">>> [%s] WARNING: ComboHitCollection by %s is missing\n",
-	       oname, _comboHitCollTag.data());
-	_cComboHitColl = nullptr;
-      }
-
-      Evt->getByLabel(_strawHitCollTag, chH);
-      if (chH.isValid()) _sComboHitColl = chH.product();
-      else {
-	printf(">>> [%s] WARNING: ComboHitCollection by %s is missing.\n",
-	       oname, _strawHitCollTag.data());
-	_sComboHitColl = nullptr;
-      }
-
-      art::Handle<StrawHitCollection> shcH;
-      Evt->getByLabel(_strawHitCollTag, shcH);
-      if (shcH.isValid()) _shColl = shcH.product();
-      else {
-	printf(">>> [%s] WARNING: StrawHitCollection by %s is missing.\n",
-	       oname, _strawHitCollTag.data());
-	_shColl = nullptr;
-      }
-
-      art::Handle<StrawDigiCollection> sdcH;
-      Evt->getByLabel(_sdCollTag, sdcH);
-      if (sdcH.isValid()) _sdColl = sdcH.product();
-      else {
-	printf(">>> [%s] WARNING: StrawDigiCollection by %s is missing.\n",
-	       oname, _strawHitCollTag.data());
-	_sdColl = nullptr;
-      }
-
-      art::Handle<StrawDigiADCWaveformCollection> swcH;
-      Evt->getByLabel(_swCollTag, swcH);
-      if (swcH.isValid()) _swColl = swcH.product();
-      else {
-	printf(">>> [%s] WARNING: StrawDigiADCWaveformCollection by %s is missing.\n",
-	       oname, _swCollTag.data());
-	_swColl = nullptr;
-      }
-
-      art::Handle<StrawDigiMCCollection> sdmccH;
-      Evt->getByLabel(_sdmcCollTag, sdmccH);
-      if (sdmccH.isValid()) {
-	_sdmcColl = sdmccH.product();
-	if (_sdmcColl->size() <= 0) {
-	  printf(">>> [%s] WARNING:StrawDigiMCCollection by %s has zero length. CONTINUE\n",
-		 oname, _sdmcCollTag.data());
-	}
-      }
-      else {
-	printf(">>> [%s] WARNING: mu2e::StrawDigiMCCollection by %s is missing\n",
+    art::Handle<StrawDigiADCWaveformCollection> swcH;
+    Evt->getByLabel(_swCollTag, swcH);
+    if (swcH.isValid()) _swColl = swcH.product();
+    else {
+      printf(">>> [%s] WARNING: StrawDigiADCWaveformCollection by %s is missing.\n",
+	     oname, _swCollTag.data());
+      _swColl = nullptr;
+    }
+    
+    art::Handle<StrawDigiMCCollection> sdmccH;
+    Evt->getByLabel(_sdmcCollTag, sdmccH);
+    if (sdmccH.isValid()) {
+      _sdmcColl = sdmccH.product();
+      if (_sdmcColl->size() <= 0) {
+	printf(">>> [%s] WARNING:StrawDigiMCCollection by %s has zero length. CONTINUE\n",
 	       oname, _sdmcCollTag.data());
-	_sdmcColl = nullptr;
       }
-
-      art::Handle<mu2e::StrawHitFlagCollection> shfcH;
-      Evt->getByLabel(_shfCollTag, shfcH);
-
-      if (shfcH.isValid()) _shfColl = shfcH.product();
-      else                 _shfColl = nullptr;
+    }
+    else {
+      printf(">>> [%s] WARNING: mu2e::StrawDigiMCCollection by %s is missing\n",
+	     oname, _sdmcCollTag.data());
+      _sdmcColl = nullptr;
+    }
+    
+    art::Handle<mu2e::StrawHitFlagCollection> shfcH;
+    Evt->getByLabel(_shfCollTag, shfcH);
+    
+    if (shfcH.isValid()) _shfColl = shfcH.product();
+    else                 _shfColl = nullptr;
 //-----------------------------------------------------------------------------
 // calorimeter hit data
 //-----------------------------------------------------------------------------
-      art::Handle<CaloHitCollection> calohit_ch;
-      Evt->getByLabel(_caloHitCollTag.data(), calohit_ch);
-
-      if (calohit_ch.isValid()) {
-	_caloHitColl = (CaloHitCollection*) calohit_ch.product();
-      }
-      else {
-	_caloHitColl = NULL;
-	printf(">>> [%s] WARNING: CaloHitCollection by %s is missing.\n",
-	       oname, _caloHitCollTag.data());
-      }
+    art::Handle<CaloHitCollection> calohit_ch;
+    Evt->getByLabel(_caloHitCollTag.data(), calohit_ch);
+    
+    if (calohit_ch.isValid()) {
+      _caloHitColl = (CaloHitCollection*) calohit_ch.product();
+    }
+    else {
+      _caloHitColl = NULL;
+      printf(">>> [%s] WARNING: CaloHitCollection by %s is missing.\n",
+	     oname, _caloHitCollTag.data());
+    }
 //-----------------------------------------------------------------------------
 // calorimeter cluster data
 //-----------------------------------------------------------------------------
-      art::Handle<CaloClusterCollection> calocluster_ch;
-      Evt->getByLabel(_caloClusterCollTag, "", calocluster_ch);
-
-      if (calocluster_ch.isValid()) {
-	_caloClusterColl = calocluster_ch.product();
-      }
-      else {
-	_caloClusterColl = NULL;
-	printf(">>> [%s] WARNING: CaloClusterCollection by %s is missing.\n",
-	       oname, _caloClusterCollTag.data());
-      }
-//-----------------------------------------------------------------------------
-// timepeaks 
-//-----------------------------------------------------------------------------
-      _timeClusterColl = NULL;
-
-      art::Handle<TimeClusterCollection> tpch;
-
-      if (_showTracks){
-	Evt->getByLabel(_timeClusterCollTag, "", tpch);
-      } 
-      else {
-//-----------------------------------------------------------------------------
-// not sure I understand the clause
-//-----------------------------------------------------------------------------
-	Evt->getByLabel(_timeClusterCollTag, tpch);
-      }
-//       if (tpch.isValid()) {
-// 	_timeClusterColl = tpch.product();
-// //-----------------------------------------------------------------------------
-// // find the right time peak to display - display the first one with the track
-// // 2018-10-12 P.Murat: dont enforce! 
-// //-----------------------------------------------------------------------------
-// 	// const TimeCluster* tp;
-// 	// int ipeak = -1;
-// 	// if (fTimeClusterColl != NULL) {
-// 	//   int ntp = fTimeClusterColl->size();
-// 	//   for (int i = 0; i<ntp; i++) {
-// 	//     tp = &fTimeClusterColl->at(i);
-// 	//     // if (tp->CprIndex() >= 0) {
-// 	//     fTimeCluster = tp;
-// 	//     ipeak = i;
-// 	//     break;
-// 	//     // }
-// 	//   }
-// 	// }
-// 	// fVisManager->SetTimeCluster(ipeak);
-//       }
-//-----------------------------------------------------------------------------
-// tracking data - downstream moving electrons
-//-----------------------------------------------------------------------------
-      art::Handle<KalRepPtrCollection> krepHandle;
-      Evt->getByLabel(_trackCollTag.data(), "", krepHandle);
-
-      _kalRepPtrColl = nullptr;
-      if (krepHandle.isValid()) {
-	_kalRepPtrColl = krepHandle.product();
-      }
+    art::Handle<CaloClusterCollection> calocluster_ch;
+    Evt->getByLabel(_caloClusterCollTag, "", calocluster_ch);
+    
+    if (calocluster_ch.isValid()) {
+      _caloClusterColl = calocluster_ch.product();
+    }
+    else {
+      _caloClusterColl = NULL;
+      printf(">>> [%s] WARNING: CaloClusterCollection by %s is missing.\n",
+	     oname, _caloClusterCollTag.data());
     }
 //-----------------------------------------------------------------------------
 // finally, TSimpBlock. The second parameter, Mode, is not used
 //-----------------------------------------------------------------------------
     fSimpBlock->Init((art::Event*)Evt,0);
-
+    
     return 0;
   }
+}
 
 //-----------------------------------------------------------------------------
-  void MuHitDisplay::analyze(const art::Event& Evt) {
-    //    const char* oname = "MuHitDisplay::analyze";
+void MuHitDisplay::analyze(const art::Event& Evt) {
+  //    const char* oname = "MuHitDisplay::analyze";
 
-    printf("[MuHitDisplay::%s] RUN: %10i EVENT: %10i\n", __func__, Evt.run(), Evt.event());
+  printf("[MuHitDisplay::%s] RUN: %10i EVENT: %10i\n", __func__, Evt.run(), Evt.event());
 //-----------------------------------------------------------------------------
 // init VisManager - failed to do it in beginJob - what is the right place for doing it?
 // get event data and initialize data blocks
 //-----------------------------------------------------------------------------
-    if (_firstCall == 1) {
-      _firstCall = 0;
-      InitVisManager();
-    }
+  if (_firstCall == 1) {
+    _firstCall = 0;
+    InitVisManager();
+  }
 
-    getData(&Evt);
-    // if (rc < 0) {
-    //   printf(">>> [%s] WARNING: not all data products present\n", oname);
-    //   return;
-    // }
-    
-    fVisManager->SetEvent(&Evt);
-    fVisManager->DisplayEvent();
+  getData(&Evt);
+  
+  fVisManager->SetEvent(&Evt);
+  fVisManager->DisplayEvent();
 //-----------------------------------------------------------------------------
 // go into interactive mode, 
 // fInteractiveMode = 1 : stop after each event (event display mode)
 // fInteractiveMode = 2 : stop only in the end of run, till '.q' is pressed
 //-----------------------------------------------------------------------------
-    TModule::analyze(Evt);
-    return;
-  } 
+  TModule::analyze(Evt);
+  return;
+} 
 
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-  int MuHitDisplay::getCRVSection(int shieldNumber) {
-    int CRVSection = -1;
-    switch (shieldNumber) {
-      case 0:
-      case 1:
-      case 2:
-      case 3:
-      case 4:
-      case 5:  CRVSection = 0; break;  //R
-      case 6:
-      case 7:
-      case 8:  CRVSection = 1; break;  //L
-      case 9:  CRVSection = 8; break;  //TS T
-      case 10:
-      case 11:
-      case 12: CRVSection = 2; break;  //T
-      case 13: CRVSection = 3; break;  //D
-      case 14: CRVSection = 4; break;  //U
-      case 15: CRVSection = 5; break;  //CU
-      case 16: CRVSection = 6; break;  //CD
-      case 17: CRVSection = 7; break;  //CT
-      }
-    return CRVSection;
+int MuHitDisplay::getCRVSection(int shieldNumber) {
+  int CRVSection = -1;
+  switch (shieldNumber) {
+  case 0:
+  case 1:
+  case 2:
+  case 3:
+  case 4:
+  case 5:  CRVSection = 0; break;  //R
+  case 6:
+  case 7:
+  case 8:  CRVSection = 1; break;  //L
+  case 9:  CRVSection = 8; break;  //TS T
+  case 10:
+  case 11:
+  case 12: CRVSection = 2; break;  //T
+  case 13: CRVSection = 3; break;  //D
+  case 14: CRVSection = 4; break;  //U
+  case 15: CRVSection = 5; break;  //CU
+  case 16: CRVSection = 6; break;  //CD
+  case 17: CRVSection = 7; break;  //CT
   }
+  return CRVSection;
+}
 
 }
 

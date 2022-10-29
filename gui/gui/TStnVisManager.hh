@@ -21,6 +21,10 @@ class TStnView;
 class TSubdetector;
 class TExtrapolator;
 
+namespace mu2e {
+  class KalSeed;
+}
+
 namespace stntuple {
   class TEvdTimeCluster;
 }
@@ -182,6 +186,10 @@ public:
 
   void  SetMbTime(float MbTime) { fMbTime = MbTime; }
   void  SetBField(float BField) { fBField = BField; }
+//-----------------------------------------------------------------------------
+// print functions
+//-----------------------------------------------------------------------------
+  void PrintTrack(const mu2e::KalSeed* KSeed);
 //-----------------------------------------------------------------------------
 // GUI
 //-----------------------------------------------------------------------------

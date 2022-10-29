@@ -23,7 +23,12 @@ public:
 
   int                 DebugLevel()       { return fDebugLevel; }
 
-					// called by TEvdManager::DisplayEvent
+					// generic print callback. to be overloaded, if needed
+
+  virtual void        NodePrint(const void* Object, const char* ClassName) ;
+
+				// called by TEvdManager::DisplayEvent. a must to overload
+
   virtual int         InitEvent() = 0;
 
   void                SetDebugLevel(int Level) { fDebugLevel = Level; }

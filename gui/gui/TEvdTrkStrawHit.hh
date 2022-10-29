@@ -13,13 +13,10 @@
 #include "TLine.h"
 
 #include "canvas/Persistency/Provenance/ProductID.h"
-#ifndef __CINT__
-#include "Offline/BTrkData/inc/TrkStrawHit.hh"
-#else
-namespace mu2e {
-  class TrkStrawHit;
-};
-#endif
+
+#include "Offline/TrackerGeom/inc/Straw.hh"
+
+#include "Offline/RecoDataProducts/inc/TrkStrawHitSeed.hh"
 
 namespace stntuple {
 class TEvdStraw;
@@ -34,8 +31,8 @@ public:
 
 protected:
 
-  const mu2e::TrkStrawHit*  fHit;
-  TEvdStraw*                fStraw;
+  const mu2e::TrkStrawHitSeed* fHit;
+  TEvdStraw*                   fStraw;
 
   int        fMask;			// hit mask
   int        fColor;
@@ -52,13 +49,13 @@ public:
 // constructors and destructor
 //-----------------------------------------------------------------------------
   TEvdTrkStrawHit() {}
-  TEvdTrkStrawHit(const mu2e::TrkStrawHit* Hit);
+  TEvdTrkStrawHit(const mu2e::TrkStrawHitSeed* Hit, const mu2e::Straw* Straw);
 
   virtual ~TEvdTrkStrawHit();
 //-----------------------------------------------------------------------------
 // accessors
 //-----------------------------------------------------------------------------
-  const mu2e::TrkStrawHit*  TrkStrawHit() { return fHit; }
+  const mu2e::TrkStrawHitSeed*  TrkStrawHitSeed() { return fHit; }
 //-----------------------------------------------------------------------------
 // modifiers
 //-----------------------------------------------------------------------------

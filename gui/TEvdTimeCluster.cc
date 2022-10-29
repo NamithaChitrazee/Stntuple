@@ -109,16 +109,16 @@ void TEvdTimeCluster::PaintTZ(Option_t* Option) {
 
 //-----------------------------------------------------------------------------
 // select based either on an upper edge or a lower edge
+// 5 is a magic number - see TStnView.cc - a threshold above which a closest object 
+// is not defined
 //-----------------------------------------------------------------------------
 int TEvdTimeCluster::DistancetoPrimitiveTZ(Int_t px, Int_t py) {
-  
+  int dist(9999);
+
   int y1  = gPad->YtoAbsPixel(fTMin);
   int y2  = gPad->YtoAbsPixel(fTMax);
 
-  int dy1 = abs(py-y1);
-  int dy2 = abs(py-y2);
-
-  int dist = (dy1 < dy2) ? dy1 : dy2 ;
+  if ((py <= y2) and (py >= y1)) dist = 5;
 
   return dist;
 }
