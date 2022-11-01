@@ -840,8 +840,17 @@ void TTrkVisNode::NodePrint(const void* Object, const char* ClassName) {
   TAnaDump* ad = TAnaDump::Instance();
 
   if (class_name == "KalSeed") {
-    const mu2e::KalSeed* ks = (const mu2e::KalSeed*) Object;
-    ad->printKalSeed(ks,"",fShCollTag.data(),fSdmcCollTag.data());
+//-----------------------------------------------------------------------------
+// print a KalSeed or a KalSeed collection
+//-----------------------------------------------------------------------------
+    if (Object) {
+      const mu2e::KalSeed* ks = (const mu2e::KalSeed*) Object;
+      ad->printKalSeed(ks,"",fShCollTag.data(),fSdmcCollTag.data());
+    }
+    else {
+					// Object = nullptr: print collection, with hits 
+      ad->printKalSeedCollection(fKsCollTag.data(),1,fShCollTag.data(),fSdmcCollTag.data());
+    }
   }
   else {
     printf("WARNING in TTrkVisNode::Print: print for %s not implemented yet\n",ClassName);

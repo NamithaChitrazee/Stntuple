@@ -121,7 +121,7 @@ void TEvdTrack::PaintXY(Option_t* Option) {
 
   //  KinKal::CentralHelix helx  = kseg->centralHelix();
 
-  double r    = helx.rad();
+  double r    = fabs(helx.rad());
   double x0   = helx.cx();
   double y0   = helx.cy();
 

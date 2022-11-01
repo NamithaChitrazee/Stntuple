@@ -1029,6 +1029,10 @@ void TStnVisManager::PrintColls(const char* Tag) {
     TVisNode* vn = FindNode("TimeClusterVisNode");
     vn->Print();
   }
+  else if (tag == "kalseeds") {
+    TVisNode* vn = FindNode("TrkVisNode");
+    vn->NodePrint(0,"KalSeed");
+  }
   else if (tag == "combo_hits") {
     TVisNode* vn = FindNode("TrkVisNode");
     vn->Print("combo_hits");

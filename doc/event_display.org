@@ -18,12 +18,12 @@ mu2e -c Stntuple/fcl/display.fcl -s dig.mu2e.CeEndpointDigiTriggered.MDC2020n_10
                               default = 1.0 (in Tesla)
    - visManager.debugLevel  : debugging optioin, default = 0
 
-** straw hit colors : see [[file:../gui/TEvdComboHit.cc::69]] (around line 69)   
+** straw hit colors : see [[file:../gui/TEvdComboHit.cc::79]] (around line 79)   
 
 |-----------+------------+-----------------|
 | color     | point size | meaning         |
 |-----------+------------+-----------------|
-| red       |            | e-              |
+| kRed      |            | e-              |
 |           |        0.8 | e- P>20 MeV/c   |
 |           |        0.4 | e- P<20 MeV/c   |
 |-----------+------------+-----------------|
@@ -44,6 +44,13 @@ mu2e -c Stntuple/fcl/display.fcl -s dig.mu2e.CeEndpointDigiTriggered.MDC2020n_10
   - Left, Right, Up, and Down arrow keys move the scene
 
   - mouse weel (Up, and Down) changes the scale
+
+  - left-click pops up a ROOT context-sensitive menu, which depends 
+    on the closest to the cursor object 
+
+  - left-click on a time cluster (TZ view) selects the time cluster.
+    when a time cluster is selected, displayed in all views are only 
+    tracks , hits and such with times within the selected time cluster
 
 ** display of SimParticles                                                   
    - if *primaryParticleTag* is set to an empty string, 
@@ -84,11 +91,14 @@ mu2e -c Stntuple/fcl/display.fcl -s dig.mu2e.CeEndpointDigiTriggered.MDC2020n_10
   - each view displays geometry and several nodes 
   - a node controls interactive cbehavior - DistanceToPrimitive
   - each note "knows" how to paint itself in each view PaintXY, PaintRZ, etc 
-
-
   - 3D views: need a simplified geometry, work in progress 
-** views                       
-  by default, view prints a list of its nodes
+** views                                                                     
+  - display supports multiple views
+  - by default, a view prints a list of all its nodes
+** printing                                                                  
+- prints : under the "print" section of the shutter
+- right click on a view pops up a context sensitive menu, a TStnView print prints 
+  all nodes (objects) displayed in the active view
 * ------------------------------------------------------------------------------
 * [1/1] TODO's                                                               
 ** DONE add a SimParticle node ? or just add a list of SimParticles to XY view ?
