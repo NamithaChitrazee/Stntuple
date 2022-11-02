@@ -6,9 +6,9 @@
 #include "TArc.h"
 
 #include "art/Framework/Principal/Event.h"
-
+					// has to be here because of typedef's
 #include "Offline/RecoDataProducts/inc/KalSeed.hh"
-#include "Offline/TrackerGeom/inc/Tracker.hh"
+
 #include "Offline/RecoDataProducts/inc/ComboHit.hh"
 #include "Offline/RecoDataProducts/inc/StrawDigi.hh"
 #include "Offline/RecoDataProducts/inc/StrawHit.hh"
@@ -20,6 +20,11 @@
 
 class TStnTrackBlock;
 class TSimpBlock;
+
+namespace mu2e {
+  class TimeCluster;
+  class Tracker;
+}
 
 namespace stntuple {
   class TEvdStrawTracker;
@@ -151,6 +156,9 @@ public:
   }
 
   void  SetPickMode   (Int_t Mode) { fPickMode    = Mode; }
+
+					// Index - in fShColl
+  int   TCHit(const mu2e::TimeCluster* TimeCluster, int Index);
 //-----------------------------------------------------------------------------
 // overloaded methods of TVisNode
 //-----------------------------------------------------------------------------

@@ -211,7 +211,9 @@ TStnFrame::TStnFrame(const char*  Name,
 
   // tb = new TGTextButton(frame,"test_01",-1,TGTextButton::GetDefaultGC()(),TGTextButton::GetDefaultFontStruct(),kRaisedFrame);
   // frame->AddFrame(tb, new TGLayoutHints(kLHintsNormal));
-  
+//-----------------------------------------------------------------------------  
+// straw vs combo hits
+//-----------------------------------------------------------------------------
   fRb[0] = new TGRadioButton(frame,"display SH", M_DISPLAY_SH);
   // rb->SetTextJustify(36);
   // rb->SetMargins    (0,0,0,0);
@@ -227,7 +229,9 @@ TStnFrame::TStnFrame(const char*  Name,
   // rb->MoveResize    (8,64,100,40);
   fRb[1]->Connect("Clicked()", "TStnFrame", this, "DoRadio()");
   frame->AddFrame(fRb[1], new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
-
+//-----------------------------------------------------------------------------  
+// check-buttons : semi-permanent choices - helices, tracks, sim particles
+//-----------------------------------------------------------------------------
   TGCheckButton* cbtn;
 
   cbtn = new TGCheckButton(frame, "Helices", kDisplayHelices);
@@ -239,6 +243,10 @@ TStnFrame::TStnFrame(const char*  Name,
   frame->AddFrame(cbtn, new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
 
   cbtn = new TGCheckButton(frame, "SimParticles", kDisplaySimParticles);
+  cbtn->Connect("Clicked()", "TStnFrame", this, "DoCheckButtons()");
+  frame->AddFrame(cbtn, new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
+
+  cbtn = new TGCheckButton(frame, "TC-only", kDisplayOnlyTCHits);
   cbtn->Connect("Clicked()", "TStnFrame", this, "DoCheckButtons()");
   frame->AddFrame(cbtn, new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
 

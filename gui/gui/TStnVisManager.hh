@@ -109,9 +109,11 @@ protected:
 
   int                 fDisplayStrawDigiMC;
   int                 fDisplayStrawHitsXY;
+
   int                 fDisplayHelices; 
   int                 fDisplayTracks; 
   int                 fDisplaySimParticles; 
+  int                 fDisplayOnlyTCHits;
 //-----------------------------------------------------------------------------
 //  functions
 //-----------------------------------------------------------------------------
@@ -164,6 +166,7 @@ public:
   int            DisplayHelices     () { return fDisplayHelices     ; }
   int            DisplayTracks      () { return fDisplayTracks      ; }
   int            DisplaySimParticles() { return fDisplaySimParticles; }
+  int            DisplayOnlyTCHits  () { return fDisplayOnlyTCHits  ; }
   //-----------------------------------------------------------------------------
   // modifiers
   //-----------------------------------------------------------------------------
@@ -174,6 +177,7 @@ public:
   void           SetDisplayHelices     (int Flag) { fDisplayHelices      = Flag; }
   void           SetDisplayTracks      (int Flag) { fDisplayTracks       = Flag; }
   void           SetDisplaySimParticles(int Flag) { fDisplaySimParticles = Flag; }
+  void           SetDisplayOnlyTCHits  (int Flag) { fDisplayOnlyTCHits   = Flag; }
 
   void           SetStations(int IMin, int IMax) override;
 

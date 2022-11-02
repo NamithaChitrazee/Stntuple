@@ -49,7 +49,7 @@ protected:
   TGStatusBar         *fStatusBar;         // !
   TGLayoutHints       *fStatusBarLayout;   // ! layout for the status bar
 
-  TGRadioButton       *fRb[2];             // ! [0]: SH [1]: CH 
+  TGRadioButton       *fRb[2];             // ! [0]: SH [1]
 
   TGCheckButton*      fDisplayHelices;     // ! 
 

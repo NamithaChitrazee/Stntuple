@@ -56,6 +56,7 @@ TStnVisManager::TStnVisManager(const char* Name, const char* Title): TVisManager
 
   fSelectedTimeCluster = nullptr;
   fDisplayHelices      = 0;
+  fDisplayOnlyTCHits   = 0;
 }
 
 //_____________________________________________________________________________
@@ -1046,6 +1047,7 @@ void TStnVisManager::DoCheckButton(int ButtonID, int Status) {
   if      (ButtonID == kDisplayHelices     ) SetDisplayHelices     (Status);
   else if (ButtonID == kDisplayTracks      ) SetDisplayTracks      (Status);
   else if (ButtonID == kDisplaySimParticles) SetDisplaySimParticles(Status);
+  else if (ButtonID == kDisplayOnlyTCHits  ) SetDisplayOnlyTCHits  (Status);
   else {
     printf("WARNING: TStnVisManager::DoCheckButton unknown button ID: %i\n",ButtonID);
   }
@@ -1055,8 +1057,8 @@ void TStnVisManager::DoCheckButton(int ButtonID, int Status) {
 //_____________________________________________________________________________
 void TStnVisManager::DoRadioButton(int ButtonID) {
 
-  if      (ButtonID == M_DISPLAY_SH) SetDisplayStrawHitsXY(1);
-  else if (ButtonID == M_DISPLAY_CH) SetDisplayStrawHitsXY(0);
+  if      (ButtonID == M_DISPLAY_SH     ) SetDisplayStrawHitsXY(1);
+  else if (ButtonID == M_DISPLAY_CH     ) SetDisplayStrawHitsXY(0);
   else {
     printf("WARNING: TStnVisManager::DoRadioButton unknown button ID: %i\n",ButtonID);
   }

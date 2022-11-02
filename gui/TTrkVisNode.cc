@@ -20,8 +20,11 @@
 // #include "art/Framework/Principal/Event.h"
 // #include "art/Framework/Principal/Handle.h"
 
+#include "Stntuple/gui/TTrkVisNode.hh"
+
 #include "Offline/GeometryService/inc/GeometryService.hh"
 #include "Offline/GeometryService/inc/GeomHandle.hh"
+#include "Offline/TrackerGeom/inc/Tracker.hh"
 
 #include "Offline/ConditionsService/inc/ConditionsHandle.hh"
 #include "Offline/TrackerConditions/inc/StrawResponse.hh"
@@ -29,13 +32,12 @@
 #include "Offline/DataProducts/inc/StrawId.hh"
 
 #include "Offline/RecoDataProducts/inc/StrawHit.hh"
-#include "Offline/RecoDataProducts/inc/KalSeed.hh"
 #include "Offline/RecoDataProducts/inc/KalSegment.hh"
+#include "Offline/RecoDataProducts/inc/TimeCluster.hh"
 
 #include "Stntuple/gui/TEvdTimeCluster.hh"
 #include "Stntuple/gui/TEvdComboHit.hh"
 #include "Stntuple/gui/TEvdTrack.hh"
-#include "Stntuple/gui/TTrkVisNode.hh"
 #include "Stntuple/gui/TEvdStraw.hh"
 #include "Stntuple/gui/TEvdStrawHit.hh"
 #include "Stntuple/gui/TEvdTrkStrawHit.hh"
@@ -431,6 +433,32 @@ int TTrkVisNode::InitEvent() {
 }
 
 //-----------------------------------------------------------------------------
+// check if a hit with 'Index' in the fShColl collection belongs to the time cluster
+// time cluster is made out of ComboHit's
+// the code could be made a bit more efficient for combo hits at a cost of passing the 
+// the hit type explicitly
+//-----------------------------------------------------------------------------
+int TTrkVisNode::TCHit(const mu2e::TimeCluster* TimeCluster, int Index) {
+  int ok(0);
+
+  int nch = TimeCluster->nhits();
+  for (int i=0; i<nch; i++) {
+    int ind = TimeCluster->hits().at(i);
+    const mu2e::ComboHit* ch = &fChColl->at(ind);
+    int nsh = ch->nStrawHits();
+    for (int ish=0; ish<nsh; ish++) {
+      if (ch->index(ish) == Index) {
+	ok = 1;
+	break;
+      }
+    }
+  }
+
+  return ok;
+}
+
+
+//-----------------------------------------------------------------------------
 // draw reconstructed tracks and STRAW hits, may want to display COMBO hits instead
 //-----------------------------------------------------------------------------
 void TTrkVisNode::PaintXY(Option_t* Option) {
@@ -469,7 +497,12 @@ void TTrkVisNode::PaintXY(Option_t* Option) {
 
       if ((station >= vm->MinStation()) && (station <= vm->MaxStation())) { 
 	if ((time >= tmin) && (time <= tmax)) {
-	  evd_sh->PaintXY(Option);
+	  // check if the hit belongs to the time cluster
+	  int ok = 1;
+	  if (etcl and vm->DisplayOnlyTCHits()) { 
+	    ok = TCHit(etcl->TimeCluster(),sh->index());
+	  }
+	  if (ok  ) evd_sh->PaintXY(Option);
 	}
       }
     }
@@ -491,7 +524,12 @@ void TTrkVisNode::PaintXY(Option_t* Option) {
 
       if ((station >= vm->MinStation()) && (station <= vm->MaxStation())) { 
 	if ((time >= tmin) && (time <= tmax)) {
-	  evd_ch->PaintXY(Option);
+	  // check if the hit belongs to the time cluster
+	  int ok = 1;
+	  if (etcl and vm->DisplayOnlyTCHits()) { 
+	    ok = TCHit(etcl->TimeCluster(),ch->index(0));
+	  }
+	  if (ok  ) evd_ch->PaintXY(Option);
 	}
       }
     }

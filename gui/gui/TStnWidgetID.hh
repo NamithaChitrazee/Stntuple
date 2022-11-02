@@ -51,10 +51,10 @@ enum GuiButtonID {
   kDisplayHelices      = 5,
   kDisplayTracks       = 6,
   kDisplaySimParticles = 7,
-
-  M_DISPLAY_SH = 21,             // radiobutton ID's
-  M_DISPLAY_CH = 22,
-  
+  kDisplayOnlyTCHits   = 8,
+					// radiobutton ID's
+  M_DISPLAY_SH         = 21,
+  M_DISPLAY_CH         = 22,
 };
 
 #endif
