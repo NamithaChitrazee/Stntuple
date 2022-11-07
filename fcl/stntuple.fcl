@@ -24,7 +24,7 @@ BEGIN_PROLOG
   STN_COMPRESS_MCS    : "compressDigiMCs"                    # "compressRecoMCs" looks dangerous
   STN_VDHITS_COLL_TAG : "compressDigiMCs:virtualdetector"
   PDG_ID              : 0                                    # 0: ignore PDG_ID
-  GEN_ID              : "unknown"                            #    ignore GEN_ID check
+  GEN_ID              : "particleGun"                        #    ignore GEN_ID check
 END_PROLOG
 #------------------------------------------------------------------------------
 #include "Offline/fcl/minimalMessageService.fcl"
