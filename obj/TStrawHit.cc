@@ -183,20 +183,24 @@ void TStrawHit::Print(Option_t* Option) const {
   opt.ToLower();
 
   if ((opt == "") || (opt.Index("banner") >= 0)) {
-    printf("----------------------------------------------------------------------------------------\n");
-    printf("MC Index    T_0     T_1     TOT_0 TOT_1     EDep  Flag GenID SimID      PdgID    PdgID_M      McMom\n");
-    printf("----------------------------------------------------------------------------------------\n");
+    printf("-------------------------------------------------------------------------------------------------------------------\n");
+    printf("  SID stn face pnl str   T_0      T_1     TOT_0 TOT_1    EDep  Flag MC GenID SimID      PdgID    PdgID_M      McMom\n");
+    printf("-------------------------------------------------------------------------------------------------------------------\n");
   }
 
   if (opt.Index("data") < 0) return;
   
-  printf("%2i %5i %9.3f %9.3f %5.0f %5.0f %8.5f 0x%02x %5i %5i %10i %10i %10.3f\n",
-	 MCFlag(), 
-	 StrawID(),  
+  printf("%5i %2i   %2i  %2i  %2i %9.3f %9.3f %5.0f %5.0f %8.5f 0x%02x %2i %5i %5i %10i %10i %10.3f\n",
+	 StrawID(), 
+	 Station(),
+	 Face(),
+	 Panel(),
+	 Straw(),
 	 fTime[0], fTime[1], // ## format
 	 TOT(0)  , TOT(1)  ,
 	 fEDep,
 	 StrawDigiFlag(),
+	 MCFlag(), 
 	 GenID(),
 	 fSimID,
 	 fPdgID,
