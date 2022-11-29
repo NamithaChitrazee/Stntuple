@@ -1,5 +1,5 @@
 
-* How to catalog a STNTUPLE dataset
+* How to catalog a STNTUPLE dataset    
 
   Catalog of a STNTUPLE dataset is created by the [[file:../scripts/catalog_stntuples][Stntuple/scripts/catalog_stntuples]] script, see its source for instructions
 
@@ -12,9 +12,32 @@ Parameters:
 -D directory: directory with the STNTUPLE files to catalog
 -p pattern  : pattern, grepping on which one can create a list of files
 -d dataset  : dataset ID (name)
--b book  : datasets could be associated with several books, for example, personal user books: book=gianipez or book=murat
--h host  : if datasets are stored on a remote host
--u user  : user name on a remote host to login
+-b book     : datasets could be associated with several books, for example, personal user books: book=gianipez or book=murat
+-h host     : if datasets are stored on a remote host
+-u user     : user name on a remote host to login
+-i          : install catalog into the web area (Stntuple.Catalog in .rootrc)
+#+end_src
+
+example:
+
+#+begin_src
+murat@mu2ebuild01:/mu2e/app/users/murat/muse>Stntuple/scripts/catalog_stntuples -b mdc2020 -d cosme01 -D /mu2e/data2/projects/mdc2020/stntuple/cosme01 -i 
+Stntuple/scripts/catalog_stntuples:61: warning: Insecure world writable dir /mu2e/app in PATH, mode 040777
+Error in <TList::Clear>: A list is accessing an object (0x88fcb00) already deleted (list name = TList)
+Error in <TList::Clear>: A list is accessing an object (0x7189f40) already deleted (list name = TList)
+Error in <TList::Clear>: A list is accessing an object (0x7189f40) already deleted (list name = TList)
+Error in <TList::Clear>: A list is accessing an object (0x8ffd610) already deleted (list name = TList)
+Error in <TList::Clear>: A list is accessing an object (0x8ffd610) already deleted (list name = TList)
+Error in <TList::Clear>: A list is accessing an object (0x8ffd610) already deleted (list name = TList)
+Error in <TList::Clear>: A list is accessing an object (0x8ffd610) already deleted (list name = TList)
+Error in <TList::Clear>: A list is accessing an object (0x8ffd610) already deleted (list name = TList)
+Error in <TList::Clear>: A list is accessing an object (0x90b48d0) already deleted (list name = TList)
+$input_file:
+new fileset: 249648 1205  1 1205 63607
+new fileset: 278758 1205  1 1205 63069
+new fileset: 277735 1205  1 1205 64134
+new fileset: 278193 1205  1 1205 62533
+new fileset: 139327 1205  3 1205 61302
 #+end_src
 
 ** Cataloging steps:                   

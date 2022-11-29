@@ -5,8 +5,9 @@
 #include "TString.h"
 #include "TGeoManager.h"
 
-#include "Stntuple/gui/TEvdCrvSection.hh"
 #include "Stntuple/geom/TStnTracker.hh"
+
+class TEvdCrvSection;
 
 class TStnGeoManager : public TNamed {
 public:

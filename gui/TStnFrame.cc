@@ -260,7 +260,7 @@ TStnFrame::TStnFrame(const char*  Name,
 //-----------------------------------------------------------------------------
 // "print KalSeedColls" button
 //-----------------------------------------------------------------------------
-  tb = new TGTextButton(frame,"p_KalSeedColls",-1,
+  tb = new TGTextButton(frame,"kalseed_colls",-1,
 			TGTextButton::GetDefaultGC()(),
 			TGTextButton::GetDefaultFontStruct(),
 			kRaisedFrame);
@@ -273,7 +273,7 @@ TStnFrame::TStnFrame(const char*  Name,
 //-----------------------------------------------------------------------------
 // "print StrawDigiMCs" button
 //-----------------------------------------------------------------------------
-  tb = new TGTextButton(frame,"StrawDigiMCs",-1,
+  tb = new TGTextButton(frame,"sdmc_colls",-1,
 			TGTextButton::GetDefaultGC()(),
 			TGTextButton::GetDefaultFontStruct(),
 			kRaisedFrame);
@@ -341,6 +341,34 @@ TStnFrame::TStnFrame(const char*  Name,
 
   tb->Connect("Pressed()", "TStnVisManager", vm, "PrintColls(=\"KalSeeds\")");
 //-----------------------------------------------------------------------------
+// "print "StrawHits" button
+//-----------------------------------------------------------------------------
+  tb = new TGTextButton(frame,"StrawHits",-1,
+			TGTextButton::GetDefaultGC()(),
+			TGTextButton::GetDefaultFontStruct(),
+			kRaisedFrame);
+  tb->SetTextJustify(36);
+  tb->SetMargins(0,0,0,0);
+  tb->SetWrapLength(-1);
+  tb->MoveResize(5,260,120,30);
+  frame->AddFrame(tb, new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
+
+  tb->Connect("Pressed()", "TStnVisManager", vm, "PrintColls(=\"StrawHits\")");
+//-----------------------------------------------------------------------------
+// "print "StrawDigis" button
+//-----------------------------------------------------------------------------
+  tb = new TGTextButton(frame,"StrawDigis",-1,
+			TGTextButton::GetDefaultGC()(),
+			TGTextButton::GetDefaultFontStruct(),
+			kRaisedFrame);
+  tb->SetTextJustify(36);
+  tb->SetMargins(0,0,0,0);
+  tb->SetWrapLength(-1);
+  tb->MoveResize(5,295,120,30);
+  frame->AddFrame(tb, new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
+
+  tb->Connect("Pressed()", "TStnVisManager", vm, "PrintColls(=\"StrawDigis\")");
+//-----------------------------------------------------------------------------
   // TGPictureButton *fPictureButton821 = new TGPictureButton(fVerticalFrame820,gClient->GetPicture("f1_s.xpm"),-1,TGPictureButton::GetDefaultGC()(),kRaisedFrame);
   // fPictureButton821->SetToolTipText("print_straw_hits");
   // fVerticalFrame820->AddFrame(fPictureButton821, new TGLayoutHints(kLHintsCenterX | kLHintsTop,5,5,5,0));
@@ -372,8 +400,8 @@ TStnFrame::TStnFrame(const char*  Name,
 
   //  sh->SetSelectedItem(fShutter02);
 
-  shutter->Resize(100,300);
-  shutter->MoveResize(10,140,120,300);
+  // shutter->Resize(100,300);
+  shutter->MoveResize(10,140,120,400);
 
   fGroupFrame->AddFrame(shutter, new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
 //-----------------------------------------------------------------------------

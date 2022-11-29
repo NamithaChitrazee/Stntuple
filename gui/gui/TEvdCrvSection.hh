@@ -1,8 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Vis node - One section of CRV
 ///////////////////////////////////////////////////////////////////////////////
-#ifndef TEvdCalSection_hh
-#define TEvdCalSection_hh
+#ifndef TEvdCrvSection_hh
+#define TEvdCrvSection_hh
 
 #include "Rtypes.h" // (?)  - Gtypes is obsolete and contains nothing
 #include "TNamed.h"

@@ -7,6 +7,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 #include "Stntuple/gui/TStnGeoManager.hh"
+#include "Stntuple/gui/TEvdCrvSection.hh"
 
 #include "TGeoManager.h"
 

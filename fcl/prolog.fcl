@@ -162,8 +162,8 @@ MuHitDisplay: { module_type:MuHitDisplay                 # class name;
     comboHitCollTag              : "makePH"                          # comboHits
     helixSeedCollTag             : "MHFinderDe"                      # helices
     strawHitCollTag              : "makeSH"
-    sdCollTag                    : "FromTrackerPrototypeData"        # tracker VST
-    swCollTag                    : "FromTrackerPrototypeData"        # tracker VST
+    sdCollTag                    : "compressDigiMCs"                 # standard MC choice
+    swCollTag                    : "compressDigiMCs"                 # standard MC choice
     sdmcCollTag                  : "compressDigiMCs"                 #  was "makeSD"
     shfCollTag                   : "DeltaFinder:StrawHits"           # straw hit flags
     spmcCollTag                  : "compressDigiMCs:virtualdetector" # was g4run
