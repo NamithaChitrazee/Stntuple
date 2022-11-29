@@ -475,7 +475,8 @@ void TTrkVisNode::PaintXY(Option_t* Option) {
 
   TStnVisManager* vm = TStnVisManager::Instance();
 
-  double tmin(0), tmax(2000.);
+  double tmin = vm->TMin(); 
+  double tmax = vm->TMax();
 
   stntuple::TEvdTimeCluster* etcl = vm->SelectedTimeCluster();
   if (etcl) {

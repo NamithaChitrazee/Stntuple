@@ -203,6 +203,8 @@ MuHitDisplay: { module_type:MuHitDisplay                 # class name;
 	displayStrawHitsXY : 1
 	debugLevel         : 0
 	bField             : 1.0      # in Tesla
+	tMin               : 0.
+	tMax               : 2000.    # override for extracted position
     }
 #------------------------------------------------------------------------------
 # plugin configuration, plugin is a name of the script to be loaded
@@ -211,7 +213,6 @@ MuHitDisplay: { module_type:MuHitDisplay                 # class name;
 #------------------------------------------------------------------------------
     rootMacro              : ""
 }
-
 #------------------------------------------------------------------------------
 # namespace
 #------------------------------------------------------------------------------

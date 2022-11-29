@@ -62,7 +62,9 @@ namespace stntuple {
 //-----------------------------------------------------------------------------
 TEvdSimParticle::TEvdSimParticle(): TObject() {
   fListOfHits  = NULL;
-  fEllipse     = new TEllipse();
+  fEllipse     = nullptr;
+  fLineXY      = nullptr;
+  fLineTZ      = nullptr;
   fParticlePDG = nullptr;
   fS1          = nullptr;
   fS2          = nullptr;
@@ -88,43 +90,10 @@ TEvdSimParticle::TEvdSimParticle(): TObject() {
 
   fParticlePDG = pdb->GetParticle(fSimp->PDGCode());
 
-  // mu2e::GeomHandle<mu2e::Tracker> ttHandle;
-  // const mu2e::Tracker* tracker = ttHandle.get();
+  double p      = fS1->momentum().R  ();
+  int    pdg_id = fSimp->PDGCode();
 
-  fListOfHits = new TObjArray();
-
-  fEllipse = new TEllipse();
-
-  double r, phi0, x0, y0, xc, yc, p, pt, q;
-
-  x0 = fS1->startPosition().x();	// in mm
-  y0 = fS1->startPosition().y();
-					// rely on particle traveling along the Z axis
-  p  = fS1->momentum().R  ();
-  pt = fS1->momentum().Rho();
-  r  = pt/2.9979*10/vm->BField();       //    10^10/c, in mm
-
-  phi0 = fS1->momentum().Phi();
-
-  q = fParticlePDG->Charge()/3;	// returned is the charge in units of 1/3 
-    
-  xc   =  x0+r*q*sin(phi0);
-  yc   =  y0-r*q*cos(phi0);
-
-  // // printf("[MuHitDispla::printHelixParams] d0 = %5.3f r = %5.3f phi0 = %5.3f x0 = %5.3f y0 = %5.3f\n",
-  // // 	 d0, r, phi0, x0, y0);
-   
-  fEllipse->SetR1(r);
-  fEllipse->SetR2(r);
-  fEllipse->SetX1(xc);
-  fEllipse->SetY1(yc);
-  fEllipse->SetPhimin(0);
-  fEllipse->SetPhimax(2*M_PI*180);
-  fEllipse->SetTheta(0);
-
-  int pdg_id = fSimp->PDGCode();
-
-  int color;
+  int color(0);
 
   if      (pdg_id == 11) {
     if    (p       > 20  ) { color = kRed;    }
@@ -136,11 +105,60 @@ TEvdSimParticle::TEvdSimParticle(): TObject() {
   else if (pdg_id == 2212) { color = kBlue+2; } 
   else                     { color = kMagenta;} 
 
-  fEllipse->SetFillStyle(0);
-  fEllipse->SetFillColor(0);
-					// figure out the color
-  fEllipse->SetLineColor(color);
-  // fEllipse->SetFillStyle(3001);		// make it transparent
+  fListOfHits = new TObjArray();
+
+  double r, phi0, x0, y0, xc, yc, pt, q;
+
+  x0 = fS1->startPosition().x();	// in mm
+  y0 = fS1->startPosition().y();
+
+  if (vm->BField() != 0) {
+					// rely on particle traveling along the Z axis
+    pt = fS1->momentum().Rho();
+    r  = pt/2.9979*10/vm->BField();	//    10^10/c, in mm
+
+    phi0 = fS1->momentum().Phi();
+
+    q = fParticlePDG->Charge()/3;	// returned is the charge in units of 1/3 
+    
+    xc   =  x0+r*q*sin(phi0);
+    yc   =  y0-r*q*cos(phi0);
+
+    // printf("[MuHitDispla::printHelixParams] d0 = %5.3f r = %5.3f phi0 = %5.3f x0 = %5.3f y0 = %5.3f\n",
+    //       d0, r, phi0, x0, y0);
+   
+    fEllipse = new TEllipse();
+    fEllipse->SetR1(r);
+    fEllipse->SetR2(r);
+    fEllipse->SetX1(xc);
+    fEllipse->SetY1(yc);
+    fEllipse->SetPhimin(0);
+    fEllipse->SetPhimax(2*M_PI*180);
+    fEllipse->SetTheta(0);
+
+    fEllipse->SetFillStyle(0);
+    fEllipse->SetFillColor(0);
+    fEllipse->SetLineColor(color);
+
+    // fEllipse->SetFillStyle(3001);		// make it transparent
+    fLineXY = nullptr;
+  }
+  else {
+//-----------------------------------------------------------------------------
+// zero field - assume cosmics ... 
+// also assume that the particle's trajectory is not horisontal
+//-----------------------------------------------------------------------------
+    double dydx = fS1->momentum().y()/fS1->momentum().x();
+
+    double y1(1000.), y2(-1000.);
+
+    double x1 = (y1-y0)/dydx + x0;
+    double x2 = (y2-y0)/dydx + x0;
+    
+    fLineXY   = new TLine(x1,y1,x2,y2);
+    fLineXY->SetLineColor(color);
+    fEllipse  = nullptr;
+  }
 //-----------------------------------------------------------------------------
 // TZ view, Z positons of StrawGasSteps - in the tracker system
 //-----------------------------------------------------------------------------
@@ -160,7 +178,9 @@ TEvdSimParticle::TEvdSimParticle(): TObject() {
 
 //-----------------------------------------------------------------------------
 TEvdSimParticle::~TEvdSimParticle() {
-  delete fEllipse;
+  if (fEllipse) delete fEllipse;
+  if (fLineXY ) delete fLineXY;
+
   delete fLineTZ;
 
   if (fListOfHits) {
@@ -194,7 +214,9 @@ void TEvdSimParticle::Paint(Option_t* Option) {
 // of the tracker, at s=0
 //-----------------------------------------------------------------------------
 void TEvdSimParticle::PaintXY(Option_t* Option) {
-  fEllipse->Paint();
+  TStnVisManager* vm = TStnVisManager::Instance();
+  if (vm->BField() != 0) fEllipse->Paint();
+  else                   fLineXY->Paint();
 }
 
 //-----------------------------------------------------------------------------
@@ -334,18 +356,37 @@ int TEvdSimParticle::DistancetoPrimitive(Int_t px, Int_t py) {
 //_____________________________________________________________________________
 int TEvdSimParticle::DistancetoPrimitiveXY(Int_t px, Int_t py) {
 
-  int dist = 9999;
+  static TVector3 global(gPad->AbsPixeltoX(px),gPad->AbsPixeltoY(py),0);
 
-  static TVector3 global;
+  int    dist(9999), dpy(10);
 
-  global.SetXYZ(gPad->AbsPixeltoX(px),gPad->AbsPixeltoY(py),0);
+  TStnVisManager* vm = TStnVisManager::Instance();
 
-  double dx = global.X()-fEllipse->GetX1();
-  double dy = global.Y()-fEllipse->GetY1();
+  if (vm->BField() != 0) {
 
-  double dr = sqrt(dx*dx+dy*dy)-fEllipse->GetR1();
+    double dx = global.X()-fEllipse->GetX1();
+    double dy = global.Y()-fEllipse->GetY1();
 
-  dist = gPad->XtoAbsPixel(global.x()+dr)-px;
+    double dr = sqrt(dx*dx+dy*dy)-fEllipse->GetR1();
+    
+    dist = gPad->XtoAbsPixel(global.x()+dr)-px;
+  }
+  else {
+    TVector3 g2(gPad->AbsPixeltoX(px),gPad->AbsPixeltoY(py+dpy),0);
+
+    double dy    = g2.y()-global.y();
+
+    double x0    = fS1->position().x();
+    double y0    = fS1->position().y();
+
+    double nux   = -fS1->momentum().y()/fS1->momentum().R();
+    double nuy   =  fS1->momentum().x()/fS1->momentum().R();
+
+    double dt    = (global.x()-x0)*nux+(global.y()-y0)*nuy;
+
+    dist         = (dt/dy)*dpy; // in pixels
+  }
+
   return abs(dist);
 }
 

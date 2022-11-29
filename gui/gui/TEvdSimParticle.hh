@@ -30,6 +30,7 @@ public:
 
   TObjArray*                fListOfHits;
   TEllipse*                 fEllipse;
+  TLine*                    fLineXY;	// for zero field
   TLine*                    fLineTZ;
   TParticlePDG*             fParticlePDG;
 //-----------------------------------------------------------------------------

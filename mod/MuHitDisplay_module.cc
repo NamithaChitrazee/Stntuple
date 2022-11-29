@@ -225,7 +225,7 @@ void MuHitDisplay::InitVisManager() {
     vm->AddView(view[i]);
   }
 //-----------------------------------------------------------------------------
-// parse the configuration module parameters
+// parse the VM configuration parameters
 //-----------------------------------------------------------------------------
   int debug_level = _vmConfig.get<int>("debugLevel");
   vm->SetDebugLevel(debug_level);
@@ -240,7 +240,10 @@ void MuHitDisplay::InitVisManager() {
   vm->SetBField(bfield);
 
   _defaultView = _vmConfig.get<string>("defaultView");
-  boost::algorithm::to_lower(_defaultView);
+
+  float tmin   = _vmConfig.get<float>("tMin");
+  float tmax   = _vmConfig.get<float>("tMax");
+  vm->SetTimeWindow(tmin,tmax);
 //-----------------------------------------------------------------------------
 // do the geometry
 //-----------------------------------------------------------------------------
