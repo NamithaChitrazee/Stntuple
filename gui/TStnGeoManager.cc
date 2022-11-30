@@ -6,50 +6,65 @@
 // dmg->fGm->GetVolume("HallAir")->Draw("ogl")
 //
 ///////////////////////////////////////////////////////////////////////////////
-#include "Stntuple/gui/TStnGeoManager.hh"
-#include "Stntuple/gui/TEvdCrvSection.hh"
-
 #include "TGeoManager.h"
+
+#include "Stntuple/gui/TEvdCrvSection.hh"
+#include "Stntuple/gui/TStnGeoManager.hh"
+
+TStnGeoManager*  TStnGeoManager::fgInstance(nullptr);
 
 ClassImp(TStnGeoManager)
 
 //-----------------------------------------------------------------------------
-TStnGeoManager::TStnGeoManager(const char* Name): TNamed(Name,Name) {
-  fTop       = NULL;
-  fDs2Vacuum = NULL;
-  fDs3Vacuum = NULL;
-  fSttMother = NULL;
-  fTrkMother = NULL;
-  fCalMother = NULL;
-  fMbsMother = NULL;
-  fTransp    = -1;
-}
-
-//-----------------------------------------------------------------------------
 // different ways of constructing the geometry
-// 1. init from GDML file
+// if Fn = nullptr, init from GDML file
+// otherwise use to access detectors
 //-----------------------------------------------------------------------------
-TStnGeoManager::TStnGeoManager(const char* Name, const char* Fn, int UseOriginalColors) : TNamed(Name,Name){
-  TGeoManager::Import(Fn);
+TStnGeoManager::TStnGeoManager(const char* Name, const char* Fn, int UseOriginalColors) : TNamed(Name,Name) {
 
-  fTop       = gGeoManager->GetTopNode();
+  if (Fn != nullptr) {
+    TGeoManager::Import(Fn);
 
-  fDs2Vacuum = FindNodeByVolumeName(fTop,"DS2Vacuum");
-  fDs3Vacuum = FindNodeByVolumeName(fTop,"DS3Vacuum");
+    fTop       = gGeoManager->GetTopNode();
 
-  fSttMother = FindNodeByVolumeName(fDs2Vacuum,"StoppingTargetMother");
+    fDs2Vacuum = FindNodeByVolumeName(fTop,"DS2Vacuum");
+    fDs3Vacuum = FindNodeByVolumeName(fTop,"DS3Vacuum");
 
-  fTrkMother = FindNodeByVolumeName(fDs3Vacuum,"TrackerMother");
-  fCalMother = FindNodeByVolumeName(fDs3Vacuum,"CalorimeterMother");
-  fMbsMother = FindNodeByVolumeName(fDs3Vacuum,"MBSMother");
+    fSttMother = FindNodeByVolumeName(fDs2Vacuum,"StoppingTargetMother");
 
-  fTransp = 40;
+    fTrkMother = FindNodeByVolumeName(fDs3Vacuum,"TrackerMother");
+    fCalMother = FindNodeByVolumeName(fDs3Vacuum,"CalorimeterMother");
+    fMbsMother = FindNodeByVolumeName(fDs3Vacuum,"MBSMother");
+    
+    fTransp = 40;
   
-  HideBuilding(UseOriginalColors);
+    HideBuilding(UseOriginalColors);
+  }
+  else {
+    fTop       = NULL;
+    fDs2Vacuum = NULL;
+    fDs3Vacuum = NULL;
+    fSttMother = NULL;
+    fTrkMother = NULL;
+    fCalMother = NULL;
+    fMbsMother = NULL;
+    fTransp    = -1;
+  }
 }
 
 //-----------------------------------------------------------------------------
 TStnGeoManager::~TStnGeoManager() {
+  fgInstance  = 0;
+}
+
+//_____________________________________________________________________________
+TStnGeoManager* TStnGeoManager::Instance() {
+  if (TStnGeoManager::fgInstance != NULL) {
+    return (TStnGeoManager*) TStnGeoManager::fgInstance;
+  }
+  else {
+    return new TStnGeoManager();
+  }
 }
 
 //-----------------------------------------------------------------------------

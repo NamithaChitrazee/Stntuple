@@ -10,6 +10,10 @@
 class TEvdCrvSection;
 
 class TStnGeoManager : public TNamed {
+protected:
+
+  static TStnGeoManager*  fgInstance;
+
 public:
   enum { kNCrvSections = 22 };
   
@@ -30,16 +34,26 @@ public:
 
   int             fTransp;
 
-  TStnGeoManager(const char* Name = "");
-  TStnGeoManager(const char* Name, const char* Fn, int OriginalColors = 0);
+  TObjArray*      fListOfDetectors; 
+
+  TStnGeoManager(const char* Name = "StnGeoManager", const char* Fn = nullptr, int OriginalColors = 0);
   ~TStnGeoManager();
+
+  static TStnGeoManager* Instance();
 //-----------------------------------------------------------------------------
 // accessors
 //-----------------------------------------------------------------------------
   TEvdCrvSection* CrvSection(int I) { return fCrvSection[I] ; }
+
+					// here I explicitly assume that the name is known
+  TStnTracker*    Tracker() const { return (TStnTracker*) fListOfDetectors->FindObject("tracker"); }
+  TObject*        Detector(const char* Name) const { return fListOfDetectors->FindObject(Name); }
 //-----------------------------------------------------------------------------
 // setters
+// from this point , TStnGeoManager owns detectors
 //-----------------------------------------------------------------------------
+  void AddDetector(TObject* Detector) { fListOfDetectors->Add(Detector); }
+
   void SetRecursiveVisibility(TGeoVolume* Vol, int OnOff);
   void SetRecursiveVisibility(TGeoNode*   Vol, int OnOff);
 
