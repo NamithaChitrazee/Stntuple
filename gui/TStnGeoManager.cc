@@ -64,12 +64,12 @@ TStnGeoManager::~TStnGeoManager() {
 }
 
 //_____________________________________________________________________________
-TStnGeoManager* TStnGeoManager::Instance() {
+TStnGeoManager* TStnGeoManager::Instance(const char* Name, const char* Fn, int UseOriginalColors) {
   if (TStnGeoManager::fgInstance != NULL) {
     return (TStnGeoManager*) TStnGeoManager::fgInstance;
   }
   else {
-    return new TStnGeoManager();
+    return new TStnGeoManager(Name,Fn,UseOriginalColors);
   }
 }
 

@@ -29,7 +29,7 @@ TEventDisplayModule::TEventDisplayModule(const char* Name, const char* Title):
   fDisplayBeamMuPlus  = 0;
 
   const char* geom_gdml_file = gEnv->GetValue("mu2e.GdmlGeometry",(const char*) NULL);
-  fGeoManager  = new TStnGeoManager("StnGeoManager",geom_gdml_file,0);
+  fGeoManager  = TStnGeoManager::Instance("StnGeoManager",geom_gdml_file,0);
 
   // the next two lines look as if they were not doing anything... 
   // TGeoVolume*  topvol = gGeoManager->GetTopVolume();

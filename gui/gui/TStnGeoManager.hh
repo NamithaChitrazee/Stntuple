@@ -37,10 +37,10 @@ public:
   TObjArray*      fListOfDetectors; 
 
 private:
-  TStnGeoManager(const char* Name = "StnGeoManager", const char* Fn = nullptr, int OriginalColors = 0);
+  TStnGeoManager(const char* Name, const char* Fn, int OriginalColors);
   ~TStnGeoManager();
 public:
-  static TStnGeoManager* Instance();
+  static TStnGeoManager* Instance(const char* Name = "StnGeoManager", const char* Fn = nullptr, int OriginalColors = 0);
 //-----------------------------------------------------------------------------
 // accessors
 //-----------------------------------------------------------------------------
