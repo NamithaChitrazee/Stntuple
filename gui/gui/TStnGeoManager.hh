@@ -36,9 +36,10 @@ public:
 
   TObjArray*      fListOfDetectors; 
 
+private:
   TStnGeoManager(const char* Name = "StnGeoManager", const char* Fn = nullptr, int OriginalColors = 0);
   ~TStnGeoManager();
-
+public:
   static TStnGeoManager* Instance();
 //-----------------------------------------------------------------------------
 // accessors
@@ -46,13 +47,14 @@ public:
   TEvdCrvSection* CrvSection(int I) { return fCrvSection[I] ; }
 
 					// here I explicitly assume that the name is known
+
   TStnTracker*    Tracker() const { return (TStnTracker*) fListOfDetectors->FindObject("tracker"); }
   TObject*        Detector(const char* Name) const { return fListOfDetectors->FindObject(Name); }
 //-----------------------------------------------------------------------------
 // setters
 // from this point , TStnGeoManager owns detectors
 //-----------------------------------------------------------------------------
-  void AddDetector(TObject* Detector) { fListOfDetectors->Add(Detector); }
+  void AddDetector(TObject* Detector); //  { fListOfDetectors->Add(Detector); }
 
   void SetRecursiveVisibility(TGeoVolume* Vol, int OnOff);
   void SetRecursiveVisibility(TGeoNode*   Vol, int OnOff);

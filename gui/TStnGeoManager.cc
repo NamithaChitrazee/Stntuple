@@ -50,11 +50,17 @@ TStnGeoManager::TStnGeoManager(const char* Name, const char* Fn, int UseOriginal
     fMbsMother = NULL;
     fTransp    = -1;
   }
+
+  fListOfDetectors = new TObjArray();
+  fListOfDetectors->SetOwner(kTRUE);
+
+  fgInstance = this;
 }
 
 //-----------------------------------------------------------------------------
 TStnGeoManager::~TStnGeoManager() {
   fgInstance  = 0;
+  delete fListOfDetectors;
 }
 
 //_____________________________________________________________________________
@@ -65,6 +71,13 @@ TStnGeoManager* TStnGeoManager::Instance() {
   else {
     return new TStnGeoManager();
   }
+}
+
+//-----------------------------------------------------------------------------
+// has to be compiled, non-inlined
+//-----------------------------------------------------------------------------
+void TStnGeoManager::AddDetector(TObject* Detector) { 
+  fListOfDetectors->Add(Detector); 
 }
 
 //-----------------------------------------------------------------------------
