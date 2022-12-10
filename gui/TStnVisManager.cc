@@ -1028,11 +1028,15 @@ void TStnVisManager::PrintColls(const char* Tag) {
   else if (tag == "tc_colls"     ) print_tc_colls();
   else if (tag == "time_clusters") {
     TVisNode* vn = FindNode("TimeClusterVisNode");
-    vn->Print();
+    vn->NodePrint(0,"time_clusters");
   }
   else if (tag == "kalseeds") {
     TVisNode* vn = FindNode("TrkVisNode");
     vn->NodePrint(0,"KalSeed");
+  }
+  else if (tag == "helices") {
+    TVisNode* vn = FindNode("HelixVisNode");
+    vn->NodePrint(0,"HelixSeed");
   }
   else if (tag == "combo_hits") {
     TVisNode* vn = FindNode("TrkVisNode");

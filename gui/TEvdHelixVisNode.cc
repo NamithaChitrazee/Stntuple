@@ -25,6 +25,8 @@
 #include "Offline/ConditionsService/inc/ConditionsHandle.hh"
 #include "Offline/TrackerConditions/inc/StrawResponse.hh"
 
+#include "Stntuple/print/TAnaDump.hh"
+
 #include "Stntuple/gui/TEvdTimeCluster.hh"
 #include "Stntuple/gui/TEvdComboHit.hh"
 #include "Stntuple/gui/TEvdHelixSeed.hh"
@@ -363,6 +365,30 @@ Int_t TEvdHelixVisNode::DistancetoPrimitiveTZ(Int_t px, Int_t py) {
 //-----------------------------------------------------------------------------
 void TEvdHelixVisNode::Clear(Option_t* Opt) {
   printf(">>> name: %s TEvdHelixVisNode::Clear is not implemented yet\n",GetName());
+}
+
+//-----------------------------------------------------------------------------
+void TEvdHelixVisNode::NodePrint(const void* Object, const char* ClassName) {
+  TString class_name(ClassName);
+
+  TAnaDump* ad = TAnaDump::Instance();
+
+  if (class_name == "HelixSeed") {
+//-----------------------------------------------------------------------------
+// print a HelixSeed or a HelixSeed collection
+//-----------------------------------------------------------------------------
+    if (Object) {
+      const mu2e::HelixSeed* hs = (const mu2e::HelixSeed*) Object;
+      ad->printHelixSeed(hs,"",fShCollTag.data(),fSdmcCollTag.data());
+    }
+    else {
+					// Object = nullptr: print collection, with hits 
+      ad->printHelixSeedCollection(fHsCollTag.data(),1,fShCollTag.data(),fSdmcCollTag.data());
+    }
+  }
+  else {
+    printf("WARNING in TTrkVisNode::Print: print for %s not implemented yet\n",ClassName);
+  }
 }
 
 //-----------------------------------------------------------------------------

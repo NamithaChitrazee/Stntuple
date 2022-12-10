@@ -191,7 +191,7 @@ void TEvdTimeClusterVisNode::Clear(Option_t* Opt) {
 
 //-----------------------------------------------------------------------------
 void TEvdTimeClusterVisNode::Print(Option_t* Opt) const {
-  printf(" >>> name: %s TEvdTimeClusterVisNode::Print is not implemented yet\n",GetName());
+  // printf(" >>> name: %s TEvdTimeClusterVisNode::Print is not implemented yet\n",GetName());
 
   TAnaDump* ad = TAnaDump::Instance();
   ad->printTimeClusterCollection(fTcCollTag.data(),fChCollTag.data(),1,fSdmcCollTag.data());

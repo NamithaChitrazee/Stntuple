@@ -369,6 +369,20 @@ TStnFrame::TStnFrame(const char*  Name,
 
   tb->Connect("Pressed()", "TStnVisManager", vm, "PrintColls(=\"StrawDigis\")");
 //-----------------------------------------------------------------------------
+// "print "Helices" button
+//-----------------------------------------------------------------------------
+  tb = new TGTextButton(frame,"Helices",-1,
+			TGTextButton::GetDefaultGC()(),
+			TGTextButton::GetDefaultFontStruct(),
+			kRaisedFrame);
+  tb->SetTextJustify(36);
+  tb->SetMargins(0,0,0,0);
+  tb->SetWrapLength(-1);
+  tb->MoveResize(5,330,120,30);
+  frame->AddFrame(tb, new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
+
+  tb->Connect("Pressed()", "TStnVisManager", vm, "PrintColls(=\"Helices\")");
+//-----------------------------------------------------------------------------
   // TGPictureButton *fPictureButton821 = new TGPictureButton(fVerticalFrame820,gClient->GetPicture("f1_s.xpm"),-1,TGPictureButton::GetDefaultGC()(),kRaisedFrame);
   // fPictureButton821->SetToolTipText("print_straw_hits");
   // fVerticalFrame820->AddFrame(fPictureButton821, new TGLayoutHints(kLHintsCenterX | kLHintsTop,5,5,5,0));
@@ -766,7 +780,7 @@ void TStnFrame::DoRadio() {
 
   printf(" TStnFrame::DoRadio radio button ID: %i\n",id);
   
-  if ((id == M_DISPLAY_SH) || (id == M_DISPLAY_CH)) {
+  if ((id == M_DISPLAY_SH) or (id == M_DISPLAY_CH)) {
 //-----------------------------------------------------------------------------
 // switch between displaying straw and combo hits
 //-----------------------------------------------------------------------------
@@ -774,6 +788,7 @@ void TStnFrame::DoRadio() {
 
     for (int i = 0; i < 2; i++) {
       if (fRb[i]->WidgetId() != id) fRb[i]->SetState(kButtonUp);
+      else                          fRb[i]->SetState(kButtonDown);
     }
   }
 }

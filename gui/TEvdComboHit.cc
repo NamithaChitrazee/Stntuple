@@ -69,7 +69,7 @@ TEvdComboHit::TEvdComboHit(const mu2e::ComboHit*      Hit,
    // printf("TEvdComboHit::TEvdComboHit: StrawDidiMC::driftDistance disabled. ask Dave Brown\n");
 
   fSigW  = Hit->wireRes();
-  fSigR  = 2.5 ; // Hit->transRes(); 
+  fSigR  = 2.5 ;                // Hit->transRes(); 
 //-----------------------------------------------------------------------------
 // style and color
 //-----------------------------------------------------------------------------

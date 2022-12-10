@@ -81,6 +81,8 @@ public:
 //-----------------------------------------------------------------------------
   virtual int  InitEvent();
 
+  virtual void NodePrint(const void* Object, const char* ClassName) ;
+
   virtual void PaintXY (Option_t* option = "");
   virtual void PaintRZ (Option_t* option = "");
   virtual void PaintTZ (Option_t* option = "");

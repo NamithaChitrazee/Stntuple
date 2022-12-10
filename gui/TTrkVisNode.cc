@@ -235,10 +235,9 @@ int TTrkVisNode::InitEvent() {
     if (mcdigi) {
 
       const mu2e::StrawGasStep* step = mcdigi->earlyStrawGasStep().get();
-
-      const mu2e::SimParticle* sim   = &(*step->simParticle());
+      const mu2e::SimParticle*  sim  = &(*step->simParticle());
     
-      if ( sim->fromGenerator() ){
+      if (sim->fromGenerator()) {
 	mu2e::GenParticle* gen = (mu2e::GenParticle*) &(*sim->genParticle());
 	//	    if ( gen->generatorId() == mu2e::GenId::conversionGun ){
 	if ( gen->generatorId() == mu2e::GenId::StoppedParticleReactionGun ){
@@ -247,11 +246,6 @@ int TTrkVisNode::InitEvent() {
       }
       int   pdg_id = sim->pdgId();
       float mc_mom = step->momvec().mag();
-      //-----------------------------------------------------------------------------
-      // old default, draw semi-random errors
-      //-----------------------------------------------------------------------------
-      sigw  = hit->wireRes()/2.;      // P.Murat
-      sigr  = 2.5;                    // in mm
 	
       intime = fabs(hit->time()-fEventTime) < fTimeWindow;
 	
@@ -271,6 +265,8 @@ int TTrkVisNode::InitEvent() {
 //-----------------------------------------------------------------------------
 // add a pointer to the hit to the straw 
 //-----------------------------------------------------------------------------
+    sigw     = hit->wireRes();      // P.Murat
+    sigr     = 2.5;                    // in mm
     int mask = 0;
     if (intime          ) mask |= stntuple::TEvdStrawHit::kInTimeBit;
     if (isFromConversion) mask |= stntuple::TEvdStrawHit::kConversionBit;
@@ -482,6 +478,26 @@ void TTrkVisNode::PaintXY(Option_t* Option) {
   if (etcl) {
     tmin = etcl->TMin(); // FIXME!
     tmax = etcl->TMax(); // FIXME!
+
+    if (vm->DisplayStrawHitsXY()) {
+//-----------------------------------------------------------------------------
+// for strash hit display, tmin and tmax should be defined by the straw, 
+// not combo, hit times
+//-----------------------------------------------------------------------------
+      const mu2e::TimeCluster* tc = etcl->TimeCluster();
+      int nch = tc->nhits();
+      for (int i=0; i<nch; i++) {
+	int ind = tc->hits().at(i);
+	const mu2e::ComboHit* ch = &fChColl->at(ind);
+	int nsh = ch->nStrawHits();
+	for (int ish=0; ish<nsh; ish++) {
+	  int loc = ch->index(ish);
+	  const mu2e::ComboHit* sh = &fSchColl->at(loc);
+	  if (sh->correctedTime() < tmin) tmin = sh->correctedTime();
+	  if (sh->correctedTime() > tmax) tmax = sh->correctedTime();
+	}
+      }
+    }
   }
   
   if (vm->DisplayStrawHitsXY()) {
@@ -494,7 +510,7 @@ void TTrkVisNode::PaintXY(Option_t* Option) {
       const mu2e::ComboHit*   sh     = evd_sh->StrawHit();
       straw     = &tracker->getStraw(sh->strawId());//strawIndex());
       station   = straw->id().getStation();
-      time      = sh->time();
+      time      = sh->correctedTime();
 
       if ((station >= vm->MinStation()) && (station <= vm->MaxStation())) { 
 	if ((time >= tmin) && (time <= tmax)) {
@@ -587,6 +603,35 @@ void TTrkVisNode::PaintRZ(Option_t* Option) {
   TStnVisManager* vm = TStnVisManager::Instance();
 
   fTracker->PaintRZ(Option);
+
+  double tmin = vm->TMin(); 
+  double tmax = vm->TMax();
+
+  stntuple::TEvdTimeCluster* etcl = vm->SelectedTimeCluster();
+  if (etcl) {
+    tmin = etcl->TMin(); // FIXME!
+    tmax = etcl->TMax(); // FIXME!
+
+    if (vm->DisplayStrawHitsXY()) {
+//-----------------------------------------------------------------------------
+// for strash hit display, tmin and tmax should be defined by the straw, 
+// not combo, hit times
+//-----------------------------------------------------------------------------
+      const mu2e::TimeCluster* tc = etcl->TimeCluster();
+      int nch = tc->nhits();
+      for (int i=0; i<nch; i++) {
+	int ind = tc->hits().at(i);
+	const mu2e::ComboHit* ch = &fChColl->at(ind);
+	int nsh = ch->nStrawHits();
+	for (int ish=0; ish<nsh; ish++) {
+	  int loc = ch->index(ish);
+	  const mu2e::ComboHit* sh = &fSchColl->at(loc);
+	  if (sh->correctedTime() < tmin) tmin = sh->correctedTime();
+	  if (sh->correctedTime() > tmax) tmax = sh->correctedTime();
+	}
+      }
+    }
+  }
 //-----------------------------------------------------------------------------
 // do not draw all straw hits - just redraw straws in different color instead
 //-----------------------------------------------------------------------------
@@ -612,7 +657,10 @@ void TTrkVisNode::PaintRZ(Option_t* Option) {
       nhits = evd_trk->NHits();
       for (int ih=0; ih<nhits; ih++) {
 	stntuple::TEvdTrkStrawHit* hit = evd_trk->Hit(ih);
-	hit->PaintRZ(Option);
+	double time = hit->TrkStrawHitSeed()->hitTime();
+	if ((time >= tmin) && (time <= tmax)) {
+	  hit->PaintRZ(Option);
+	}
       }
     }
   }
@@ -853,7 +901,6 @@ void TTrkVisNode::Print(Option_t* Opt) const {
     }
     sim->Print("data");
   }
-
 //-----------------------------------------------------------------------------
 // print ComboHits
 //-----------------------------------------------------------------------------

@@ -35,6 +35,33 @@ public:
     kConversionBit = 0x1 << 1
   };
 
+  enum { 
+    kStereo      = 0x00000001, // <<  0
+    kEnergySel   = 0x00000002, // <<  1
+    kRadSel      = 0x00000004, // <<  2
+    kTimeSel     = 0x00000008, // <<  3
+    kBkgClust    = 0x00000020, // <<  5,
+    kBkg         = 0x00000040, // <<  6,
+    kIsolated    = 0x00000080, // <<  7,
+    kOutlier     = 0x00000100, // <<  8,
+    kOther       = 0x00000200, // <<  9,
+    kTdiv        = 0x00000400, // << 10,
+    kClust       = 0x00000800, // << 11,
+    kCalosel     = 0x00001000, // << 12,
+    kStrawxtalk  = 0x00002000, // << 13
+    kElextalk    = 0x00002000, // << 14
+    kTrksel      = 0x00008000, // << 15
+    kActive      = 0x00010000, // << 16
+    kDoca        = 0x00020000, // << 17
+    kResolvedphi = 0x00040000, // << 18
+    kCalopresel  = 0x00080000, // << 19
+    kIntime      = 0x00100000, // << 20
+    kPanelcombo  = 0x00200000, // << 21
+    kTrack       = 0x00400000, // << 22
+    kDead        = 0x00800000, // << 23
+    kNoisy       = 0x01000000, // << 24
+  };
+
 protected:
 					// backward pointers to the reconstruction objects
   const mu2e::ComboHit*      fHit;
