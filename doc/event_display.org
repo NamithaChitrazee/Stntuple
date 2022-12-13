@@ -99,6 +99,11 @@ mu2e -c Stntuple/fcl/display.fcl -s dig.mu2e.CeEndpointDigiTriggered.MDC2020n_10
 - prints : under the "print" section of the shutter
 - right click on a view pops up a context sensitive menu, a TStnView print prints 
   all nodes (objects) displayed in the active view
+
+** command line printing                                                     
+   d = TAnaDump::Instance()
+
+*** d->printTimeClusterCollection("TZClusterFinder","makePH",1,"makeSD")    
 * ------------------------------------------------------------------------------
 * [1/1] TODO's                                                               
 ** DONE add a SimParticle node ? or just add a list of SimParticles to XY view ?
