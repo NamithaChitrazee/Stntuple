@@ -190,6 +190,30 @@ void TEvdTimeClusterVisNode::Clear(Option_t* Opt) {
 }
 
 //-----------------------------------------------------------------------------
+void TEvdTimeClusterVisNode::NodePrint(const void* Object, const char* ClassName) {
+  TString class_name(ClassName);
+
+  TAnaDump* ad = TAnaDump::Instance();
+
+  if (class_name == "TimeCluster") {
+//-----------------------------------------------------------------------------
+// print a HelixSeed or a HelixSeed collection
+//-----------------------------------------------------------------------------
+    if (Object) {
+      const mu2e::TimeCluster* tc = (const mu2e::TimeCluster*) Object;
+      ad->printTimeCluster(tc,"",fChColl,fSdmcCollTag.data());
+    }
+    else {
+					// Object = nullptr: print collection, with hits 
+      ad->printTimeClusterCollection(fTcCollTag.data(),fChCollTag.data(),1,fSdmcCollTag.data());
+    }
+  }
+  else {
+    printf("WARNING in TTimeClusterVisNode::%s: print for %s not implemented yet\n",__func__,ClassName);
+  }
+}
+
+//-----------------------------------------------------------------------------
 void TEvdTimeClusterVisNode::Print(Option_t* Opt) const {
   // printf(" >>> name: %s TEvdTimeClusterVisNode::Print is not implemented yet\n",GetName());
 

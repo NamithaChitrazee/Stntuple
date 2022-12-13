@@ -46,6 +46,8 @@ MuHitDisplay::MuHitDisplay(fhicl::ParameterSet const& pset) :
   _swCollTag                   (pset.get<string>("swCollTag")),
   
   _helixSeedCollTag            (pset.get<string>("helixSeedCollTag")),
+  _ksfCollTag                  (pset.get<string>("ksfCollTag")),
+  _kffCollTag                  (pset.get<string>("kffCollTag")),
   _trackCollTag                (pset.get<string>("trackCollTag")),
   _simpCollTag                 (pset.get<string>("simpCollTag")),
   _timeClusterCollTag          (pset.get<string>("timeClusterCollTag")),
@@ -281,7 +283,6 @@ void MuHitDisplay::InitVisManager() {
 
   tnode->SetShCollTag       (_strawHitCollTag  );
   tnode->SetChCollTag       (_comboHitCollTag  );
-  //  tnode->SetStrawHitFlagColl(&fStrawHitFlagColl);
   tnode->SetKsCollTag       ( _trackCollTag    );
   tnode->SetSdmcCollTag     (_sdmcCollTag      );
   tnode->SetSimpColl        (&_simpColl        );

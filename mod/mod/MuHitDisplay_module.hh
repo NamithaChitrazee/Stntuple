@@ -98,6 +98,8 @@ private:
   string        _swCollTag;
   
   string        _helixSeedCollTag;	// helix seed collection tag
+  string        _ksfCollTag;
+  string        _kffCollTag;
   string        _trackCollTag;
   string        _simpCollTag;
   string        _timeClusterCollTag;

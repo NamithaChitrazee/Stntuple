@@ -387,7 +387,7 @@ void TEvdHelixVisNode::NodePrint(const void* Object, const char* ClassName) {
     }
   }
   else {
-    printf("WARNING in TTrkVisNode::Print: print for %s not implemented yet\n",ClassName);
+    printf("WARNING in TEvdHelixVisNode::NodePrint: print for %s not implemented yet\n",ClassName);
   }
 }
 

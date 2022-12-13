@@ -26,6 +26,7 @@ void     print_kalseed_colls   ();   // print all KalSeed      collections
 void     print_sd_colls        ();   // print all StrawDigi    collections
 void     print_sdmc_colls      ();   // print all StrawDigiMC  collections
 void     print_sh_colls        ();   // print all StrawHit     collections
+void     print_shf_colls       ();   // print all StrawHitFlag collections
 void     print_simp_colls      ();   // print all SimParticle  collections
 void     print_spmc_colls      ();   // print all StepPointMC  collections
 void     print_tc_colls        ();   // print all time cluster collections

@@ -82,6 +82,9 @@ public:
   virtual int  DistancetoPrimitiveTZ(Int_t px, Int_t py);
 
   virtual void Clear(const char* Opt = "")       ;
+
+  virtual void NodePrint(const void* Object, const char* ClassName);
+
   virtual void Print(const char* Opt = "") const ; // **MENU**
 
   ClassDef(TEvdTimeClusterVisNode,0)
