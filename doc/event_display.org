@@ -1,5 +1,4 @@
 #
-
 * STNTUPLE event display                                                     
 ** how to run:                                                               
 #+begin_src
