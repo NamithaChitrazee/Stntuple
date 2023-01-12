@@ -13,10 +13,11 @@
 #include "TH1.h"
 #include "TH2.h"
 
-#include "Stntuple/scripts/hist_data.hh"
-#include "Stntuple/scripts/plot_data.hh"
-#include "Stntuple/scripts/plot_utilities.hh"
+#include "Stntuple/val/hist_data.hh"
+#include "Stntuple/val/plot_data.hh"
 #include "Stntuple/val/stntuple_val_functions.hh"
+
+#include "Stntuple/scripts/plot_utilities.hh"
 //-----------------------------------------------------------------------------
 // compare two histograms with different ModuleName/HistName's from two different files
 // HistName like "spmc_1/mom"
@@ -89,7 +90,7 @@ void plot_hist_1D(hist_data_t* Hist1,  hist_data_t*  Hist2, int Print = 0) {
   TString canvas_name;
 
   if(hf1) {
-    canvas_name += ds1->fID;
+    canvas_name += ds1->GetName();
     canvas_name += "_";
   }
   canvas_name += Hist1->fModule;
@@ -214,11 +215,11 @@ void plot_hist_1D(hist_data_t* Hist1,  hist_data_t*  Hist2, int Print = 0) {
     TString nam2 = hn2(hn2.Index('/')+1,hn2.Length());
 
     if (Hist1->fYLogScale == 1) {
-      if (hf1) Hist1->fPlotName = Form("%s_%s_vs_%s_%s_log",ds1->fID.Data(),fol1.Data(),fol2.Data(),nam1.Data());
+      if (hf1) Hist1->fPlotName = Form("%s_%s_vs_%s_%s_log",ds1->GetName(),fol1.Data(),fol2.Data(),nam1.Data());
       else     Hist1->fPlotName = Form("%s_vs_%s_%s_log",fol1.Data(),fol2.Data(),nam1.Data());
     }
     else {
-      if (hf1) Hist1->fPlotName = Form("%s_%s_vs_%s_%s_lin",ds1->fID.Data(),fol1.Data(),fol2.Data(),nam1.Data());
+      if (hf1) Hist1->fPlotName = Form("%s_%s_vs_%s_%s_lin",ds1->GetName(),fol1.Data(),fol2.Data(),nam1.Data());
       else     Hist1->fPlotName = Form("%s_vs_%s_%s_lin",fol1.Data(),fol2.Data(),nam1.Data());
     }
   }
@@ -285,7 +286,7 @@ int plot_hist_1d(hist_data_t* Hist, int NHist, int Print = 0) {
   }
   else {
     if (ds1) {
-      canvas_name += ds1->fID;
+      canvas_name += ds1->GetName();
       canvas_name += "_";
     }
     canvas_name += Hist1->fModule;
@@ -521,11 +522,11 @@ int plot_hist_1d(hist_data_t* Hist, int NHist, int Print = 0) {
     // TString nam2 = hn2(hn2.Index('/')+1,hn2.Length());
 
     if (Hist1->fYLogScale == 1) {
-      if (hf1) Hist1->fPlotName = Form("%s_%s_vs_%s_%s_log",ds1->fID.Data(),fol1.Data(),"fol2_data",nam1.Data()); // fol2.Data(),);
+      if (hf1) Hist1->fPlotName = Form("%s_%s_vs_%s_%s_log",ds1->GetName(),fol1.Data(),"fol2_data",nam1.Data()); // fol2.Data(),);
       else     Hist1->fPlotName = Form("%s_vs_%s_%s_log",fol1.Data(),"fol2_data",nam1.Data()); // fol2.Data()
     }
     else {
-      if (hf1) Hist1->fPlotName = Form("%s_%s_vs_%s_%s_lin",ds1->fID.Data(),fol1.Data(),"fol2_data",nam1.Data()); // fol2.Data(),nam1.Data());
+      if (hf1) Hist1->fPlotName = Form("%s_%s_vs_%s_%s_lin",ds1->GetName(),fol1.Data(),"fol2_data",nam1.Data()); // fol2.Data(),nam1.Data());
       else     Hist1->fPlotName = Form("%s_vs_%s_%s_lin",fol1.Data(),"fol2_data",nam1.Data()); // fol2.Data(),
     }
   }
@@ -587,9 +588,10 @@ int plot_hist_1d(plot_data_t* Plot, int Print = 0, const char* Format = "eps") {
   TString canvas_name("c_plot_hist_1D");
 
   if (Plot->fCanvasName != "") canvas_name = Plot->fCanvasName;
+  else if (Plot->fName  != "") canvas_name = "c_"+Plot->fName;
   else {
     if (ds1) {
-      canvas_name += ds1->fID;
+      canvas_name += ds1->GetName();
       canvas_name += "_";
     }
     canvas_name += Hist1->fModule;
@@ -816,11 +818,11 @@ int plot_hist_1d(plot_data_t* Plot, int Print = 0, const char* Format = "eps") {
     TString nam1 = hn1(hn1.Index('/')+1,hn1.Length());
 
     if (Plot->fYLogScale == 1) {
-      if (hf1) Plot->fName = Form("%s_%s_vs_%s_%s_log",ds1->fID.Data(),fol1.Data(),"fol2_data",nam1.Data());
+      if (hf1) Plot->fName = Form("%s_%s_vs_%s_%s_log",ds1->id(),fol1.Data(),"fol2_data",nam1.Data());
       else     Plot->fName = Form("%s_vs_%s_%s_log",fol1.Data(),"fol2_data",nam1.Data());
     }
     else {
-      if (hf1) Plot->fName = Form("%s_%s_vs_%s_%s_lin",ds1->fID.Data(),fol1.Data(),"fol2_data",nam1.Data());
+      if (hf1) Plot->fName = Form("%s_%s_vs_%s_%s_lin",ds1->id(),fol1.Data(),"fol2_data",nam1.Data());
       else     Plot->fName = Form("%s_vs_%s_%s_lin",fol1.Data(),"fol2_data",nam1.Data());
     }
   }
@@ -855,7 +857,7 @@ void fit_gaus_hist_1D(hist_data_t* Hist, const char* FOpt, const char* GOpt, dou
   hist_file_t*   hf = Hist->fFile;
   stn_dataset_t* ds = hf->fDataset;
   
-  TH1F* hpx1 = (TH1F*) gh1(hf->fName,Hist->fModule,Hist->fName)->Clone(hname);
+  TH1F* hpx1 = (TH1F*) gh1(hf->GetName(),Hist->fModule,Hist->fName)->Clone(hname);
   Hist->fHist = hpx1;
 
   if (Hist->fRebin > 0) hpx1->Rebin(Hist->fRebin);
@@ -904,7 +906,7 @@ void fit_gaus_hist_1D(hist_data_t* Hist, const char* FOpt, const char* GOpt, dou
 //-----------------------------------------------------------------------------
 // write dataset names inside the plot
 //-----------------------------------------------------------------------------
-  TString label(ds->fID);
+  TString label(ds->id());
 
   if (Hist->fPlotLabel != "") label = Hist->fPlotLabel;
 					// lower left corner

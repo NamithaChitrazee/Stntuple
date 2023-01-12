@@ -1,10 +1,11 @@
 //-----------------------------------------------------------------------------
 // struct to hold a plot data with multiple histograms
 //-----------------------------------------------------------------------------
-#ifndef __Stntuple_scripts_plot_data_hh__
-#define __Stntuple_scripts_plot_data_hh__
+#ifndef __Stntuple_val_plot_data_hh__
+#define __Stntuple_val_plot_data_hh__
 
-#include "hist_data.hh"
+#include "Stntuple/val/hist_data.hh"
+
 #include "TString.h"
 #include "TCanvas.h"
 
@@ -123,7 +124,5 @@ public:
     return 0;
   }
 };
-
-TString plot_data_t::fgFiguresDir = "plot_data::undefined";
 
 #endif

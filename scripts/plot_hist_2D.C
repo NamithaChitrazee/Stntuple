@@ -13,8 +13,9 @@
 #include "TH2.h"
 
 #include "Stntuple/val/stntuple_val_functions.hh"
+#include "Stntuple/val/hist_data.hh"
+
 #include "Stntuple/scripts/plot_utilities.hh"
-#include "Stntuple/scripts/hist_data.hh"
 //-----------------------------------------------------------------------------
 // plot one hist
 //-----------------------------------------------------------------------------
@@ -36,7 +37,7 @@ void plot_hist_2D(hist_data_t* Hd, int Print = 0) {
     return ;
   }
   
-  TH2F* hpx1 = (TH2F*) gh2(hf1->fName,Hd->fModule,Hd->fName)->Clone(h1name);
+  TH2F* hpx1 = (TH2F*) gh2(hf1->GetName(),Hd->fModule,Hd->fName)->Clone(h1name);
   Hd->fHist  = hpx1;
   if (Hd->fRebin > 0) hpx1->Rebin(Hd->fRebin);
 //-----------------------------------------------------------------------------
@@ -177,12 +178,12 @@ void plot_hist_2D(hist_data_t* Hist1,  hist_data_t*  Hist2, int Print = 0) {
   hist_file_t* hf1 = Hist1->fFile;
   hist_file_t* hf2 = Hist2->fFile;
   
-  TH2F* hpx1 = (TH2F*) gh1(hf1->fName,Hist1->fModule,Hist1->fName)->Clone(h1name);
+  TH2F* hpx1 = (TH2F*) gh1(hf1->GetName(),Hist1->fModule,Hist1->fName)->Clone(h1name);
   Hist1->fHist = hpx1;
   
   if (Hist1->fRebin > 0) hpx1->Rebin(Hist1->fRebin);
   
-  TH2F* hpx2 = (TH2F*) gh2(hf2->fName,Hist2->fModule,Hist2->fName)->Clone(h2name);
+  TH2F* hpx2 = (TH2F*) gh2(hf2->GetName(),Hist2->fModule,Hist2->fName)->Clone(h2name);
   Hist2->fHist = hpx2;
   
   if (Hist2->fRebin > 0) hpx2->Rebin(Hist2->fRebin);

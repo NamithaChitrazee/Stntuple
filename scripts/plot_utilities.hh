@@ -5,7 +5,7 @@
 #include "TPaveStats.h"
 #include "TLatex.h"
 
-#include "Stntuple/scripts/hist_data.hh"
+#include "Stntuple/val/hist_data.hh"
 //-----------------------------------------------------------------------------
 void set_draw_options(TH1* Hist, hist_data_t* Hd) {
   if (Hd->fLineColor   > 0) Hist->SetLineColor(Hd->fLineColor);
