@@ -14,7 +14,7 @@
 #include "art/Framework/Principal/Event.h"
 #include "Offline/RecoDataProducts/inc/HelixSeed.hh"
 
-class TStnVisNode;
+#include "Stntuple/gui/TStnVisNode.hh"
 
 namespace stntuple {
 

@@ -49,7 +49,7 @@ public:
     kClust       = 0x00000800, // << 11,
     kCalosel     = 0x00001000, // << 12,
     kStrawxtalk  = 0x00002000, // << 13
-    kElextalk    = 0x00002000, // << 14
+    kElextalk    = 0x00004000, // << 14
     kTrksel      = 0x00008000, // << 15
     kActive      = 0x00010000, // << 16
     kDoca        = 0x00020000, // << 17

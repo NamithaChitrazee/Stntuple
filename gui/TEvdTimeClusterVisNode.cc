@@ -62,13 +62,18 @@ TEvdTimeClusterVisNode::TEvdTimeClusterVisNode(const char* name, TStnTimeCluster
   fListOfTimeClusters = new TObjArray();
   fListOfTimeClusters->SetOwner(kTRUE);
 
+  fListOfPhiClusters  = new TObjArray();
+  fListOfPhiClusters->SetOwner(kTRUE);
+
   fTcColl             = nullptr;
-  fTcColl             = nullptr;
+  fPcColl             = nullptr;
+  fChColl             = nullptr;
 }
 
 //-----------------------------------------------------------------------------
 TEvdTimeClusterVisNode::~TEvdTimeClusterVisNode() {
   delete fListOfTimeClusters;
+  delete fListOfPhiClusters;
 }
 
 //-----------------------------------------------------------------------------
@@ -90,6 +95,16 @@ int TEvdTimeClusterVisNode::InitEvent() {
     fTcColl = nullptr;
   }
 
+  art::Handle<mu2e::TimeClusterCollection> pccH;
+  event->getByLabel(art::InputTag(fPcCollTag), pccH);
+  if (pccH.isValid()) fPcColl = pccH.product();
+  else {
+    mf::LogWarning("TEvdTimeClusterVisNode::InitEvent") << " WARNING:" << __LINE__ 
+							<< " : mu2e::TimeClusterCollection " 
+							<< fPcCollTag << " not found";
+    fPcColl = nullptr;
+  }
+
   art::Handle<mu2e::ComboHitCollection> chcH;
   event->getByLabel(art::InputTag(fChCollTag), chcH);
   if (chcH.isValid()) fChColl = chcH.product();
@@ -100,14 +115,13 @@ int TEvdTimeClusterVisNode::InitEvent() {
     fChColl = nullptr;
   }
 //-----------------------------------------------------------------------------
-// initialize helices
+// initialize time clusters
 //-----------------------------------------------------------------------------
-  stntuple::TEvdTimeCluster  *tcl;
   const mu2e::TimeCluster    *tc;  
 
   fListOfTimeClusters->Delete();
-  int ntc = 0;
 
+  int ntc = 0;
   if (fTcColl != nullptr) ntc = fTcColl->size();
   
   for (int i=0; i<ntc; i++) {
@@ -117,9 +131,10 @@ int TEvdTimeClusterVisNode::InitEvent() {
 //-----------------------------------------------------------------------------
     int nch = tc->nhits();
     
-    double tmin(1.e6), tmax(-1), zmin(1.e6), zmax(-1.);
+    double t0(-1.), tmin(1.e6), tmax(-1), zmin(1.e6), zmax(-1.), phimin(1.e6), phimax(-1.e6);
 
     if (fChColl != nullptr) {
+      double sumt = 0;
       for (int ih=0; ih<nch; ih++) {
 	int ind = tc->hits().at(ih);
 	const mu2e::ComboHit* hit = &fChColl->at(ind);
@@ -127,29 +142,105 @@ int TEvdTimeClusterVisNode::InitEvent() {
 	if (time < tmin) tmin = time;
 	if (time > tmax) tmax = time;
 
+        sumt += time;
+
 	float z = hit->pos().z();
 	if (z < zmin) zmin = z;
 	if (z > zmax) zmax = z;
       }
+
+      t0 = sumt/(nch+1e-12);
     }
     else {
-      tmin = 0;
-      tmax = 1700;
+      tmin =     0;
+      tmax =  1700;
       zmin = -1600;
-      zmax = 1600;
+      zmax =  1600;
     }
       
-    tcl   = new stntuple::TEvdTimeCluster(i,tc,tmin,tmax,zmin,zmax);
-
+    stntuple::TEvdTimeCluster* tcl;
+    tcl = new stntuple::TEvdTimeCluster(i,tc,t0,tmin,tmax,zmin,zmax,phimin,phimax,this);
     fListOfTimeClusters->Add(tcl);
+  }
+//-----------------------------------------------------------------------------
+// phi clusters
+//-----------------------------------------------------------------------------
+  fListOfPhiClusters->Delete();
+  int npc = 0;
+  if (fPcColl != nullptr) npc = fPcColl->size();
+  
+  for (int i=0; i<npc; i++) {
+    const mu2e::TimeCluster* pc = &fPcColl->at(i);
+//-----------------------------------------------------------------------------
+// phi clusters are time clusters ...
+//-----------------------------------------------------------------------------   
+    double t0(-1.), tmin(1.e6), tmax(-1), zmin(1.e6), zmax(-1.), phimin(1.e6), phimax(-1.e6);
+
+    double sumt = 0;
+    if (fChColl != nullptr) {
+      int nch = pc->nhits();
+      for (int ih=0; ih<nch; ih++) {
+	int ind = pc->hits().at(ih);
+	const mu2e::ComboHit* hit = &fChColl->at(ind);
+	float time = hit->correctedTime();
+	if (time < tmin) tmin = time;
+	if (time > tmax) tmax = time;
+
+        sumt += time;
+
+        float phi = hit->phi();      // [-M_PI, M_PI]
+        if (phi < 0) phi += 2*M_PI;  
+                                        // the range to be defined later
+        if (phi > phimax) phimax = phi;
+        if (phi < phimin) phimin = phi;
+
+	float z = hit->pos().z();
+	if (z < zmin) zmin = z;
+	if (z > zmax) zmax = z;
+      }
+      t0 = sumt/(nch+1.e-12);
+    }
+    else {
+      tmin =     0;
+      tmax =  1700;
+      zmin = -1600;
+      zmax =  1600;
+    }
+      
+    stntuple::TEvdTimeCluster* pcl;
+    pcl = new stntuple::TEvdTimeCluster(i,pc,t0,tmin,tmax,zmin,zmax,phimin,phimax,this);
+    fListOfPhiClusters->Add(pcl);
   }
 
   return 0;
 }
 
 //-----------------------------------------------------------------------------
+// XY view : display phi clusters , only if a time cluster has been selected
+//-----------------------------------------------------------------------------
+void TEvdTimeClusterVisNode::PaintXY(Option_t* Option) {
+
+  TStnVisManager* vm = TStnVisManager::Instance();
+
+  TEvdTimeCluster* tc = vm->SelectedTimeCluster();
+  if (tc) {
+                                        // display phi clusters corresponding to this time cluster
+
+    int ncl = fListOfPhiClusters->GetEntries();
+    for (int i=0; i<ncl; i++) {
+      TEvdTimeCluster* pc = (TEvdTimeCluster*) fListOfPhiClusters->At(i);
+      float t0 = pc->T0();
+      if ((t0 <= tc->TMax()) and (t0 >= tc->TMin())) {
+        pc->PaintXY(Option);
+      }
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
 // TZ view is only for the pattern recognition / time cluster finding
 // display reconstructed tracks and combo hits 
+// do not display phi clusters in TZ 
 //-----------------------------------------------------------------------------
 void TEvdTimeClusterVisNode::PaintTZ(Option_t* Option) {
 

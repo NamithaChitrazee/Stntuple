@@ -55,6 +55,8 @@ TStnVisManager::TStnVisManager(const char* Name, const char* Title): TVisManager
   fBField              = 1.0;                   // in Tesla
 
   fSelectedTimeCluster = nullptr;
+  fSelectedPhiCluster  = nullptr;
+
   fDisplayHelices      = 0;
   fDisplayOnlyTCHits   = 0;
 }

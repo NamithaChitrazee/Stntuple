@@ -38,6 +38,7 @@
 
 #include "Stntuple/print/TAnaDump.hh"
 
+#include "Stntuple/gui/TEvdTimeClusterVisNode.hh"
 #include "Stntuple/gui/TEvdTimeCluster.hh"
 #include "Stntuple/gui/TStnVisManager.hh"
 
@@ -57,14 +58,21 @@ TEvdTimeCluster::TEvdTimeCluster(): TObject() {
 // pointer to track is just cached
 //-----------------------------------------------------------------------------
   TEvdTimeCluster::TEvdTimeCluster(int Number, const mu2e::TimeCluster* TimeCluster, 
-				   float TMin, float TMax, float ZMin, float ZMax): TObject() {
+                                   float T0,
+				   float TMin, float TMax, float ZMin, float ZMax, 
+                                   float PhiMin, float PhiMax,
+                                   TStnVisNode* VisNode): TObject() {
   fNumber      = Number;
   fTimeCluster = TimeCluster;
+  fVisNode     = VisNode;
 
-  fTMin = TMin;
-  fTMax = TMax;
-  fZMin = ZMin;
-  fZMax = ZMax;
+  fT0     = T0;
+  fTMin   = TMin;
+  fTMax   = TMax;
+  fZMin   = ZMin;
+  fZMax   = ZMax;
+  fPhiMin = PhiMin;
+  fPhiMax = PhiMax;
 
   fBox  = new TBox(ZMin,TMin,ZMax,TMax);
   fBox->SetLineColor(kBlue-7);
@@ -72,6 +80,14 @@ TEvdTimeCluster::TEvdTimeCluster(): TObject() {
   fBox->SetFillStyle(3002);
 
   fListOfHits = nullptr;
+
+  float rmax = 700.;
+
+  fEllipse = new TEllipse(0.,0.,rmax,rmax,fPhiMin*180/M_PI,fPhiMax*180/M_PI,0);
+  fEllipse->SetLineColor(kGreen);
+  fEllipse->SetFillColor(kBlue+1);
+  fEllipse->SetFillStyle(3003);
+
 }
 
 //-----------------------------------------------------------------------------
@@ -92,9 +108,15 @@ void TEvdTimeCluster::Paint(Option_t* Option) {
 
   int view = TVisManager::Instance()->GetCurrentView()->Type();
 
-  if      (view == TStnVisManager::kTZ ) PaintTZ (Option);
+  if      (view == TStnVisManager::kXY ) PaintXY (Option);
+  else if (view == TStnVisManager::kTZ ) PaintTZ (Option);
 
   gPad->Modified();
+}
+
+//-----------------------------------------------------------------------------
+void TEvdTimeCluster::PaintXY(Option_t* Option) {
+  fEllipse->Paint(Option);
 }
 
 //-----------------------------------------------------------------------------
@@ -134,48 +156,48 @@ void TEvdTimeCluster::Clear(Option_t* Opt) {
 //-----------------------------------------------------------------------------
 void TEvdTimeCluster::Print(Option_t* Option) const {
 
-  // TAnaDump* ad = TAnaDump::Instance();
+  TAnaDump* ad = TAnaDump::Instance();
 
-  // TEvdHelixVisNode* hvn = (TEvdHelixVisNode*) fVisNode;
+  TEvdTimeClusterVisNode* vn = (TEvdTimeClusterVisNode*) fVisNode;
 
-  // TString opt = Option;
-  // opt.ToLower();
-
-  // if (opt == "") ad->printHelixSeed(fHelixSeed, hvn->ShCollTag().data(), hvn->SdmcCollTag().data(),  "");
-  // else           ad->printHelixSeed(fHelixSeed, hvn->ShCollTag().data(), hvn->SdmcCollTag().data(), opt);
-  
-  
+  ad->printTimeCluster(fTimeCluster,Option,vn->ChColl(), vn->SdmcCollTag().data());
 }
 
 //-----------------------------------------------------------------------------
-  void TEvdTimeCluster::ExecuteEvent(int Event, int Px, int Py) {
+void TEvdTimeCluster::ExecuteEvent(int Event, int Px, int Py) {
+
+  // switch (Event) {
+  // case kButton1Down: 
+  //   Select();
+  // }
+}
+
+//-----------------------------------------------------------------------------
+void TEvdTimeCluster::Select() {
 
   TStnVisManager* vm = TStnVisManager::Instance();
 
-  switch (Event) {
-  case kButton1Down:
-    TEvdTimeCluster* selected = vm->SelectedTimeCluster();
+  TEvdTimeCluster* selected = vm->SelectedTimeCluster();
 
-    if (selected == this) { 
+  if (selected == this) { 
 //-----------------------------------------------------------------------------
 // deselect previously selected cluster
 //-----------------------------------------------------------------------------
-      vm->SetSelectedTimeCluster(nullptr);
-      fBox->SetLineColor(kBlue-7);
-      fBox->SetFillColor(kBlue-7);
-    }
-    else {
+    vm->SetSelectedTimeCluster(nullptr);
+    fBox->SetLineColor(kBlue-7);
+    fBox->SetFillColor(kBlue-7);
+  }
+  else {
 //-----------------------------------------------------------------------------
 // previously selected cluster was different: deselect it
 //-----------------------------------------------------------------------------
-      if (selected != nullptr) {
-	selected->Box()->SetLineColor(kBlue-7);
-	selected->Box()->SetFillColor(kBlue-7);
-      }
-      vm->SetSelectedTimeCluster(this);
-      fBox->SetLineColor(kRed+2);
-      fBox->SetFillColor(kRed+2);
+    if (selected != nullptr) {
+      selected->Box()->SetLineColor(kBlue-7);
+      selected->Box()->SetFillColor(kBlue-7);
     }
+    vm->SetSelectedTimeCluster(this);
+    fBox->SetLineColor(kRed+2);
+    fBox->SetFillColor(kRed+2);
   }
   
 }

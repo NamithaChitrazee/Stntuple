@@ -121,7 +121,7 @@ int TEvdHelixVisNode::InitEvent() {
   
   for (int i=0; i<nhel; i++) {
     hseed = &fHsColl->at(i);
-    hel   = new stntuple::TEvdHelixSeed(i,hseed,this);
+    hel   = new stntuple::TEvdHelixSeed(i,hseed, this);
 //-----------------------------------------------------------------------------
 // helices are made out of combo hits
 //-----------------------------------------------------------------------------

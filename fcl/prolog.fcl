@@ -172,6 +172,7 @@ MuHitDisplay: { module_type:MuHitDisplay                 # class name;
     caloHitCollTag               : "CaloHitMaker"
     caloClusterCollTag           : "CaloClusterMaker"
 
+    phiClusterCollTag            : "PhiClusterFinder"
     timeClusterCollTag           : "CalTimePeakFinder"
     trackCollTag                 : "KFFDeMHDar"
     kffCollTag                   : "KSFDeMHDar"

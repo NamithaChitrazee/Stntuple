@@ -51,6 +51,7 @@ MuHitDisplay::MuHitDisplay(fhicl::ParameterSet const& pset) :
   _trackCollTag                (pset.get<string>("trackCollTag")),
   _simpCollTag                 (pset.get<string>("simpCollTag")),
   _timeClusterCollTag          (pset.get<string>("timeClusterCollTag")),
+  _phiClusterCollTag           (pset.get<string>("phiClusterCollTag")),
   _caloHitCollTag              (pset.get<string>("caloHitCollTag")),
   _trkExtrapol                 (pset.get<string>("trkExtrapol")),
   _trkCalMatch                 (pset.get<string>("trkCalMatch")),
@@ -61,9 +62,9 @@ MuHitDisplay::MuHitDisplay(fhicl::ParameterSet const& pset) :
   _generatorID                 (pset.get<mu2e::GenId>   ("generatorID", mu2e::GenId::CeEndpoint)),
   _minEnergyDep                (pset.get<double>        ("minEnergyDep", 0)),
   _timeWindow                  (pset.get<double>        ("timeWindow", 1.e6)),
-  fGoodHitMask                 (pset.get<vector<string>>("goodHitMask")),
-  fBadHitMask                  (pset.get<vector<string>>("badHitMask")),
-  _minHits                     (pset.get<unsigned>      ("minHits")),
+  // fGoodHitMask                 (pset.get<vector<string>>("goodHitMask")),
+  // fBadHitMask                  (pset.get<vector<string>>("badHitMask")),
+//  _minHits                     (pset.get<unsigned>      ("minHits")),
   _minSimpMomentum             (pset.get<double>        ("minSimpMomentum")),
 
   _showCRVOnly                 (pset.get<bool>("showCRVOnly", false)),
@@ -306,17 +307,19 @@ void MuHitDisplay::InitVisManager() {
 //-----------------------------------------------------------------------------
   TEvdTimeClusterVisNode* tc_node = new TEvdTimeClusterVisNode ("TimeClusterVisNode", NULL);
   tc_node->SetTcCollTag  (_timeClusterCollTag);
+  tc_node->SetPcCollTag  (_phiClusterCollTag );
   tc_node->SetChCollTag  (_comboHitCollTag   );
   tc_node->SetSdmcCollTag(_sdmcCollTag       );
 //-----------------------------------------------------------------------------
 // nodes are defined, now come views
-// 1. XY view : tracker + calorimeter
+// 1. XY view : tracker + calorimeter + time clusters
 //-----------------------------------------------------------------------------
   TStnView* vxy = new TStnView(TStnVisManager::kXY,-1,"XYView","XY View");
   vxy->AddNode(tnode);
   vxy->AddNode(hnode);
   vxy->AddNode(cal_node[0]);
   vxy->AddNode(cal_node[1]);
+  vxy->AddNode(tc_node);
   vm->AddView(vxy);
 //-----------------------------------------------------------------------------
 // 2. RZ view : tracker only, so far
@@ -369,8 +372,10 @@ int MuHitDisplay::getData(const art::Event* Evt) {
     printf(">>> Section-collections cleared\n");
       
     mu2e::GeomHandle<mu2e::CosmicRayShield> CRS;
-      
-    // Loop over the RecoPulses in the collection and sort each pulse/bar into its appropriate section
+//-----------------------------------------------------------------------------
+// Loop over the RecoPulses in the collection and sort each pulse/bar 
+// into its appropriate section
+//-----------------------------------------------------------------------------
     int    crvCollSize = fCrvPulseColl->size();
     for (int ic=0; ic < crvCollSize; ++ic) {
       mu2e::CrvRecoPulse                   icprc       = fCrvPulseColl->at(ic);

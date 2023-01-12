@@ -8,11 +8,14 @@
 #include "TClonesArray.h"
 #include "TH1.h"
 #include "TBox.h"
+#include "TEllipse.h"
 
 namespace mu2e {
   class TimeCluster;
   class ComboHit;
 }
+
+class TStnVisNode;
 
 namespace stntuple {
 
@@ -24,14 +27,19 @@ public:
 protected:
   int                       fNumber;
   const mu2e::TimeCluster*  fTimeCluster;
+  TStnVisNode*              fVisNode;      // backward link to the note
 
   TObjArray*                fListOfHits;   // list of combo hits
+  float                     fT0; 
   float                     fTMin;
   float                     fTMax;
   float                     fZMin;
   float                     fZMax;
+  float                     fPhiMin;
+  float                     fPhiMax;
   int                       fColor;
   TBox*                     fBox;
+  TEllipse*                 fEllipse;
 public:
 //-----------------------------------------------------------------------------
 // constructors and destructor
@@ -39,18 +47,24 @@ public:
   TEvdTimeCluster();
 
   TEvdTimeCluster(int Number, const mu2e::TimeCluster* aTimeCluster,
-		  float TMin, float TMax, float ZMin, float ZMax);
+                  float T0,
+		  float TMin, float TMax, float ZMin, float ZMax,
+                  float PhiMin, float PhiMax,
+                  TStnVisNode* VisNode);
 
   virtual ~TEvdTimeCluster();
 //-----------------------------------------------------------------------------
 // accessors
 //-----------------------------------------------------------------------------
   const mu2e::TimeCluster* TimeCluster() const { return fTimeCluster; }
-  float                    TMin       () const { return fTMin; }
-  float                    TMax       () const { return fTMax; }
-  float                    ZMin       () const { return fZMin; }
-  float                    ZMax       () const { return fZMax; }
-  TBox*                    Box        () const { return fBox;  }
+  float                    T0         () const { return fT0    ; }
+  float                    TMin       () const { return fTMin  ; }
+  float                    TMax       () const { return fTMax  ; }
+  float                    ZMin       () const { return fZMin  ; }
+  float                    ZMax       () const { return fZMax  ; }
+  float                    PhiMin     () const { return fPhiMin; }
+  float                    PhiMax     () const { return fPhiMax; }
+  TBox*                    Box        () const { return fBox   ; }
 //-----------------------------------------------------------------------------
 // modifiers
 //-----------------------------------------------------------------------------
@@ -59,9 +73,12 @@ public:
 //-----------------------------------------------------------------------------
 // drawing functions
 //-----------------------------------------------------------------------------
+  virtual void  PaintXY  (Option_t* option = "");
   virtual void  PaintTZ  (Option_t* option = "");
+
+  virtual void  Select();                        // **MENU**
+
   virtual Int_t DistancetoPrimitiveTZ (Int_t px, Int_t py);
-  //  virtual Int_t DistancetoPrimitiveCal(Int_t px, Int_t py);
 //-----------------------------------------------------------------------------
 // overloaded methods of TObject
 //-----------------------------------------------------------------------------

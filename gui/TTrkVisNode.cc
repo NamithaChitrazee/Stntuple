@@ -161,9 +161,9 @@ int TTrkVisNode::InitEvent() {
   event->getByLabel(art::InputTag(fChCollTag), chcH);
   if (chcH.isValid()) fChColl = chcH.product();
   else {
-    mf::LogWarning("TEvdTimeClusterVisNode::InitEvent") << " WARNING:" << __LINE__ 
-							<< " : mu2e::ComboHitCollection " 
-							<< fChCollTag << " not found";
+    mf::LogWarning("TTrkVisNode::InitEvent") << " WARNING:" << __LINE__ 
+                                             << " : mu2e::ComboHitCollection " 
+                                             << fChCollTag << " not found";
     fChColl = nullptr;
   }
 
@@ -171,9 +171,9 @@ int TTrkVisNode::InitEvent() {
   event->getByLabel(art::InputTag(fShCollTag), schcH);
   if (schcH.isValid()) fSchColl = schcH.product();
   else {
-    mf::LogWarning("TEvdTimeClusterVisNode::InitEvent") << " WARNING:" << __LINE__ 
-							<< " : mu2e::ComboHitCollection " 
-							<< fShCollTag << " not found";
+    mf::LogWarning("TTrkVisNode::InitEvent") << " WARNING:" << __LINE__ 
+                                             << " : mu2e::ComboHitCollection " 
+                                             << fShCollTag << " not found";
     fSchColl = nullptr;
   }
 
@@ -181,9 +181,9 @@ int TTrkVisNode::InitEvent() {
   event->getByLabel(art::InputTag(fShCollTag), shcH);
   if (shcH.isValid()) fShColl = shcH.product();
   else {
-    mf::LogWarning("TEvdTimeClusterVisNode::InitEvent") << " WARNING:" << __LINE__ 
-							<< " : mu2e::StrawHitCollection " 
-							<< fShCollTag << " not found";
+    mf::LogWarning("TTrkVisNode::InitEvent") << " WARNING:" << __LINE__ 
+                                             << " : mu2e::StrawHitCollection " 
+                                             << fShCollTag << " not found";
     fShColl = nullptr;
   }
 
@@ -191,9 +191,9 @@ int TTrkVisNode::InitEvent() {
   event->getByLabel(art::InputTag(fSdmcCollTag), sdmccH);
   if (sdmccH.isValid()) fSdmcColl = sdmccH.product();
   else {
-    mf::LogWarning("TEvdTimeClusterVisNode::InitEvent") << " WARNING:" << __LINE__ 
-							<< " : mu2e::StrawDigiMCCollection " 
-							<< fSdmcCollTag << " not found";
+    mf::LogWarning("TTrkVisNode::InitEvent") << " WARNING:" << __LINE__ 
+                                             << " : mu2e::StrawDigiMCCollection " 
+                                             << fSdmcCollTag << " not found";
     fSdmcColl = nullptr;
   }
 					
@@ -201,9 +201,9 @@ int TTrkVisNode::InitEvent() {
   event->getByLabel(art::InputTag(fKsCollTag), kscH);
   if (kscH.isValid()) fKsColl = kscH.product();
   else {
-    mf::LogWarning("TEvdTimeClusterVisNode::InitEvent") << " WARNING:" << __LINE__ 
-							<< " : mu2e::KalSeedCollection " 
-							<< fKsCollTag << " not found";
+    mf::LogWarning("TTrkVisNode::InitEvent") << " WARNING:" << __LINE__ 
+                                             << " : mu2e::KalSeedCollection " 
+                                             << fKsCollTag << " not found";
     fKsColl = nullptr;
   }
 //-----------------------------------------------------------------------------
@@ -481,7 +481,7 @@ void TTrkVisNode::PaintXY(Option_t* Option) {
 
     if (vm->DisplayStrawHitsXY()) {
 //-----------------------------------------------------------------------------
-// for strash hit display, tmin and tmax should be defined by the straw, 
+// when displaying straw hits, tmin and tmax should be defined by the straw, 
 // not combo, hit times
 //-----------------------------------------------------------------------------
       const mu2e::TimeCluster* tc = etcl->TimeCluster();
@@ -614,7 +614,7 @@ void TTrkVisNode::PaintRZ(Option_t* Option) {
 
     if (vm->DisplayStrawHitsXY()) {
 //-----------------------------------------------------------------------------
-// for strash hit display, tmin and tmax should be defined by the straw, 
+// for straw hit display, tmin and tmax should be defined by the straw, 
 // not combo, hit times
 //-----------------------------------------------------------------------------
       const mu2e::TimeCluster* tc = etcl->TimeCluster();
@@ -691,17 +691,31 @@ void TTrkVisNode::PaintTZ(Option_t* Option) {
 
   TStnVisManager* vm = TStnVisManager::Instance();
 
-  int nhits = fListOfComboHits->GetEntries();
-  for (int i=0; i<nhits; i++) {
-    stntuple::TEvdComboHit* hit = (stntuple::TEvdComboHit*) fListOfComboHits->At(i);
+  double tmin = vm->TMin(); 
+  double tmax = vm->TMax();
 
-    // float time  = hit->Time();
+  stntuple::TEvdTimeCluster* etcl = vm->SelectedTimeCluster();
 
-    //    if ((time >= tmin) && (time <= tmax)) {
-    hit->PaintTZ(Option);
-    // }
+  if (etcl) {
+    tmin = etcl->TMin(); // FIXME!
+    tmax = etcl->TMax(); // FIXME!
   }
 
+  int nhits = fListOfComboHits->GetEntries();
+  for (int i=0; i<nhits; i++) {
+    stntuple::TEvdComboHit* ech = (stntuple::TEvdComboHit*) fListOfComboHits->At(i);
+
+    float time  = ech->correctedTime();
+
+    if ((time >= tmin) && (time <= tmax)) {
+      // check if the hit belongs to the time cluster
+      int ok = 1;
+      if (etcl and vm->DisplayOnlyTCHits()) { 
+        ok = TCHit(etcl->TimeCluster(),ech->ComboHit()->index(0));
+      }
+      if (ok) ech->PaintTZ(Option);
+    }
+  }
 //-----------------------------------------------------------------------------
 // SimParticle's
 //-----------------------------------------------------------------------------

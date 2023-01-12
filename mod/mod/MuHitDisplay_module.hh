@@ -103,6 +103,7 @@ private:
   string        _trackCollTag;
   string        _simpCollTag;
   string        _timeClusterCollTag;
+  string        _phiClusterCollTag;
   string        _caloHitCollTag;
   string        _trkExtrapol;
   string        _trkCalMatch;
@@ -116,9 +117,9 @@ private:
   double        _minEnergyDep;          // unused
   double        _timeWindow;            // unused
 
-  StrawHitFlag  fGoodHitMask;           // unused
-  StrawHitFlag  fBadHitMask;            // unused
-  size_t        _minHits;               // unused
+  // StrawHitFlag  fGoodHitMask;           // unused
+  // StrawHitFlag  fBadHitMask;            // unused
+  // size_t        _minHits;               // unused
   double        _minSimpMomentum;       // to initialize Simp Block
 //-----------------------------------------------------------------------------
 // Control for CRV-specific viewing

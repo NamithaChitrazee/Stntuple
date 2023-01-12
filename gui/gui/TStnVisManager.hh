@@ -97,7 +97,9 @@ protected:
 
   int                 fMinStation;
   int                 fMaxStation;
+
   stntuple::TEvdTimeCluster*    fSelectedTimeCluster;
+  stntuple::TEvdTimeCluster*    fSelectedPhiCluster;
   int                 fDebugLevel;
 					// to display all the data in a given time window 
 					// vis manager would enforces the same time limits on all views,
@@ -150,6 +152,7 @@ public:
   int            MaxStation() { return fMaxStation; }
 
   stntuple::TEvdTimeCluster*  SelectedTimeCluster() { return fSelectedTimeCluster; }
+  stntuple::TEvdTimeCluster*  SelectedPhiCluster () { return fSelectedPhiCluster;  }
 
   float          TMin() { return fTMin; }
   float          TMax() { return fTMax; }
@@ -182,6 +185,7 @@ public:
   void           SetStations(int IMin, int IMax) override;
 
   void           SetSelectedTimeCluster(stntuple::TEvdTimeCluster* Tc) { fSelectedTimeCluster = Tc; }
+  void           SetSelectedPhiCluster (stntuple::TEvdTimeCluster* Pc) { fSelectedPhiCluster  = Pc; }
   
   void   SetTimeWindow(float TMin, float TMax) override {
     fTMin = TMin;
