@@ -63,6 +63,7 @@ void TGenAnaModule::BookSimpHistograms(SimpHist_t* Hist, const char* Folder) {
   HBook1F(hist->fPdgCode   ,"pdg_code",Form("%s: PDG code"     ,Folder), 200,-1000, 1000,Folder);
   HBook1F(hist->fMomentum  ,"mom"    ,Form("%s: Momentum"      ,Folder), 200, 0, 200,Folder);
   HBook1F(hist->fNStrawHits,"nsh"    ,Form("%s: N(straw hits"  ,Folder), 200, 0, 200,Folder);
+  HBook1F(hist->fProperTime,"tprop"  ,Form("%s: proper time"   ,Folder), 200, 0,  50,Folder);
 }
 
 
@@ -171,6 +172,12 @@ void TGenAnaModule::FillSimpHistograms(SimpHist_t* Hist, TSimParticle* Part) {
   hist->fPdgCode->Fill(Part->PDGCode());
   hist->fMomentum->Fill(p->P());
   hist->fNStrawHits->Fill(Part->NStrawHits());
+
+  float t0 = Part->StartProperTime();
+  float t1 = Part->EndProperTime  ();
+  float dt = (t0 >= 0) ? t1-t0 : -1;
+
+  hist->fProperTime->Fill(dt);
 }
 
 //-----------------------------------------------------------------------------

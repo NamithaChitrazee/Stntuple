@@ -30,10 +30,13 @@ public:
   float           fMomTargetEnd;
   float           fMomTrackerFront;	// entrance to ST
 
+  float           fStartProperTime;     // ** addeed in V4
+  float           fEndProperTime;       // ** addeed in V4
+
   TLorentzVector  fStartPos;
   TLorentzVector  fStartMom;
-  TLorentzVector  fEndPos;
-  TLorentzVector  fEndMom;
+  TLorentzVector  fEndPos;              // ** added in V3
+  TLorentzVector  fEndMom;              // ** added in V3
 //-----------------------------------------------------------------------------
 // transient variables
 //-----------------------------------------------------------------------------
@@ -73,6 +76,9 @@ public:
   int    StartVolumeIndex () const { return fStartVolumeIndex; }
   int    EndVolumeIndex   () const { return fEndVolumeIndex  ; }
 
+  float  StartProperTime  () const { return fStartProperTime; }
+  float  EndProperTime    () const { return fEndProperTime  ; }
+
   const TLorentzVector* StartPos() const { return &fStartPos; }
   const TLorentzVector* StartMom() const { return &fStartMom; }
   const TLorentzVector* EndPos  () const { return &fEndPos;   }
@@ -87,6 +93,9 @@ public:
 
   void     SetMomTargetEnd   (double P) { fMomTargetEnd    = P; }
   void     SetMomTrackerFront(double P) { fMomTrackerFront = P; }
+
+  void     SetStartProperTime(double T) { fStartProperTime = T; }
+  void     SetEndProperTime  (double T) { fEndProperTime   = T; }
 
   void     SetStartPos(double X, double Y, double Z, double T) {
     fStartPos.SetXYZT(X,Y,Z,T);
@@ -119,8 +128,9 @@ public:
 //-----------------------------------------------------------------------------
   void     ReadV1(TBuffer &R__b);
   void     ReadV2(TBuffer &R__b);
+  void     ReadV3(TBuffer &R__b);
 
-  ClassDef(TSimParticle,3)
+  ClassDef(TSimParticle,4)
 };
 
 #endif

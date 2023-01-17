@@ -243,12 +243,15 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
 				       process_id);
       simp->SetStartMom(px, py, pz, energy);
       simp->SetStartPos(sp.x(),sp.y(),sp.z(),sim->startGlobalTime());
+      simp->SetStartProperTime(sim->startProperTime());
       simp->SetEndMom  (sim->endMomentum().x(),
 			sim->endMomentum().y(),
 			sim->endMomentum().z(),
 			sim->endMomentum().e());
       const CLHEP::Hep3Vector ep = sim->endPosition();
       simp->SetEndPos(ep.x(),ep.y(),ep.z(),sim->endGlobalTime());
+      simp->SetEndProperTime(sim->endProperTime());
+
       simp->SetNStrawHits(nhits);
       simp->SetSimParticle(sim);
       simp->SetShid(v_shid);
