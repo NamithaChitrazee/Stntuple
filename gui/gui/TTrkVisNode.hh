@@ -43,14 +43,19 @@ public:
   };
   
 protected:
-
   
   const mu2e::ComboHitCollection*              fChColl;     // several SH per CH
   std::string                                  fChCollTag;
   
+  const mu2e::StrawHitFlagCollection*          fChfColl;     // CH flags
+  std::string                                  fChfCollTag;
+  
   const mu2e::ComboHitCollection*              fSchColl;     // one     SH per CH
-  const mu2e::StrawHitCollection*              fShColl;            // straw hit coll
+  const mu2e::StrawHitCollection*              fShColl;      // straw hit coll
   std::string                                  fShCollTag;
+
+  const mu2e::StrawHitFlagCollection*          fShfColl;     // SH flags, for printing, mostly
+  std::string                                  fShfCollTag;
 
   const mu2e::StrawDigiCollection**            fSdColl;		   // straw digi coll
 
@@ -132,7 +137,9 @@ public:
 
   void SetKsCollTag     (std::string& CollTag) { fKsCollTag   = CollTag; }
   void SetChCollTag     (std::string& CollTag) { fChCollTag   = CollTag; }
+  void SetChfCollTag    (std::string& CollTag) { fChfCollTag  = CollTag; }
   void SetShCollTag     (std::string& CollTag) { fShCollTag   = CollTag; }
+  void SetShfCollTag    (std::string& CollTag) { fShfCollTag  = CollTag; }
   void SetSdmcCollTag   (std::string& CollTag) { fSdmcCollTag = CollTag; }
 
   void  SetSimpBlock   (TSimpBlock* Block) { fSimpBlock    = Block; }

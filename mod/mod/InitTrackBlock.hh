@@ -53,7 +53,7 @@ public:
   art::InputTag   fKalSeedCollTag;
   art::InputTag   fPIDProductCollTag;
   art::InputTag   fStrawDigiMCCollTag;
-  art::InputTag   fSpmcCollTag;
+  art::InputTag   fVdhCollTag;                     // VDH = virtual detector hit
   art::InputTag   fTciCollTag;                     // TCI = track calo    intersection
   art::InputTag   fTcmCollTag;                     // TCM = track cluster match
   art::InputTag   fTrkQualCollTag;
@@ -83,7 +83,7 @@ public:
   void   SetComboHitCollTag         (std::string& Tag) { fComboHitCollTag      = art::InputTag(Tag); }
   void   SetKalSeedCollTag          (std::string& Tag) { fKalSeedCollTag       = art::InputTag(Tag); }
   void   SetPIDProductCollTag       (std::string& Tag) { fPIDProductCollTag    = art::InputTag(Tag); }
-  void   SetSpmcCollTag             (std::string& Tag) { fSpmcCollTag          = art::InputTag(Tag); }
+  void   SetVdhCollTag              (std::string& Tag) { fVdhCollTag           = art::InputTag(Tag); }
   void   SetStrawDigiMCCollTag      (std::string& Tag) { fStrawDigiMCCollTag   = art::InputTag(Tag); }
   void   SetTciCollTag              (std::string& Tag) { fTciCollTag           = art::InputTag(Tag); }
   void   SetTcmCollTag              (std::string& Tag) { fTcmCollTag           = art::InputTag(Tag); }

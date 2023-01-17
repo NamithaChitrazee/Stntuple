@@ -691,10 +691,11 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 // no more step point MC's in the tracker - straw gas steps there
 //-----------------------------------------------------------------------------
       art::Handle<mu2e::StepPointMCCollection> vdhits;
-      AnEvent->getByLabel(fSpmcCollTag,vdhits);
+      AnEvent->getByLabel(fVdhCollTag,vdhits);
       if (!vdhits.isValid()) {
 	char warning[500];
-	snprintf(warning,500,"WARNING: StepPointMCCollection %s:virtualdetector not found\n",fSpmcCollTag.encode().data());
+	snprintf(warning,500,"WARNING in InitTrackBlock::%s: StepPointMCCollection %s not found\n",
+                 __func__,fVdhCollTag.encode().data());
 	mf::LogWarning(oname) << warning;
       }
       else {

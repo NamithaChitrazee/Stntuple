@@ -147,7 +147,7 @@ StntupleMakerTemplate : { module_type:StntupleMaker
 }
 
 #------------------------------------------------------------------------------
-# 
+# when needed, mask DeltaFinder under 'FlagBkgHits' label
 #------------------------------------------------------------------------------
 MuHitDisplay: { module_type:MuHitDisplay                 # class name;
     @table::StntupleTModuleFclDefaults                   # defaults of the base class
@@ -160,12 +160,13 @@ MuHitDisplay: { module_type:MuHitDisplay                 # class name;
     
     genpCollTag                  : "generate"
     comboHitCollTag              : "makePH"                          # comboHits
+    chfCollTag                   : "FlagBkgHits:ComboHits"           # combo hit flags
     helixSeedCollTag             : "MHFinderDe"                      # helices
     strawHitCollTag              : "makeSH"
     sdCollTag                    : "compressDigiMCs"                 # standard MC choice
     swCollTag                    : "compressDigiMCs"                 # standard MC choice
     sdmcCollTag                  : "compressDigiMCs"                 #  was "makeSD"
-    shfCollTag                   : "DeltaFinder:StrawHits"           # straw hit flags
+    shfCollTag                   : "FlagBkgHits:StrawHits"           # straw hit flags
     spmcCollTag                  : "compressDigiMCs:virtualdetector" # was g4run
     simpCollTag                  : "compressDigiMCs"                 # was g4run
 
@@ -183,7 +184,7 @@ MuHitDisplay: { module_type:MuHitDisplay                 # class name;
 
     pidCollTag                   : "ParticleID"
     primaryParticleTag           : "compressDigiMCs"                 # this is new, to be passed to InitSimpBlock
-    vdHitsCollTag                : "compressDigiMCs"                 # this is new, to be passed to InitSimpBlock
+    vdHitsCollTag                : "compressDigiMCs:virtualdetector" # this is new, to be passed to InitSimpBlock
     
     #      goodHitMask                 : ["EnergySelection","RadiusSelection","TimeSelection"]
     goodHitMask                  : ["EnergySelection", "RadiusSelection"]

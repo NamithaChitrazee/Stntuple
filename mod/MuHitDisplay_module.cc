@@ -39,11 +39,12 @@ MuHitDisplay::MuHitDisplay(fhicl::ParameterSet const& pset) :
   _crvRecoPulseCollTag         (pset.get<string>("crvRecoPulsesCollTag")),
   			        
   _strawHitCollTag             (pset.get<string>("strawHitCollTag")),
-  _comboHitCollTag             (pset.get<string>("comboHitCollTag")),
-  _sdCollTag                   (pset.get<string>("sdCollTag")),
-  _sdmcCollTag                 (pset.get<string>("sdmcCollTag")),
   _shfCollTag                  (pset.get<string>("shfCollTag")),
-  _swCollTag                   (pset.get<string>("swCollTag")),
+  _comboHitCollTag             (pset.get<string>("comboHitCollTag")),
+  _chfCollTag                  (pset.get<string>("chfCollTag")),
+  _sdCollTag                   (pset.get<string>("sdCollTag")),            // straw digi
+  _sdmcCollTag                 (pset.get<string>("sdmcCollTag")),
+  _swCollTag                   (pset.get<string>("swCollTag")),           // straw waveformws
   
   _helixSeedCollTag            (pset.get<string>("helixSeedCollTag")),
   _ksfCollTag                  (pset.get<string>("ksfCollTag")),
@@ -62,9 +63,6 @@ MuHitDisplay::MuHitDisplay(fhicl::ParameterSet const& pset) :
   _generatorID                 (pset.get<mu2e::GenId>   ("generatorID", mu2e::GenId::CeEndpoint)),
   _minEnergyDep                (pset.get<double>        ("minEnergyDep", 0)),
   _timeWindow                  (pset.get<double>        ("timeWindow", 1.e6)),
-  // fGoodHitMask                 (pset.get<vector<string>>("goodHitMask")),
-  // fBadHitMask                  (pset.get<vector<string>>("badHitMask")),
-//  _minHits                     (pset.get<unsigned>      ("minHits")),
   _minSimpMomentum             (pset.get<double>        ("minSimpMomentum")),
 
   _showCRVOnly                 (pset.get<bool>("showCRVOnly", false)),
@@ -282,13 +280,15 @@ void MuHitDisplay::InitVisManager() {
 //-----------------------------------------------------------------------------
   TTrkVisNode* tnode = new TTrkVisNode ("TrkVisNode", fTracker, NULL);
 
-  tnode->SetShCollTag       (_strawHitCollTag  );
-  tnode->SetChCollTag       (_comboHitCollTag  );
-  tnode->SetKsCollTag       ( _trackCollTag    );
-  tnode->SetSdmcCollTag     (_sdmcCollTag      );
-  tnode->SetSimpColl        (&_simpColl        );
-  tnode->SetSpmcColl        (&_spmcColl        );
-  tnode->SetSwColl          (&_swColl          );
+  tnode->SetShCollTag       (_strawHitCollTag);
+  tnode->SetShfCollTag      (_shfCollTag     );
+  tnode->SetChCollTag       (_comboHitCollTag);
+  tnode->SetChfCollTag      (_chfCollTag     );
+  tnode->SetKsCollTag       (_trackCollTag   );
+  tnode->SetSdmcCollTag     (_sdmcCollTag    );
+  tnode->SetSimpColl        (&_simpColl      );
+  tnode->SetSpmcColl        (&_spmcColl      );
+  tnode->SetSwColl          (&_swColl        );
 //-----------------------------------------------------------------------------
 // SimpBlock is initialized in the module, a node references it via the pointer
 //-----------------------------------------------------------------------------

@@ -91,10 +91,11 @@ private:
   string        _crvRecoPulseCollTag;
 
   string        _strawHitCollTag;
+  string        _shfCollTag;            // straw hit flags
   string        _comboHitCollTag;
+  string        _chfCollTag;            // straw hit flags
   string        _sdCollTag;		// strawDigiCollTag
   string        _sdmcCollTag;
-  string        _shfCollTag;            // straw hit flags
   string        _swCollTag;
   
   string        _helixSeedCollTag;	// helix seed collection tag

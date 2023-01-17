@@ -95,7 +95,8 @@ void TAnaDump::printKalSeed(const mu2e::KalSeed* KalSeed           ,
     fEvent->getByLabel(tag,sdmccH);
     if (sdmccH.isValid()) sdmcc = sdmccH.product();
     else {
-      printf("ERROR in TAnaDump::printTrackSeed: no StrawDigiMCCollection with tag=%s, available collections are:\n", tag.encode().data());
+      printf("ERROR in TAnaDump::printTrackSeed: no StrawDigiMCCollection with tag=%s,",tag.encode().data());
+      printf(" available collections are:\n");
  
       vector<art::Handle<mu2e::StrawDigiMCCollection>> list;
       const  art::Handle<mu2e::StrawDigiMCCollection>*  handle;
@@ -129,7 +130,9 @@ void TAnaDump::printKalSeed(const mu2e::KalSeed* KalSeed           ,
       int  hitIndex  = int(hit_seed->index());
       hit            = &shcol->at(hitIndex);
       loc            = hit - hit_0;
-
+//-----------------------------------------------------------------------------
+// fake hit flag - FIXME
+//-----------------------------------------------------------------------------
       int straw_hit_flag = hit_seed->flag().hasAllProperties(mu2e::StrawHitFlagDetail::active);
 
       if (sdmcc) {

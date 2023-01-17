@@ -579,9 +579,9 @@ void DisplayMu2eGeometry::SetTrackerColors() {
     ""
   };
   
-  SetRecursiveColorTranspByName(fTrkMother,"TTracker",kYellow   ,90);
-  SetRecursiveColorTranspByName(fTrkMother,"Plane"   ,kYellow   ,99);
-  SetRecursiveColorTranspByName(fTrkMother,"Panel"   ,kYellow   ,99);
+  SetRecursiveColorTranspByName(fTrkMother,"TTracker",kYellow   ,80);
+  SetRecursiveColorTranspByName(fTrkMother,"Plane"   ,kYellow   ,90);
+  SetRecursiveColorTranspByName(fTrkMother,"Panel"   ,kGray     ,50);         // 99
   
   SetRecursiveColorTranspByName(fTrkMother,"TTrackerEndRingUpstream",kGray  ,0);
   SetRecursiveColorTranspByName(fTrkMother,"TTrackerSupport"        ,kGray  ,0);

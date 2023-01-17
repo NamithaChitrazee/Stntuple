@@ -126,7 +126,7 @@ protected:
   string                   fPrimaryParticleTag;
   string                   fTriggerResultsTag;
 
-  string                   fVDHitsCollTag;                  // hits on virtual detectors (StepPointMCCollection)
+  string                   fVdhCollTag;                     // hits on virtual detectors (StepPointMCCollection)
 
   vector<string>           fTimeClusterBlockName;
   vector<string>           fTimeClusterCollTag;
@@ -263,7 +263,7 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
   , fPrimaryParticleTag      (PSet.get<string>        ("primaryParticleTag"  ))
   , fTriggerResultsTag       (PSet.get<string>        ("triggerResultsTag"   ))
 
-  , fVDHitsCollTag           (PSet.get<string>        ("vdHitsCollTag"       ))
+  , fVdhCollTag              (PSet.get<string>        ("vdHitsCollTag"       ))
   , fTimeClusterBlockName    (PSet.get<vector<string>>("timeClusterBlockName"))
   , fTimeClusterCollTag      (PSet.get<vector<string>>("timeClusterCollTag"  ))
   , fHelixBlockName          (PSet.get<vector<string>>("helixBlockName"      ))
@@ -579,7 +579,7 @@ void StntupleMaker::beginJob() {
     fInitSimpBlock->SetSimpCollTag       (fSimpCollTag);
     fInitSimpBlock->SetStrawHitCollTag   (fStrawHitCollTag);
     fInitSimpBlock->SetSdmcCollTag       (fStrawDigiMCCollTag);
-    fInitSimpBlock->SetVDHitsCollTag     (fVDHitsCollTag);
+    fInitSimpBlock->SetVDHitsCollTag     (fVdhCollTag);
     fInitSimpBlock->SetPrimaryParticleTag(fPrimaryParticleTag);
     fInitSimpBlock->SetMinSimpMomentum   (fMinSimpMomentum);
     fInitSimpBlock->SetMaxZ              (fSimpMaxZ);
@@ -716,7 +716,7 @@ void StntupleMaker::beginJob() {
       init_block->SetComboHitCollTag    (fStrawHitCollTag );
       init_block->SetKalSeedCollTag     (fTrackCollTag[i] );  // tracks saved as lists of KalSeeds
       init_block->SetPIDProductCollTag  (fPidCollTag[i]   );
-      init_block->SetSpmcCollTag        (fSpmcCollTag[i]  );
+      init_block->SetVdhCollTag         (fVdhCollTag      );  // 
       init_block->SetStrawDigiMCCollTag (fStrawDigiMCCollTag);
       init_block->SetTciCollTag         (fTciCollTag[i]);
       init_block->SetTcmCollTag         (fTcmCollTag[i]);
@@ -739,7 +739,7 @@ void StntupleMaker::beginJob() {
 	// track_data->AddCollName("mu2e::TrackClusterMatchCollection"   ,fTcmCollTag[i].data()      );
 	// track_data->AddCollName("mu2e::TrkQualCollection"             ,fTrkQualCollTag[i].data()  );
 	// track_data->AddCollName("mu2e::PIDProductCollection"          ,fPidCollTag[i].data()      );
-	// track_data->AddCollName("mu2e::StepPointMCCollection"         ,fVDHitsCollTag.data()      );
+	// track_data->AddCollName("mu2e::StepPointMCCollection"         ,fVdhCollTag.data()      );
 	// track_data->AddCollName("DarHandle"                           ,GetName()                  ,"DarHandle"    );
 	// track_data->AddCollName("KalDiagHandle"                       ,GetName()                  ,"KalDiagHandle");
 
