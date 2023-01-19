@@ -288,7 +288,7 @@ public:
   void printTimeClusterCollection(const char* TcCollTag             ,    // time cluster collection tag
 				  const char* ChCollTag             ,    // combo hit collection tag
 				  int         PrintHits   = 0       ,
-				  const char* SdmcCollTag = "makeSD");   // straw digi mc coll tag
+				  const char* SdmcCollTag = nullptr);   // straw digi mc coll tag
 //-----------------------------------------------------------------------------
 // calorimeter cluster added to the track fit
 //-----------------------------------------------------------------------------

@@ -24,10 +24,12 @@ void TAnaDump::printTimeCluster(const mu2e::TimeCluster*        TimeCluster,
   int                        flags;
 
   // MC collection could be absent, missing, or incorrectly specified
+  const char* sdmc_coll_tag = SdmcCollTag;
+  if (sdmc_coll_tag == nullptr) sdmc_coll_tag = fStrawDigiMCCollTag.Data();
 
   const mu2e::StrawDigiMCCollection* mcdigis(nullptr);
   art::Handle<mu2e::StrawDigiMCCollection> sdmccH;
-  fEvent->getByLabel(SdmcCollTag, sdmccH);
+  fEvent->getByLabel(sdmc_coll_tag, sdmccH);
   if (sdmccH.isValid()) mcdigis = sdmccH.product();
   
   TString opt = Opt;
