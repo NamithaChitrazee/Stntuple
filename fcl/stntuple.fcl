@@ -55,29 +55,20 @@ END_PROLOG
 #include "Offline/CaloReco/fcl/prolog.fcl"
 #include "Offline/CaloCluster/fcl/prolog.fcl"
 #include "Offline/CalPatRec/fcl/prolog.fcl"
-#\\\include "Offline/Trigger/fcl/prolog_trigger.fcl"
-
-#include "Stntuple/fcl/prolog.fcl"
-#include "pbar2m/fcl/prolog.fcl"
 #------------------------------------------------------------------------------
 # trigger prologs
 #------------------------------------------------------------------------------
-# #include "Offline/TrkPatRec/fcl/prolog_trigger.fcl"
-# #include "Offline/CalPatRec/fcl/prolog_trigger.fcl"
-# #include "Offline/CaloReco/fcl/prolog_trigger.fcl"
-# #include "Offline/CaloCluster/fcl/prolog_trigger.fcl"
-# #include "Offline/TrkHitReco/fcl/prolog_trigger.fcl"
-# #include "Offline/TrkReco/fcl/prolog_trigger.fcl"
-# #include "Offline/TrkFilters/fcl/prolog_trigger.fcl"
-#\\\\ #include "Offline/CaloFilters/fcl/prolog_trigger.fcl"
+#include "Offline/Trigger/fcl/prolog_trigger.fcl"
+
+#include "Stntuple/fcl/prolog.fcl"
+#include "pbar2m/fcl/prolog.fcl"
 #------------------------------------------------------------------------------
 # templates: do not include prologs, 
 # define table and sequence templates combining information from multiples packages
 # services are initialized in Stntuple/fcl/stntuple_templates.fcl
 # (1): services section (Services.SimAndReco and Services.Sim today are the same)
 #       add time tracker template
-#------------------------------------------------------------------------------
-#------------------------------------------------------------------------------
+#
 # include-less clones on Production fcls with all templates
 # assume that '_prolog' files don't have BEGIN_PROLOG/END_PROLOG clauses
 #------------------------------------------------------------------------------
@@ -134,6 +125,11 @@ outputs: {
     }
     #    FullOutput : { @table::Mixing.Output  outputCommands : [ "keep *_*_*_*"                  ] }
     #    DetOutput  : { @table::Mixing.Output  outputCommands : [ @sequence::production.mixing_output ] }
+    SignalOutput      : { @table::Digitize.SignalOutput      }
+    CaloOutput        : { @table::Digitize.CaloOutput        }
+    TrkOutput         : { @table::Digitize.TrkOutput         }
+    DiagOutput        : { @table::Digitize.DiagOutput        }
+    UntriggeredOutput : { @table::Digitize.UntriggeredOutput }
 }
 #------------------------------------------------------------------------------
 # lower case 'stntuple' is for inclusion
@@ -155,12 +151,14 @@ stntuple : {
     filters  : { 
 	@table::Common.filters
 	@table::Primary.filters
+        @table::Digitize.filters
 	@table::Reconstruction.filters
 	@table::Stntuple.filters   
     }
 
     analyzers: { 
 	@table::Common.analyzers
+	@table::Digitize.analyzers
 	@table::Reconstruction.analyzers
 	@table::Stntuple.analyzers 
     }

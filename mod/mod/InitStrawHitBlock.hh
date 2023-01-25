@@ -14,7 +14,7 @@
 namespace stntuple {
 class InitStrawHitBlock : public TStnInitDataBlock {
 public:
-  art::InputTag   fStrawHitCollTag;
+  art::InputTag   fShCollTag;
   art::InputTag   fStrawDigiCollTag;
   art::InputTag   fStrawDigiMCCollTag;
   art::InputTag   fSdwfCollTag;
@@ -24,7 +24,7 @@ public:
 //-----------------------------------------------------------------------------
 public:
 
-  void   SetStrawHitCollTag    (std::string& Tag) { fStrawHitCollTag    = art::InputTag(Tag); }
+  void   SetShCollTag          (art::InputTag& Tag) { fShCollTag    = Tag; }
   void   SetStrawDigiCollTag   (std::string& Tag) { fStrawDigiCollTag   = art::InputTag(Tag); }
   void   SetStrawDigiMCCollTag (std::string& Tag) { fStrawDigiMCCollTag = art::InputTag(Tag); }
   void   SetSdwfCollTag        (std::string& Tag) { fSdwfCollTag        = art::InputTag(Tag); }

@@ -49,7 +49,7 @@ public:
 
   art::InputTag   fAlgorithmIDCollTag;
   art::InputTag   fCaloClusterCollTag;
-  art::InputTag   fComboHitCollTag;
+  art::InputTag   fSsChCollTag;           // single-straw combo hit collection tag
   art::InputTag   fKalSeedCollTag;
   art::InputTag   fPIDProductCollTag;
   art::InputTag   fStrawDigiMCCollTag;
@@ -65,7 +65,7 @@ public:
   const mu2e::KalSeedCollection*           list_of_kreps              ;
   const mu2e::TrkQualCollection*           list_of_trk_qual           ;
   const mu2e::StrawDigiMCCollection*       list_of_mc_straw_hits      ;
-  const mu2e::ComboHitCollection*          list_of_combo_hits         ;
+  const mu2e::ComboHitCollection*          fSschColl                  ;
   const mu2e::TrkCaloIntersectCollection*  list_of_extrapolated_tracks;
   const mu2e::PIDProductCollection*        list_of_pidp               ;
 
@@ -80,7 +80,7 @@ public:
 
   void   SetAlgorithmIDCollTag      (std::string& Tag) { fAlgorithmIDCollTag   = art::InputTag(Tag); }
   void   SetCaloClusterCollTag      (std::string& Tag) { fCaloClusterCollTag   = art::InputTag(Tag); }
-  void   SetComboHitCollTag         (std::string& Tag) { fComboHitCollTag      = art::InputTag(Tag); }
+  void   SetSsChCollTag             (art::InputTag& Tag) { fSsChCollTag      = Tag; }
   void   SetKalSeedCollTag          (std::string& Tag) { fKalSeedCollTag       = art::InputTag(Tag); }
   void   SetPIDProductCollTag       (std::string& Tag) { fPIDProductCollTag    = art::InputTag(Tag); }
   void   SetVdhCollTag              (std::string& Tag) { fVdhCollTag           = art::InputTag(Tag); }

@@ -965,11 +965,11 @@ void TTrkVisNode::NodePrint(const void* Object, const char* ClassName) {
 //-----------------------------------------------------------------------------
     if (Object) {
       const mu2e::KalSeed* ks = (const mu2e::KalSeed*) Object;
-      ad->printKalSeed(ks,"",fShCollTag.data(),fSdmcCollTag.data());
+      ad->printKalSeed(ks,"",fShCollTag.encode().data(),fSdmcCollTag.data());
     }
     else {
 					// Object = nullptr: print collection, with hits 
-      ad->printKalSeedCollection(fKsCollTag.data(),1,fShCollTag.data(),fSdmcCollTag.data());
+      ad->printKalSeedCollection(fKsCollTag.data(),1,fShCollTag.encode().data(),fSdmcCollTag.data());
     }
   }
   else {

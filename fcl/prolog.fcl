@@ -79,10 +79,10 @@ StntupleMakerTemplate : { module_type:StntupleMaker
 # STN_COMPRESS_MCS is ddefined in 'Stntuple/fcl/stntuple.fcl' and can be redefined 
 # in the job config file
 #------------------------------------------------------------------------------
-    comboHitCollTag      : "makePH"
+    chCollTag            : "makePH"
     strawDigiCollTag     : "makeSD"
     sdwfCollTag          : "makeSD"
-    strawHitCollTag      : "makeSH"
+    shCollTag            : "makeSH"
     strawDigiMCCollTag   : @local::STN_COMPRESS_MCS              # was "makeSD"
 #------------------------------------------------------------------------------
 # TSimpBlock initialization parameters
@@ -124,6 +124,7 @@ StntupleMakerTemplate : { module_type:StntupleMaker
     tciCollTag           : [ "TrkExtrapol"  ]
     tcmCollTag           : [ "CaloMatching" ]
     trkQualCollTag       : [ "TrackQual"    ]
+    pbiTag               : "PBISim"                   ## proton bunch intensity object
     pidBlockName         : [ "PidBlock"     ]
     pidCollTag           : [ "ParticleID"   ]    #   [ "AvikPID"      ]
     trackSHBlockName     : [ "TrackHitBlock"] 
@@ -222,7 +223,13 @@ MuHitDisplay: { module_type:MuHitDisplay                 # class name;
 #------------------------------------------------------------------------------
 Stntuple : {
     producers : {}  # empty table
-    filters   : {}  # empty table
+
+    filters   : {
+	EventFilter : { module_type:EventFilter
+	    printFreq    : 1000000
+	    eventList    : []          # [ run1, subrun1, event1, ...]
+	}
+    } 
 #------------------------------------------------------------------------------
 # STNTUPLE modules become analyzers - need to deal with the trigger intormation
 #------------------------------------------------------------------------------
@@ -688,11 +695,6 @@ Stntuple : {
 #------------------------------------------------------------------------------
 # 
 #------------------------------------------------------------------------------
-	EventFilter : { module_type:EventFilter
-	    printFreq    : 1000000
-	    eventList    : []          # [ run1, subrun1, event1, ...]
-	}
-
 	MuHitDisplay    : { @table::MuHitDisplay }
     }
 }

@@ -38,7 +38,7 @@ MuHitDisplay::MuHitDisplay(fhicl::ParameterSet const& pset) :
   _caloClusterCollTag          (pset.get<string>("caloClusterCollTag"  )),
   _crvRecoPulseCollTag         (pset.get<string>("crvRecoPulsesCollTag")),
   			        
-  _strawHitCollTag             (pset.get<string>("strawHitCollTag")),
+  _shCollTag                   (pset.get<art::InputTag>("strawHitCollTag")),
   _shfCollTag                  (pset.get<string>("shfCollTag")),
   _comboHitCollTag             (pset.get<string>("comboHitCollTag")),
   _chfCollTag                  (pset.get<string>("chfCollTag")),
@@ -128,7 +128,7 @@ void MuHitDisplay::beginJob() {
   StntupleInitSimpBlock* init_block = new StntupleInitSimpBlock();
 
   init_block->SetSimpCollTag       (_simpCollTag);
-  init_block->SetStrawHitCollTag   (_strawHitCollTag);
+  init_block->SetShCollTag         (_shCollTag);
   init_block->SetSdmcCollTag       (_sdmcCollTag);
   init_block->SetVDHitsCollTag     (_vdHitsCollTag);
   init_block->SetPrimaryParticleTag(_ppTag);
@@ -280,7 +280,7 @@ void MuHitDisplay::InitVisManager() {
 //-----------------------------------------------------------------------------
   TTrkVisNode* tnode = new TTrkVisNode ("TrkVisNode", fTracker, NULL);
 
-  tnode->SetShCollTag       (_strawHitCollTag);
+  tnode->SetShCollTag       (_shCollTag);
   tnode->SetShfCollTag      (_shfCollTag     );
   tnode->SetChCollTag       (_comboHitCollTag);
   tnode->SetChfCollTag      (_chfCollTag     );
@@ -300,7 +300,7 @@ void MuHitDisplay::InitVisManager() {
   TEvdHelixVisNode* hnode = new TEvdHelixVisNode ("HelixVisNode", NULL);
   hnode->SetHelixSeedCollTag(_helixSeedCollTag);
   hnode->SetSdmcCollTag     (_sdmcCollTag);
-  hnode->SetShCollTag       (_strawHitCollTag );
+  hnode->SetShCollTag       (_shCollTag );
 //-----------------------------------------------------------------------------
 // TimeClusterVisNode: one time collection 
 // to begin with, add timecluster node to only one view - TZ
@@ -439,7 +439,7 @@ int MuHitDisplay::getData(const art::Event* Evt) {
     if (sdcH.isValid()) _sdColl = sdcH.product();
     else {
       printf(">>> [%s] WARNING: StrawDigiCollection by %s is missing.\n",
-	     oname, _strawHitCollTag.data());
+	     oname, _shCollTag.encode().data());
       _sdColl = nullptr;
     }
 

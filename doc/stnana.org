@@ -5,7 +5,10 @@
 
   - *stnana* : an interactive event loop utility 
   - user analysis packages which contain the code used by *stnana*
-* steps to proceed :
+* examples of stnana analysis modules                                        
+  for starters, see the code in file:../ana/  
+  Modules there are example of modules run in stnana event loop
+* steps to proceed :                                                         
 
   1) [[file:analysis_packages.org][create your own analysis package and compile its code into a shared library]]
 
@@ -36,7 +39,7 @@ on first 10000 events of the dataset defined by the book="detsim" and dsname="cn
 
 WARNING: trk.C is not loaded by default, so don't try to call trk_ana() interactively.
 
-* *stnana* call format                  
+* *stnana* call format                                                       
 
 stnana provides an interactive interface to the STNTUPLE event loop utility. Meaning of the call parameters:
 

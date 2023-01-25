@@ -90,7 +90,7 @@ private:
   string        _caloClusterCollTag;
   string        _crvRecoPulseCollTag;
 
-  string        _strawHitCollTag;
+  art::InputTag _shCollTag;
   string        _shfCollTag;            // straw hit flags
   string        _comboHitCollTag;
   string        _chfCollTag;            // straw hit flags

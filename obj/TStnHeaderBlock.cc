@@ -62,6 +62,7 @@ void TStnHeaderBlock::ReadV1(TBuffer &R__b) {
   fNCaloHits     = -1               ;   // *** added in V2
   fNCRVHits      = -1               ;   // *** added in V2
   fCpu           = data.fCpu        ;
+  fNComboHits    = -1               ;   // *** added in V3
 
   fInstLum       = data.fInstLum    ;
   fMeanLum       = -1.              ;   // *** added in V2
@@ -105,6 +106,7 @@ TStnHeaderBlock::TStnHeaderBlock() {
   fNStrawHits    = -1;
   fNCaloHits     = -1;
   fNCRVHits      = -1;
+  fNComboHits    = -1;
 
   fInstLum       = -1;
   fMeanLum       = -1;
@@ -122,7 +124,6 @@ TStnHeaderBlock::TStnHeaderBlock() {
 TStnHeaderBlock::~TStnHeaderBlock() {
 }
 
-
 //_____________________________________________________________________________
 void TStnHeaderBlock::Clear(Option_t* opt) {
   f_EventNumber       = -1;
@@ -130,7 +131,6 @@ void TStnHeaderBlock::Clear(Option_t* opt) {
   f_SubrunNumber      = -1;
   fLinksInitialized   =  0;
 }
-
 
 //_____________________________________________________________________________
 void TStnHeaderBlock::Print(Option_t* opt) const {
@@ -150,6 +150,3 @@ void TStnHeaderBlock::Print(Option_t* opt) const {
   printf("*** Run,Subrun,Event: %6i,%7i,%-9i: %s\n", 
 	 fRunNumber,fSectionNumber,fEventNumber,opt);
 }
-
-
-

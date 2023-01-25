@@ -42,33 +42,33 @@
 // fill SimParticle's data block
 //-----------------------------------------------------------------------------
 int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent, int Mode) {
-  const char* oname = {"StntupleInitMu2eSimpBlock"};
+  const char* oname = {"Stntuple::InitSimpBlock"};
 
   std::vector<art::Handle<mu2e::SimParticleCollection>> list_of_sp;
 
   const mu2e::SimParticleCollection*       simp_coll(0);
   const mu2e::SimParticle*                 sim(0);
-  const mu2e::StrawHitCollection*          list_of_straw_hits(nullptr);
+  const mu2e::StrawHitCollection*          shColl(nullptr);
   const mu2e::StrawDigiMCCollection*       mcdigis(nullptr);
 
   double        px, py, pz, energy;
-  int           id, parent_id, process_id, n_straw_hits(0), nhits;
+  int           id, parent_id, process_id, nsh(0), nhits;
   int           pdg_code, start_vol_id, end_vol_id, creation_code, termination_code;
   TSimParticle* simp;
 
   TSimpBlock* simp_block = (TSimpBlock*) Block;
   simp_block->Clear();
 
-  art::Handle<mu2e::StrawHitCollection> shHandle;
-  if (! fStrawHitCollTag.empty()) {
-    bool ok = AnEvent->getByLabel(fStrawHitCollTag,shHandle);
+  art::Handle<mu2e::StrawHitCollection> shcH;
+  if (! fShCollTag.empty()) {
+    bool ok = AnEvent->getByLabel(fShCollTag,shcH);
     if (ok) {
-      list_of_straw_hits = shHandle.product();
-      n_straw_hits      = list_of_straw_hits->size();
+      shColl = shcH.product();
+      nsh    = shColl->size();
     }
     else {
       mf::LogWarning(oname) << " WARNING: no StrawHitCollection tag=" 
-			    << fStrawHitCollTag.encode().data() <<  " found";
+			    << fShCollTag.encode().data() <<  " found";
     }
   }
 
@@ -79,7 +79,7 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
     if (ok) mcdigis = mcdH.product();
     else {
       mf::LogWarning(oname) << " WARNING: no StrawDigiMCCollection tag=" 
-			    << fStrawHitCollTag.encode().data() <<  " found";
+			    << fShCollTag.encode().data() <<  " found";
     }
   }
 
@@ -102,22 +102,22 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
 //-----------------------------------------------------------------------------
   std::vector<int>  vid, vin;
   int               np_with_straw_hits(0);  // number of particles with straw hits
-					   // straw hit ID's, per particle
-  std::vector<int>* vshid[n_straw_hits+1];
+                                            // straw hit ID's, per particle
+  std::vector<int>* vshid[nsh+1];
 
-  vid.reserve(n_straw_hits);
-  vin.reserve(n_straw_hits);
+  vid.reserve(nsh);
+  vin.reserve(nsh);
 
-  for (int i=0; i<n_straw_hits; i++) {
-    vin[i]   = 0;
+  for (int i=0; i<nsh; i++) {
+    vin  [i] = 0;
     vshid[i] = nullptr;
   }
 
-  if ((n_straw_hits > 0) and (mcdigis != nullptr)) {
+  if ((nsh > 0) and (mcdigis != nullptr)) {
 
     const mu2e::StrawGasStep* step(nullptr);
 
-    for (int i=0; i<n_straw_hits; i++) {
+    for (int i=0; i<nsh; i++) {
       const mu2e::StrawDigiMC* mcdigi = &mcdigis->at(i);
 
       step = mcdigi->earlyStrawGasStep().get();

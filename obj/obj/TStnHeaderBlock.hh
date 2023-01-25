@@ -17,7 +17,11 @@ class TStnHeaderBlock : public TStnDataBlock {
   friend Int_t StntupleInitMu2eHeaderBlockLinks(TStnDataBlock*, AbsEvent* , int);
 
   enum {
-    kNFreeInts   =  5,                  // starting from version 2
+    kNFreeInts_v2   =  5,               // starting from version 2
+    kNFreeFloats_v2 =  5
+  };
+  enum {
+    kNFreeInts   =  4,                  // starting from version 3
     kNFreeFloats =  5
   };
 
@@ -36,6 +40,7 @@ public:
   int               fNCaloHits;         // *** added in V2 - total N reco pulses
   int               fNCRVHits;          // *** added in V2 - total N CRV hits
   Int_t             fCpu;               // packed word with processing time
+  int               fNComboHits;        // *** added in V3
   int               fInt[kNFreeInts];   // provision for future I/O expansion
 
   float             fInstLum;		 // instantaneous luminosity
@@ -56,19 +61,22 @@ public:
   virtual ~TStnHeaderBlock();
 					// ****** accessors 
 
-  Int_t  EventNumber  () const { return fEventNumber;   }
-  Int_t  RunNumber    () const { return fRunNumber;     }
-  Int_t  SectionNumber() const { return fSectionNumber; }
-  Int_t  SubrunNumber () const { return fSectionNumber; }    // Mu2e synonim of the CDF "section number"
-  Int_t  McFlag       () const { return fMcFlag;        }
-  Int_t  NTracks      () const { return fNTracks;       }
+  int    EventNumber  () const { return fEventNumber;   }
+  int    RunNumber    () const { return fRunNumber;     }
+  int    SectionNumber() const { return fSectionNumber; }
+  int    SubrunNumber () const { return fSectionNumber; }    // Mu2e synonim of the CDF "section number"
+  int    McFlag       () const { return fMcFlag;        }
+  int    NTracks      () const { return fNTracks;       }
+  int    NStrawHits   () const { return fNStrawHits;    }
+  int    NComboHits   () const { return fNComboHits;    }
 
-  Float_t InstLum     () const { return fInstLum;       }
-  Float_t MeanLum     () const { return fMeanLum;       }
-  Float_t LumWeight   () const { return fInstLum/fMeanLum; }
+  float InstLum       () const { return fInstLum;       }
+  float MeanLum       () const { return fMeanLum;       }
+  float LumWeight     () const { return fInstLum/fMeanLum; }
 
-  Float_t CpuTime     () const { return ((fCpu>>8)/10.0);   } // in s
-  Float_t CpuSpeed    () const { return ((fCpu&0xFF)/5.0); } // in GHz
+  float CpuTime       () const { return ((fCpu>>8)/10.0);   } // in s
+  float CpuSpeed      () const { return ((fCpu&0xFF)/5.0); } // in GHz
+
   const TString& StnVersion () const { return fStnVersion;    }
 
 					// ****** setters/modifiers
@@ -83,7 +91,7 @@ public:
   void   ReadV1(TBuffer& R__b);
 
 
-  ClassDef(TStnHeaderBlock,2)	       // Mu2e STNTUPLE event header
+  ClassDef(TStnHeaderBlock,3)	       // Mu2e STNTUPLE event header
 };
 
 #endif

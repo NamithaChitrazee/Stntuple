@@ -1,47 +1,47 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
 ///////////////////////////////////////////////////////////////////////////////
-#include "TROOT.h"
-#include "TFolder.h"
-#include "TNamed.h"
-
-#include <Stntuple/obj/TStnEvent.hh>
-#include <Stntuple/obj/TStnHeaderBlock.hh>
-#include <Stntuple/mod/InitStntupleDataBlocks.hh>
-#include <Stntuple/mod/StntupleUtilities.hh>
-
-#include "Offline/RecoDataProducts/inc/StrawHit.hh"
-#include "Offline/MCDataProducts/inc/ProtonBunchIntensity.hh"
+#include "TLorentzVector.h"
+#include "TDatabasePDG.h"
+#include "TParticlePDG.h"
+#include <vector>
 
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
-#include "art/Framework/Principal/Selector.h"
 #include "art/Framework/Principal/Handle.h"
 #include "art/Framework/Principal/Event.h"
 #include "art/Framework/Principal/Provenance.h"
+#include "canvas/Utilities/InputTag.h"
+
+#include "Stntuple/obj/TStnHeaderBlock.hh"
+#include "Stntuple/mod/InitHeaderBlock.hh"
+#include <Stntuple/mod/StntupleUtilities.hh>
+
+#include "Offline/RecoDataProducts/inc/StrawHit.hh"
+#include "Offline/RecoDataProducts/inc/ComboHit.hh"
+
+#include "Stntuple/mod/THistModule.hh"
+#include "Offline/MCDataProducts/inc/ProtonBunchIntensity.hh"
 
 void stntuple_get_version(char* ver, char* test);
 
-//_____________________________________________________________________________
-Int_t StntupleInitMu2eHeaderBlock(TStnDataBlock* block, AbsEvent* AnEvent, int mode) 
-{
-  
-  static TFolder*         fol     = NULL;
-  static const char       oname[] = "StntupleInitMu2eHeaderBlock";
-
-  if (! fol) {
 //-----------------------------------------------------------------------------
-//  initialize local static variables
+// fill header  block
 //-----------------------------------------------------------------------------
-    fol     = (TFolder*) gROOT->GetRootFolder()->FindObject("Stntuple");
-  }
+namespace stntuple {
 
-  TStnHeaderBlock* data = (TStnHeaderBlock*) block;
+int InitHeaderBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent, int Mode) {
+  const char oname []  = {"stntuple::InitHeaderBlock::InitDataBlock"};
+
+  TStnHeaderBlock* data = (TStnHeaderBlock*) Block;
 
   data->fEventNumber   = AnEvent->event();
   data->fRunNumber     = AnEvent->run();
   data->fSectionNumber = AnEvent->subRun();
-  if (data->fRunNumber < 100000) data->fMcFlag = 1.; // gblEnv->monteFlag();
+//-----------------------------------------------------------------------------
+// MC is supposed to have run numbers < 100000
+//-----------------------------------------------------------------------------
+  if (data->fRunNumber < 100000) data->fMcFlag = 1;
   else                           data->fMcFlag = 0;
 
   data->fNTracks       = -1;
@@ -62,7 +62,6 @@ Int_t StntupleInitMu2eHeaderBlock(TStnDataBlock* block, AbsEvent* AnEvent, int m
 // Loop over ProtonBunchIntensity objects
 //-----------------------------------------------------------------------------
     const mu2e::ProtonBunchIntensity* pbi= pbiHandle.product();
-
     data->fInstLum = pbi->intensity();
     data->fMeanLum = -1. ;
   }
@@ -75,50 +74,33 @@ Int_t StntupleInitMu2eHeaderBlock(TStnDataBlock* block, AbsEvent* AnEvent, int m
 //-----------------------------------------------------------------------------
 // number of straw hits
 //-----------------------------------------------------------------------------
-  char   strh_module_label[100], strh_description[100];
+  art::Handle<mu2e::StrawHitCollection> shcH;
+  const mu2e::StrawHitCollection*       shColl(nullptr);
 
-  data->GetModuleLabel("mu2e::StrawHitCollection",strh_module_label);
-  data->GetDescription("mu2e::StrawHitCollection",strh_description );
+  if (! fShCollTag.empty()) {
+    AnEvent->getByLabel(fShCollTag,shcH);
 
-  art::Handle<mu2e::StrawHitCollection> strh_handle;
-  const mu2e::StrawHitCollection*       list_of_hits(0);
+    if (shcH.isValid()) {
+      shColl = shcH.product();
+      data->fNStrawHits = shColl->size();
+    }
+  }
+//-----------------------------------------------------------------------------
+// number of combo hits
+//-----------------------------------------------------------------------------
+  art::Handle<mu2e::ComboHitCollection> chcH;
+  const mu2e::ComboHitCollection*       chColl(nullptr);
 
-  if (strh_module_label[0] != 0) {
-    if (strh_description[0] == 0) AnEvent->getByLabel(strh_module_label,strh_handle);
-    else                          AnEvent->getByLabel(strh_module_label,strh_description,strh_handle);
+  if (! fChCollTag.empty()) {
+    AnEvent->getByLabel(fChCollTag,chcH);
 
-    if (strh_handle.isValid()) {
-      list_of_hits = strh_handle.product();
-      data->fNStrawHits = list_of_hits->size();
+    if (chcH.isValid()) {
+      chColl = chcH.product();
+      data->fNComboHits = chColl->size();
     }
   }
 
   return 0;
 }
 
-//_____________________________________________________________________________
-Int_t StntupleInitMu2eHeaderBlockLinks(TStnDataBlock* Block, AbsEvent* AnEvent, int Mode) 
-{
-  // Mu2e version, section number is defined
-
-  Int_t  ev_number, rn_number;
-
-  ev_number = AnEvent->event();
-  rn_number = AnEvent->run();
-
-  if (! Block->Initialized(ev_number,rn_number)) return -1;
-
-					// do not do initialize links 2nd time
-
-  if (Block->LinksInitialized()) return 0;
-
-  TStnHeaderBlock* header = (TStnHeaderBlock*) Block;
-//-----------------------------------------------------------------------------
-// mark links as initialized
-//-----------------------------------------------------------------------------
-  header->fLinksInitialized = 1;
-
-  return 0;
 }
-
-

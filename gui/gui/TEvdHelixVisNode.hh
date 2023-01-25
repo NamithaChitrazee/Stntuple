@@ -5,7 +5,7 @@
 #include "TClonesArray.h"
 #include "TArc.h"
 					// needed for rootcint... ComboHit
-
+#include "canvas/Utilities/InputTag.h"
 #include "canvas/Persistency/Common/Ptr.h"
 
 #include "Offline/RecoDataProducts/inc/HelixSeed.hh"
@@ -30,7 +30,7 @@ protected:
   const mu2e::HelixSeedCollection*  fHsColl;
 
   std::string                       fHsCollTag;
-  std::string                       fShCollTag;   // straw/combo hit collection
+  art::InputTag                     fShCollTag;   // straw/combo hit collection
   std::string                       fSdmcCollTag; // straw digi collection
 
   TStnHelixBlock*                   fHelixBlock;
@@ -64,14 +64,14 @@ public:
   }
 
   std::string& HsCollTag()   { return fHsCollTag   ; }
-  std::string& ShCollTag()   { return fShCollTag   ; }
+  art::InputTag& ShCollTag() { return fShCollTag   ; }
   std::string& SdmcCollTag() { return fSdmcCollTag ; }
 //-----------------------------------------------------------------------------
 // modifiers
 //-----------------------------------------------------------------------------
-  void SetHelixSeedCollTag (std::string& CollTag) { fHsCollTag   = CollTag; }
-  void SetSdmcCollTag      (std::string& CollTag) { fSdmcCollTag = CollTag; }
-  void SetShCollTag        (std::string& CollTag) { fShCollTag   = CollTag; }
+  void SetHelixSeedCollTag (std::string& Tag) { fHsCollTag   = Tag; }
+  void SetSdmcCollTag      (std::string& Tag) { fSdmcCollTag = Tag; }
+  void SetShCollTag        (art::InputTag& Tag) { fShCollTag   = Tag; }
 
 //  void  SetListOfTracks(TObjArray*  List ) { fListOfTracks = List ; }
   void  SetHelixColor  (Color_t     Color) { fHelixColor   = Color; }

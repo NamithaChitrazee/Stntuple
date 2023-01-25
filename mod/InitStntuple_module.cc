@@ -71,17 +71,8 @@ void InitStntuple::beginJob() {
   // "non-split,old"
   // header block, however is always written in split mode
 
-  fgTree   = new TTree("STNTUPLE", "STNTUPLE");
-
-  AddDataBlock("HeaderBlock","TStnHeaderBlock",
-	       StntupleInitMu2eHeaderBlock,
-	       THistModule::BufferSize(),
-	       0, // 99,                          // fSplitMode.value(), always split
-	       THistModule::CompressionLevel());
-
-  SetResolveLinksMethod("HeaderBlock",StntupleInitMu2eHeaderBlockLinks);
-
-  fnLum = 0;
+  fgTree      = new TTree("STNTUPLE", "STNTUPLE");
+  fnLum       = 0;
   fSumInstLum = 0.0;
 
   FILE* pipe;
@@ -91,8 +82,6 @@ void InitStntuple::beginJob() {
   gSystem->ClosePipe(pipe);
 
   THistModule::afterBeginJob();
-
-//  return AppResult::OK;
 }
 
 

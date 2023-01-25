@@ -14,7 +14,7 @@ namespace stntuple {
 
 Int_t StntupleInitMu2eCalDataBlock       (TStnDataBlock* blk, AbsEvent* evt, int mode);
 Int_t StntupleInitMu2eClusterBlock       (TStnDataBlock* blk, AbsEvent* evt, int mode);
-Int_t StntupleInitMu2eHeaderBlock        (TStnDataBlock* blk, AbsEvent* evt, int mode);
+// Int_t StntupleInitMu2eHeaderBlock        (TStnDataBlock* blk, AbsEvent* evt, int mode);
 Int_t StntupleInitMu2eHelixBlock         (TStnDataBlock* blk, AbsEvent* evt, int mode);
 Int_t StntupleInitMu2ePidBlock           (TStnDataBlock* blk, AbsEvent* evt, int mode);
 Int_t StntupleInitMu2eTimeClusterBlock   (TStnDataBlock* blk, AbsEvent* evt, int mode);

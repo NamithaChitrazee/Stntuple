@@ -74,6 +74,39 @@ TTrackAnaModule::~TTrackAnaModule() {
 
 
 //-----------------------------------------------------------------------------
+void TTrackAnaModule::BookEventHistograms(EventHist_t* Hist, const char* Folder) {
+  //  char name [200];
+  //  char title[200];
+
+  HBook1F(Hist->fEleCosTh  ,"ce_costh" ,Form("%s: Conversion Electron Cos(Theta)"  ,Folder),100,-1,1,Folder);
+  HBook1F(Hist->fEleMom    ,"ce_mom"   ,Form("%s: Conversion Electron Momentum"    ,Folder),1000,  0,200,Folder);
+  HBook1D(Hist->fDioMom    ,"dio_mom"  ,Form("%s: DIO momentum"                    ,Folder),1000, 50,150,Folder);
+  HBook1F(Hist->fRv         ,"rv"      ,Form("%s: R(Vertex)"                       ,Folder), 100, 0, 1000,Folder);
+  HBook1F(Hist->fVx         ,"vx"      ,Form("%s: X(Vertex)"                       ,Folder), 300,-150,150,Folder);
+  HBook1F(Hist->fVy         ,"vy"      ,Form("%s: Y(Vertex)"                       ,Folder), 300,-150,150,Folder);
+  HBook1F(Hist->fVz         ,"vz"      ,Form("%s: Z(Vertex)"                       ,Folder), 300, 0,15000,Folder);
+  //  HBook1F(Hist->fNClusters ,"ncl"      ,Form("%s: Number of Reconstructed Clusters",Folder),200,0,200,Folder);
+  HBook1F(Hist->fNTracks   ,"ntrk"     ,Form("%s: Number of Reconstructed Tracks"  ,Folder),100,0,100,Folder);
+  HBook1F(Hist->fNStrawHits[0],"nsh_0" ,Form("%s: Number of Straw Hits [0]"        ,Folder),250,0,  250,Folder);
+  HBook1F(Hist->fNStrawHits[1],"nsh_1" ,Form("%s: Number of Straw Hits [1]"        ,Folder),500,0,10000,Folder);
+  HBook1F(Hist->fNComboHits[0],"nch_0" ,Form("%s: Number of Combo Hits [0]"        ,Folder),250,0,  250,Folder);
+  HBook1F(Hist->fNComboHits[1],"nch_1" ,Form("%s: Number of Combo Hits [1]"        ,Folder),500,0,10000,Folder);
+  HBook1F(Hist->fNGoodSH   ,"nsh50"    ,Form("%s: N(SH) +/-50"                     ,Folder),300,0,1500,Folder);
+  HBook1F(Hist->fDtClT     ,"dt_clt"   ,Form("%s: DT(cluster-track)"               ,Folder),100,-100,100,Folder);
+  HBook1F(Hist->fDtClS     ,"dt_cls"   ,Form("%s: DT(cluster-straw hit)"           ,Folder),200,-200,200,Folder);
+  HBook1F(Hist->fSHTime    ,"shtime"   ,Form("%s: Straw Hit Time"                  ,Folder),400,0,2000,Folder);
+  HBook1F(Hist->fEMax      ,"emax"     ,Form("%s: Max cluster energy"              ,Folder),150,0,150,Folder);
+  HBook1F(Hist->fNHyp      ,"nhyp"     ,Form("%s: N(fit hypotheses)"               ,Folder),5,0,5,Folder);
+  HBook1F(Hist->fBestHyp[0],"bfh0"     ,Form("%s: Best Fit Hyp[0](e-,e+,mu-,mu+)"  ,Folder),5,0,5,Folder);
+  HBook1F(Hist->fBestHyp[1],"bfh1"     ,Form("%s: Best Fit Hyp[1](e-,e+,mu-,mu+)"  ,Folder),5,0,5,Folder);
+  HBook1F(Hist->fNGenp     ,"ngenp"    ,Form("%s: N(Gen Particles)"                ,Folder),500,0,500,Folder);
+
+  // HBook1F(Hist->fNHitCrystalsTot,"nhcr_tot",Form("%s: NHit Crystals Tot",Folder), 100, 0,100,Folder);
+  // HBook1F(Hist->fECal,"ecal",Form("%s: E(cal), sum over both disks",Folder), 500, 0,250,Folder);
+  // HBook1F(Hist->fECalOverEKin,"ec_over_ek",Form("%s: E(cal)/E(kin)",Folder), 200, 0,2,Folder);
+}
+
+//-----------------------------------------------------------------------------
 void TTrackAnaModule::BookGenpHistograms(GenpHist_t* Hist, const char* Folder) {
 //   char name [200];
 //   char title[200];
@@ -188,37 +221,6 @@ void TTrackAnaModule::BookTrackHistograms(TrackHist_t* Hist, const char* Folder)
 
   HBook1F(Hist->fFrE1   ,"fre1"   ,Form("%s: E1/Etot"       ,Folder),200, 0,  1,Folder);
   HBook1F(Hist->fFrE2   ,"fre2"   ,Form("%s: (E1+E2)/Etot"  ,Folder),200, 0,  1,Folder);
-}
-
-//-----------------------------------------------------------------------------
-void TTrackAnaModule::BookEventHistograms(EventHist_t* Hist, const char* Folder) {
-  //  char name [200];
-  //  char title[200];
-
-  HBook1F(Hist->fEleCosTh  ,"ce_costh" ,Form("%s: Conversion Electron Cos(Theta)"  ,Folder),100,-1,1,Folder);
-  HBook1F(Hist->fEleMom    ,"ce_mom"   ,Form("%s: Conversion Electron Momentum"    ,Folder),1000,  0,200,Folder);
-  HBook1D(Hist->fDioMom    ,"dio_mom"  ,Form("%s: DIO momentum"                    ,Folder),1000, 50,150,Folder);
-  HBook1F(Hist->fRv         ,"rv"      ,Form("%s: R(Vertex)"                       ,Folder), 100, 0, 1000,Folder);
-  HBook1F(Hist->fVx         ,"vx"      ,Form("%s: X(Vertex)"                       ,Folder), 300,-150,150,Folder);
-  HBook1F(Hist->fVy         ,"vy"      ,Form("%s: Y(Vertex)"                       ,Folder), 300,-150,150,Folder);
-  HBook1F(Hist->fVz         ,"vz"      ,Form("%s: Z(Vertex)"                       ,Folder), 300, 0,15000,Folder);
-  //  HBook1F(Hist->fNClusters ,"ncl"      ,Form("%s: Number of Reconstructed Clusters",Folder),200,0,200,Folder);
-  HBook1F(Hist->fNTracks   ,"ntrk"     ,Form("%s: Number of Reconstructed Tracks"  ,Folder),100,0,100,Folder);
-  HBook1F(Hist->fNStrawHits[0],"nsh_0" ,Form("%s: Number of Straw Hits [0]"        ,Folder),250,0,250,Folder);
-  HBook1F(Hist->fNStrawHits[1],"nsh_1" ,Form("%s: Number of Straw Hits [1]"        ,Folder),250,0,5000,Folder);
-  HBook1F(Hist->fNGoodSH   ,"nsh50"    ,Form("%s: N(SH) +/-50"                     ,Folder),300,0,1500,Folder);
-  HBook1F(Hist->fDtClT     ,"dt_clt"   ,Form("%s: DT(cluster-track)"               ,Folder),100,-100,100,Folder);
-  HBook1F(Hist->fDtClS     ,"dt_cls"   ,Form("%s: DT(cluster-straw hit)"           ,Folder),200,-200,200,Folder);
-  HBook1F(Hist->fSHTime    ,"shtime"   ,Form("%s: Straw Hit Time"                  ,Folder),400,0,2000,Folder);
-  HBook1F(Hist->fEMax      ,"emax"     ,Form("%s: Max cluster energy"              ,Folder),150,0,150,Folder);
-  HBook1F(Hist->fNHyp      ,"nhyp"     ,Form("%s: N(fit hypotheses)"               ,Folder),5,0,5,Folder);
-  HBook1F(Hist->fBestHyp[0],"bfh0"     ,Form("%s: Best Fit Hyp[0](e-,e+,mu-,mu+)"  ,Folder),5,0,5,Folder);
-  HBook1F(Hist->fBestHyp[1],"bfh1"     ,Form("%s: Best Fit Hyp[1](e-,e+,mu-,mu+)"  ,Folder),5,0,5,Folder);
-  HBook1F(Hist->fNGenp     ,"ngenp"    ,Form("%s: N(Gen Particles)"                ,Folder),500,0,500,Folder);
-
-  // HBook1F(Hist->fNHitCrystalsTot,"nhcr_tot",Form("%s: NHit Crystals Tot",Folder), 100, 0,100,Folder);
-  // HBook1F(Hist->fECal,"ecal",Form("%s: E(cal), sum over both disks",Folder), 500, 0,250,Folder);
-  // HBook1F(Hist->fECalOverEKin,"ec_over_ek",Form("%s: E(cal)/E(kin)",Folder), 200, 0,2,Folder);
 }
 
 //-----------------------------------------------------------------------------
@@ -352,8 +354,14 @@ void TTrackAnaModule::FillEventHistograms(EventHist_t* Hist) {
 
   // Hist->fNClusters->Fill(fNClusters);
   Hist->fNTracks->Fill  (fNTracks[0]);
-  // Hist->fNStrawHits[0]->Fill(fNStrawHits);
-  // Hist->fNStrawHits[1]->Fill(fNStrawHits);
+
+  int nsh = GetHeaderBlock()->NStrawHits();
+  Hist->fNStrawHits[0]->Fill(nsh);
+  Hist->fNStrawHits[1]->Fill(nsh);
+
+  int nch = GetHeaderBlock()->NComboHits();
+  Hist->fNComboHits[0]->Fill(nch);
+  Hist->fNComboHits[1]->Fill(nch);
 
   double emax   = -1;
   double dt     = 9999.;
@@ -687,9 +695,9 @@ int TTrackAnaModule::Event(int ientry) {
 
   //  TDiskCalorimeter::GeomData_t disk_geom;
 
-  fTrackBlock  ->GetEntry(ientry);
-  fGenpBlock->GetEntry(ientry);
-  fSimpBlock->GetEntry(ientry);
+  fTrackBlock->GetEntry(ientry);
+  fGenpBlock ->GetEntry(ientry);
+  fSimpBlock ->GetEntry(ientry);
 //-----------------------------------------------------------------------------
 // assume electron in the first particle, otherwise the logic will need to 
 // be changed

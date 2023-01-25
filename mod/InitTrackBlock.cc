@@ -35,9 +35,6 @@
 #include "Offline/RecoDataProducts/inc/HelixSeed.hh"
 #include "Offline/RecoDataProducts/inc/KalSeed.hh"
 
-// #include "Offline/RecoDataProducts/inc/KalRepPtrCollection.hh"
-// #include "Offline/RecoDataProducts/inc/KalRepCollection.hh"
-
 #include "Offline/BTrkData/inc/TrkStrawHit.hh"
 #include "Offline/BTrkData/inc/TrkCaloHit.hh"
 #include "Offline/BTrkData/inc/Doublet.hh"
@@ -231,10 +228,10 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
   AnEvent->getByLabel(fTrkQualCollTag,trkQualHandle);
   if (trkQualHandle.isValid()) list_of_trk_qual = trkQualHandle.product();
 
-  list_of_combo_hits = 0;
-  art::Handle<mu2e::ComboHitCollection> shHandle;
-  AnEvent->getByLabel(fComboHitCollTag,shHandle);
-  if (shHandle.isValid()) list_of_combo_hits = shHandle.product();
+  fSschColl = 0;
+  art::Handle<mu2e::ComboHitCollection> sschcH;
+  AnEvent->getByLabel(fSsChCollTag,sschcH);
+  if (sschcH.isValid()) fSschColl = sschcH.product();
 
   list_of_mc_straw_hits = 0;
   art::Handle<mu2e::StrawDigiMCCollection> sdmcHandle;
@@ -415,7 +412,7 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
       track->fNHPerStation[j] = 0;
     }
     
-    int     loc, n_straw_hits, found, ntrkhits(0), nhitsambig0(0); // , pdg_code;
+    int     loc, nss_ch, found, ntrkhits(0), nhitsambig0(0); // , pdg_code;
     int     ipart;
     int     id(-1),  npart(0), part_nh[100], part_id[100];
     int     part_pdg_code[100]; 
@@ -425,11 +422,11 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
     const mu2e::SimParticle   *sim   (nullptr); 
     const mu2e::StrawGasStep  *stgs  (nullptr);
 
-    n_straw_hits = list_of_combo_hits->size();
+    nss_ch = fSschColl->size();
 
-    if (n_straw_hits <= 0) {
+    if (nss_ch <= 0) {
       printf(">>> ERROR in StntupleInitMu2eTrackBlock: ComboHitCollection by module XXXX is empty, NHITS = %i\n",
-	     n_straw_hits);
+	     nss_ch);
     }
     else {
       for (int it=0; it<n_krep_hits; it++) {
@@ -448,7 +445,7 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 //-----------------------------------------------------------------------------
 	if (1) { // hit->isActive()) { // all KalSeed hits are active 
 	  loc   = hit->index();
-	  if ((loc >= 0) && (loc < n_straw_hits)) {
+	  if ((loc >= 0) && (loc < nss_ch)) {
 	    if ((list_of_mc_straw_hits != NULL) && (list_of_mc_straw_hits->size() > 0)) {
 
 	      const mu2e::StrawDigiMC* mcdigi = &list_of_mc_straw_hits->at(loc);
@@ -506,7 +503,7 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 	  }
 	  else {
 	    printf(">>> ERROR in StntupleInitMu2eTrackBlock: wrong hit collection used, loc = %10i, n_straw_hits = %10i\n",
-		   loc,n_straw_hits);
+		   loc,nss_ch);
 	  }
 
 	  const mu2e::StrawId& straw_id = straw->id();
@@ -747,20 +744,13 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 //-----------------------------------------------------------------------------
 // number of MC hits produced by the mother particle
 //-----------------------------------------------------------------------------
-    const mu2e::StrawGasStep* step(nullptr);
-
     track->fNMcStrawHits = 0;
 
     if (list_of_mc_straw_hits->size() > 0) {
-      for (int i=0; i<n_straw_hits; i++) {
+      for (int i=0; i<nss_ch; i++) {
 	const mu2e::StrawDigiMC* mcdigi = &list_of_mc_straw_hits->at(i);
 
-	if (mcdigi->wireEndTime(mu2e::StrawEnd::cal) < mcdigi->wireEndTime(mu2e::StrawEnd::hv)) {
-	  step = mcdigi->strawGasStep(mu2e::StrawEnd::cal).get();
-	}
-	else {
-	  step = mcdigi->strawGasStep(mu2e::StrawEnd::hv ).get();
-	}
+        const mu2e::StrawGasStep* step = mcdigi->earlyStrawGasStep().get();
 
 	if (step) {
 	  art::Ptr<mu2e::SimParticle> const& simptr = step->simParticle(); 

@@ -156,10 +156,12 @@ Digitize: {
 
   EndSequence : [digiCompressionCheck]
 }
+#------------------------------------------------------------------------------
 # override the Trigger sequence to prepare digis
-# P.M. comment this out - too dangerous! Lets see what happens
-
-# Trigger.PrepareDigis: [ @sequence::CommonMC.DigiSim, @sequence::TrackerMC.DigiSim, @sequence::CaloMC.DigiSim ]
+# P.M. turns out this is needed... used by the Trigger... 
+# an attempt to comment this out leads to a problem when running with trigger
+#------------------------------------------------------------------------------
+Trigger.PrepareDigis: [ @sequence::CommonMC.DigiSim, @sequence::TrackerMC.DigiSim, @sequence::CaloMC.DigiSim ]
 
 Digitize.SignalOutput.outputCommands : [ "drop *_*_*_*",
   @sequence::Digitize.DigiProducts]

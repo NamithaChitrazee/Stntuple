@@ -38,8 +38,8 @@
 #include "Stntuple/obj/TStnHelixBlock.hh"
 #include "Stntuple/obj/TStrawHitBlock.hh"
 #include "Stntuple/obj/TCalDataBlock.hh"
-#include "Stntuple/obj/TSimpBlock.hh"
 #include "Stntuple/obj/TGenpBlock.hh"
+#include "Stntuple/obj/TSimpBlock.hh"
 #include "Stntuple/obj/TStepPointMCBlock.hh"
 #include "Stntuple/obj/TStnHeaderBlock.hh"
 //-----------------------------------------------------------------------------
@@ -52,6 +52,7 @@
 #include "Stntuple/mod/InitCrvPulseBlock.hh"
 #include "Stntuple/mod/InitCrvClusterBlock.hh"
 #include "Stntuple/mod/InitGenpBlock.hh"
+#include "Stntuple/mod/InitHeaderBlock.hh"
 #include "Stntuple/mod/InitSimpBlock.hh"
 #include "Stntuple/mod/InitStrawHitBlock.hh"
 #include "Stntuple/mod/InitStepPointMCBlock.hh"
@@ -113,8 +114,8 @@ protected:
 
   string                   fSimpCollTag;
 
-  string                   fComboHitCollTag;
-  string                   fStrawHitCollTag;
+  art::InputTag            fChCollTag;
+  art::InputTag            fShCollTag;
   string                   fStrawDigiCollTag;
   string                   fSdwfCollTag;
   string                   fStrawDigiMCCollTag;
@@ -123,9 +124,6 @@ protected:
   string                   fCrvCoincidenceCollTag;          //
   string                   fCrvCoincidenceClusterCollTag;   //
 
-  string                   fPrimaryParticleTag;
-  string                   fTriggerResultsTag;
-
   string                   fVdhCollTag;                     // hits on virtual detectors (StepPointMCCollection)
 
   vector<string>           fTimeClusterBlockName;
@@ -133,6 +131,10 @@ protected:
 
   vector<string>           fHelixBlockName;
   vector<string>           fHelixCollTag;
+
+  art::InputTag            fPbiTag;
+  string                   fPrimaryParticleTag;
+  string                   fTriggerResultsTag;
 
   vector<string>           fTrackSeedBlockName;
   vector<string>           fTrackSeedCollTag;
@@ -164,6 +166,7 @@ protected:
   StntupleInitCrvPulseBlock*    fInitCrvPulseBlock;
   StntupleInitCrvClusterBlock*  fInitCrvClusterBlock;
   StntupleInitGenpBlock*        fInitGenpBlock;
+  stntuple::InitHeaderBlock*    fInitHeaderBlock;
   StntupleInitSimpBlock*        fInitSimpBlock;
   stntuple::InitStrawHitBlock*  fInitStrawHitBlock;
   StntupleInitTriggerBlock*     fInitTriggerBlock;
@@ -250,8 +253,8 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
   , fGenpCollTag             (PSet.get<string>        ("genpCollTag"         ))
   , fSimpCollTag             (PSet.get<string>        ("simpCollTag"         ))
 
-  , fComboHitCollTag         (PSet.get<string>        ("comboHitCollTag"     ))
-  , fStrawHitCollTag         (PSet.get<string>        ("strawHitCollTag"     ))
+  , fChCollTag               (PSet.get<art::InputTag> ("chCollTag"     ))
+  , fShCollTag               (PSet.get<art::InputTag> ("shCollTag"     ))
   , fStrawDigiCollTag        (PSet.get<string>        ("strawDigiCollTag"    ))
   , fSdwfCollTag             (PSet.get<string>        ("sdwfCollTag"         ))
   , fStrawDigiMCCollTag      (PSet.get<string>        ("strawDigiMCCollTag"  ))
@@ -260,14 +263,16 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
   , fCrvCoincidenceCollTag       (PSet.get<string>    ("crvCoincidenceCollTag"       ))
   , fCrvCoincidenceClusterCollTag(PSet.get<string>    ("crvCoincidenceClusterCollTag"))
 
-  , fPrimaryParticleTag      (PSet.get<string>        ("primaryParticleTag"  ))
-  , fTriggerResultsTag       (PSet.get<string>        ("triggerResultsTag"   ))
-
   , fVdhCollTag              (PSet.get<string>        ("vdHitsCollTag"       ))
   , fTimeClusterBlockName    (PSet.get<vector<string>>("timeClusterBlockName"))
   , fTimeClusterCollTag      (PSet.get<vector<string>>("timeClusterCollTag"  ))
   , fHelixBlockName          (PSet.get<vector<string>>("helixBlockName"      ))
   , fHelixCollTag            (PSet.get<vector<string>>("helixCollTag"        ))
+
+  , fPbiTag                  (PSet.get<art::InputTag> ("pbiTag"    ))
+  , fPrimaryParticleTag      (PSet.get<string>        ("primaryParticleTag"  ))
+  , fTriggerResultsTag       (PSet.get<string>        ("triggerResultsTag"   ))
+
 
   , fTrackSeedBlockName      (PSet.get<vector<string>>("trackSeedBlockName"  ))
   , fTrackSeedCollTag        (PSet.get<vector<string>>("trackSeedCollTag"    ))
@@ -311,6 +316,7 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
   fInitCrvPulseBlock    = nullptr;
   fInitCrvClusterBlock  = nullptr;
   fInitGenpBlock        = nullptr;
+  fInitHeaderBlock      = nullptr;
   fInitSimpBlock        = nullptr;
   fInitStrawHitBlock    = nullptr;
   fInitTriggerBlock     = nullptr;
@@ -338,8 +344,7 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
   // fKalDiagHandle        = new TNamedHandle("KalDiagHandle"      ,fKalDiag);
 
   fFolder->Add(fDarHandle);
-  // fFolder->Add(fKalDiagHandle);
-  fFolder->Add(fTimeOffsetMapsHandle);
+  //  fFolder->Add(fTimeOffsetMapsHandle);
 }
 
 
@@ -355,8 +360,8 @@ StntupleMaker::~StntupleMaker() {
 
   delete fInitStepPointMCBlock;
   delete fInitTrackBlock;
+  delete fInitHeaderBlock;
 }
-
 
 //------------------------------------------------------------------------------
 void StntupleMaker::beginRun(const art::Run& aRun) {
@@ -374,7 +379,6 @@ void StntupleMaker::beginRun(const art::Run& aRun) {
     if (c) TModule::fFolder->Add(new TNamed("STNMAKER_PROD_TCL",c));
     else   TModule::fFolder->Add(new TNamed("STNMAKER_PROD_TCL","unknown"));
   }
-
 //-----------------------------------------------------------------------------
 // StepPointMC collections - set mbtime - have to do that at beginRun()
 //-----------------------------------------------------------------------------
@@ -429,8 +433,18 @@ void StntupleMaker::beginJob() {
 //-----------------------------------------------------------------------------
 // header block is always there
 //-----------------------------------------------------------------------------
-  TStnHeaderBlock* header = (TStnHeaderBlock*) Event()->GetDataBlock("HeaderBlock");
-  header->AddCollName("mu2e::StrawHitCollection",fStrawHitCollTag.data());
+  fInitHeaderBlock = new stntuple::InitHeaderBlock();
+  fInitHeaderBlock->SetPbiTag(fPbiTag);
+  fInitHeaderBlock->SetChCollTag(fChCollTag);
+  fInitHeaderBlock->SetShCollTag(fShCollTag);
+
+  AddDataBlock("HeaderBlock","TStnHeaderBlock",
+	       fInitHeaderBlock,
+	       THistModule::BufferSize(),
+	       0, // 99,                          // fSplitMode.value()
+	       THistModule::CompressionLevel());
+
+  //  SetResolveLinksMethod("HeaderBlock",StntupleInitMu2eHeaderBlockLinks);
 //-----------------------------------------------------------------------------
 // calorimeter hit data
 // this is not RAW hit data yet...
@@ -577,7 +591,7 @@ void StntupleMaker::beginJob() {
     fInitSimpBlock = new StntupleInitSimpBlock();
 
     fInitSimpBlock->SetSimpCollTag       (fSimpCollTag);
-    fInitSimpBlock->SetStrawHitCollTag   (fStrawHitCollTag);
+    fInitSimpBlock->SetShCollTag         (fShCollTag);
     fInitSimpBlock->SetSdmcCollTag       (fStrawDigiMCCollTag);
     fInitSimpBlock->SetVDHitsCollTag     (fVdhCollTag);
     fInitSimpBlock->SetPrimaryParticleTag(fPrimaryParticleTag);
@@ -621,7 +635,7 @@ void StntupleMaker::beginJob() {
   if (fMakeStrawHits) {
     fInitStrawHitBlock = new stntuple::InitStrawHitBlock();
 
-    fInitStrawHitBlock->SetStrawHitCollTag   (fStrawHitCollTag   );
+    fInitStrawHitBlock->SetShCollTag   (fShCollTag);
     fInitStrawHitBlock->SetStrawDigiCollTag  (fStrawDigiCollTag  );
     fInitStrawHitBlock->SetStrawDigiMCCollTag(fStrawDigiMCCollTag);
 
@@ -648,8 +662,8 @@ void StntupleMaker::beginJob() {
       init_block->SetTimeClusterCollTag(fTimeClusterCollTag[i]);
       //      init_block->SetHelixCollTag      (fHelixCollTag[i]);
 
-      init_block->SetStrawHitCollTag   (fStrawHitCollTag);
-      init_block->SetComboHitCollTag   (fComboHitCollTag);
+      init_block->SetShCollTag   (fShCollTag);
+      init_block->SetChCollTag   (fChCollTag);
       init_block->SetStrawDigiMCCollTag(fStrawDigiMCCollTag);
 
       AddDataBlock(block_name,"TStnTimeClusterBlock",init_block,buffer_size,split_mode,compression_level);
@@ -657,6 +671,7 @@ void StntupleMaker::beginJob() {
   }
 //--------------------------------------------------------------------------------
 // trackSeed data
+// pass to the track seed block the name of the single-straw combohit collection (fShCollTag)
 //--------------------------------------------------------------------------------
   if (fMakeTrackSeeds) {
     int nb = fTrackSeedBlockName.size();
@@ -674,7 +689,7 @@ void StntupleMaker::beginJob() {
 	db->AddCollName("mu2e::KalSeedCollection"    ,fTrackSeedCollTag[i].data());
 	db->AddCollName("HelixBlockName"             ,fHelixBlockName  [i].data());
 	db->AddCollName("mu2e::StrawDigiMCCollection",fStrawDigiMCCollTag.data() );
-	db->AddCollName("mu2e::ComboHitCollection"   ,fStrawHitCollTag.data()    );
+	db->AddCollName("mu2e::ComboHitCollection"   ,fShCollTag.encode().data() );
 
 	SetResolveLinksMethod(block_name,StntupleInitMu2eTrackSeedBlockLinks);	
       }
@@ -692,7 +707,7 @@ void StntupleMaker::beginJob() {
       stntuple::InitTrackStrawHitBlock* init_block = new stntuple::InitTrackStrawHitBlock();
       fInitTrackStrawHitBlock->Add(init_block);
 
-      init_block->SetStrawHitCollTag    (fStrawHitCollTag   );
+      init_block->SetShCollTag    (fShCollTag   );
       init_block->SetKalSeedCollTag     (fTrackCollTag[i]   );  // tracks saved as lists of KalSeeds
       init_block->SetStrawDigiCollTag   (fStrawDigiCollTag  );
       init_block->SetStrawDigiMCCollTag (fStrawDigiMCCollTag);
@@ -713,7 +728,7 @@ void StntupleMaker::beginJob() {
       fInitTrackBlock->Add(init_block);
 
       init_block->SetCaloClusterCollTag (fCaloClusterMaker);
-      init_block->SetComboHitCollTag    (fStrawHitCollTag );
+      init_block->SetSsChCollTag        (fShCollTag       );
       init_block->SetKalSeedCollTag     (fTrackCollTag[i] );  // tracks saved as lists of KalSeeds
       init_block->SetPIDProductCollTag  (fPidCollTag[i]   );
       init_block->SetVdhCollTag         (fVdhCollTag      );  // 

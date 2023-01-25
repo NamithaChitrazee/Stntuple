@@ -14,7 +14,7 @@
 class StntupleInitSimpBlock : public TStnInitDataBlock {
 public:
   art::InputTag   fSimpCollTag;
-  art::InputTag   fStrawHitCollTag;
+  art::InputTag   fShCollTag;
   art::InputTag   fStrawDigiMCCollTag;
   art::InputTag   fVDHitsCollTag;
   art::InputTag   fPrimaryParticleTag;
@@ -27,8 +27,8 @@ public:
 //-----------------------------------------------------------------------------
 public:
 
-  void   SetSimpCollTag       (std::string& Tag ) { fSimpCollTag        = art::InputTag(Tag); }
-  void   SetStrawHitCollTag   (std::string& Tag ) { fStrawHitCollTag    = art::InputTag(Tag); }
+  void   SetSimpCollTag       (std::string&   Tag ) { fSimpCollTag        = art::InputTag(Tag); }
+  void   SetShCollTag         (art::InputTag& Tag ) { fShCollTag    = Tag; }
   void   SetSdmcCollTag       (std::string& Tag ) { fStrawDigiMCCollTag = art::InputTag(Tag); }
   void   SetVDHitsCollTag     (std::string& Tag ) { fVDHitsCollTag      = art::InputTag(Tag); }
   void   SetPrimaryParticleTag(std::string& Tag ) { fPrimaryParticleTag = art::InputTag(Tag); }

@@ -66,6 +66,7 @@ public:
     TH1F*    fEleCosTh;
     TH1F*    fNTracks;
     TH1F*    fNStrawHits[2];
+    TH1F*    fNComboHits[2];
     TH1F*    fNGoodSH;
     TH1F*    fDtClT;
     TH1F*    fEMax;			// energy of the first reco cluster

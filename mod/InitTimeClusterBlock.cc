@@ -8,6 +8,8 @@
 #include "TLorentzVector.h"
 #include "TVector2.h"
 
+#include "messagefacility/MessageLogger/MessageLogger.h"
+
 #include "Stntuple/obj/TStnDataBlock.hh"
 #include "Stntuple/obj/TStnEvent.hh"
 
@@ -43,6 +45,7 @@
 // the other one has a combo hit per straw digi
 //-----------------------------------------------------------------------------
 int  StntupleInitTimeClusterBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mode) {
+  const char* oname = {"StntupleInitTimeClusterBlock::InitDataBlock"};
 
   TStnTimeClusterBlock*         cb = (TStnTimeClusterBlock*) Block;
 
@@ -64,20 +67,27 @@ int  StntupleInitTimeClusterBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent*
   art::Handle<mu2e::ComboHitCollection>    chcH;
   const mu2e::ComboHitCollection*          chc(nullptr);
 
-  art::Handle<mu2e::ComboHitCollection>    shcH;
-  const mu2e::ComboHitCollection*          shc(nullptr);
+  art::Handle<mu2e::ComboHitCollection>    sschcH;
+  const mu2e::ComboHitCollection*          sschc(nullptr);
 
-  if (! fComboHitCollTag.empty()) {
-    bool ok = Evt->getByLabel(fComboHitCollTag,chcH);
+  if (! fChCollTag.empty()) {
+    bool ok = Evt->getByLabel(fChCollTag,chcH);
     if (ok) {
       chc          = chcH.product();
     }
+    else {
+      mf::LogWarning(oname) << " ERROR: no ComboHitCollection tag=" 
+			    << fShCollTag.encode().data() <<  " found. BAIL OUT";
+      return -1;
+    }
   }
-
-  if (! fStrawHitCollTag.empty()) {
-    bool ok = Evt->getByLabel(fStrawHitCollTag,shcH);
+//-----------------------------------------------------------------------------
+// single straw hit collection (also ComboHit's
+//-----------------------------------------------------------------------------
+  if (! fShCollTag.empty()) {
+    bool ok = Evt->getByLabel(fShCollTag,sschcH);
     if (ok) {
-      shc          = shcH.product();
+      sschc          = sschcH.product();
     }
   }
 
@@ -89,11 +99,6 @@ int  StntupleInitTimeClusterBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent*
     if (ok) {
       mcdigis = sdmccH.product();
     }
-  }
-
-  if (chc == nullptr) {
-    printf(" >>> ERROR in StntupleInitMu2eTrackStrawHitBlock: ComboHitColl \"%s\" not found. BAIL OUT\n",fStrawHitCollTag.encode().data());
-    return -1;
   }
 
   const mu2e::CaloCluster     *cluster(0);
@@ -138,7 +143,7 @@ int  StntupleInitTimeClusterBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent*
     simm[0] = nullptr;
 
     for (int ih=0; ih<tc->fNComboHits; ih++) {
-      StrawHitIndex hit_index = tmpTCl->hits().at(ih);
+      StrawHitIndex hit_index   = tmpTCl->hits().at(ih);
       const mu2e::ComboHit* hit = &chc->at(hit_index);
 //-----------------------------------------------------------------------------
 // loop over straw hits of one combo hit
@@ -147,17 +152,12 @@ int  StntupleInitTimeClusterBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent*
       for (int ish=0; ish<nsh; ish++) {
 	int i2 = hit->index(ish);
 	std::vector<StrawDigiIndex> shids;
-	shc->fillStrawDigiIndices((const art::Event&) *Evt,i2,shids);
+	sschc->fillStrawDigiIndices((const art::Event&) *Evt,i2,shids);
       
 	const mu2e::StrawDigiMC* mcdigi = &mcdigis->at(shids[0]);
       
-	if (mcdigi->wireEndTime(mu2e::StrawEnd::cal) < mcdigi->wireEndTime(mu2e::StrawEnd::hv)) {
-	  step = mcdigi->strawGasStep(mu2e::StrawEnd::cal).get();
-	}
-	else {
-	  step = mcdigi->strawGasStep(mu2e::StrawEnd::hv ).get();
-	}
-      
+        step = mcdigi->earlyStrawGasStep().get();
+
 	int id(-1);
 	const mu2e::SimParticle* sim(nullptr);
 	if (step) {
@@ -270,7 +270,6 @@ Int_t StntupleInitTimeClusterBlock::ResolveLinks(TStnDataBlock* Block, AbsEvent*
     
     tc->SetHelixSeedIndex(helixseedIndex);
   }
-
 //-----------------------------------------------------------------------------
 // mark links as initialized
 //-----------------------------------------------------------------------------

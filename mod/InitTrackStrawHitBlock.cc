@@ -1,6 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // 2014-01-26 P.Murat
 ///////////////////////////////////////////////////////////////////////////////
+#include "messagefacility/MessageLogger/MessageLogger.h"
 
 #include "Stntuple/mod/InitStntupleDataBlocks.hh"
 #include "Stntuple/mod/InitTrackStrawHitBlock.hh"
@@ -10,7 +11,6 @@
 #include "Offline/RecoDataProducts/inc/StrawHit.hh"
 #include "Offline/RecoDataProducts/inc/StrawDigi.hh"
 
-#include "Offline/RecoDataProducts/inc/KalRepPtrCollection.hh"
 #include "Offline/RecoDataProducts/inc/KalSeed.hh"
 
 #include "Offline/BTrkData/inc/TrkStrawHit.hh"
@@ -25,6 +25,7 @@
 namespace stntuple {
 //-----------------------------------------------------------------------------
 int InitTrackStrawHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* _Event, int Mode) {
+  const char oname [] = {"stntuple::InitTrackStrawHitBlock::InitDataBlock"};
 
   int ev_number = _Event->event();
   int rn_number = _Event->run();
@@ -51,12 +52,12 @@ int InitTrackStrawHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* _Event
   art::Handle<mu2e::StrawDigiMCCollection> sdmccH;
   const mu2e::StrawDigiMCCollection*       sdmc_coll(nullptr);
 
-  if (! fStrawHitCollTag.empty() != 0) {
-    bool ok = _Event->getByLabel(fStrawHitCollTag,shcH);
+  if (! fShCollTag.empty() != 0) {
+    bool ok = _Event->getByLabel(fShCollTag,shcH);
     if (ok) sh_coll = shcH.product();
     else {
-      printf(" >>> ERROR in InitTrackStrawHitBlock: no StrawHitColl with tag: %s. BAIL OUT\n",
-	     fStrawHitCollTag.encode().data());
+      mf::LogWarning(oname) << " ERROR in InitTrackStrawHitBlock: no StrawHitColl with tag=" 
+                            << fShCollTag.encode().data() <<  " BAIL OUT";
       return -1;
     }
   }

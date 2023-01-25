@@ -316,8 +316,8 @@ void TEvdHelixSeed::Print(Option_t* Option) const {
   TString opt = Option;
   opt.ToLower();
 
-  if (opt == "") ad->printHelixSeed(fHelixSeed, hvn->ShCollTag().data(), hvn->SdmcCollTag().data(),  "");
-  else           ad->printHelixSeed(fHelixSeed, hvn->ShCollTag().data(), hvn->SdmcCollTag().data(), opt);
+  if (opt == "") ad->printHelixSeed(fHelixSeed, hvn->ShCollTag().encode().data(), hvn->SdmcCollTag().data(),  "");
+  else           ad->printHelixSeed(fHelixSeed, hvn->ShCollTag().encode().data(), hvn->SdmcCollTag().data(), opt);
   
   
 }

@@ -14,8 +14,8 @@
 class StntupleInitTimeClusterBlock : public TStnInitDataBlock {
 public:
   art::InputTag   fTimeClusterCollTag;
-  art::InputTag   fStrawHitCollTag;
-  art::InputTag   fComboHitCollTag;
+  art::InputTag   fShCollTag;
+  art::InputTag   fChCollTag;
   art::InputTag   fStrawDigiMCCollTag;
 //-----------------------------------------------------------------------------
 // functions
@@ -23,8 +23,8 @@ public:
 public:
 
   void   SetTimeClusterCollTag (std::string& Tag) { fTimeClusterCollTag = art::InputTag(Tag); }
-  void   SetComboHitCollTag    (std::string& Tag) { fComboHitCollTag    = art::InputTag(Tag); }
-  void   SetStrawHitCollTag    (std::string& Tag) { fStrawHitCollTag    = art::InputTag(Tag); }
+  void   SetChCollTag    (art::InputTag& Tag) { fChCollTag    = Tag; }
+  void   SetShCollTag    (art::InputTag& Tag) { fShCollTag    = Tag; }
   void   SetStrawDigiMCCollTag (std::string& Tag) { fStrawDigiMCCollTag = art::InputTag(Tag); }
   //  void   SetHelixCollTag       (std::string& Tag) { fHelixCollTag       = art::InputTag(Tag); }
   

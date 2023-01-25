@@ -47,11 +47,14 @@ int InitStrawHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int 
   art::Handle<mu2e::StrawDigiCollection>            sdch;
   const mu2e::StrawDigiCollection*                  sdc (nullptr);
 
-  if (! fStrawHitCollTag.empty() != 0) {
-    bool ok = Event->getByLabel(fStrawHitCollTag,chch);
+//-----------------------------------------------------------------------------
+// assume that straw hits and combo hits are created by the same module - why ?
+//-----------------------------------------------------------------------------
+  if (! fShCollTag.empty() != 0) {
+    bool ok = Event->getByLabel(fShCollTag,chch);
     if (ok) chc = chch.product();
     
-    ok = Event->getByLabel(fStrawHitCollTag,shch);
+    ok = Event->getByLabel(fShCollTag,shch);
     if (ok) { 
       shc   = shch.product();
       nhits = shc->size();
@@ -59,7 +62,7 @@ int InitStrawHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int 
     else {
       mf::LogWarning("InitStrawHitBlock::InitDataBlock") << " ERROR:" << __LINE__ 
 							 << " : mu2e::StrawHitCollection " 
-							 << fStrawHitCollTag.encode().data() 
+							 << fShCollTag.encode().data() 
 							 << " not found, BAIL OUT. rc = -1";
       return -1;
     }
@@ -88,7 +91,6 @@ int InitStrawHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int 
 							 << " not found.";
     }
   }
-
 //-----------------------------------------------------------------------------
 // MC data may not be present ...
 //-----------------------------------------------------------------------------

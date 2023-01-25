@@ -379,11 +379,11 @@ void TEvdHelixVisNode::NodePrint(const void* Object, const char* ClassName) {
 //-----------------------------------------------------------------------------
     if (Object) {
       const mu2e::HelixSeed* hs = (const mu2e::HelixSeed*) Object;
-      ad->printHelixSeed(hs,"",fShCollTag.data(),fSdmcCollTag.data());
+      ad->printHelixSeed(hs,"",fShCollTag.encode().data(),fSdmcCollTag.data());
     }
     else {
 					// Object = nullptr: print collection, with hits 
-      ad->printHelixSeedCollection(fHsCollTag.data(),1,fShCollTag.data(),fSdmcCollTag.data());
+      ad->printHelixSeedCollection(fHsCollTag.data(),1,fShCollTag.encode().data(),fSdmcCollTag.data());
     }
   }
   else {
