@@ -73,11 +73,13 @@ public:
   float         fCanvasTopMargin;
   TCanvas*      fCanvas;
   TString       fOutputFn;
-
+                                        // stnana histogram file, JobName is the stnana (analysis) job name
   hist_data_t(const char* DsID = "", const char* JobName = "", const char* Module = "", const char* HistName = "");
-  
+                                        // stnana histogram file
   hist_data_t(stn_book* Book, const char* DsID, const char* JobName, const char* Module, const char* HistName);
 
+                                        // art histogram file - FullHistName is a full path, the rest parameters
+                                        // define the file name
   hist_data_t(stn_book* Book, const char* DsID, const char* JobName, const char* FullHistName);
   
   hist_data_t(stn_catalog* Catalog, const char* BookName, const char* DsID,

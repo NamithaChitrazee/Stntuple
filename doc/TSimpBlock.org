@@ -5,22 +5,22 @@
   - interface                 : [[file:../obj/obj/TSimpBlock.hh][Stntuple/obj/obj/TSimpBlock.hh]]
   - initialization code       : [[file:../mod/InitSimpBlock.cc][Stntuple/mod/InitSimpBlock.cc]]
   - initialization parameters :                      
-| FCL parameter      | variable        | comment                                                                                      |
-|--------------------+-----------------+----------------------------------------------------------------------------------------------|
-| GEN_ID             | fGenProcessID   | if > 0, store only SimParticles corresponding to generator-level particles,                  |
-|                    |                 | particles with the generator code fGenProcessID, but do not store the ones produced by Geant |
-|--------------------+-----------------+----------------------------------------------------------------------------------------------|
-| PDG_ID             | fPdgID          | if != 0, store only particles with the given PDG ID                                          |
-|--------------------+-----------------+----------------------------------------------------------------------------------------------|
-| simpMaxZ           | fMaxZ           | by default, do not store particles produced in the calorimeter                               |
-|--------------------+-----------------+----------------------------------------------------------------------------------------------|
-| simpMinEnergy      | fMinEnergy      | if > 0, the energy threshold for particles to be stored                                      |
-|--------------------+-----------------+----------------------------------------------------------------------------------------------|
-| simpUseTimeOffsets | fUseTimeOffsets | if != 0, stored TSimParticle times are corrected by the time offsetts                        |
-|                    |                 | note, that the times are not wrapped around the microbunch period                            |
-|                    |                 | comment: requires branch=su2020 of the Mu2e Offline                                          |
-|                    |                 | default = 0                                                                                  |
-|--------------------+-----------------+----------------------------------------------------------------------------------------------|
+| FCL parameter      | variable         | comment                                                                                      |
+|--------------------+------------------+----------------------------------------------------------------------------------------------|
+| GEN_ID             | fGenProcessID    | if > 0, store only SimParticles corresponding to generator-level particles,                  |
+|                    |                  | particles with the generator code fGenProcessID, but do not store the ones produced by Geant |
+|--------------------+------------------+----------------------------------------------------------------------------------------------|
+| PDG_ID             | fPdgID           | if != 0, store only particles with the given PDG ID                                          |
+|--------------------+------------------+----------------------------------------------------------------------------------------------|
+| simpMaxZ           | fMaxZ            | by default, do not store particles produced in the calorimeter                               |
+|--------------------+------------------+----------------------------------------------------------------------------------------------|
+| minSimpMomentum    | fMinSimpMomentum | if > 0, the momentum threshold for particles to be stored                                    |
+|--------------------+------------------+----------------------------------------------------------------------------------------------|
+| simpUseTimeOffsets | fUseTimeOffsets  | if != 0, stored TSimParticle times are corrected by the time offsetts                        |
+|                    |                  | note, that the times are not wrapped around the microbunch period                            |
+|                    |                  | comment: requires branch=su2020 of the Mu2e Offline                                          |
+|                    |                  | default = 0                                                                                  |
+|--------------------+------------------+----------------------------------------------------------------------------------------------|
 
   how to define parameters of interest: 
 
@@ -30,7 +30,7 @@
 
   - pdgId : particle PDG ID, defined in [[file:../fcl/prolog.fcl::@local::PDG_ID][Stntuple/fcl/prolog.fcl]]
 * Details on variables 
--  unless *simpUseTimeOffsets* was set to non-zero at ntuple production time, 
+-  unless *simpUseTimeOffsets* was set to non-zero at ntuple production time, *obsolete, no longer used*
    TSimParticle time is the time w/o timing offsets applied   
 * ------------------------------------------------------------------------------
 * *common problems*

@@ -115,6 +115,11 @@ public:
     fLineR.SetLineColor(Color); 
   }
 
+  void SetLineWidth(int W) { 
+    fLineW.SetLineWidth(W); 
+    fLineR.SetLineWidth(W); 
+  }
+
   virtual void  PaintXY    (Option_t* option = "");
   virtual void  PaintTZ    (Option_t* Option = "");
   // virtual void  Paint      (Option_t* option = "");
