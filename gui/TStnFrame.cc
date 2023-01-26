@@ -214,40 +214,32 @@ TStnFrame::TStnFrame(const char*  Name,
 //-----------------------------------------------------------------------------  
 // straw vs combo hits
 //-----------------------------------------------------------------------------
-  fRb[0] = new TGRadioButton(frame,"display SH", M_DISPLAY_SH);
-  // rb->SetTextJustify(36);
-  // rb->SetMargins    (0,0,0,0);
-  // rb->SetWrapLength (-1);
-  // rb->MoveResize    (8,64,100,40);
-  fRb[0]->Connect("Clicked()", "TStnFrame", this, "DoRadio()");
-  frame->AddFrame(fRb[0], new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
+  TGCheckButton* cbtn;
 
-  fRb[1] = new TGRadioButton(frame,"display CH", M_DISPLAY_CH);
+  cbtn = new TGCheckButton(frame,"on:sh/off:ch", kDisplaySH);
   // rb->SetTextJustify(36);
   // rb->SetMargins    (0,0,0,0);
   // rb->SetWrapLength (-1);
   // rb->MoveResize    (8,64,100,40);
-  fRb[1]->Connect("Clicked()", "TStnFrame", this, "DoRadio()");
-  frame->AddFrame(fRb[1], new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
+  cbtn->Connect("Clicked()", "TStnVisManager", vm, "DoCheckButton()");
+  frame->AddFrame(cbtn, new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
 //-----------------------------------------------------------------------------  
 // check-buttons : semi-permanent choices - helices, tracks, sim particles
 //-----------------------------------------------------------------------------
-  TGCheckButton* cbtn;
-
   cbtn = new TGCheckButton(frame, "Helices", kDisplayHelices);
-  cbtn->Connect("Clicked()", "TStnFrame", this, "DoCheckButtons()");
+  cbtn->Connect("Clicked()", "TStnVisManager", vm, "DoCheckButton()");
   frame->AddFrame(cbtn, new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
 
   cbtn = new TGCheckButton(frame, "Tracks", kDisplayTracks);
-  cbtn->Connect("Clicked()", "TStnFrame", this, "DoCheckButtons()");
+  cbtn->Connect("Clicked()", "TStnVisManager", vm, "DoCheckButton()");
   frame->AddFrame(cbtn, new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
 
   cbtn = new TGCheckButton(frame, "SimParticles", kDisplaySimParticles);
-  cbtn->Connect("Clicked()", "TStnFrame", this, "DoCheckButtons()");
+  cbtn->Connect("Clicked()", "TStnVisManager", vm, "DoCheckButton()");
   frame->AddFrame(cbtn, new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
 
   cbtn = new TGCheckButton(frame, "TC-only", kDisplayOnlyTCHits);
-  cbtn->Connect("Clicked()", "TStnFrame", this, "DoCheckButtons()");
+  cbtn->Connect("Clicked()", "TStnVisManager", vm, "DoCheckButton()");
   frame->AddFrame(cbtn, new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
 
   shutter->AddItem(sh_item);
@@ -393,10 +385,23 @@ TStnFrame::TStnFrame(const char*  Name,
 
   shutter->AddItem(sh02);
 //-----------------------------------------------------------------------------
-// "Trees" : no use yet
+// SHUTTER#3 : "Ignore" 
+// things we don't want to display, for example, flagged hits of low-energy particles
 //-----------------------------------------------------------------------------
-  TGShutterItem* shi03 = new TGShutterItem(shutter, new TGHotString("Trees"),1002,kVerticalFrame);
+  TGShutterItem* shi03 = new TGShutterItem(shutter, new TGHotString("Ignore"),1002,kVerticalFrame);
   frame = (TGCompositeFrame *) shi03->GetContainer();
+//-----------------------------------------------------------------------------
+// ignore compton hits
+//-----------------------------------------------------------------------------
+  cbtn->Connect("Clicked()", "TStnVisManager", vm, "DoCheckButton()");
+  cbtn = new TGCheckButton(frame,"low-E e-/e+", kIgnoreComptonHits);
+  // rb->SetTextJustify(36);
+  // rb->SetMargins    (0,0,0,0);
+  // rb->SetWrapLength (-1);
+  // rb->MoveResize    (8,64,100,40);
+  cbtn->Connect("Clicked()", "TStnVisManager",vm, "DoCheckButton()");
+  // frame->AddFrame(fRb[0], new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
+
 
   // TGPictureButton *fPictureButton840 = new TGPictureButton(fVerticalFrame839,gClient->GetPicture("ntuple_s.xpm"),-1,TGPictureButton::GetDefaultGC()(),kRaisedFrame);
   // fPictureButton840->SetToolTipText("TNtuple");
@@ -771,40 +776,3 @@ void TStnFrame::DoTab(Int_t id) {
    printf("*** TStnFrame::DoTab : Tab item %d activated\n", id);
 }
 
-//-----------------------------------------------------------------------------
-void TStnFrame::DoRadio() {
-   // Handle radio buttons.
-
-  TGButton *btn = (TGButton *) gTQSender;
-  int id = btn->WidgetId();
-
-  printf(" TStnFrame::DoRadio radio button ID: %i\n",id);
-  
-  if ((id == M_DISPLAY_SH) or (id == M_DISPLAY_CH)) {
-//-----------------------------------------------------------------------------
-// switch between displaying straw and combo hits
-//-----------------------------------------------------------------------------
-    fVisManager->DoRadioButton(id);
-
-    for (int i = 0; i < 2; i++) {
-      if (fRb[i]->WidgetId() != id) fRb[i]->SetState(kButtonUp);
-      else                          fRb[i]->SetState(kButtonDown);
-    }
-  }
-}
-
-//-----------------------------------------------------------------------------
-// TGCheckButton changes its state on its own
-//-----------------------------------------------------------------------------
-void TStnFrame::DoCheckButtons() {
-   // Handle check buttons.
-
-  TGButton *btn = (TGButton *) gTQSender;
-  int id = btn->WidgetId();
-
-  printf(" TStnFrame::DoCheckButtons check button ID: %i state: %i\n",id,btn->IsOn());
-  
-  int is_on = (int) btn->IsOn(); 
-
-  fVisManager->DoCheckButton(id,is_on);
-}

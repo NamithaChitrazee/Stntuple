@@ -293,11 +293,11 @@ void TVisManager::Gdspec(const char *name) {
 } 
 
 //_____________________________________________________________________________
-void TVisManager::DoCheckButton(int ButtonID, int Status) { 
+void TVisManager::DoCheckButton() { 
 } 
 
 //_____________________________________________________________________________
-void TVisManager::DoRadioButton(int ButtonID) { 
+void TVisManager::DoRadioButton() { 
 } 
 
 //_____________________________________________________________________________

@@ -58,7 +58,12 @@ TStnVisManager::TStnVisManager(const char* Name, const char* Title): TVisManager
   fSelectedPhiCluster  = nullptr;
 
   fDisplayHelices      = 0;
+  fDisplayTracks       = 1;
   fDisplayOnlyTCHits   = 0;
+  fDisplaySimParticles = 1;
+  fDisplayStrawHitsXY  = 1;
+  fDisplayStrawDigiMC  = 0;                    // not sure what this is, check
+  fIgnoreComptonHits   = 0;
 }
 
 //_____________________________________________________________________________
@@ -1048,27 +1053,56 @@ void TStnVisManager::PrintColls(const char* Tag) {
 }
 
 //_____________________________________________________________________________
-void TStnVisManager::DoCheckButton(int ButtonID, int Status) {
+void TStnVisManager::DoCheckButton() {
 
-  if      (ButtonID == kDisplayHelices     ) SetDisplayHelices     (Status);
-  else if (ButtonID == kDisplayTracks      ) SetDisplayTracks      (Status);
-  else if (ButtonID == kDisplaySimParticles) SetDisplaySimParticles(Status);
-  else if (ButtonID == kDisplayOnlyTCHits  ) SetDisplayOnlyTCHits  (Status);
+  TGButton* btn    = (TGButton *) gTQSender;
+  int       id     = btn->WidgetId();
+  int       status = (int) btn->IsOn(); 
+
+  printf("TStnVisManager::%s: button ID: %i state: %i\n",__func__,id,status);
+
+  if      (id == kDisplayHelices     ) SetDisplayHelices     (status);
+  else if (id == kDisplayTracks      ) SetDisplayTracks      (status);
+  else if (id == kDisplaySimParticles) SetDisplaySimParticles(status);
+  else if (id == kDisplayOnlyTCHits  ) SetDisplayOnlyTCHits  (status);
+  else if (id == kDisplaySH          ) SetDisplayStrawHitsXY (status);
+  else if (id == kIgnoreComptonHits  ) SetIgnoreComptonHits  (status);
   else {
-    printf("WARNING: TStnVisManager::DoCheckButton unknown button ID: %i\n",ButtonID);
+    printf("WARNING: TStnVisManager::DoCheckButton unknown button ID: %i\n",id);
   }
 
 }
 
-//_____________________________________________________________________________
-void TStnVisManager::DoRadioButton(int ButtonID) {
+//-----------------------------------------------------------------------------
+// it is virtual
+//-----------------------------------------------------------------------------
+void TStnVisManager::DoRadioButton() {
 
-  if      (ButtonID == M_DISPLAY_SH     ) SetDisplayStrawHitsXY(1);
-  else if (ButtonID == M_DISPLAY_CH     ) SetDisplayStrawHitsXY(0);
+  TGButton* btn = (TGButton*) gTQSender;
+  int id = btn->WidgetId();
+
+  EButtonState new_state;
+
+  EButtonState state = btn->GetState();
+  if (state == kButtonUp) new_state = kButtonDown;
+  else                    new_state = kButtonUp;
+
+  printf("TStnVisManager::%s radio button ID: %i state: %i new_state: %i\n",
+         __func__,id,state,new_state);
+  
+  if      (id == M_DISPLAY_SH) { 
+    if (new_state == kButtonUp) SetDisplayStrawHitsXY(1);
+    else                        SetDisplayStrawHitsXY(0);
+  }
+  else if (id == M_IGNORE_COMPTON ) {
+    if (new_state == kButtonUp) SetIgnoreComptonHits(1);
+    else                        SetIgnoreComptonHits(0);
+  }
   else {
-    printf("WARNING: TStnVisManager::DoRadioButton unknown button ID: %i\n",ButtonID);
+    printf("WARNING: TStnVisManager::DoRadioButton unknown button ID: %i\n",id);
   }
 
+  btn->SetState(new_state);
 }
 
 //_____________________________________________________________________________

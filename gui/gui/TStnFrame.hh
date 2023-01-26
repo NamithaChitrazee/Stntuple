@@ -49,7 +49,7 @@ protected:
   TGStatusBar         *fStatusBar;         // !
   TGLayoutHints       *fStatusBarLayout;   // ! layout for the status bar
 
-  TGRadioButton       *fRb[2];             // ! [0]: SH [1]
+  //  TGRadioButton       *fRb[2];             // ! [0]: SH [1]
 
   TGCheckButton*      fDisplayHelices;     // ! 
 
@@ -75,9 +75,6 @@ public:
   void DoOK();
   void DoCancel();
   void DoTab(Int_t id);
-
-  void DoRadio();
-  void DoCheckButtons();
 
   void HandleButtons(Int_t id = -1);
   void EditorBar();

@@ -44,17 +44,22 @@ enum GuiCommandID {
 
   M_PRINT_STRAW_H,
   M_PRINT_COMBO_H
+
 };
 
 enum GuiButtonID {
 					// checkbutton ID's
-  kDisplayHelices      = 5,
-  kDisplayTracks       = 6,
-  kDisplaySimParticles = 7,
-  kDisplayOnlyTCHits   = 8,
-					// radiobutton ID's
+  kDisplayHelices      =  5,
+  kDisplayTracks       =  6,
+  kDisplaySimParticles =  7,
+  kDisplayOnlyTCHits   =  8,
+  kDisplaySH           =  9,
+  kIgnoreComptonHits   = 10,
+					// radiobutton ID's (not used)...
   M_DISPLAY_SH         = 21,
   M_DISPLAY_CH         = 22,
+  M_IGNORE_COMPTON     = 23
+
 };
 
 #endif

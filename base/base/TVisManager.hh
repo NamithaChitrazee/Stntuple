@@ -119,9 +119,9 @@ public:
   virtual void InitEvent   ();		// self-initialization, called from DisplayEvent
   virtual void DisplayEvent();
 
-  virtual void DefaultRange();
-  virtual void DoCheckButton(int ButtonID, int Status);
-  virtual void DoRadioButton(int ButtonID);
+  virtual void DefaultRange ();
+  virtual void DoCheckButton();
+  virtual void DoRadioButton();
 
   virtual void DrawOneSpec(const char* name);
 

@@ -32,6 +32,7 @@
 #include "Offline/DataProducts/inc/StrawId.hh"
 
 #include "Offline/RecoDataProducts/inc/StrawHit.hh"
+#include "Offline/RecoDataProducts/inc/StrawHitFlag.hh"
 #include "Offline/RecoDataProducts/inc/KalSegment.hh"
 #include "Offline/RecoDataProducts/inc/TimeCluster.hh"
 
@@ -114,8 +115,8 @@ int TTrkVisNode::InitEvent() {
   TStnVisManager* vm      = TStnVisManager::Instance();
   const art::Event* event = vm->Event();
 
- // Tracker calibration object.
-  //  mu2e::ConditionsHandle<mu2e::StrawResponse> srep = mu2e::ConditionsHandle<mu2e::StrawResponse>("ignored");
+  // Tracker calibration object.
+  // mu2e::ConditionsHandle<mu2e::StrawResponse> srep = mu2e::ConditionsHandle<mu2e::StrawResponse>("ignored");
 
   const mu2e::ComboHit              *hit;
   stntuple::TEvdStrawHit            *evd_straw_hit; 
@@ -524,20 +525,32 @@ void TTrkVisNode::PaintXY(Option_t* Option) {
 //-----------------------------------------------------------------------------
 // display straw hits
 //-----------------------------------------------------------------------------
+    const mu2e::ComboHit* sch0 = &fSchColl->at(0);
     int nhits = fListOfStrawHits->GetEntries();
     for (int i=0; i<nhits; i++) {
       stntuple::TEvdStrawHit* evd_sh = GetEvdStrawHit(i);
-      const mu2e::ComboHit*   sh     = evd_sh->StrawHit();
-      straw     = &tracker->getStraw(sh->strawId());//strawIndex());
+      const mu2e::ComboHit*   sch    = evd_sh->StrawHit();
+//-----------------------------------------------------------------------------
+// see in flags need to be checked, use external flags
+//-----------------------------------------------------------------------------
+      if (vm->IgnoreComptonHits()) {
+        int           loc  = sch-sch0;
+        const mu2e::StrawHitFlag* flag = &fShfColl->at(loc);
+        if (flag->hasAnyProperty(mu2e::StrawHitFlagDetail::bkg))      continue;
+      }
+
+      straw     = &tracker->getStraw(sch->strawId());
       station   = straw->id().getStation();
-      time      = sh->correctedTime();
+      time      = sch->correctedTime();
 
       if ((station >= vm->MinStation()) && (station <= vm->MaxStation())) { 
 	if ((time >= tmin) && (time <= tmax)) {
-	  // check if the hit belongs to the time cluster
+//-----------------------------------------------------------------------------
+// check if the hit belongs to the time cluster
+//-----------------------------------------------------------------------------
 	  int ok = 1;
 	  if (etcl and vm->DisplayOnlyTCHits()) { 
-	    ok = TCHit(etcl->TimeCluster(),sh->index());
+	    ok = TCHit(etcl->TimeCluster(),sch->index());
 	  }
 	  if (ok  ) evd_sh->PaintXY(Option);
 	}
@@ -548,10 +561,21 @@ void TTrkVisNode::PaintXY(Option_t* Option) {
 //-----------------------------------------------------------------------------
 // display combo hits
 //-----------------------------------------------------------------------------
+    const mu2e::ComboHit* ch0 = &fChColl->at(0);
     int nch = fListOfComboHits->GetEntries();
     for (int i=0; i<nch; i++) {
       stntuple::TEvdComboHit* evd_ch = (stntuple::TEvdComboHit*) fListOfComboHits->At(i);
       const mu2e::ComboHit*   ch     = evd_ch->ComboHit();
+
+      if (vm->IgnoreComptonHits()) {
+        int           loc  = ch-ch0;
+        const mu2e::StrawHitFlag* flag = &fChfColl->at(loc);
+        if (flag->hasAnyProperty(mu2e::StrawHitFlagDetail::bkg))      continue;
+      }
+//-----------------------------------------------------------------------------
+// a combined hit doesn't have it's own measured time - that is calculated
+// look at the first straw
+//-----------------------------------------------------------------------------
       int index = ch->index(0);
       const mu2e::ComboHit* sh = &fSchColl->at(index);
 
@@ -721,9 +745,18 @@ void TTrkVisNode::PaintTZ(Option_t* Option) {
     tmax = etcl->TMax(); // FIXME!
   }
 
+  const mu2e::ComboHit* ch0 = &fChColl->at(0);
+
   int nhits = fListOfComboHits->GetEntries();
   for (int i=0; i<nhits; i++) {
     stntuple::TEvdComboHit* ech = (stntuple::TEvdComboHit*) fListOfComboHits->At(i);
+    const mu2e::ComboHit*   ch  = ech->ComboHit();
+
+    if (vm->IgnoreComptonHits()) {
+      int           loc  = ch-ch0;
+      const mu2e::StrawHitFlag* flag = &fChfColl->at(loc);
+      if (flag->hasAnyProperty(mu2e::StrawHitFlagDetail::bkg))      continue;
+    }
 
     float time  = ech->correctedTime();
 

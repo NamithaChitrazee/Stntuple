@@ -115,7 +115,10 @@ protected:
   int                 fDisplayHelices; 
   int                 fDisplayTracks; 
   int                 fDisplaySimParticles; 
-  int                 fDisplayOnlyTCHits;
+  int                 fDisplayOnlyTCHits;      // will be useless longer term, as the time cluster should 
+                                               // include all hits within the time interval, 
+                                               // further selections - based on the hit flags
+  int                 fIgnoreComptonHits;      // if 1, do not show hits marked as 'compton' (flag='bgr')
 //-----------------------------------------------------------------------------
 //  functions
 //-----------------------------------------------------------------------------
@@ -170,6 +173,7 @@ public:
   int            DisplayTracks      () { return fDisplayTracks      ; }
   int            DisplaySimParticles() { return fDisplaySimParticles; }
   int            DisplayOnlyTCHits  () { return fDisplayOnlyTCHits  ; }
+  int            IgnoreComptonHits  () { return fIgnoreComptonHits  ; }
   //-----------------------------------------------------------------------------
   // modifiers
   //-----------------------------------------------------------------------------
@@ -181,6 +185,7 @@ public:
   void           SetDisplayTracks      (int Flag) { fDisplayTracks       = Flag; }
   void           SetDisplaySimParticles(int Flag) { fDisplaySimParticles = Flag; }
   void           SetDisplayOnlyTCHits  (int Flag) { fDisplayOnlyTCHits   = Flag; }
+  void           SetIgnoreComptonHits  (int Flag) { fIgnoreComptonHits   = Flag; }
 
   void           SetStations(int IMin, int IMax) override;
 
@@ -201,13 +206,13 @@ public:
 //-----------------------------------------------------------------------------
 // GUI
 //-----------------------------------------------------------------------------
-  virtual void  DoCheckButton(int ButtonID, int Status) override;
-  virtual void  DoRadioButton(int ButtonID)             override;
-  virtual void  Quit         ()                         override;   //
-  virtual int   EndRun       ()                         override;
+  virtual void  DoCheckButton() override;
+  virtual void  DoRadioButton() override;
+  virtual void  Quit         () override;   //
+  virtual int   EndRun       () override;
 
-  void  InitEvent() override ; 
-  void  UpdateViews();
+  virtual void  InitEvent    () override; 
+  void          UpdateViews  ();
 
 
   virtual TCanvas*  NewCanvas(const char* Name,
