@@ -200,6 +200,8 @@ void TSimParticle::Streamer(TBuffer& R__b) {
 TSimParticle::TSimParticle() {
   SetUniqueID(UINT_MAX);
   fGeneratorID   = -1;
+  fShid          = nullptr;
+  fSimParticle   = nullptr;
 }
 
 //_____________________________________________________________________________
@@ -220,7 +222,6 @@ TSimParticle::~TSimParticle() {
     delete fShid;
     fShid = nullptr;
   }
-  fSimParticle = nullptr;
 }
 
 //_____________________________________________________________________________

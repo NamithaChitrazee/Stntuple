@@ -620,7 +620,11 @@ void TTrkVisNode::PaintXY(Option_t* Option) {
 
     for (int i=0; i<nsim; i++ ) {
       esp = GetEvdSimParticle(i);
-      esp->Paint(Option);
+      TSimParticle* simp = esp->SimParticle();
+      float mom          = simp->StartMom()->P();
+      if ((mom >= vm->MinMcMomentum()) and (mom <= vm->MaxMcMomentum())) {
+        esp->PaintXY(Option);
+      }
     }
   }
 //-----------------------------------------------------------------------------
@@ -719,7 +723,11 @@ void TTrkVisNode::PaintRZ(Option_t* Option) {
 
     for (int i=0; i<nsim; i++ ) {
       esim = (stntuple::TEvdSimParticle*) fListOfSimParticles->At(i);
-      esim->PaintRZ(Option);
+      TSimParticle* simp = esim->SimParticle();
+      float mom          = simp->StartMom()->P();
+      if ((mom >= vm->MinMcMomentum()) and (mom <= vm->MaxMcMomentum())) {
+        esim->PaintRZ(Option);
+      }
     }
   }
 

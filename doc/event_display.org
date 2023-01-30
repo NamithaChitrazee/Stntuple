@@ -103,6 +103,9 @@ mu2e -c Stntuple/fcl/display.fcl -s dig.mu2e.CeEndpointDigiTriggered.MDC2020n_10
    d = TAnaDump::Instance()
 
 *** d->printTimeClusterCollection("TZClusterFinder","makePH",1,"makeSD")    
+** known issues                                                              
+*** window is not updating while everything else seems to function OK        
+    - move the cursor out of the window and then back in. Scroll the mouse wheel up and down
 * ------------------------------------------------------------------------------
 * [1/1] TODO's                                                               
 ** DONE add a SimParticle node ? or just add a list of SimParticles to XY view ?

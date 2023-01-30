@@ -364,8 +364,12 @@ int TEvdSimParticle::DistancetoPrimitiveXY(Int_t px, Int_t py) {
 
   if (vm->BField() != 0) {
 
-    double dx = global.X()-fEllipse->GetX1();
-    double dy = global.Y()-fEllipse->GetY1();
+
+    double x1 = gPad->PixeltoX(px);
+    double y1 = gPad->PixeltoY(py);
+
+    double dx = x1-fEllipse->GetX1();
+    double dy = y1-fEllipse->GetY1();
 
     double dr = sqrt(dx*dx+dy*dy)-fEllipse->GetR1();
     

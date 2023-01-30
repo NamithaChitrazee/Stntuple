@@ -64,6 +64,9 @@ TStnVisManager::TStnVisManager(const char* Name, const char* Title): TVisManager
   fDisplayStrawHitsXY  = 1;
   fDisplayStrawDigiMC  = 0;                    // not sure what this is, check
   fIgnoreComptonHits   = 0;
+
+  fMinMcMomentum       = 60;
+  fMaxMcMomentum       = 1.e10;                // in MeV/c
 }
 
 //_____________________________________________________________________________

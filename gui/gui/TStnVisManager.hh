@@ -95,19 +95,26 @@ protected:
 
   const art::Event*   fEvent;
 
-  int                 fMinStation;
-  int                 fMaxStation;
-
   stntuple::TEvdTimeCluster*    fSelectedTimeCluster;
   stntuple::TEvdTimeCluster*    fSelectedPhiCluster;
+
   int                 fDebugLevel;
 					// to display all the data in a given time window 
 					// vis manager would enforces the same time limits on all views,
 					// later those can be redefined individually
   float               fTMin;
   float               fTMax;
+
+  int                 fMinStation;
+  int                 fMaxStation;
+                                        // min and max momentum values for displayed MC particles
+  float               fMinMcMomentum;
+  float               fMaxMcMomentum;
+
   float               fMbTime;
-  float               fBField;          // by defautl , 1 T, but could be less
+
+  float               fBField;          // by defautl , 1 T, but could be less. Need to know to display straight
+                                        // cosmics
 
   int                 fDisplayStrawDigiMC;
   int                 fDisplayStrawHitsXY;
@@ -149,16 +156,8 @@ public:
 
   const art::Event* Event() { return fEvent; }
 
-  int            DisplayStrawDigiMC() { return fDisplayStrawDigiMC; }
-  
-  int            MinStation() { return fMinStation; }
-  int            MaxStation() { return fMaxStation; }
-
   stntuple::TEvdTimeCluster*  SelectedTimeCluster() { return fSelectedTimeCluster; }
   stntuple::TEvdTimeCluster*  SelectedPhiCluster () { return fSelectedPhiCluster;  }
-
-  float          TMin() { return fTMin; }
-  float          TMax() { return fTMax; }
 
   float          MbTime() { return fMbTime; }
   float          BField() { return fBField; }
@@ -168,15 +167,26 @@ public:
     TMax = fTMax;
   }
 
-  int            DisplayStrawHitsXY () { return fDisplayStrawHitsXY ; }
-  int            DisplayHelices     () { return fDisplayHelices     ; }
-  int            DisplayTracks      () { return fDisplayTracks      ; }
-  int            DisplaySimParticles() { return fDisplaySimParticles; }
-  int            DisplayOnlyTCHits  () { return fDisplayOnlyTCHits  ; }
-  int            IgnoreComptonHits  () { return fIgnoreComptonHits  ; }
-  //-----------------------------------------------------------------------------
-  // modifiers
-  //-----------------------------------------------------------------------------
+  int            DisplayHelices     () const { return fDisplayHelices     ; }
+  int            DisplayOnlyTCHits  () const { return fDisplayOnlyTCHits  ; }
+  int            DisplaySimParticles() const { return fDisplaySimParticles; }
+  int            DisplayStrawDigiMC () const { return fDisplayStrawDigiMC ; }
+  int            DisplayStrawHitsXY () const { return fDisplayStrawHitsXY ; }
+  int            DisplayTracks      () const { return fDisplayTracks      ; }
+  
+  int            IgnoreComptonHits  () const { return fIgnoreComptonHits  ; }
+
+  float          MinMcMomentum      () const { return fMinMcMomentum; }
+  float          MaxMcMomentum      () const { return fMaxMcMomentum; }
+
+  int            MinStation         () const { return fMinStation; }
+  int            MaxStation         () const { return fMaxStation; }
+
+  float          TMin               () const { return fTMin; }
+  float          TMax               () const { return fTMax; }
+//-----------------------------------------------------------------------------
+// modifiers
+//-----------------------------------------------------------------------------
   void           SetEvent(const art::Event* Evt) { fEvent = Evt; }
 
   void           SetDisplayStrawDigiMC (int Flag) { fDisplayStrawDigiMC  = Flag; }
@@ -188,6 +198,9 @@ public:
   void           SetIgnoreComptonHits  (int Flag) { fIgnoreComptonHits   = Flag; }
 
   void           SetStations(int IMin, int IMax) override;
+
+  void           SetMinMcMomentum(float Mom) { fMinMcMomentum = Mom; }
+  void           SetMaxMcMomentum(float Mom) { fMaxMcMomentum = Mom; }
 
   void           SetSelectedTimeCluster(stntuple::TEvdTimeCluster* Tc) { fSelectedTimeCluster = Tc; }
   void           SetSelectedPhiCluster (stntuple::TEvdTimeCluster* Pc) { fSelectedPhiCluster  = Pc; }
