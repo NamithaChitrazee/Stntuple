@@ -60,15 +60,15 @@ production : {
 
 	@table::CommonTrk.producers
 
-	TrkQualDeMHPar  : { @table::TrkQualDeM  KalSeedCollection: "KFFDeMHPar"  }
-	TrkQualDeMHDar  : { @table::TrkQualDeM  KalSeedCollection: "KFFDeMHDar"  }
-	TrkQualDmuMHPar : { @table::TrkQualDmuM KalSeedCollection: "KFFDmuMHPar" }
-	TrkQualDmuMHDar : { @table::TrkQualDmuM KalSeedCollection: "KFFDmuMHDar" }
+#	TrkQualDeMHPar  : { @table::TrkQualDeM  KalSeedCollection: "KFFDeMHPar"  }
+#	TrkQualDeMHDar  : { @table::TrkQualDeM  KalSeedCollection: "KFFDeMHDar"  }
+#	TrkQualDmuMHPar : { @table::TrkQualDmuM KalSeedCollection: "KFFDmuMHPar" }
+#	TrkQualDmuMHDar : { @table::TrkQualDmuM KalSeedCollection: "KFFDmuMHDar" }
 
-	TrkQualUeMHPar  : { @table::TrkQualUeM  KalSeedCollection: "KFFUeMHPar"  }
-	TrkQualUeMHDar  : { @table::TrkQualUeM  KalSeedCollection: "KFFUeMHDar"  }
-	TrkQualUmuMHPar : { @table::TrkQualUmuM KalSeedCollection: "KFFUmuMHPar" }
-	TrkQualUmuMHDar : { @table::TrkQualUmuM KalSeedCollection: "KFFUmuMHDar" }
+#	TrkQualUeMHPar  : { @table::TrkQualUeM  KalSeedCollection: "KFFUeMHPar"  }
+#	TrkQualUeMHDar  : { @table::TrkQualUeM  KalSeedCollection: "KFFUeMHDar"  }
+#	TrkQualUmuMHPar : { @table::TrkQualUmuM KalSeedCollection: "KFFUmuMHPar" }
+#	TrkQualUmuMHDar : { @table::TrkQualUmuM KalSeedCollection: "KFFUmuMHDar" }
 #------------------------------------------------------------------------------
 # helix mergers: each combines all found helices with the same direction and mass 
 # into one collection
