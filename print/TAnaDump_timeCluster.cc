@@ -15,10 +15,11 @@
 
 using namespace std;
 //-----------------------------------------------------------------------------
-void TAnaDump::printTimeCluster(const mu2e::TimeCluster*        TimeCluster, 
-				const char*                     Opt, 
-				const mu2e::ComboHitCollection* ChColl, 
-				const char*                     SdmcCollTag) {
+void TAnaDump::printTimeCluster(const mu2e::TimeCluster*            TimeCluster, 
+				const char*                         Opt, 
+				const mu2e::ComboHitCollection*     ChColl, 
+				const mu2e::StrawHitFlagCollection* ChfColl, 
+				const char*                         SdmcCollTag) {
 
   const mu2e::ComboHit*      hit;
   int                        flags;
@@ -75,19 +76,25 @@ void TAnaDump::printTimeCluster(const mu2e::TimeCluster*        TimeCluster,
 
       int  nhits = TimeCluster->nhits();
 
-      const mu2e::StrawGasStep* step(nullptr);
+      const mu2e::ComboHit* ch_0 = &ChColl->at(0);
 
       for (int i=0; i<nhits; i++) {
 	int index = int(TimeCluster->hits().at(i));
 
 	if (opt.Index("debug") < 0) {
-	  hit         = &(ChColl->at(index));
-	  vector<StrawDigiIndex> shids;
-	  ChColl->fillStrawDigiIndices(*(fEvent),index,shids);
-	  flags = 0;                  // *((int*) &TimeCluster->_shfcol->at(index));
-	  step  = nullptr;
+	  hit     = &(ChColl->at(index));
+          int loc = hit-ch_0;
+	  flags   = *((int*) &hit->flag());
+          if (ChfColl) {
+//-----------------------------------------------------------------------------
+// use supplied StrawHitFlagCollection to print flags 
+//-----------------------------------------------------------------------------
+            flags = *((int*) &ChfColl->at(loc));
+          }
+
+          const mu2e::StrawGasStep* step(nullptr);
 	  if (mcdigis) {
-	    const mu2e::StrawDigiMC* sdmc = &mcdigis->at(shids[0]);
+	    const mu2e::StrawDigiMC* sdmc = &mcdigis->at(hit->index(0));
 	    step  = sdmc->earlyStrawGasStep().get();
 	  }
 	  printComboHit(hit,step,"data",i,flags);
@@ -106,6 +113,7 @@ void TAnaDump::printTimeCluster(const mu2e::TimeCluster*        TimeCluster,
 //-----------------------------------------------------------------------------
 void TAnaDump::printTimeClusterCollection(const char* TcCollTag  , 
 					  const char* ChCollTag  ,
+					  const char* ChfCollTag ,
 					  int         hitOpt     ,
 					  const char* SdmcCollTag) {
 
@@ -115,6 +123,9 @@ void TAnaDump::printTimeClusterCollection(const char* TcCollTag  ,
 
   art::Handle<mu2e::ComboHitCollection>     chcH;
   const mu2e::ComboHitCollection*           chc(0);
+
+  art::Handle<mu2e::StrawHitFlagCollection>  chfcH;
+  const mu2e::StrawHitFlagCollection*        chfc(nullptr);
 //-----------------------------------------------------------------------------
 // locate collections to be used
 //-----------------------------------------------------------------------------
@@ -132,6 +143,15 @@ void TAnaDump::printTimeClusterCollection(const char* TcCollTag  ,
     return;
   }
 
+  fEvent->getByLabel(ChfCollTag,chfcH);
+  if (chfcH.isValid()) chfc = (mu2e::StrawHitFlagCollection* )chcH.product();
+  else {
+    print_shf_colls();
+//-----------------------------------------------------------------------------
+// can do without flags, so don't bail out...
+//-----------------------------------------------------------------------------
+  }
+
   int banner_printed(0);
 
   for (auto j=tcc->begin(); j != tcc->end(); ++j) {
@@ -142,19 +162,19 @@ void TAnaDump::printTimeClusterCollection(const char* TcCollTag  ,
       banner_printed = 1;
     }
 
-    if      (hitOpt == 0) printTimeCluster(tc,"data",chc,SdmcCollTag);
+    if      (hitOpt == 0) printTimeCluster(tc,"data",chc,chfc,SdmcCollTag);
     else if (hitOpt == 1) {
 //-----------------------------------------------------------------------------
 // if hit printout has been requested, print banner in front of each cluster
 //-----------------------------------------------------------------------------
-      printTimeCluster(tc,"data+hits",chc,SdmcCollTag);
+      printTimeCluster(tc,"data+hits",chc,chfc,SdmcCollTag);
       banner_printed = 0;
     }
     else if (hitOpt == 2) {
 //-----------------------------------------------------------------------------
 // debug mode
 //-----------------------------------------------------------------------------
-      printTimeCluster(tc,"data+hits+debug",chc,SdmcCollTag);
+      printTimeCluster(tc,"data+hits+debug",chc,chfc,SdmcCollTag);
       banner_printed = 0;
     }
   }

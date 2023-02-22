@@ -122,10 +122,11 @@ protected:
   int                 fDisplayHelices; 
   int                 fDisplayTracks; 
   int                 fDisplaySimParticles; 
-  int                 fDisplayOnlyTCHits;      // will be useless longer term, as the time cluster should 
-                                               // include all hits within the time interval, 
-                                               // further selections - based on the hit flags
-  int                 fIgnoreComptonHits;      // if 1, do not show hits marked as 'compton' (flag='bgr')
+  int                 fDisplayOnlyTCHits;   // will be useless longer term, as the time cluster should 
+                                            // include all hits within the time interval, 
+                                            // further selections - based on the hit flags
+  int                 fIgnoreComptonHits;   // if 1, do not show hits marked as 'compton'(flag='bgr')
+  int                 fIgnoreProtonHits;    // if 1, do not show hits marked as 'proton' (no 'energysel' flag)
 //-----------------------------------------------------------------------------
 //  functions
 //-----------------------------------------------------------------------------
@@ -175,6 +176,7 @@ public:
   int            DisplayTracks      () const { return fDisplayTracks      ; }
   
   int            IgnoreComptonHits  () const { return fIgnoreComptonHits  ; }
+  int            IgnoreProtonHits   () const { return fIgnoreProtonHits   ; }
 
   float          MinMcMomentum      () const { return fMinMcMomentum; }
   float          MaxMcMomentum      () const { return fMaxMcMomentum; }
@@ -196,6 +198,7 @@ public:
   void           SetDisplaySimParticles(int Flag) { fDisplaySimParticles = Flag; }
   void           SetDisplayOnlyTCHits  (int Flag) { fDisplayOnlyTCHits   = Flag; }
   void           SetIgnoreComptonHits  (int Flag) { fIgnoreComptonHits   = Flag; }
+  void           SetIgnoreProtonHits   (int Flag) { fIgnoreProtonHits    = Flag; }
 
   void           SetStations(int IMin, int IMax) override;
 

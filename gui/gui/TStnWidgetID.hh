@@ -55,10 +55,12 @@ enum GuiButtonID {
   kDisplayOnlyTCHits   =  8,
   kDisplaySH           =  9,
   kIgnoreComptonHits   = 10,
+  kIgnoreProtonHits    = 11,
 					// radiobutton ID's (not used)...
   M_DISPLAY_SH         = 21,
   M_DISPLAY_CH         = 22,
-  M_IGNORE_COMPTON     = 23
+  M_IGNORE_COMPTON     = 23,
+  M_IGNORE_PROTONS     = 24
 
 };
 

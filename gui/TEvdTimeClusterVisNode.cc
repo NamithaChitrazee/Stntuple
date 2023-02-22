@@ -68,6 +68,7 @@ TEvdTimeClusterVisNode::TEvdTimeClusterVisNode(const char* name, TStnTimeCluster
   fTcColl             = nullptr;
   fPcColl             = nullptr;
   fChColl             = nullptr;
+  fChfColl            = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -113,6 +114,16 @@ int TEvdTimeClusterVisNode::InitEvent() {
 							<< " : mu2e::ComboHitCollection " 
 							<< fChCollTag << " not found";
     fChColl = nullptr;
+  }
+
+  art::Handle<mu2e::StrawHitFlagCollection> chfcH;
+  event->getByLabel(art::InputTag(fChfCollTag), chfcH);
+  if (chfcH.isValid()) fChfColl = chfcH.product();
+  else {
+    mf::LogWarning("TEvdTimeClusterVisNode::InitEvent") << " WARNING:" << __LINE__ 
+							<< " : mu2e::StrawHitFlagHitCollection " 
+							<< fChfCollTag << " not found";
+    fChfColl = nullptr;
   }
 //-----------------------------------------------------------------------------
 // initialize time clusters
@@ -292,11 +303,11 @@ void TEvdTimeClusterVisNode::NodePrint(const void* Object, const char* ClassName
 //-----------------------------------------------------------------------------
     if (Object) {
       const mu2e::TimeCluster* tc = (const mu2e::TimeCluster*) Object;
-      ad->printTimeCluster(tc,"",fChColl,fSdmcCollTag.data());
+      ad->printTimeCluster(tc,"",fChColl,fChfColl,fSdmcCollTag.data());
     }
     else {
 					// Object = nullptr: print collection, with hits 
-      ad->printTimeClusterCollection(fTcCollTag.data(),fChCollTag.data(),1,fSdmcCollTag.data());
+      ad->printTimeClusterCollection(fTcCollTag.data(),fChCollTag.data(),fChfCollTag.data(),1,fSdmcCollTag.data());
     }
   }
   else {
@@ -309,6 +320,6 @@ void TEvdTimeClusterVisNode::Print(Option_t* Opt) const {
   // printf(" >>> name: %s TEvdTimeClusterVisNode::Print is not implemented yet\n",GetName());
 
   TAnaDump* ad = TAnaDump::Instance();
-  ad->printTimeClusterCollection(fTcCollTag.data(),fChCollTag.data(),1,fSdmcCollTag.data());
+  ad->printTimeClusterCollection(fTcCollTag.data(),fChCollTag.data(),fChfCollTag.data(),1,fSdmcCollTag.data());
 }
 

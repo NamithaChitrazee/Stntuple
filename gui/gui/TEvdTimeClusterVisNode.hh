@@ -9,6 +9,7 @@
 #include "Stntuple/gui/TStnVisNode.hh"
 #include "Offline/RecoDataProducts/inc/TimeCluster.hh"
 #include "Offline/RecoDataProducts/inc/ComboHit.hh"
+#include "Offline/RecoDataProducts/inc/StrawHitFlag.hh"
 
 class TStnTrackBlock;
 class TSimpBlock;
@@ -24,15 +25,17 @@ public:
   
 protected:
 
-  const mu2e::TimeClusterCollection* fTcColl;
-  const mu2e::TimeClusterCollection* fPcColl;
-  const mu2e::ComboHitCollection*    fChColl;
+  const mu2e::TimeClusterCollection*  fTcColl;
+  const mu2e::TimeClusterCollection*  fPcColl;
+  const mu2e::ComboHitCollection*     fChColl;
+  const mu2e::StrawHitFlagCollection* fChfColl;
 
   TStnTimeClusterBlock*              fTcBlock;
 
   std::string                        fTcCollTag;   // time cluster coll tag
   std::string                        fPcCollTag;   // phi cluster coll tag (also time clusters)
   std::string                        fChCollTag;   // combo hit collection
+  std::string                        fChfCollTag;  // combo hit flag collection
   std::string                        fSdmcCollTag; // straw digi collection
 
   Color_t                            fTcColor;
@@ -72,15 +75,18 @@ public:
   std::string& TcCollTag()   { return fTcCollTag   ; }
   std::string& PcCollTag()   { return fPcCollTag   ; }
   std::string& ChCollTag()   { return fChCollTag   ; }
+  std::string& ChfCollTag()  { return fChfCollTag  ; }
   std::string& SdmcCollTag() { return fSdmcCollTag ; }
 
-  const mu2e::TimeClusterCollection* TcColl() { return fTcColl; }
-  const mu2e::TimeClusterCollection* PcColl() { return fPcColl; }
-  const mu2e::ComboHitCollection*    ChColl() { return fChColl; }
+  const mu2e::TimeClusterCollection*  TcColl () { return fTcColl; }
+  const mu2e::TimeClusterCollection*  PcColl () { return fPcColl; }
+  const mu2e::ComboHitCollection*     ChColl () { return fChColl; }
+  const mu2e::StrawHitFlagCollection* ChfColl() { return fChfColl; }
 //-----------------------------------------------------------------------------
 // modifiers
 //-----------------------------------------------------------------------------
   void SetChCollTag  (std::string& CollTag) { fChCollTag   = CollTag; }
+  void SetChfCollTag (std::string& CollTag) { fChfCollTag  = CollTag; }
   void SetSdmcCollTag(std::string& CollTag) { fSdmcCollTag = CollTag; }
   void SetTcCollTag  (std::string& CollTag) { fTcCollTag   = CollTag; }
   void SetPcCollTag  (std::string& CollTag) { fPcCollTag   = CollTag; }

@@ -64,6 +64,7 @@ TStnVisManager::TStnVisManager(const char* Name, const char* Title): TVisManager
   fDisplayStrawHitsXY  = 1;
   fDisplayStrawDigiMC  = 0;                    // not sure what this is, check
   fIgnoreComptonHits   = 0;
+  fIgnoreProtonHits    = 0;
 
   fMinMcMomentum       = 60;
   fMaxMcMomentum       = 1.e10;                // in MeV/c
@@ -1070,6 +1071,7 @@ void TStnVisManager::DoCheckButton() {
   else if (id == kDisplayOnlyTCHits  ) SetDisplayOnlyTCHits  (status);
   else if (id == kDisplaySH          ) SetDisplayStrawHitsXY (status);
   else if (id == kIgnoreComptonHits  ) SetIgnoreComptonHits  (status);
+  else if (id == kIgnoreProtonHits   ) SetIgnoreProtonHits   (status);
   else {
     printf("WARNING: TStnVisManager::DoCheckButton unknown button ID: %i\n",id);
   }
@@ -1100,6 +1102,10 @@ void TStnVisManager::DoRadioButton() {
   else if (id == M_IGNORE_COMPTON ) {
     if (new_state == kButtonUp) SetIgnoreComptonHits(1);
     else                        SetIgnoreComptonHits(0);
+  }
+  else if (id == M_IGNORE_PROTONS ) {
+    if (new_state == kButtonUp) SetIgnoreProtonHits(1);
+    else                        SetIgnoreProtonHits(0);
   }
   else {
     printf("WARNING: TStnVisManager::DoRadioButton unknown button ID: %i\n",id);

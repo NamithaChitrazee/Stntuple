@@ -280,13 +280,15 @@ public:
 //-----------------------------------------------------------------------------
 // time clusters
 //-----------------------------------------------------------------------------
-  void printTimeCluster   (const mu2e::TimeCluster*        TimePeak      , 
-                           const char* Opt                          = "", 
-			   const mu2e::ComboHitCollection* ChColl   = 0,
-			   const char* SdmcCollTag                  = "makeSD");
+  void printTimeCluster   (const mu2e::TimeCluster*            TimePeak        , 
+                           const char*                         Opt         = "", 
+			   const mu2e::ComboHitCollection*     ChColl      = nullptr,
+                           const mu2e::StrawHitFlagCollection* ChfColl     = nullptr,
+			   const char*                         SdmcCollTag = "makeSD");
 
   void printTimeClusterCollection(const char* TcCollTag             ,    // time cluster collection tag
-				  const char* ChCollTag             ,    // combo hit collection tag
+				  const char* ChCollTag             ,    // combo hit coll tag
+				  const char* ChfCollTag            ,    // combo hit flag coll tag
 				  int         PrintHits   = 0       ,
 				  const char* SdmcCollTag = nullptr);   // straw digi mc coll tag
 //-----------------------------------------------------------------------------

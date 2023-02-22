@@ -248,7 +248,6 @@ TStnFrame::TStnFrame(const char*  Name,
 //-----------------------------------------------------------------------------
   TGShutterItem *sh02 = new TGShutterItem(shutter, new TGHotString("print"),1001,kVerticalFrame);
   frame = (TGCompositeFrame *)sh02->GetContainer();
-
 //-----------------------------------------------------------------------------
 // "print KalSeedColls" button
 //-----------------------------------------------------------------------------
@@ -393,27 +392,14 @@ TStnFrame::TStnFrame(const char*  Name,
 //-----------------------------------------------------------------------------
 // ignore compton hits
 //-----------------------------------------------------------------------------
-  cbtn->Connect("Clicked()", "TStnVisManager", vm, "DoCheckButton()");
   cbtn = new TGCheckButton(frame,"low-E e-/e+", kIgnoreComptonHits);
-  // rb->SetTextJustify(36);
-  // rb->SetMargins    (0,0,0,0);
-  // rb->SetWrapLength (-1);
-  // rb->MoveResize    (8,64,100,40);
   cbtn->Connect("Clicked()", "TStnVisManager",vm, "DoCheckButton()");
-  // frame->AddFrame(fRb[0], new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
+  frame->AddFrame(cbtn, new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
 
+  cbtn = new TGCheckButton(frame,"protons", kIgnoreProtonHits);
+  cbtn->Connect("Clicked()", "TStnVisManager",vm, "DoCheckButton()");
+  frame->AddFrame(cbtn, new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
 
-  // TGPictureButton *fPictureButton840 = new TGPictureButton(fVerticalFrame839,gClient->GetPicture("ntuple_s.xpm"),-1,TGPictureButton::GetDefaultGC()(),kRaisedFrame);
-  // fPictureButton840->SetToolTipText("TNtuple");
-  // fVerticalFrame839->AddFrame(fPictureButton840, new TGLayoutHints(kLHintsCenterX | kLHintsTop,5,5,5,0));
-
-  // TGPictureButton *fPictureButton843 = new TGPictureButton(fVerticalFrame839,gClient->GetPicture("tree_s.xpm"),-1,TGPictureButton::GetDefaultGC()(),kRaisedFrame);
-  // fPictureButton843->SetToolTipText("TTree");
-  // fVerticalFrame839->AddFrame(fPictureButton843, new TGLayoutHints(kLHintsCenterX | kLHintsTop,5,5,5,0));
-
-  // TGPictureButton *fPictureButton846 = new TGPictureButton(fVerticalFrame839,gClient->GetPicture("chain_s.xpm"),-1,TGPictureButton::GetDefaultGC()(),kRaisedFrame);
-  // fPictureButton846->SetToolTipText("TChain");
-  // fVerticalFrame839->AddFrame(fPictureButton846, new TGLayoutHints(kLHintsCenterX | kLHintsTop,5,5,5,0));
 
   shutter->AddItem(shi03);
 

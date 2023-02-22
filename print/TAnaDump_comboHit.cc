@@ -20,7 +20,7 @@ void TAnaDump::printComboHit(const mu2e::ComboHit* Hit, const mu2e::StrawGasStep
   if ((opt == "") || (opt.Index("banner") >= 0)) {
     printf("#----------------------------------------------------------------------------------------------------");
     printf("--------------------------------------------------------------------------------------------\n");
-    printf("#   I nsh   SID   Flags  Pln:Pnl:Lay:Str      X        Y        Z       Time     TCorr     eDep   End");
+    printf("#   I nsh   SID   Flags  Stn:Pln:Pnl:Str     X       Y       Z    Phi    Time    TCorr     eDep   End");
     printf("  DrTime  PrTime  TRes    WDist     WRes        PDG     PDG(M) GenID simID       p        pz\n");
     printf("#----------------------------------------------------------------------------------------------------");
     printf("--------------------------------------------------------------------------------------------\n");
@@ -63,15 +63,15 @@ void TAnaDump::printComboHit(const mu2e::ComboHit* Hit, const mu2e::StrawGasStep
 
     printf("%5u",Hit->strawId().asUint16());
 
-    if (Flags >= 0) printf(" %08x",Flags);
-    else            printf("        ");
+    printf(" %08x",Flags);
 
-    printf(" %3i %3i %3i %3i  %8.3f %8.3f %9.3f %8.3f %8.3f %8.5f  %3i %7.2f %7.2f %5.2f %8.3f %8.3f %10i %10i %5i %5i %8.3f %8.3f\n",
+    printf(" %3i %3i %3i %3i %7.2f %7.2f %8.2f %7.2f %7.2f %5.2f %8.5f  %3i %7.2f %7.2f %5.2f %8.3f %8.3f %10i %10i %5i %5i %8.3f %8.3f\n",
+	   Hit->strawId().station(),
 	   Hit->strawId().plane(),
 	   Hit->strawId().panel(),
-	   Hit->strawId().layer(),
 	   Hit->strawId().straw(),
 	   Hit->pos().x(),Hit->pos().y(),Hit->pos().z(),
+           Hit->pos().phi(),
 	   Hit->time(),
 	   Hit->correctedTime(),
 	   Hit->energyDep(),
