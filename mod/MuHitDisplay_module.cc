@@ -309,6 +309,7 @@ void MuHitDisplay::InitVisManager() {
   tc_node->SetTcCollTag  (_timeClusterCollTag);
   tc_node->SetPcCollTag  (_phiClusterCollTag );
   tc_node->SetChCollTag  (_comboHitCollTag   );
+  tc_node->SetChfCollTag (_chfCollTag        );
   tc_node->SetSdmcCollTag(_sdmcCollTag       );
 //-----------------------------------------------------------------------------
 // nodes are defined, now come views

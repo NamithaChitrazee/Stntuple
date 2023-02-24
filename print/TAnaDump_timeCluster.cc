@@ -14,15 +14,14 @@
 #include "Offline/RecoDataProducts/inc/TimeCluster.hh"
 
 using namespace std;
+using namespace mu2e;
+
 //-----------------------------------------------------------------------------
 void TAnaDump::printTimeCluster(const mu2e::TimeCluster*            TimeCluster, 
 				const char*                         Opt, 
 				const mu2e::ComboHitCollection*     ChColl, 
 				const mu2e::StrawHitFlagCollection* ChfColl, 
 				const char*                         SdmcCollTag) {
-
-  const mu2e::ComboHit*      hit;
-  int                        flags;
 
   // MC collection could be absent, missing, or incorrectly specified
   const char* sdmc_coll_tag = SdmcCollTag;
@@ -49,15 +48,25 @@ void TAnaDump::printTimeCluster(const mu2e::TimeCluster*            TimeCluster,
     int nsh(0); 
     int nhits = TimeCluster->nhits();
 					// loop over the combo hits and count the number of straw hits
+
+    vector<const mu2e::ComboHit*> v;
+    v.reserve(nhits);
+
     for (int i=0; i<nhits; i++) {
       int index = TimeCluster->hits().at(i);
 					// pointers could be screwed up
       if (opt.Index("debug") < 0) {
-	hit  = &(ChColl->at(index));
+	const ComboHit* hit  = &(ChColl->at(index));
 	nsh += hit->nStrawHits();
+        v.push_back(hit);
       }
     }
-
+//-----------------------------------------------------------------------------
+// sort (combo) hits in Z
+//-----------------------------------------------------------------------------
+    std::sort(v.begin(),v.end(),
+              [](const ComboHit* a, const ComboHit* b) { return a->pos().z() < b->pos().z(); });
+    
     printf("%10.3f %10.3f %10.3f %10.3f %10.3f %5i %5i\n",
 	   caloClusterEnergy, 
 	   TimeCluster->position().x(),
@@ -76,25 +85,21 @@ void TAnaDump::printTimeCluster(const mu2e::TimeCluster*            TimeCluster,
 
       int  nhits = TimeCluster->nhits();
 
-      const mu2e::ComboHit* ch_0 = &ChColl->at(0);
+      const ComboHit* ch_0 = &ChColl->at(0);
 
-      for (int i=0; i<nhits; i++) {
-	int index = int(TimeCluster->hits().at(i));
-
+        for (int i=0; i<nhits; i++) {
+        const ComboHit* hit = v[i];
+        int loc   = hit-ch_0;
+        int flags = *((int*) &hit->flag());
 	if (opt.Index("debug") < 0) {
-	  hit     = &(ChColl->at(index));
-          int loc = hit-ch_0;
-	  flags   = *((int*) &hit->flag());
-          if (ChfColl) {
 //-----------------------------------------------------------------------------
-// use supplied StrawHitFlagCollection to print flags 
+// if ChfColl is defined, use supplied StrawHitFlagCollection to print flags 
 //-----------------------------------------------------------------------------
-            flags = *((int*) &ChfColl->at(loc));
-          }
+          if (ChfColl) flags = *((int*) &ChfColl->at(loc));
 
-          const mu2e::StrawGasStep* step(nullptr);
+          const StrawGasStep* step(nullptr);
 	  if (mcdigis) {
-	    const mu2e::StrawDigiMC* sdmc = &mcdigis->at(hit->index(0));
+	    const StrawDigiMC* sdmc = &mcdigis->at(hit->index(0));
 	    step  = sdmc->earlyStrawGasStep().get();
 	  }
 	  printComboHit(hit,step,"data",i,flags);
@@ -103,7 +108,7 @@ void TAnaDump::printTimeCluster(const mu2e::TimeCluster*            TimeCluster,
 //-----------------------------------------------------------------------------
 // debug mode: print only an index and a location of the hit
 //-----------------------------------------------------------------------------
-	  printf("%5i %5i\n",i,index);
+	  printf("%5i %5i\n",i,loc);
 	}
       }
     }

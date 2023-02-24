@@ -303,7 +303,7 @@ void TEvdTimeClusterVisNode::NodePrint(const void* Object, const char* ClassName
 //-----------------------------------------------------------------------------
     if (Object) {
       const mu2e::TimeCluster* tc = (const mu2e::TimeCluster*) Object;
-      ad->printTimeCluster(tc,"",fChColl,fChfColl,fSdmcCollTag.data());
+      ad->printTimeCluster(tc,"data+hits+banner",fChColl,fChfColl,fSdmcCollTag.data());
     }
     else {
 					// Object = nullptr: print collection, with hits 

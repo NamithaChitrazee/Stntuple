@@ -18,11 +18,11 @@ void TAnaDump::printComboHit(const mu2e::ComboHit* Hit, const mu2e::StrawGasStep
   opt.ToLower();
 
   if ((opt == "") || (opt.Index("banner") >= 0)) {
-    printf("#----------------------------------------------------------------------------------------------------");
+    printf("#-----------------------------------------------------------------------------------------------");
     printf("--------------------------------------------------------------------------------------------\n");
-    printf("#   I nsh   SID   Flags  Stn:Pln:Pnl:Str     X       Y       Z    Phi    Time    TCorr     eDep   End");
-    printf("  DrTime  PrTime  TRes    WDist     WRes        PDG     PDG(M) GenID simID       p        pz\n");
-    printf("#----------------------------------------------------------------------------------------------------");
+    printf("#   I nsh   SID   Flags  Stn:Pln:Pnl:Str     X       Y       Z      Phi    Time   TCorr     eDep");
+    printf("   DrTime  PrTime TRes    WDist     WRes simID       p        pz        PDG     PDG(M) GenID\n");
+    printf("#-----------------------------------------------------------------------------------------------");
     printf("--------------------------------------------------------------------------------------------\n");
   }
 
@@ -65,7 +65,7 @@ void TAnaDump::printComboHit(const mu2e::ComboHit* Hit, const mu2e::StrawGasStep
 
     printf(" %08x",Flags);
 
-    printf(" %3i %3i %3i %3i %7.2f %7.2f %8.2f %7.2f %7.2f %5.2f %8.5f  %3i %7.2f %7.2f %5.2f %8.3f %8.3f %10i %10i %5i %5i %8.3f %8.3f\n",
+    printf(" %3i %3i %3i %3i %7.2f %7.2f %8.2f %5.2f %7.2f %7.2f %8.5f %7.2f %7.2f %5.2f %8.3f %8.3f %5i %8.3f %8.3f %10i %10i %5i\n",
 	   Hit->strawId().station(),
 	   Hit->strawId().plane(),
 	   Hit->strawId().panel(),
@@ -76,19 +76,21 @@ void TAnaDump::printComboHit(const mu2e::ComboHit* Hit, const mu2e::StrawGasStep
 	   Hit->correctedTime(),
 	   Hit->energyDep(),
 
-	   (int) Hit->driftEnd(),
+	   // (int) Hit->driftEnd(),
 	   Hit->driftTime(),
 	   Hit->propTime(),
 	   Hit->transRes(),
 	   Hit->wireDist(),
 	   Hit->wireRes(),
 
-	   pdg_id,
-	   mother_pdg_id,
-	   generator_id,
 	   sim_id,
 	   mc_mom,
-	   mc_mom_z);
+	   mc_mom_z,
+
+	   pdg_id,
+	   mother_pdg_id,
+	   generator_id
+           );
   }
 }
 

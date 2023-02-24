@@ -154,13 +154,15 @@ void TEvdTimeCluster::Clear(Option_t* Opt) {
 
 
 //-----------------------------------------------------------------------------
+// interactively, always print everything
+//-----------------------------------------------------------------------------
 void TEvdTimeCluster::Print(Option_t* Option) const {
 
   TAnaDump* ad = TAnaDump::Instance();
 
   TEvdTimeClusterVisNode* vn = (TEvdTimeClusterVisNode*) fVisNode;
 
-  ad->printTimeCluster(fTimeCluster,Option,vn->ChColl(), vn->ChfColl(), vn->SdmcCollTag().data());
+  ad->printTimeCluster(fTimeCluster,"data+banner+hits",vn->ChColl(), vn->ChfColl(), vn->SdmcCollTag().data());
 }
 
 //-----------------------------------------------------------------------------
