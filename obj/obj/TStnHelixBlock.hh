@@ -13,8 +13,9 @@
 
 class TStnHelixBlock: public TStnDataBlock {
 
-  friend Int_t StntupleInitMu2eHelixBlock     (TStnDataBlock*, AbsEvent* , int);
-  friend Int_t StntupleInitMu2eHelixBlockLinks(TStnDataBlock*, AbsEvent* , int);
+  friend class StntupleInitHelixBlock; 
+  // friend Int_t StntupleInitMu2eHelixBlock     (TStnDataBlock*, AbsEvent* , int);
+  // friend Int_t StntupleInitMu2eHelixBlockLinks(TStnDataBlock*, AbsEvent* , int);
 public:
 //----------------------------------------------------------------------------
 //  data members

@@ -142,6 +142,7 @@ stntuple : {
 	@table::Digitize.producers
 	@table::Reconstruction.producers
 	@table::Stntuple.producers 
+	@table::Trigger.producers 
 	# 
 	compressDigiMCs : { @table::Digitize.producers.compressDigiMCs       # defined in Filters/fcl/
 	    crvDigiMCTag         : ""
@@ -154,6 +155,7 @@ stntuple : {
         @table::Digitize.filters
 	@table::Reconstruction.filters
 	@table::Stntuple.filters   
+	@table::Trigger.filters
     }
 
     analyzers: { 

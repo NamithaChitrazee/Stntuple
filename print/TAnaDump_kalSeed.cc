@@ -86,8 +86,8 @@ void TAnaDump::printKalSeed(const mu2e::KalSeed* KalSeed           ,
     art::Handle<mu2e::StrawDigiMCCollection> sdmccH;
     const mu2e::StrawDigiMCCollection* sdmcc(nullptr);
 
-    if      (StrawDigiMCCollTag  != nullptr) tag = art::InputTag(StrawDigiMCCollTag);
-    else if (fStrawDigiMCCollTag != ""     ) tag = art::InputTag(fStrawDigiMCCollTag.Data());
+    if      (StrawDigiMCCollTag != nullptr) tag = StrawDigiMCCollTag;
+    else if (fSdmcCollTag       != ""     ) tag = fSdmcCollTag;
     else {
       printf("ERROR in TAnaDump::printTrackSeed: no StrawDigiMCCollTag specified, BAIL OUT\n");
       return;
@@ -181,8 +181,8 @@ void TAnaDump::printKalSeedCollection(const char* KalSeedCollTag    ,
   fEvent->getByLabel(art::InputTag(StrawDigiMCCollTag),sdmccH);
 
   if (sdmccH.isValid()) {
-    _mcdigis            = sdmccH.product();
-    fStrawDigiMCCollTag = StrawDigiMCCollTag;
+    _mcdigis     = sdmccH.product();
+    fSdmcCollTag = StrawDigiMCCollTag;
   }
   else {
     printf("ERROR in TAnaDump::printKalSeedCollection: no StrawDigiMCCollection tag=%s, available are\n",StrawDigiMCCollTag);

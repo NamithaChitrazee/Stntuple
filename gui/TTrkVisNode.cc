@@ -966,7 +966,7 @@ void TTrkVisNode::Print(Option_t* Opt) const {
 
   if (opt == "combo_hits") {
     TAnaDump* ad = TAnaDump::Instance();
-    ad->printComboHitCollection(fChCollTag.data(),fSdmcCollTag.data());
+    ad->printComboHitCollection(fChCollTag.data(),fSdmcCollTag.encode().data());
     return;
   }
 //-----------------------------------------------------------------------------
@@ -1017,11 +1017,11 @@ void TTrkVisNode::NodePrint(const void* Object, const char* ClassName) {
 //-----------------------------------------------------------------------------
     if (Object) {
       const mu2e::KalSeed* ks = (const mu2e::KalSeed*) Object;
-      ad->printKalSeed(ks,"",fShCollTag.encode().data(),fSdmcCollTag.data());
+      ad->printKalSeed(ks,"",fShCollTag.encode().data(),fSdmcCollTag.encode().data());
     }
     else {
 					// Object = nullptr: print collection, with hits 
-      ad->printKalSeedCollection(fKsCollTag.data(),1,fShCollTag.encode().data(),fSdmcCollTag.data());
+      ad->printKalSeedCollection(fKsCollTag.data(),1,fShCollTag.encode().data(),fSdmcCollTag.encode().data());
     }
   }
   else {

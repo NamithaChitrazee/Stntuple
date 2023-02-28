@@ -29,7 +29,7 @@ public:
 
   void   SetSimpCollTag       (std::string&   Tag ) { fSimpCollTag        = art::InputTag(Tag); }
   void   SetShCollTag         (art::InputTag& Tag ) { fShCollTag    = Tag; }
-  void   SetSdmcCollTag       (std::string& Tag ) { fStrawDigiMCCollTag = art::InputTag(Tag); }
+  void   SetSdmcCollTag       (art::InputTag& Tag ) { fStrawDigiMCCollTag = Tag; }
   void   SetVDHitsCollTag     (std::string& Tag ) { fVDHitsCollTag      = art::InputTag(Tag); }
   void   SetPrimaryParticleTag(std::string& Tag ) { fPrimaryParticleTag = art::InputTag(Tag); }
   void   SetMinSimpMomentum   (double       MinP) { fMinSimpMomentum    = MinP              ; }

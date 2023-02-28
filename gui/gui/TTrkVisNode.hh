@@ -61,7 +61,7 @@ protected:
   const mu2e::StrawDigiCollection**            fSdColl;		   // straw digi coll
 
   const mu2e::StrawDigiMCCollection*           fSdmcColl;          // straw digi MC coll
-  std::string                                  fSdmcCollTag;       // straw digi collection
+  art::InputTag                                fSdmcCollTag;       // straw digi collection
 
   const mu2e::StrawDigiADCWaveformCollection** fSwColl;		   // straw digi waveform coll
 
@@ -141,7 +141,7 @@ public:
   void SetChfCollTag    (std::string& CollTag) { fChfCollTag  = CollTag; }
   void SetShCollTag     (art::InputTag& CollTag) { fShCollTag   = CollTag; }
   void SetShfCollTag    (std::string& CollTag) { fShfCollTag  = CollTag; }
-  void SetSdmcCollTag   (std::string& CollTag) { fSdmcCollTag = CollTag; }
+  void SetSdmcCollTag   (art::InputTag& CollTag) { fSdmcCollTag = CollTag; }
 
   void  SetSimpBlock   (TSimpBlock* Block) { fSimpBlock    = Block; }
   void  SetListOfTracks(TObjArray*  List ) { fListOfTracks = List ; }

@@ -112,14 +112,14 @@ StntupleMakerTemplate : { module_type:StntupleMaker
     helixBlockName       : [ "MHDeM"      ]
     helixCollTag         : [ "HelixBlock" ]
 
-    trackSeedBlockName   : []
-    trackSeedCollTag     : []
+    trackSeedBlockName   : [ "KSFBlock"     ]
+    trackSeedCollTag     : [ "KSFDeM"       ]
 #------------------------------------------------------------------------------
 # default - negative particles... need to redo merging of opposite signs
 #------------------------------------------------------------------------------
     trackBlockName       : [ "TrackBlock"   ]
     trackCollTag         : [ "KFFDeM"       ]
-    trackTsBlockName     : [ "TSBlock"      ]
+    trackTsBlockName     : [ "KSFBlock"     ]
     trackTsCollTag       : [ "KSFDeM"       ]
     tciCollTag           : [ "TrkExtrapol"  ]
     tcmCollTag           : [ "CaloMatching" ]

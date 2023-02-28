@@ -303,11 +303,11 @@ void TEvdTimeClusterVisNode::NodePrint(const void* Object, const char* ClassName
 //-----------------------------------------------------------------------------
     if (Object) {
       const mu2e::TimeCluster* tc = (const mu2e::TimeCluster*) Object;
-      ad->printTimeCluster(tc,"data+hits+banner",fChColl,fChfColl,fSdmcCollTag.data());
+      ad->printTimeCluster(tc,"data+hits+banner",fChColl,fChfColl,fSdmcCollTag.encode().data());
     }
     else {
 					// Object = nullptr: print collection, with hits 
-      ad->printTimeClusterCollection(fTcCollTag.data(),fChCollTag.data(),fChfCollTag.data(),1,fSdmcCollTag.data());
+      ad->printTimeClusterCollection(fTcCollTag.data(),fChCollTag.data(),fChfCollTag.data(),1,fSdmcCollTag.encode().data());
     }
   }
   else {
@@ -320,6 +320,6 @@ void TEvdTimeClusterVisNode::Print(Option_t* Opt) const {
   // printf(" >>> name: %s TEvdTimeClusterVisNode::Print is not implemented yet\n",GetName());
 
   TAnaDump* ad = TAnaDump::Instance();
-  ad->printTimeClusterCollection(fTcCollTag.data(),fChCollTag.data(),fChfCollTag.data(),1,fSdmcCollTag.data());
+  ad->printTimeClusterCollection(fTcCollTag.data(),fChCollTag.data(),fChfCollTag.data(),1,fSdmcCollTag.encode().data());
 }
 

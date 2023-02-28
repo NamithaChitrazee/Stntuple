@@ -36,7 +36,7 @@ protected:
   std::string                        fPcCollTag;   // phi cluster coll tag (also time clusters)
   std::string                        fChCollTag;   // combo hit collection
   std::string                        fChfCollTag;  // combo hit flag collection
-  std::string                        fSdmcCollTag; // straw digi collection
+  art::InputTag                      fSdmcCollTag; // straw digi collection
 
   Color_t                            fTcColor;
   Color_t                            fPcColor;
@@ -76,7 +76,7 @@ public:
   std::string& PcCollTag()   { return fPcCollTag   ; }
   std::string& ChCollTag()   { return fChCollTag   ; }
   std::string& ChfCollTag()  { return fChfCollTag  ; }
-  std::string& SdmcCollTag() { return fSdmcCollTag ; }
+  art::InputTag& SdmcCollTag() { return fSdmcCollTag ; }
 
   const mu2e::TimeClusterCollection*  TcColl () { return fTcColl; }
   const mu2e::TimeClusterCollection*  PcColl () { return fPcColl; }
@@ -87,7 +87,7 @@ public:
 //-----------------------------------------------------------------------------
   void SetChCollTag  (std::string& CollTag) { fChCollTag   = CollTag; }
   void SetChfCollTag (std::string& CollTag) { fChfCollTag  = CollTag; }
-  void SetSdmcCollTag(std::string& CollTag) { fSdmcCollTag = CollTag; }
+  void SetSdmcCollTag(art::InputTag& CollTag) { fSdmcCollTag = CollTag; }
   void SetTcCollTag  (std::string& CollTag) { fTcCollTag   = CollTag; }
   void SetPcCollTag  (std::string& CollTag) { fPcCollTag   = CollTag; }
 

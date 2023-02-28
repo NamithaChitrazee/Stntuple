@@ -22,10 +22,12 @@ void TAnaDump::printTimeCluster(const mu2e::TimeCluster*            TimeCluster,
 				const mu2e::ComboHitCollection*     ChColl, 
 				const mu2e::StrawHitFlagCollection* ChfColl, 
 				const char*                         SdmcCollTag) {
-
-  // MC collection could be absent, missing, or incorrectly specified
+//-----------------------------------------------------------------------------
+// MC collection could be absent, missing, or incorrectly specified - 
+// don't want to crash in either case
+//-----------------------------------------------------------------------------
   const char* sdmc_coll_tag = SdmcCollTag;
-  if (sdmc_coll_tag == nullptr) sdmc_coll_tag = fStrawDigiMCCollTag.Data();
+  if (sdmc_coll_tag[0] == 0) sdmc_coll_tag = fSdmcCollTag.encode().data();
 
   const mu2e::StrawDigiMCCollection* mcdigis(nullptr);
   art::Handle<mu2e::StrawDigiMCCollection> sdmccH;

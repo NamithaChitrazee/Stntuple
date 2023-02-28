@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
-//  Apr 2016 G. Pezzullo: initialization of the MU2E STNTUPLE Helix block
-//
+// Apr 2016 G. Pezzullo: initialization of the MU2E STNTUPLE Helix block
+// Feb 2023 P.Murat: make initialization a class 
 //-----------------------------------------------------------------------------
 #include <cstdio>
 #include "TROOT.h"
@@ -10,6 +10,7 @@
 #include "TDatabasePDG.h"
 #include "TParticlePDG.h"
 
+#include "Stntuple/mod/InitHelixBlock.hh"
 
 #include "Stntuple/obj/TStnDataBlock.hh"
 #include "Stntuple/obj/TStnNode.hh"
@@ -36,30 +37,26 @@
 #include "Offline/RecoDataProducts/inc/HelixSeed.hh"
 #include "Offline/RecoDataProducts/inc/HelixHit.hh"
 #include "Offline/RecoDataProducts/inc/KalSeed.hh"
+#include "Offline/RecoDataProducts/inc/KalSeedAssns.hh"
 
 #include "Offline/RecoDataProducts/inc/CaloCluster.hh"
-#include "Offline/RecoDataProducts/inc/StrawHitPosition.hh"
 
 #include "Offline/MCDataProducts/inc/StrawDigiMC.hh"
 #include "Offline/MCDataProducts/inc/SimParticle.hh"
 #include "Offline/MCDataProducts/inc/StepPointMC.hh"
 #include "Offline/TrkDiag/inc/TrkMCTools.hh"
 
-#include "Offline/Mu2eUtilities/inc/LsqSums4.hh"
-#include "Math/VectorUtil.h"
 
-using namespace ROOT::Math::VectorUtil;
-
+using namespace ROOT::Math;
 //-----------------------------------------------------------------------------
 // assume that the collection name is set, so we could grab it from the event
 //-----------------------------------------------------------------------------
-int  StntupleInitMu2eHelixBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mode) {
+int  StntupleInitHelixBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mode) {
 
-  const mu2e::HelixSeedCollection* list_of_helices(0);
   //  mu2e::AlgorithmIDCollection*     aid_coll    (0);
 
-  char                 helix_module_label[100], helix_description[100]; 
-  char                 makeSD_module_label[100];
+  //   char                 helix_module_label[100], helix_description[100]; 
+  // char                 makeSD_module_label[100];
 
   int ev_number = Evt->event();
   int rn_number = Evt->run();
@@ -71,37 +68,29 @@ int  StntupleInitMu2eHelixBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mode) {
   TStnHelix*           helix(0);
 
   cb->Clear();
-  cb->GetModuleLabel("mu2e::StrawDigiMCCollection",makeSD_module_label);
+  //  cb->GetModuleLabel("mu2e::StrawDigiMCCollection",makeSD_module_label);
 //-----------------------------------------------------------------------------
 // algorithm ID's are determined by the same modules as the helices themselves
 //-----------------------------------------------------------------------------
-  cb->GetModuleLabel("mu2e::HelixSeedCollection", helix_module_label);
-  cb->GetDescription("mu2e::HelixSeedCollection", helix_description );
-
   art::Handle<mu2e::HelixSeedCollection>   hch;
 
-  if (helix_module_label[0] != 0) {
-    if (helix_description[0] == 0) {
-      Evt->getByLabel(helix_module_label,hch);
-    }
-    else {
-      Evt->getByLabel(helix_module_label,helix_description,hch);
-    }
-
-    if (hch.isValid()) list_of_helices = hch.product();
+  fListOfHSeeds = nullptr;
+  if (not fHSeedCollTag.empty()) {
+    Evt->getByLabel(fHSeedCollTag,hch);
+    if (hch.isValid()) fListOfHSeeds = hch.product();
   }
 
-  const mu2e::StrawDigiMCCollection* mcdigis(0);
-  art::Handle<mu2e::StrawDigiMCCollection> mcdH;
-  Evt->getByLabel(makeSD_module_label, mcdH);
-  mcdigis = mcdH.product();
+  const mu2e::StrawDigiMCCollection* sdmcColl(0);
+  art::Handle<mu2e::StrawDigiMCCollection> sdmccH;
+  Evt->getByLabel(fSdmcCollTag, sdmccH);
+  sdmcColl = sdmccH.product();
   
   const mu2e::HelixSeed     *tmpHel(0);
   int                        nhelices(0);
   const mu2e::RobustHelix   *robustHel(0);
   const mu2e::CaloCluster   *cluster(0);
  
-  if (list_of_helices) nhelices = list_of_helices->size();
+  if (fListOfHSeeds) nhelices = fListOfHSeeds->size();
   
   TParticlePDG* part(nullptr);
   TDatabasePDG* pdg_db = TDatabasePDG::Instance();
@@ -112,7 +101,7 @@ int  StntupleInitMu2eHelixBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mode) {
     std::vector<int>     hits_simp_id, hits_simp_index, hits_simp_z;
     
     helix                  = cb->NewHelix();
-    tmpHel                 = &list_of_helices->at(i);
+    tmpHel                 = &fListOfHSeeds->at(i);
     cluster                = tmpHel->caloCluster().get();
     robustHel              = &tmpHel->helix();
     if (cluster != 0){
@@ -177,7 +166,7 @@ int  StntupleInitMu2eHelixBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mode) {
       hits->fillStrawDigiIndices(*(Evt),j,shids);
       
       for (size_t k=0; k<shids.size(); ++k) {
-      	const mu2e::StrawDigiMC* sdmc = &mcdigis->at(shids[k]);
+      	const mu2e::StrawDigiMC* sdmc = &sdmcColl->at(shids[k]);
 
 	const mu2e::StrawGasStep* step (nullptr);
 	if (sdmc->wireEndTime(mu2e::StrawEnd::cal) < sdmc->wireEndTime(mu2e::StrawEnd::hv)) {
@@ -238,21 +227,21 @@ int  StntupleInitMu2eHelixBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mode) {
       }
     }
     
-    if ( (mostvalueindex<0) || (mostvalueindex >= (int)mcdigis->size()))        {
+    if ( (mostvalueindex<0) || (mostvalueindex >= (int) sdmcColl->size()))        {
       printf(">>> ERROR: event %i helix %i no MC found. MostValueindex = %i hits_simp_index[id_max] = %i mcdigis_size =%li \n", 
-	     Evt->event(), i, mostvalueindex, hits_simp_index[id_max], mcdigis->size());
+	     Evt->event(), i, mostvalueindex, hits_simp_index[id_max], sdmcColl->size());
       continue;
     }
     
-    const mu2e::StrawDigiMC* sdmc = &mcdigis->at(mostvalueindex);
+    const mu2e::StrawDigiMC* sdmc = &sdmcColl->at(mostvalueindex);
 
-    const mu2e::StrawGasStep* step(nullptr);
-    if (sdmc->wireEndTime(mu2e::StrawEnd::cal) < sdmc->wireEndTime(mu2e::StrawEnd::hv)) {
-      step = sdmc->strawGasStep(mu2e::StrawEnd::cal).get();
-    }
-    else {
-      step = sdmc->strawGasStep(mu2e::StrawEnd::hv ).get();
-    }
+    const mu2e::StrawGasStep* step = sdmc->earlyStrawGasStep().get();
+    // if (sdmc->wireEndTime(mu2e::StrawEnd::cal) < sdmc->wireEndTime(mu2e::StrawEnd::hv)) {
+    //   step = sdmc->strawGasStep(mu2e::StrawEnd::cal).get();
+    // }
+    // else {
+    //   step = sdmc->strawGasStep(mu2e::StrawEnd::hv ).get();
+    // }
 
     const mu2e::SimParticle* sim(nullptr);
 
@@ -306,7 +295,7 @@ int  StntupleInitMu2eHelixBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mode) {
 
        	const mu2e::StrawGasStep* step(nullptr);
 
-      	const mu2e::StrawDigiMC*  sdmc = &mcdigis->at(secondmostvalueindex);
+      	const mu2e::StrawDigiMC*  sdmc = &sdmcColl->at(secondmostvalueindex);
 	if (sdmc->wireEndTime(mu2e::StrawEnd::cal) < sdmc->wireEndTime(mu2e::StrawEnd::hv)) {
 	  step = sdmc->strawGasStep(mu2e::StrawEnd::cal).get();
 	}
@@ -360,7 +349,7 @@ int  StntupleInitMu2eHelixBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mode) {
 }
 
 //-----------------------------------------------------------------------------
-Int_t StntupleInitMu2eHelixBlockLinks(TStnDataBlock* Block, AbsEvent* AnEvent, int Mode) 
+Int_t StntupleInitHelixBlock::ResolveLinks(TStnDataBlock* Block, AbsEvent* AnEvent, int Mode) 
 {
 
   Int_t  evt, run, srn;
@@ -375,81 +364,68 @@ Int_t StntupleInitMu2eHelixBlockLinks(TStnDataBlock* Block, AbsEvent* AnEvent, i
 
   if (Block->LinksInitialized()) return 0;
 
-  TStnEvent*               ev;
-  TStnHelixBlock*          hb;
-  TStnHelix*               helix;
-  TStnTrackSeedBlock*      tsb;
-  // TStnTrackSeed*           trkseed;
-  TStnTimeClusterBlock*    tcb;
-  TStnTimeCluster*         tp;
+  art::Handle<mu2e::KalHelixAssns> ksfhaH;
+  const mu2e::KalHelixAssns* ksfha;
+  AnEvent->getByLabel(fKsfCollTag, ksfhaH);
+  ksfha = ksfhaH.product();
 
-  const mu2e::HelixSeed*   khelix, *fkhelix;
-  // const mu2e::KalSeed*     kseed;
-  const mu2e::TimeCluster* ktimepeak, *fktimepeak;
-
-  char                     ts_block_name[100], tc_block_name[100];
-
-  ev     = Block->GetEvent();
-  hb     = (TStnHelixBlock*) Block;
+  TStnEvent*      ev = Block->GetEvent();
+  TStnHelixBlock* hb = (TStnHelixBlock*) Block;
   int nhelices = hb->NHelices();
 //-----------------------------------------------------------------------------
 // this is a hack, to be fixed soon
 //-----------------------------------------------------------------------------
-  hb->GetModuleLabel("TrackSeedBlockName"  ,ts_block_name);
-  hb->GetModuleLabel("TimeClusterBlockName",tc_block_name);
-
   int ntseeds(0), ntpeaks(0);
 
-  tsb    = (TStnTrackSeedBlock*  ) ev->GetDataBlock(ts_block_name);
-  tcb    = (TStnTimeClusterBlock*) ev->GetDataBlock(tc_block_name);
+  TStnTrackSeedBlock*   tsb = (TStnTrackSeedBlock*  ) ev->GetDataBlock(fKsfBlockName.Data());
+  TStnTimeClusterBlock* tcb = (TStnTimeClusterBlock*) ev->GetDataBlock(fTclBlockName.Data());
 
-  if (tsb) ntseeds  = tsb->NTrackSeeds();
+  if (tsb) ntseeds = tsb->NTrackSeeds();
   if (tcb) ntpeaks = tcb->NTimeClusters();
 
-  for (int i=0; i<nhelices; ++i){
-    helix  = hb   ->Helix(i);
-    khelix = helix->fHelix;
-    int      trackseedIndex(-1);
-    for (int j=0; j<ntseeds; ++j){
-      // trkseed = tsb->TrackSeed(j);
-      // kseed   = trkseed->fTrackSeed;
-      printf("StntupleInitMu2eHelixBlockLinks ERROR:  kseed->helix() undefined, FIXIT\n");
-      fkhelix = nullptr; // kseed->helix().get();
-      if (fkhelix == khelix) {
-	trackseedIndex = j;
-	break;
+  for (int i=0; i<nhelices; ++i) {
+    TStnHelix*      hel = hb->Helix(i);
+    const mu2e::HelixSeed* hs1 = hel->fHelix;
+//-----------------------------------------------------------------------------
+// looking for the seed in associations - a helix may not have a seed
+//-----------------------------------------------------------------------------
+    const mu2e::KalSeed* ksf(nullptr);
+    for (auto ass: *ksfha) {
+      const mu2e::HelixSeed* hs2 = ass.second.get();
+      if (hs1 == hs2) {
+        ksf = ass.first.get();
+        break;
       }
     }
-//-----------------------------------------------------------------------------
-// don't print diagnostics if the block name is empty
-// non-merged helices and not chozen helices do not have associated seeds
-//-----------------------------------------------------------------------------
-    // if ((trackseedIndex < 0) && (ts_block_name[0] != 0)) {
-    //   printf(">>> ERROR: block %s HelixFinder helix %i -> no TrackSeed associated\n", hb->GetNode()->GetName(),i);
-    //   continue;
-    // }
-    helix->SetTrackSeedIndex(trackseedIndex);
 
-    ktimepeak = khelix->timeCluster().get();
-    int      timepeakIndex(-1);
+    int ksfIndex(-1);
+
+    if (ksf != nullptr) {
+      for (int j=0; j<ntseeds; ++j){
+        TStnTrackSeed* tseed = tsb->TrackSeed(j);
+        const mu2e::KalSeed* ks2   = tseed->fTrackSeed;
+        if (ks2 == ksf) {
+          ksfIndex = j;
+          break;
+        }
+      }
+    }
+
+    hel->SetTrackSeedIndex(ksfIndex);
+
+    const mu2e::TimeCluster* ktimepeak = hs1->timeCluster().get();
+
+    int      tclIndex(-1);
     for (int j=0; j<ntpeaks;++j){
-      tp         = tcb->TimeCluster(j);
-      fktimepeak = tp->fTimeCluster;
+      TStnTimeCluster* tp = tcb->TimeCluster(j);
+      const mu2e::TimeCluster* fktimepeak = tp->fTimeCluster;
       if (fktimepeak == ktimepeak){
-	timepeakIndex = j;
+	tclIndex = j;
 	break;
       }
     }
-//-----------------------------------------------------------------------------
-// don't print diagnostics if the time cluster block name is empty
-// for TimeClusterBlockTpr clusters are not defined
-//-----------------------------------------------------------------------------
-    // if ((timepeakIndex < 0) && (tc_block_name[0] != 0)) {
-    //   printf(">>> ERROR: block %s  %s CalHelixFinder helix %i -> no TimeCluster associated\n", hb->GetNode()->GetName(), tc_block_name, i);//FIXME!
-    //   continue;
-    // }
 
-    helix->SetTimeClusterIndex(timepeakIndex);
+    hel->SetTimeClusterIndex(tclIndex);
   }
 //-----------------------------------------------------------------------------
 // mark links as initialized

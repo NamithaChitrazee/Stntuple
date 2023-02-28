@@ -320,17 +320,17 @@ void TAnaDump::printHelixSeedCollection(const char* HelixSeedCollTag,
   strcpy(popt,"data");
   if (PrintHits > 0) strcat(popt,"+hits");
 
-  const char* sdmc_coll_tag = StrawDigiMCCollTag;
-  if (sdmc_coll_tag == nullptr) sdmc_coll_tag = fStrawDigiMCCollTag.Data();
+  art::InputTag sdmc_coll_tag = StrawDigiMCCollTag;
+  if (sdmc_coll_tag == nullptr) sdmc_coll_tag = fSdmcCollTag;
 
   for (int i=0; i<nhelices; i++) {
     helix = &list_of_helixSeeds->at(i);
     if (banner_printed == 0) {
-      printHelixSeed(helix,StrawHitCollTag,sdmc_coll_tag,"banner"); 
+      printHelixSeed(helix,StrawHitCollTag,sdmc_coll_tag.encode().data(),"banner"); 
       banner_printed = 1;
     }
 
-    printHelixSeed(helix,StrawHitCollTag,sdmc_coll_tag,popt);
+    printHelixSeed(helix,StrawHitCollTag,sdmc_coll_tag.encode().data(),popt);
   }
 }
 

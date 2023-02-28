@@ -13,8 +13,6 @@
 #include <string>
 #include <cstdio>
 
-#include "Stntuple/obj/TStnEvent.hh"
-
 #include "fhiclcpp/ParameterSet.h"
 
 #include <assert.h>
@@ -28,10 +26,10 @@
 #include "TFolder.h"
 #include "TSystem.h"
 
-// conditions
 #include "Offline/ConditionsService/inc/ConditionsHandle.hh"
 #include "Offline/ConditionsService/inc/AcceleratorParams.hh"
 
+#include "Stntuple/obj/TStnEvent.hh"
 #include "Stntuple/obj/TStnNode.hh"
 #include "Stntuple/obj/TStnErrorLogger.hh"
 #include "Stntuple/obj/TStnTrackBlock.hh"
@@ -53,10 +51,12 @@
 #include "Stntuple/mod/InitCrvClusterBlock.hh"
 #include "Stntuple/mod/InitGenpBlock.hh"
 #include "Stntuple/mod/InitHeaderBlock.hh"
+#include "Stntuple/mod/InitHelixBlock.hh"
 #include "Stntuple/mod/InitSimpBlock.hh"
 #include "Stntuple/mod/InitStrawHitBlock.hh"
 #include "Stntuple/mod/InitStepPointMCBlock.hh"
 #include "Stntuple/mod/InitTrackBlock.hh"
+#include "Stntuple/mod/InitTrackSeedBlock.hh"
 #include "Stntuple/mod/InitTrackStrawHitBlock.hh"
 #include "Stntuple/mod/InitTriggerBlock.hh"
 #include "Stntuple/mod/InitTimeClusterBlock.hh"
@@ -111,14 +111,13 @@ protected:
 // module parameters
 //-----------------------------------------------------------------------------
   string                   fGenpCollTag;
-
   string                   fSimpCollTag;
 
   art::InputTag            fChCollTag;
   art::InputTag            fShCollTag;
   string                   fStrawDigiCollTag;
   string                   fSdwfCollTag;
-  string                   fStrawDigiMCCollTag;
+  art::InputTag            fSdmcCollTag;
 
   string                   fCrvRecoPulseCollTag;            //
   string                   fCrvCoincidenceCollTag;          //
@@ -126,18 +125,18 @@ protected:
 
   string                   fVdhCollTag;                     // hits on virtual detectors (StepPointMCCollection)
 
-  vector<string>           fTimeClusterBlockName;
-  vector<string>           fTimeClusterCollTag;
+  vector<string>           fTClBlockName;                   // time cluster block names
+  vector<string>           fTClCollTag;                     // time cluster coll tags
 
   vector<string>           fHelixBlockName;
-  vector<string>           fHelixCollTag;
+  vector<string>           fHelixSeedCollTag;
 
   art::InputTag            fPbiTag;
   string                   fPrimaryParticleTag;
   string                   fTriggerResultsTag;
 
-  vector<string>           fTrackSeedBlockName;
-  vector<string>           fTrackSeedCollTag;
+  vector<string>           fKsfBlockName;
+  vector<string>           fKsfCollTag;
 
   vector<string>           fTrackBlockName;
   vector<string>           fTrackCollTag;
@@ -171,7 +170,9 @@ protected:
   stntuple::InitStrawHitBlock*  fInitStrawHitBlock;
   StntupleInitTriggerBlock*     fInitTriggerBlock;
   TObjArray*                    fInitTrackStrawHitBlock;
+  TObjArray*                    fInitHelixBlock;
   TObjArray*                    fInitTrackBlock;
+  TObjArray*                    fInitTrackSeedBlock;
   TObjArray*                    fInitStepPointMCBlock;
   TObjArray*                    fInitTimeClusterBlock;
 //-----------------------------------------------------------------------------
@@ -184,7 +185,6 @@ protected:
   double                   fMinECrystal  ;  // 
   double                   fMinSimpMomentum; // min tot momentum of a particle to be stored in SIMP block
   double                   fSimpMaxZ     ; // max Z of a particle to be stored in SIMP block
-  //  int                      fSimpUseTimeOffsets; // default=0
 
   string                   fCutHelixSeedCollTag; // helix collection to cut on
   int                      fMinNHelices    ; // min number of helices (for cosmics)
@@ -257,25 +257,24 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
   , fShCollTag               (PSet.get<art::InputTag> ("shCollTag"     ))
   , fStrawDigiCollTag        (PSet.get<string>        ("strawDigiCollTag"    ))
   , fSdwfCollTag             (PSet.get<string>        ("sdwfCollTag"         ))
-  , fStrawDigiMCCollTag      (PSet.get<string>        ("strawDigiMCCollTag"  ))
+  , fSdmcCollTag             (PSet.get<art::InputTag> ("strawDigiMCCollTag"  ))
 
   , fCrvRecoPulseCollTag         (PSet.get<string>    ("crvRecoPulseCollTag"         ))
   , fCrvCoincidenceCollTag       (PSet.get<string>    ("crvCoincidenceCollTag"       ))
   , fCrvCoincidenceClusterCollTag(PSet.get<string>    ("crvCoincidenceClusterCollTag"))
 
   , fVdhCollTag              (PSet.get<string>        ("vdHitsCollTag"       ))
-  , fTimeClusterBlockName    (PSet.get<vector<string>>("timeClusterBlockName"))
-  , fTimeClusterCollTag      (PSet.get<vector<string>>("timeClusterCollTag"  ))
+  , fTClBlockName            (PSet.get<vector<string>>("timeClusterBlockName"))
+  , fTClCollTag              (PSet.get<vector<string>>("timeClusterCollTag"  ))
   , fHelixBlockName          (PSet.get<vector<string>>("helixBlockName"      ))
-  , fHelixCollTag            (PSet.get<vector<string>>("helixCollTag"        ))
+  , fHelixSeedCollTag        (PSet.get<vector<string>>("helixCollTag"        ))
 
   , fPbiTag                  (PSet.get<art::InputTag> ("pbiTag"    ))
   , fPrimaryParticleTag      (PSet.get<string>        ("primaryParticleTag"  ))
   , fTriggerResultsTag       (PSet.get<string>        ("triggerResultsTag"   ))
 
-
-  , fTrackSeedBlockName      (PSet.get<vector<string>>("trackSeedBlockName"  ))
-  , fTrackSeedCollTag        (PSet.get<vector<string>>("trackSeedCollTag"    ))
+  , fKsfBlockName            (PSet.get<vector<string>>("trackSeedBlockName"  ))
+  , fKsfCollTag              (PSet.get<vector<string>>("trackSeedCollTag"    ))
 
   , fTrackBlockName          (PSet.get<vector<string>>("trackBlockName"      ))
   , fTrackCollTag            (PSet.get<vector<string>>("trackCollTag"        ))
@@ -302,7 +301,6 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
   , fMinECrystal             (PSet.get<double>        ("minECrystal"         ))
   , fMinSimpMomentum         (PSet.get<double>        ("minSimpMomentum"     ))
   , fSimpMaxZ                (PSet.get<double>        ("simpMaxZ"            ))
-  //  , fSimpUseTimeOffsets      (PSet.get<int>           ("simpUseTimeOffsets"  ))
   , fCutHelixSeedCollTag     (PSet.get<string>        ("cutHelixSeedCollTag" ))
   , fMinNHelices             (PSet.get<int>           ("minNHelices"         ))
 {
@@ -324,8 +322,14 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
   fInitStepPointMCBlock = new TObjArray();
   fInitStepPointMCBlock->SetOwner(kTRUE);
 
+  fInitHelixBlock       = new TObjArray();
+  fInitHelixBlock->SetOwner(kTRUE);
+
   fInitTrackBlock       = new TObjArray();
   fInitTrackBlock->SetOwner(kTRUE);
+
+  fInitTrackSeedBlock   = new TObjArray();
+  fInitTrackSeedBlock->SetOwner(kTRUE);
 
   fInitTrackStrawHitBlock = new TObjArray();
   fInitTrackStrawHitBlock->SetOwner(kTRUE);
@@ -359,7 +363,9 @@ StntupleMaker::~StntupleMaker() {
   if (fInitSimpBlock      ) delete fInitSimpBlock;
 
   delete fInitStepPointMCBlock;
+  delete fInitHelixBlock;
   delete fInitTrackBlock;
+  delete fInitTrackSeedBlock;
   delete fInitHeaderBlock;
 }
 
@@ -520,46 +526,26 @@ void StntupleMaker::beginJob() {
 // helix data
 //--------------------------------------------------------------------------------
   if (fMakeHelices) {
-    int nb         = fHelixBlockName.size();
-    int nts_blocks = fTrackSeedBlockName.size();
+    int nblocks    = fHelixBlockName.size();
+    int nks_blocks = fKsfBlockName.size();
 
-    for (int i=0; i<nb; i++) {
-      const char*    block_name = fHelixBlockName[i].data();
-//-----------------------------------------------------------------------------
-// empty data block name is just a place holder, skip such
-//-----------------------------------------------------------------------------
-      if (block_name[0] == 0x0)                             continue;
-      TStnDataBlock* db         = AddDataBlock(block_name, 
-					       "TStnHelixBlock",
-					       StntupleInitMu2eHelixBlock,
-					       buffer_size,
-					       split_mode,
-					       compression_level);
-      if (db) {
-	db->AddCollName("mu2e::HelixSeedCollection"  , fHelixCollTag[i].data()   );
-	db->AddCollName("mu2e::StrawDigiMCCollection",fStrawDigiMCCollTag.data() );
-//-----------------------------------------------------------------------------
-// for links: time cluster block not defined/saved for merged helix collection - 
-// shall we save it?
-//-----------------------------------------------------------------------------
- 	db->AddCollName("TimeClusterBlockName"       , fTimeClusterBlockName[i].data());
-	if (i < nts_blocks) {
-//-----------------------------------------------------------------------------
-// track seed block matches the helix block
-//-----------------------------------------------------------------------------
-	  db->AddCollName("TrackSeedBlockName"         , fTrackSeedBlockName[i].data()  );
-	}
-	else {
-//-----------------------------------------------------------------------------
-// track seed block undefined, mark as such
-//-----------------------------------------------------------------------------
-	  db->AddCollName("TrackSeedBlockName"         , "undefined");
-	}
+    for (int i=0; i<nblocks; i++) {
+      const char* block_name = fHelixBlockName[i].data();
+      StntupleInitHelixBlock* init_block = new StntupleInitHelixBlock();
+      fInitHelixBlock->Add(init_block);
+
+      init_block->SetHSeedCollTag(fHelixSeedCollTag[i]);
+      init_block->SetSdmcCollTag (fSdmcCollTag );
+      init_block->SetTclBlockName(fTClBlockName   [i]);
+
+      if (i < nks_blocks) {
+        art::InputTag tag = fKsfCollTag[i];
+        init_block->SetKsfCollTag  (tag);
+        init_block->SetKsfBlockName(fKsfBlockName[i]);
       }
-//-----------------------------------------------------------------------------
-// helix blocks have links to be set
-//-----------------------------------------------------------------------------
-      SetResolveLinksMethod(block_name,StntupleInitMu2eHelixBlockLinks);
+
+      AddDataBlock(block_name,"TStnHelixBlock",init_block,
+                   buffer_size,split_mode,compression_level);
     }
   }
 //-----------------------------------------------------------------------------
@@ -592,7 +578,7 @@ void StntupleMaker::beginJob() {
 
     fInitSimpBlock->SetSimpCollTag       (fSimpCollTag);
     fInitSimpBlock->SetShCollTag         (fShCollTag);
-    fInitSimpBlock->SetSdmcCollTag       (fStrawDigiMCCollTag);
+    fInitSimpBlock->SetSdmcCollTag       (fSdmcCollTag);
     fInitSimpBlock->SetVDHitsCollTag     (fVdhCollTag);
     fInitSimpBlock->SetPrimaryParticleTag(fPrimaryParticleTag);
     fInitSimpBlock->SetMinSimpMomentum   (fMinSimpMomentum);
@@ -637,7 +623,7 @@ void StntupleMaker::beginJob() {
 
     fInitStrawHitBlock->SetShCollTag   (fShCollTag);
     fInitStrawHitBlock->SetStrawDigiCollTag  (fStrawDigiCollTag  );
-    fInitStrawHitBlock->SetStrawDigiMCCollTag(fStrawDigiMCCollTag);
+    fInitStrawHitBlock->SetStrawDigiMCCollTag(fSdmcCollTag);
 
     if (fMakeStrawWaveforms) { 
       fInitStrawHitBlock->SetWriteSdwf(1);
@@ -650,21 +636,20 @@ void StntupleMaker::beginJob() {
 // time clusters
 //--------------------------------------------------------------------------------
   if (fMakeTimeClusters) {
-    int nblocks = fTimeClusterBlockName.size();
+    int nblocks = fTClBlockName.size();
 
     for (int i=0; i<nblocks; i++) {
-      const char* block_name = fTimeClusterBlockName[i].data();
+      const char* block_name = fTClBlockName[i].data();
       if ((block_name[0] == 0) || (block_name[0] == ' ')) continue;
 
       StntupleInitTimeClusterBlock* init_block = new StntupleInitTimeClusterBlock();
       fInitTimeClusterBlock->Add(init_block);
 
-      init_block->SetTimeClusterCollTag(fTimeClusterCollTag[i]);
-      //      init_block->SetHelixCollTag      (fHelixCollTag[i]);
+      init_block->SetTimeClusterCollTag(fTClCollTag[i]);
 
       init_block->SetShCollTag   (fShCollTag);
       init_block->SetChCollTag   (fChCollTag);
-      init_block->SetStrawDigiMCCollTag(fStrawDigiMCCollTag);
+      init_block->SetStrawDigiMCCollTag(fSdmcCollTag);
 
       AddDataBlock(block_name,"TStnTimeClusterBlock",init_block,buffer_size,split_mode,compression_level);
     }
@@ -674,25 +659,20 @@ void StntupleMaker::beginJob() {
 // pass to the track seed block the name of the single-straw combohit collection (fShCollTag)
 //--------------------------------------------------------------------------------
   if (fMakeTrackSeeds) {
-    int nb = fTrackSeedBlockName.size();
+    int nb = fKsfBlockName.size();
 
     for (int i=0; i<nb; i++) {
-      const char* block_name = fTrackSeedBlockName[i].data();
-      TStnDataBlock* db      = AddDataBlock(block_name, 
-					    "TStnTrackSeedBlock",
-					    StntupleInitMu2eTrackSeedBlock,
-					    buffer_size,
-					    split_mode,
-					    compression_level);
-      if (db) {
-	db->AddCollName("mu2e::HelixSeedCollection"  ,fHelixCollTag    [i].data());
-	db->AddCollName("mu2e::KalSeedCollection"    ,fTrackSeedCollTag[i].data());
-	db->AddCollName("HelixBlockName"             ,fHelixBlockName  [i].data());
-	db->AddCollName("mu2e::StrawDigiMCCollection",fStrawDigiMCCollTag.data() );
-	db->AddCollName("mu2e::ComboHitCollection"   ,fShCollTag.encode().data() );
+      const char* block_name = fKsfBlockName[i].data();
+      StntupleInitTrackSeedBlock* init_block = new StntupleInitTrackSeedBlock();
+      fInitTrackSeedBlock->Add(init_block);
 
-	SetResolveLinksMethod(block_name,StntupleInitMu2eTrackSeedBlockLinks);	
-      }
+      init_block->SetHsBlockName(fHelixBlockName[i]);
+      init_block->SetSschCollTag(fShCollTag       );
+      init_block->SetKsfCollTag (fKsfCollTag[i]);
+      init_block->SetSdmcCollTag(fSdmcCollTag);
+
+      AddDataBlock(block_name,"TStnTrackSeedBlock",init_block,buffer_size,
+                   split_mode,compression_level);
     }
   }
 //-----------------------------------------------------------------------------
@@ -710,7 +690,7 @@ void StntupleMaker::beginJob() {
       init_block->SetShCollTag    (fShCollTag   );
       init_block->SetKalSeedCollTag     (fTrackCollTag[i]   );  // tracks saved as lists of KalSeeds
       init_block->SetStrawDigiCollTag   (fStrawDigiCollTag  );
-      init_block->SetStrawDigiMCCollTag (fStrawDigiMCCollTag);
+      init_block->SetStrawDigiMCCollTag (fSdmcCollTag);
 
       AddDataBlock(block_name,"TTrackStrawHitBlock",init_block,buffer_size,
 		   split_mode,compression_level);
@@ -729,10 +709,10 @@ void StntupleMaker::beginJob() {
 
       init_block->SetCaloClusterCollTag (fCaloClusterMaker);
       init_block->SetSsChCollTag        (fShCollTag       );
-      init_block->SetKalSeedCollTag     (fTrackCollTag[i] );  // tracks saved as lists of KalSeeds
+      init_block->SetKFFCollTag         (fTrackCollTag[i] );  // tracks saved as lists of KalSeeds
       init_block->SetPIDProductCollTag  (fPidCollTag[i]   );
       init_block->SetVdhCollTag         (fVdhCollTag      );  // 
-      init_block->SetStrawDigiMCCollTag (fStrawDigiMCCollTag);
+      init_block->SetStrawDigiMCCollTag (fSdmcCollTag);
       init_block->SetTciCollTag         (fTciCollTag[i]);
       init_block->SetTcmCollTag         (fTcmCollTag[i]);
       init_block->SetTrkQualCollTag     (fTrkQualCollTag[i]);
@@ -746,18 +726,6 @@ void StntupleMaker::beginJob() {
 // if nshortblocks != 0, for each track we store an index to that tracks's seed
 //-----------------------------------------------------------------------------
       if (db) {
-	// track_data->AddCollName("mu2e::CaloClusterCollection"         ,fCaloClusterMaker.data()   );
-	// track_data->AddCollName("mu2e::KalRepCollection"              ,fTrackCollTag[i].data()    );
-	// track_data->AddCollName("mu2e::ComboHitCollection"            ,fStrawHitCollTag.data()    );
-	// track_data->AddCollName("mu2e::StrawDigiMCCollection"         ,fStrawDigiMCCollTag.data() );
-	// track_data->AddCollName("mu2e::TrkCaloIntersectCollection"    ,fTciCollTag [i].data()     );
-	// track_data->AddCollName("mu2e::TrackClusterMatchCollection"   ,fTcmCollTag[i].data()      );
-	// track_data->AddCollName("mu2e::TrkQualCollection"             ,fTrkQualCollTag[i].data()  );
-	// track_data->AddCollName("mu2e::PIDProductCollection"          ,fPidCollTag[i].data()      );
-	// track_data->AddCollName("mu2e::StepPointMCCollection"         ,fVdhCollTag.data()      );
-	// track_data->AddCollName("DarHandle"                           ,GetName()                  ,"DarHandle"    );
-	// track_data->AddCollName("KalDiagHandle"                       ,GetName()                  ,"KalDiagHandle");
-
 	if (fTrackTsBlockName.size() > 0) {
 	  init_block->SetTrackTsBlockName(fTrackTsBlockName[i].data());
 	  init_block->SetTrackTsCollTag  (fTrackTsCollTag  [i]);

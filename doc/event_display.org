@@ -100,9 +100,26 @@ mu2e -c Stntuple/fcl/display.fcl -s dig.mu2e.CeEndpointDigiTriggered.MDC2020n_10
   all nodes (objects) displayed in the active view
 
 ** command line printing                                                     
+#+begin_quote   print time cluster collection                                
    d = TAnaDump::Instance()
+   d->printTimeClusterCollection("TZClusterFinder","makePH","DeltaFinder::ComboHits",1,"makeSD")    
+#+end_quote               
 
-*** d->printTimeClusterCollection("TZClusterFinder","makePH",1,"makeSD")    
+  printing available collection names :
+
+#+begin_quote
+  print_ch_colls()
+  print_genp_colls()
+  print_combo_hit_colls()
+  print_helix_seed_colls()
+  print_kalseed_colls()
+  print_kalrep_colls()           ; // obsolete
+  print_sd_colls()
+  print_shf_colls()
+  print_simp_colls()
+  print_spmc_solls()
+  print_tc_colls()
+#+end_quote
 ** known issues                                                              
 *** window is not updating while everything else seems to function OK        
     - move the cursor out of the window and then back in. Scroll the mouse wheel up and down

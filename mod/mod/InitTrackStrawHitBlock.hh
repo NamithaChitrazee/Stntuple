@@ -34,7 +34,7 @@ public:
   void   SetKalSeedCollTag     (std::string& Tag) { fKalSeedCollTag     = art::InputTag(Tag); }
   void   SetShCollTag    (art::InputTag& Tag) { fShCollTag    = Tag; }
   void   SetStrawDigiCollTag   (std::string& Tag) { fStrawDigiCollTag   = art::InputTag(Tag); }
-  void   SetStrawDigiMCCollTag (std::string& Tag) { fStrawDigiMCCollTag = art::InputTag(Tag); }
+  void   SetStrawDigiMCCollTag (art::InputTag& Tag) { fStrawDigiMCCollTag = Tag; }
   
   virtual int InitDataBlock  (TStnDataBlock* Block, AbsEvent* Evt, int Mode);
   //  virtual int ResolveLinks   (TStnDataBlock* Block, AbsEvent* Evt, int Mode);

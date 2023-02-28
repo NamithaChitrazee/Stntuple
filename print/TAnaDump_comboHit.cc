@@ -127,15 +127,15 @@ void TAnaDump::printComboHitCollection(const char* StrawHitCollTag   ,
     return;
   }
 
-  TString sdmc_tag = StrawDigiMCCollTag;
-  if (sdmc_tag == "") sdmc_tag = fStrawDigiMCCollTag;
+  art::InputTag sdmc_tag = StrawDigiMCCollTag;
+  if (sdmc_tag == "") sdmc_tag = fSdmcCollTag;
 
   art::Handle<mu2e::StrawDigiMCCollection> mcdH;
-  fEvent->getByLabel<mu2e::StrawDigiMCCollection>(sdmc_tag.Data(),mcdH);
+  fEvent->getByLabel<mu2e::StrawDigiMCCollection>(sdmc_tag,mcdH);
   const mu2e::StrawDigiMCCollection*  mcdigis(nullptr);
   if (mcdH.isValid())   mcdigis = mcdH.product();
   else {
-    printf("ERROR: cant find StrawDigiMCCollection tag=%s, EXIT\n",sdmc_tag.Data());
+    printf("ERROR: cant find StrawDigiMCCollection tag=%s, EXIT\n",sdmc_tag.encode().data());
     print_sdmc_colls();
     return;
   }

@@ -311,14 +311,12 @@ void TEvdHelixSeed::Print(Option_t* Option) const {
 
   TAnaDump* ad = TAnaDump::Instance();
 
-  TEvdHelixVisNode* hvn = (TEvdHelixVisNode*) fVisNode;
+  TEvdHelixVisNode* vn = (TEvdHelixVisNode*) fVisNode;
 
   TString opt = Option;
   opt.ToLower();
 
-  if (opt == "") ad->printHelixSeed(fHelixSeed, hvn->ShCollTag().encode().data(), hvn->SdmcCollTag().data(),  "");
-  else           ad->printHelixSeed(fHelixSeed, hvn->ShCollTag().encode().data(), hvn->SdmcCollTag().data(), opt);
-  
-  
+  if (opt == "") ad->printHelixSeed(fHelixSeed,vn->ShCollTag().encode().data(),vn->SdmcCollTag().encode().data(), "");
+  else           ad->printHelixSeed(fHelixSeed,vn->ShCollTag().encode().data(),vn->SdmcCollTag().encode().data(),opt);
 }
 }

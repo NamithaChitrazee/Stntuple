@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
-//  Apr 2016 G. Pezzullo: initialization of the MU2E STNTUPLE TrackSeed block
-//
+// Apr 2016 G. Pezzullo: initialization of the MU2E STNTUPLE TrackSeed block
+// Feb 2023 P.Murat: convert initializatin to a class
 //-----------------------------------------------------------------------------
 #include <cstdio>
 #include "TROOT.h"
@@ -9,6 +9,7 @@
 #include "TDatabasePDG.h"
 #include "TParticlePDG.h"
 
+#include "Stntuple/mod/InitTrackSeedBlock.hh"
 
 #include "Stntuple/obj/TStnDataBlock.hh"
 #include "Stntuple/obj/TStnEvent.hh"
@@ -25,79 +26,54 @@
 #include "Offline/GeometryService/inc/GeometryService.hh"
 #include "Offline/GeometryService/inc/GeomHandle.hh"
 
+#include "Offline/RecoDataProducts/inc/KalSeedAssns.hh"
 #include "Offline/RecoDataProducts/inc/KalSeed.hh"
 #include "Offline/RecoDataProducts/inc/CaloCluster.hh"
 #include "Offline/RecoDataProducts/inc/StrawHit.hh"
 
-#include "Offline/MCDataProducts/inc/SimParticle.hh"
 #include "Offline/MCDataProducts/inc/SimParticle.hh"
 #include "Offline/MCDataProducts/inc/StrawGasStep.hh"
 #include "Offline/MCDataProducts/inc/StrawDigiMC.hh"
 //-----------------------------------------------------------------------------
 // assume that the collection name is set, so we could grab it from the event
 //-----------------------------------------------------------------------------
-int  StntupleInitMu2eTrackSeedBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mode) {
+int  StntupleInitTrackSeedBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mode) {
 
-  const mu2e::KalSeedCollection*  list_of_trackSeeds;
-  const mu2e::ComboHitCollection* list_of_combo_hits(0);
-
-  char                      trkSeed_module_label[100], trkSeed_description[100]; 
-  char                      cmbh_module_label   [100], cmbh_description[100];
-
-  int  ev_number, rn_number;
-
-  ev_number = Evt->event();
-  rn_number = Evt->run();
+  int ev_number = Evt->event();
+  int rn_number = Evt->run();
 
   if (Block->Initialized(ev_number,rn_number)) return 0;
 
-  TStnTrackSeed*              trackSeed(0);
-  TStnTrackSeedBlock*         data = (TStnTrackSeedBlock*) Block;
+  TStnTrackSeed*      trackSeed(0);
+  TStnTrackSeedBlock* data = (TStnTrackSeedBlock*) Block;
 
   data->Clear();
 
-  data->GetModuleLabel("mu2e::KalSeedCollection", trkSeed_module_label);
-  data->GetDescription("mu2e::KalSeedCollection", trkSeed_description );
+  art::Handle<mu2e::KalSeedCollection> ksfcH;
+  Evt->getByLabel(fKsfCollTag, ksfcH);
+  const mu2e::KalSeedCollection*  ksfColl = ksfcH.product();
 
-  art::Handle<mu2e::KalSeedCollection>               trackSeed_handle;
-  if (trkSeed_description[0] == 0) Evt->getByLabel(trkSeed_module_label, trackSeed_handle);
-  else                          Evt->getByLabel(trkSeed_module_label, trkSeed_description, trackSeed_handle);
-  list_of_trackSeeds = (mu2e::KalSeedCollection*) &(*trackSeed_handle);
-
-  data->GetModuleLabel("mu2e::ComboHitCollection",cmbh_module_label);
-  data->GetDescription("mu2e::ComboHitCollection",cmbh_description );
-
-  art::Handle<mu2e::ComboHitCollection> shHandle;
-  if (cmbh_module_label[0] != 0) {
-    if (cmbh_description[0] == 0) Evt->getByLabel(cmbh_module_label,shHandle);
-    else                          Evt->getByLabel(cmbh_module_label,cmbh_description,shHandle);
-    if (shHandle.isValid()) list_of_combo_hits = shHandle.product();
-  }
+  art::Handle<mu2e::ComboHitCollection> sschcH;
+  Evt->getByLabel(fSschCollTag,sschcH);
+  const mu2e::ComboHitCollection* sschColl = sschcH.product();
   
-  
-  const mu2e::KalSeed         *trkSeed(0);
-  int                           ntrkseeds(0);
-  
-  const mu2e::CaloCluster       *cluster(0);
+  const mu2e::KalSeed*     trkSeed(0);
+  const mu2e::CaloCluster* cluster(nullptr);
  
-  ntrkseeds = list_of_trackSeeds->size();    
-
-  char                 makeSD_module_label[100];
-  data->GetModuleLabel("mu2e::StrawDigiMCCollection",makeSD_module_label);
-
-  const mu2e::StrawDigiMCCollection* mcdigis(0);
-  art::Handle<mu2e::StrawDigiMCCollection> mcdH;
-  Evt->getByLabel(makeSD_module_label, mcdH);
-  mcdigis = mcdH.product();
+  const mu2e::StrawDigiMCCollection* sdmcColl(0);
+  art::Handle<mu2e::StrawDigiMCCollection> sdmccH;
+  Evt->getByLabel(fSdmcCollTag,sdmccH);
+  sdmcColl = sdmccH.product();
   
   TParticlePDG*        part(0);
   TDatabasePDG*        pdg_db = TDatabasePDG::Instance();
  
-  for (int i=0; i<ntrkseeds; i++) {
+  int nts = ksfColl->size();    
+  for (int i=0; i<nts; i++) {
     std::vector<int>     hits_simp_id, hits_simp_index, hits_simp_z;
     
     trackSeed                  = data->NewTrackSeed();
-    trkSeed                    = &list_of_trackSeeds->at(i);
+    trkSeed                    = &ksfColl->at(i);
     cluster                    = trkSeed->caloCluster().get();
 
     if (cluster != 0){
@@ -129,10 +105,11 @@ int  StntupleInitMu2eTrackSeedBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mod
     trackSeed->fChi2         = trkSeed->chisquared();
     trackSeed->fFitCons      = trkSeed->fitConsistency();
 
-    //now loop over the hits to search the particle that generated the track
+    // now loop over the hits to search the particle that generated the track
+
     int                      nsh = trkSeed->hits().size();
     const mu2e::ComboHit*    hit(0), *hit_0(0);
-    hit_0     = &list_of_combo_hits->at(0);
+    hit_0     = &sschColl->at(0);
 
     int                   loc(-1);
 
@@ -141,21 +118,16 @@ int  StntupleInitMu2eTrackSeedBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mod
 
     for (int j=0; j<nsh; ++j){
       int  hitIndex  = int(trkSeed->hits().at(j).index());
-      hit            = &list_of_combo_hits->at(hitIndex);
+      hit            = &sschColl->at(hitIndex);
       loc            = hit - hit_0;
       
       if(j==0) first_hit_z = hit->pos().z();
       else if(j==nsh-1) last_hit_z = hit->pos().z();
    
       const mu2e::StrawGasStep* step(nullptr);
-      if (mcdigis) {
-	const mu2e::StrawDigiMC* sdmc = &mcdigis->at(loc);
-	if (sdmc->wireEndTime(mu2e::StrawEnd::cal) < sdmc->wireEndTime(mu2e::StrawEnd::hv)) {
-	  step = sdmc->strawGasStep(mu2e::StrawEnd::cal).get();
-	}
-	else {
-	  step = sdmc->strawGasStep(mu2e::StrawEnd::hv ).get();
-	}
+      if (sdmcColl) {
+ 	const mu2e::StrawDigiMC* sdmc = &sdmcColl->at(loc);
+        step = sdmc->earlyStrawGasStep().get();
       }
 
       if (step) {
@@ -167,13 +139,11 @@ int  StntupleInitMu2eTrackSeedBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mod
 	hits_simp_z.push_back(step->position().z());
      }
     }
-
 //-----------------------------------------------------------------------------
 // calculate the number of loops made
 //-----------------------------------------------------------------------------
     trackSeed->fNLoops = (last_hit_z - first_hit_z)/(fabs(lambda)*2.*M_PI);
- 
-//-----------------------------------------------------------------------------
+ //-----------------------------------------------------------------------------
 // find the simparticle that created the majority of the hits
 //-----------------------------------------------------------------------------
     int     max(0), mostvalueindex(-1), mostvalue= hits_simp_id[0];
@@ -195,14 +165,9 @@ int  StntupleInitMu2eTrackSeedBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mod
     trackSeed->fSimpId2Hits = -1;
 
     const mu2e::StrawGasStep* step(nullptr);
-    const mu2e::StrawDigiMC* sdmc = &mcdigis->at(mostvalueindex);
-    if (mcdigis) {
-      if (sdmc->wireEndTime(mu2e::StrawEnd::cal) < sdmc->wireEndTime(mu2e::StrawEnd::hv)) {
-	step = sdmc->strawGasStep(mu2e::StrawEnd::cal).get();
-      }
-      else {
-	step = sdmc->strawGasStep(mu2e::StrawEnd::hv ).get();
-      }
+    if (sdmcColl) {
+      const mu2e::StrawDigiMC* sdmc = &sdmcColl->at(mostvalueindex);
+      step = sdmc->earlyStrawGasStep().get();
     }
     const mu2e::SimParticle * sim (0);
 
@@ -231,8 +196,9 @@ int  StntupleInitMu2eTrackSeedBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mod
       const CLHEP::Hep3Vector sp = simptr->startPosition();
       trackSeed->fOrigin1.SetXYZT(sp.x(),sp.y(),sp.z(),simptr->startGlobalTime());
     }
-    
-    //look for the second most frequent hit
+//-----------------------------------------------------------------------------
+// look for the second most frequent hit -what is that ?
+//-----------------------------------------------------------------------------
     if (max != nsh && max > 0){
       int   secondmostvalueindex(-1);
       max     = 0;//reset max
@@ -254,13 +220,8 @@ int  StntupleInitMu2eTrackSeedBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mod
 
       if (secondmostvalueindex >=0){
 	const mu2e::StrawGasStep* step(nullptr);
-	const mu2e::StrawDigiMC* sdmc = &mcdigis->at(secondmostvalueindex);
-	if (sdmc->wireEndTime(mu2e::StrawEnd::cal) < sdmc->wireEndTime(mu2e::StrawEnd::hv)) {
-	  step = sdmc->strawGasStep(mu2e::StrawEnd::cal).get();
-	}
-	else {
-	  step = sdmc->strawGasStep(mu2e::StrawEnd::hv ).get();
-	}
+	const mu2e::StrawDigiMC* sdmc = &sdmcColl->at(secondmostvalueindex);
+        step = sdmc->earlyStrawGasStep().get();
 		
 	const mu2e::SimParticle * sim (nullptr);
 
@@ -301,58 +262,64 @@ int  StntupleInitMu2eTrackSeedBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mod
 }
 
 //-----------------------------------------------------------------------------
-int StntupleInitMu2eTrackSeedBlockLinks(TStnDataBlock* Block, AbsEvent* AnEvent, int Mode) {
-
-  // int  ev_number, rn_number;
-
-  // ev_number = AnEvent->event();
-  // rn_number = AnEvent->run();
-					// do not do initialize links 2nd time
-
+int StntupleInitTrackSeedBlock::ResolveLinks(TStnDataBlock* Block, AbsEvent* AnEvent, int Mode) {
+//-----------------------------------------------------------------------------
+// do not do initialize links the 2nd time
+//-----------------------------------------------------------------------------
   if (Block->LinksInitialized()) return 0;
 
-  TStnTrackSeedBlock* tsb;
-  TStnHelixBlock*     hb;
-  TStnHelix          *helix;
-  TStnEvent*          ev;
+  art::Handle<mu2e::KalHelixAssns> ksfhaH;
+  const mu2e::KalHelixAssns* ksfha;
+  AnEvent->getByLabel(fKsfCollTag, ksfhaH);
+  ksfha = ksfhaH.product();
 
-  const mu2e::HelixSeed* khelix, *fkhelix;
-
-  tsb    = (TStnTrackSeedBlock*) Block;
-
-  char                kseed_module_label[100], helix_block_name[100];
-  tsb->GetModuleLabel("mu2e::KalSeedCollection"  , kseed_module_label);
-  tsb->GetModuleLabel("HelixBlockName"           , helix_block_name);
-
-  ev     = Block->GetEvent();
-  hb     = (TStnHelixBlock*)     ev->GetDataBlock(helix_block_name);
+  TStnTrackSeedBlock* tsb = (TStnTrackSeedBlock*) Block;
+  TStnEvent*          ev  = Block->GetEvent();
+  TStnHelixBlock*     hb  = (TStnHelixBlock*) ev->GetDataBlock(fHsBlockName.encode().data());
   
-  int    ntrkseed = tsb ->NTrackSeeds();
-  int    nhelix(0);
-
-  if (hb) nhelix = hb->NHelices();
+  int nts  = tsb->NTrackSeeds();
+  int nhel = hb->NHelices();
   
-  for (int i=0; i<ntrkseed; i++) {
-    TStnTrackSeed* trkseed = tsb->TrackSeed(i);
-    // const mu2e::KalSeed*   kseed   = trkseed->fTrackSeed;
+  for (int i=0; i<nts; i++) {
+    TStnTrackSeed* tseed = tsb->TrackSeed(i);
+    const mu2e::KalSeed* ksf   = tseed->fTrackSeed;
+//-----------------------------------------------------------------------------
+// looking for the seed in associations
+//-----------------------------------------------------------------------------
+    const mu2e::HelixSeed* hs(nullptr);
+    for (auto ass: *ksfha) {
+      const mu2e::KalSeed* qsf = ass.first.get();
+      if (qsf == ksf) {
+        hs = ass.second.get();
+        break;
+      }
+    }
 
-    printf("StntupleInitMu2eTrackSeedBlockLinks ERROR: kseed->helix() is gone. FIXIT\n");
-    fkhelix  = nullptr; // kseed->helix().get();
-    int  helixIndex(-1);
-    for (int j=0; j<nhelix; ++j){
-      helix  = hb->Helix(j);
-      khelix = helix->fHelix;
-      if ( khelix == fkhelix){
-	helixIndex = j;
-	break;
-      }    
+    int  hindex(-1);
+
+    if (hs == nullptr) { 
+      printf("ERROR in StntupleInitTrackSeedBlock::ResolveLinks: kseed->helix() is gone. FIXIT\n");
+    }
+    else {
+//-----------------------------------------------------------------------------
+// search for a helix in helix block
+//-----------------------------------------------------------------------------
+      const mu2e::HelixSeed* hs2(nullptr);
+      for (int j=0; j<nhel; ++j){
+        TStnHelix* hel  = hb->Helix(j);
+        hs2 = hel->fHelix;
+        if (hs2 == hs){
+          hindex = j;
+          break;
+        }    
+      }
     }
     
-    if (helixIndex < 0) {
-      printf(">>> InitTrackSeedBlock ERROR: %s trackseed %i -> no HelixSeed associated\n", kseed_module_label, i);
-      continue;
+    if (hindex < 0) {
+      printf("ERROR in InitTrackSeedBlock::ResolveLinks: trackseed %s:%i has no HelixSeed associated\n", 
+             fKsfCollTag.encode().data(),i);
     }
-    trkseed->SetHelixIndex(helixIndex);
+    tseed->SetHelixIndex(hindex);
   }
 //-----------------------------------------------------------------------------
 // mark links as initialized

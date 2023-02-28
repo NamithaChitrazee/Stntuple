@@ -60,8 +60,8 @@ TStnVisManager::TStnVisManager(const char* Name, const char* Title): TVisManager
   fDisplayHelices      = 0;
   fDisplayTracks       = 1;
   fDisplayOnlyTCHits   = 0;
-  fDisplaySimParticles = 1;
-  fDisplayStrawHitsXY  = 1;
+  fDisplaySimParticles = 0;                    // dont' want all of them by default
+  fDisplayStrawHitsXY  = 0;                    // display combo hits 
   fDisplayStrawDigiMC  = 0;                    // not sure what this is, check
   fIgnoreComptonHits   = 0;
   fIgnoreProtonHits    = 0;

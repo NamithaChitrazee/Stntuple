@@ -26,7 +26,7 @@ public:
 
   void   SetShCollTag          (art::InputTag& Tag) { fShCollTag    = Tag; }
   void   SetStrawDigiCollTag   (std::string& Tag) { fStrawDigiCollTag   = art::InputTag(Tag); }
-  void   SetStrawDigiMCCollTag (std::string& Tag) { fStrawDigiMCCollTag = art::InputTag(Tag); }
+  void   SetStrawDigiMCCollTag (art::InputTag& Tag) { fStrawDigiMCCollTag = Tag; }
   void   SetSdwfCollTag        (std::string& Tag) { fSdwfCollTag        = art::InputTag(Tag); }
   void   SetWriteSdwf          (int         Flag) { fWriteSdwf          = Flag              ; }
   

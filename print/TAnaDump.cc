@@ -78,12 +78,14 @@ ClassImp(TAnaDump)
 TAnaDump* TAnaDump::fgInstance = 0;
 
 //-----------------------------------------------------------------------------
+// WeightMode = 1 is for XY chi2 , WeightMode = 0 is for Phi-z chi2
+//-----------------------------------------------------------------------------
 double TAnaDump::evalWeight(const mu2e::ComboHit* Hit   ,
 			    CLHEP::Hep3Vector&    StrawDir ,
 			    CLHEP::Hep3Vector&    HelCenter, 
 			    double                Radius   ,
 			    int                   WeightMode,
-			    fhicl::ParameterSet const& Pset) {//WeightMode = 1 is for XY chi2 , WeightMode = 0 is for Phi-z chi2
+			    fhicl::ParameterSet const& Pset) {
   
   // double    rs(2.5);   // straw radius, mm
   // double    ew(30.0);  // assumed resolution along the wire, mm
@@ -133,15 +135,15 @@ TAnaDump::TAnaDump(const fhicl::ParameterSet* PSet) {
   fEvent                  = nullptr;
   fListOfObjects          = new TObjArray();
   fFlagBgrHitsModuleLabel = "FlagBkgHits";
-  fStrawDigiMCCollTag     = "compressDigiMCs";
+  fSdmcCollTag            = "compressDigiMCs";
 
-  if (PSet) {
-    fhicl::ParameterSet to_maps = PSet->get<fhicl::ParameterSet>("timeOffsetMaps" );
-    fTimeOffsets = new mu2e::SimParticleTimeOffset(to_maps);
-  }
-  else {
-    fTimeOffsets = NULL;
-  }
+  // if (PSet) {
+  //   fhicl::ParameterSet to_maps = PSet->get<fhicl::ParameterSet>("timeOffsetMaps" );
+  //   fTimeOffsets = new mu2e::SimParticleTimeOffset(to_maps);
+  // }
+  // else {
+  //   fTimeOffsets = NULL;
+  // }
 
   _printUtils = new mu2e::TrkPrintUtils(PSet->get<fhicl::ParameterSet>("printUtils",fhicl::ParameterSet()));
 }
@@ -159,7 +161,7 @@ TAnaDump* TAnaDump::Instance(const fhicl::ParameterSet* PSet) {
 TAnaDump::~TAnaDump() {
   fListOfObjects->Delete();
   delete fListOfObjects;
-  delete fTimeOffsets;
+  //  delete fTimeOffsets;
   delete _printUtils;
 }
 
@@ -1145,17 +1147,18 @@ void TAnaDump::printKalRepCollection(const char* KalRepCollTag     ,
     return;
   }
 
-  TString sdmc_tag = StrawDigiMCCollTag;
-  if (sdmc_tag == "") sdmc_tag = fStrawDigiMCCollTag;
+  art::InputTag sdmc_tag = StrawDigiMCCollTag;
+  if (sdmc_tag == "") sdmc_tag = fSdmcCollTag;
 
-  art::Handle<mu2e::StrawDigiMCCollection> mcdh;
-  fEvent->getByLabel<mu2e::StrawDigiMCCollection>(sdmc_tag.Data(),mcdh);
+  art::Handle<mu2e::StrawDigiMCCollection> sdmccH;
+  fEvent->getByLabel<mu2e::StrawDigiMCCollection>(sdmc_tag,sdmccH);
 
-  if (mcdh.isValid()) _mcdigis = mcdh.product();
-  else                _mcdigis = nullptr;
+  if (sdmccH.isValid()) _mcdigis = sdmccH.product();
+  else                  _mcdigis = nullptr;
 
   if (_mcdigis == nullptr) {
-    printf(">>> ERROR in TAnaDump::printKalRepCollection: failed to locate StepPointMCCollection:: by %s\n",sdmc_tag.Data());
+    printf(">>> ERROR in TAnaDump::printKalRepCollection: failed to locate StepPointMCCollection:: by %s\n",
+           sdmc_tag.encode().data());
   }
 
   int ntrk = krepsHandle->size();
@@ -1648,8 +1651,8 @@ void TAnaDump::printStrawHitCollection(const char* StrawHitCollTag   ,
     return;
   }
 
-  const char* sdmcc_tag = StrawDigiMCCollTag;
-  if (sdmcc_tag == nullptr) sdmcc_tag = fStrawDigiMCCollTag.Data();
+  art::InputTag sdmcc_tag = StrawDigiMCCollTag;
+  if (sdmcc_tag.empty()) sdmcc_tag = fSdmcCollTag;
 
   art::Handle<mu2e::StrawDigiMCCollection> mcdh;
   fEvent->getByLabel<mu2e::StrawDigiMCCollection>(sdmcc_tag,mcdh);
@@ -1659,7 +1662,7 @@ void TAnaDump::printStrawHitCollection(const char* StrawHitCollTag   ,
 
   if (_mcdigis == nullptr) {
     printf(">>> ERROR in %s: failed to locate StrawDigiMCCollection with tag=%s, BAIL OUT.\n",
-	   oname,fStrawDigiMCCollTag.Data());
+	   oname,fSdmcCollTag.encode().data());
     return;
   }
  
@@ -1758,13 +1761,13 @@ void TAnaDump::printStrawGasStep(const mu2e::StrawGasStep* Step, const char* Opt
 
     float stepTime;
 
-    if (fTimeOffsets) {
-      fTimeOffsets->updateMap(*fEvent);
-      stepTime = fTimeOffsets->timeWithOffsetsApplied(*Step);
-    }
-    else {
-      stepTime = Step->time();
-    }
+    // if (fTimeOffsets) {
+    //   fTimeOffsets->updateMap(*fEvent);
+    //   stepTime = fTimeOffsets->timeWithOffsetsApplied(*Step);
+    // }
+    // else {
+    stepTime = Step->time();
+    //}
 
     printf(" %8.3f  %8.3f %8.3f  %9.3f %10i  %10i  %10i  %10i",
 	   Step->ionizingEdep(),
@@ -2030,13 +2033,13 @@ void TAnaDump::printStepPointMC(const mu2e::StepPointMC* Step, const char* Detec
 //2014-26-11 gianipez added the timeoffsets to the steppoints time
 
     double stepTime(-9999.);
-    if (fTimeOffsets) {
-      fTimeOffsets->updateMap(*fEvent);
-      stepTime = fTimeOffsets->timeWithOffsetsApplied(*Step);
-    }
-    else {
-      stepTime = Step->time();
-    }
+    // if (fTimeOffsets) {
+    //   fTimeOffsets->updateMap(*fEvent);
+    //   stepTime = fTimeOffsets->timeWithOffsetsApplied(*Step);
+    // }
+    // else {
+    stepTime = Step->time();
+    //}
 
     //    const mu2e::PhysicalVolumeInfo& pvinfo = volumes->at(sim->startVolumeIndex());
     //    const mu2e::PhysicalVolumeInfo& pvinfo = volumes->at(Step->volumeId()); - sometimes crashes..

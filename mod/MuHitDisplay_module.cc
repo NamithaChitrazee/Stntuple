@@ -43,7 +43,7 @@ MuHitDisplay::MuHitDisplay(fhicl::ParameterSet const& pset) :
   _comboHitCollTag             (pset.get<string>("comboHitCollTag")),
   _chfCollTag                  (pset.get<string>("chfCollTag")),
   _sdCollTag                   (pset.get<string>("sdCollTag")),            // straw digi
-  _sdmcCollTag                 (pset.get<string>("sdmcCollTag")),
+  _sdmcCollTag                 (pset.get<art::InputTag>("sdmcCollTag")),
   _swCollTag                   (pset.get<string>("swCollTag")),           // straw waveformws
   
   _helixSeedCollTag            (pset.get<string>("helixSeedCollTag")),
@@ -145,7 +145,7 @@ void MuHitDisplay::beginJob() {
 //-----------------------------------------------------------------------------
 // define collection names to be used for initialization
 //-----------------------------------------------------------------------------
-  TModule::fDump->SetStrawDigiMCCollTag(_sdmcCollTag.data());
+  TModule::fDump->SetStrawDigiMCCollTag(_sdmcCollTag);
   TModule::beginJob();
 }
 
@@ -284,7 +284,7 @@ void MuHitDisplay::InitVisManager() {
   tnode->SetShfCollTag      (_shfCollTag     );
   tnode->SetChCollTag       (_comboHitCollTag);
   tnode->SetChfCollTag      (_chfCollTag     );
-  tnode->SetKsCollTag       (_trackCollTag   );
+  tnode->SetKsCollTag       (_kffCollTag     );
   tnode->SetSdmcCollTag     (_sdmcCollTag    );
   tnode->SetSimpColl        (&_simpColl      );
   tnode->SetSpmcColl        (&_spmcColl      );
@@ -459,12 +459,12 @@ int MuHitDisplay::getData(const art::Event* Evt) {
       _sdmcColl = sdmccH.product();
       if (_sdmcColl->size() <= 0) {
 	printf(">>> [%s] WARNING:StrawDigiMCCollection by %s has zero length. CONTINUE\n",
-	       oname, _sdmcCollTag.data());
+	       oname, _sdmcCollTag.encode().data());
       }
     }
     else {
       printf(">>> [%s] WARNING: mu2e::StrawDigiMCCollection by %s is missing\n",
-	     oname, _sdmcCollTag.data());
+	     oname, _sdmcCollTag.encode().data());
       _sdmcColl = nullptr;
     }
     

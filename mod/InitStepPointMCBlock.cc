@@ -25,7 +25,7 @@ int StntupleInitStepPointMCBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* 
 //-----------------------------------------------------------------------------
 // load simulation time offsets for this event: timeOffsets may not be defined yet (stages 1, 2, 3)
 //-----------------------------------------------------------------------------
-  if (fTimeOffsets) fTimeOffsets->updateMap(*AnEvent);
+//  if (fTimeOffsets) fTimeOffsets->updateMap(*AnEvent);
 
   const mu2e::StepPointMC*                    spmc;
 //-----------------------------------------------------------------------------
@@ -109,14 +109,15 @@ int StntupleInitStepPointMCBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* 
       edep_tot      = spmc->totalEDep();
       edep_nio      = spmc->nonIonizingEDep();
 
-      if (fTimeOffsets) {
+      //      if (fTimeOffsets) {
 //-----------------------------------------------------------------------------
 // time - within the microbunch
 //-----------------------------------------------------------------------------
-	double tx = fTimeOffsets->timeWithOffsetsApplied(*spmc);
-	time = fmod(tx+fMbTime,fMbTime);
-      }
-      else time =  spmc->time();
+      //   double tx = fTimeOffsets->timeWithOffsetsApplied(*spmc);
+      //   time = fmod(tx+fMbTime,fMbTime);
+      // }
+      // else 
+      time =  spmc->time();
 
       float proper_time = spmc->properTime();
       step_length = spmc->stepLength();

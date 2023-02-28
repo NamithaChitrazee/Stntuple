@@ -23,10 +23,9 @@ public:
 public:
 
   void   SetTimeClusterCollTag (std::string& Tag) { fTimeClusterCollTag = art::InputTag(Tag); }
-  void   SetChCollTag    (art::InputTag& Tag) { fChCollTag    = Tag; }
-  void   SetShCollTag    (art::InputTag& Tag) { fShCollTag    = Tag; }
-  void   SetStrawDigiMCCollTag (std::string& Tag) { fStrawDigiMCCollTag = art::InputTag(Tag); }
-  //  void   SetHelixCollTag       (std::string& Tag) { fHelixCollTag       = art::InputTag(Tag); }
+  void   SetChCollTag          (art::InputTag& Tag) { fChCollTag    = Tag; }
+  void   SetShCollTag          (art::InputTag& Tag) { fShCollTag    = Tag; }
+  void   SetStrawDigiMCCollTag (art::InputTag& Tag) { fStrawDigiMCCollTag = Tag; }
   
   virtual int InitDataBlock    (TStnDataBlock* Block, AbsEvent* Evt, int Mode);
   virtual int ResolveLinks     (TStnDataBlock* Block, AbsEvent* Evt, int Mode);

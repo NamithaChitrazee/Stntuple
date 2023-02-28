@@ -11,8 +11,7 @@
 #include "Stntuple/obj/TStnTrackSeed.hh"
 
 class TStnTrackSeedBlock: public TStnDataBlock {
-  friend Int_t StntupleInitMu2eTrackSeedBlock     (TStnDataBlock*, AbsEvent*, int);
-  friend Int_t StntupleInitMu2eTrackSeedBlockLinks(TStnDataBlock*, AbsEvent*, int);
+  friend class StntupleInitTrackSeedBlock;
 public:
 //----------------------------------------------------------------------------
 //  data members

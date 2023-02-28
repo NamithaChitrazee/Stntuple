@@ -71,7 +71,7 @@ public:
   const art::Event*               fEvent;
   TObjArray*                      fListOfObjects;
   TString                         fFlagBgrHitsModuleLabel;
-  TString                         fStrawDigiMCCollTag;
+  art::InputTag                   fSdmcCollTag;
   mu2e::SimParticleTimeOffset*    fTimeOffsets;
   const mu2e::StrawDigiMCCollection*    _mcdigis;
   double                          fTmp[100];  // for testing
@@ -111,7 +111,7 @@ public:
   void   SetEvent(const art::Event* Evt) { fEvent = Evt; }
 
   void   SetFlagBgrHitsModuleLabel(const char* Tag) { fFlagBgrHitsModuleLabel = Tag; }
-  void   SetStrawDigiMCCollTag    (const char* Tag) { fStrawDigiMCCollTag     = Tag; }
+  void   SetStrawDigiMCCollTag    (art::InputTag& Tag) { fSdmcCollTag = Tag; }
 
   double evalWeight(const mu2e::ComboHit*      Hit       ,
 		    CLHEP::Hep3Vector&         StrawDir  ,

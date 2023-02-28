@@ -95,7 +95,7 @@ private:
   string        _comboHitCollTag;
   string        _chfCollTag;            // straw hit flags
   string        _sdCollTag;		// strawDigiCollTag
-  string        _sdmcCollTag;
+  art::InputTag _sdmcCollTag;
   string        _swCollTag;
   
   string        _helixSeedCollTag;	// helix seed collection tag

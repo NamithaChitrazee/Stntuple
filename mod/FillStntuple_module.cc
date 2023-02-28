@@ -149,7 +149,10 @@ void FillStntuple::analyze(const AbsEvent& anEvent) {
   THistModule::beforeEvent(anEvent);
 
   static int old_rs = -1;
-
+//-----------------------------------------------------------------------------
+// at this point, all individual blocks are filled
+// initialize information cross-linking the blocks
+//-----------------------------------------------------------------------------
   TIter it(Event()->GetListOfNodes());
 
   unsigned long rtime = (unsigned long)(gSystem->Now());

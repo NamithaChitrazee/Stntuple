@@ -31,7 +31,7 @@ protected:
 
   std::string                       fHsCollTag;
   art::InputTag                     fShCollTag;   // straw/combo hit collection
-  std::string                       fSdmcCollTag; // straw digi collection
+  art::InputTag                     fSdmcCollTag; // straw digi collection
 
   TStnHelixBlock*                   fHelixBlock;
   Color_t                           fHelixColor;
@@ -63,14 +63,14 @@ public:
     return (stntuple::TEvdHelixSeed*)    fListOfHelixSeeds->At(I); 
   }
 
-  std::string& HsCollTag()   { return fHsCollTag   ; }
-  art::InputTag& ShCollTag() { return fShCollTag   ; }
-  std::string& SdmcCollTag() { return fSdmcCollTag ; }
+  std::string&   HsCollTag  ()   { return fHsCollTag   ; }
+  art::InputTag& ShCollTag  () { return fShCollTag   ; }
+  art::InputTag& SdmcCollTag() { return fSdmcCollTag ; }
 //-----------------------------------------------------------------------------
 // modifiers
 //-----------------------------------------------------------------------------
   void SetHelixSeedCollTag (std::string& Tag) { fHsCollTag   = Tag; }
-  void SetSdmcCollTag      (std::string& Tag) { fSdmcCollTag = Tag; }
+  void SetSdmcCollTag      (art::InputTag& Tag) { fSdmcCollTag = Tag; }
   void SetShCollTag        (art::InputTag& Tag) { fShCollTag   = Tag; }
 
 //  void  SetListOfTracks(TObjArray*  List ) { fListOfTracks = List ; }

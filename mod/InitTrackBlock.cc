@@ -134,10 +134,10 @@ double StntupleInitTrackBlock::s_at_given_z(const mu2e::KalSeed* KSeed, double Z
 
   // double  ds(10.), s0, s1, s2, z0, z1, z2, dzds, sz, sz1, z01;
 
-  // // s1     = Krep->firstHit()->kalHit()->hit()->fltLen();
-  // // s2     = Krep->lastHit ()->kalHit()->hit()->fltLen();
+  // // s1     = Kffs->firstHit()->kalHit()->hit()->fltLen();
+  // // s2     = Kffs->lastHit ()->kalHit()->hit()->fltLen();
 
-  // const TrkHitVector* hots = &Krep->hitVector();
+  // const TrkHitVector* hots = &Kffs->hitVector();
   // int nh = hots->size();
 
   // const TrkHit *first(nullptr), *last(nullptr);
@@ -153,8 +153,8 @@ double StntupleInitTrackBlock::s_at_given_z(const mu2e::KalSeed* KSeed, double Z
   // s1 = first->fltLen();
   // s2 = last ->fltLen();
 
-  // z1     = Krep->position(s1).z();
-  // z2     = Krep->position(s2).z();
+  // z1     = Kffs->position(s1).z();
+  // z2     = Kffs->position(s2).z();
 
   // dzds   = (z2-z1)/(s2-s1);
   // //-----------------------------------------------------------------------------
@@ -171,8 +171,8 @@ double StntupleInitTrackBlock::s_at_given_z(const mu2e::KalSeed* KSeed, double Z
 
   // sz    = s0+(Z-z0)/dzds;
 
-  // z0     = Krep->position(sz).z();     // z0 has to be close to Z(TT_FrontPA)
-  // z01    = Krep->position(sz+ds).z();
+  // z0     = Kffs->position(sz).z();     // z0 has to be close to Z(TT_FrontPA)
+  // z01    = Kffs->position(sz+ds).z();
 
   // dzds   = (z01-z0)/ds;
   // sz1    = sz+(Z-z0)/dzds;	          // should be good enough
@@ -215,12 +215,12 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
   AnEvent->getByLabel(fAlgorithmIDCollTag, algsHandle);
   if (algsHandle.isValid()) list_of_algs = (mu2e::AlgorithmIDCollection*) algsHandle.product();
 
-  list_of_kreps = 0;
-  art::Handle<mu2e::KalSeedCollection> krepsHandle;
-  AnEvent->getByLabel(fKalSeedCollTag,krepsHandle);
-  if (krepsHandle.isValid())    { 
-    list_of_kreps = krepsHandle.product();
-    ntrk          = list_of_kreps->size();
+  list_of_kffs = 0;
+  art::Handle<mu2e::KalSeedCollection> kffcH;
+  AnEvent->getByLabel(fKFFCollTag,kffcH);
+  if (kffcH.isValid())    { 
+    list_of_kffs = kffcH.product();
+    ntrk         = list_of_kffs->size();
   }
 
   list_of_trk_qual = 0;
@@ -267,8 +267,7 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 
   for (int itrk=0; itrk<ntrk; itrk++) {
     track          = data->NewTrack();
-    // art::Handle<mu2e::KalSeedCollection> handle;
-    const mu2e::KalSeed* krep = &list_of_kreps->at(itrk);
+    const mu2e::KalSeed* kffs = &list_of_kffs->at(itrk);
     // AnEvent->get(ptr.id(), handle);
 //-----------------------------------------------------------------------------
 // track-only-based particle ID, initialization ahs already happened in the constructor
@@ -281,8 +280,8 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
       track->fRSlopeErr    = pidp->GetResidualsSlopeError();
     }
 
-    // const KalRep* krep = ptr.get();
-    track->fKalRep[0] = (mu2e::KalSeed*) krep;
+    // const KalRep* kffs = ptr.get();
+    track->fKalRep[0] = (mu2e::KalSeed*) kffs;
     mask = (0x0001 << 16) | 0x0000;
 
     if (list_of_algs) {
@@ -298,13 +297,13 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
     double  h1_fltlen(1.e6), hn_fltlen(1.e6), sent, sexit;
     const mu2e::TrkStrawHitSeed *first(nullptr), *last(nullptr);
 
-    const std::vector<mu2e::TrkStrawHitSeed>* hots = &krep->hits();
-    int n_krep_hits = hots->size();
+    const std::vector<mu2e::TrkStrawHitSeed>* hots = &kffs->hits();
+    int n_kffs_hits = hots->size();
 
-    // const TrkHit* first = krep->firstHit()->kalHit()->hit();
-    // const TrkHit* last  = krep->lastHit ()->kalHit()->hit();
+    // const TrkHit* first = kffs->firstHit()->kalHit()->hit();
+    // const TrkHit* last  = kffs->lastHit ()->kalHit()->hit();
 
-    for (int ih=0; ih<n_krep_hits; ++ih) {
+    for (int ih=0; ih<n_kffs_hits; ++ih) {
       const mu2e::TrkStrawHitSeed* hit =  &hots->at(ih);
       if ((hit != nullptr) and (hit->flag().hasAnyProperty(mu2e::StrawHitFlagDetail::active))) {
 	if (first == nullptr) first = hit;
@@ -324,7 +323,7 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 
     double min_ds1(1.e6), min_ds2(1.e6);
 
-    for(auto const& ks : krep->segments() ) {
+    for(auto const& ks : kffs->segments() ) {
       double smin = ks.timeToFlt(ks.tmin());
       double smax = ks.timeToFlt(ks.tmax());
 
@@ -358,10 +357,10 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
     track->Momentum()->SetXYZM(px,py,pz,0.511);
     track->fP         = kseg->mom();
     track->fPt        = track->Momentum()->Pt();
-    track->fChi2      = krep->chisquared();
-    track->fFitCons   = krep->fitConsistency();
-    track->fT0        = krep->t0().t0();
-    track->fT0Err     = krep->t0().t0Err();
+    track->fChi2      = kffs->chisquared();
+    track->fFitCons   = kffs->fitConsistency();
+    track->fT0        = kffs->t0().t0();
+    track->fT0Err     = kffs->t0().t0Err();
 //-----------------------------------------------------------------------------
 // momentum error in the first point
 //-----------------------------------------------------------------------------
@@ -374,7 +373,7 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 //-----------------------------------------------------------------------------
     // Hep3Vector tfront = ds->toDetector(vdet->getGlobal(mu2e::VirtualDetectorId::TT_FrontPA));
     // double     zfront = tfront.z();
-    // double     sz0    = s_at_given_z(krep,zfront);
+    // double     sz0    = s_at_given_z(kffs,zfront);
 //-----------------------------------------------------------------------------
 // fP0 : track momentum value at Z(TT_FrontPA) - the same as in the first point
 // fP2 : track momentum at Z(TT_Back), just for fun, should not be used for anything
@@ -396,9 +395,9 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 //-----------------------------------------------------------------------------
 //    Hep3Vector vd_tt_back = ds->toDetector(vdet->getGlobal(mu2e::VirtualDetectorId::TT_Back));
     // double     zback      = vd_tt_back.z();
-    // double     szb        = s_at_given_z(krep,zback);
+    // double     szb        = s_at_given_z(kffs,zback);
 
-    double     tback      = -1; // FIXME krep->arrivalTime(szb);
+    double     tback      = -1; // FIXME kffs->arrivalTime(szb);
 					// rename later
     track->fTBack         = tback;
 //-----------------------------------------------------------------------------
@@ -406,7 +405,7 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 //-----------------------------------------------------------------------------
     const mu2e::TrkStrawHitSeed  *hit; // , *closest_hit(NULL);
 
-    //const TrkHitVector*       krep_hits = &krep->hitVector();
+    //const TrkHitVector*       kffs_hits = &kffs->hitVector();
     
     for (int j=0; j<40; j++) {
       track->fNHPerStation[j] = 0;
@@ -429,7 +428,7 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 	     nss_ch);
     }
     else {
-      for (int it=0; it<n_krep_hits; it++) {
+      for (int it=0; it<n_kffs_hits; it++) {
 	hit = &hots->at(it);
 	mu2e::StrawId sid = hit->strawId();
 	const mu2e::Straw* straw = &tracker->straw(sid);
@@ -441,7 +440,7 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 //-----------------------------------------------------------------------------
 // the rest makes sense only for active hits
 // all KalSeed hits are "active", figuring out non-active ones 
-// now requires comparing the outputs of a seed fit and a full fit
+// now requires comparing the outputs of the seed fit and the full fit
 //-----------------------------------------------------------------------------
 	if (1) { // hit->isActive()) { // all KalSeed hits are active 
 	  loc   = hit->index();
@@ -502,8 +501,8 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 	    }
 	  }
 	  else {
-	    printf(">>> ERROR in StntupleInitMu2eTrackBlock: wrong hit collection used, loc = %10i, n_straw_hits = %10i\n",
-		   loc,nss_ch);
+	    printf(">>> ERROR in StntupleInitMu2eTrackBlock: wrong hit collection used");
+            printf(", loc = %10i, n_straw_hits = %10i\n", loc,nss_ch);
 	  }
 
 	  const mu2e::StrawId& straw_id = straw->id();
@@ -524,7 +523,7 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 // Dave's variables calculated by KalDiag
 //-----------------------------------------------------------------------------
     // printf("InitTrackBlock: ERROR: kalDiag is gone, FIXIT\n");
-    // _kalDiag->kalDiag(krep,false);
+    // _kalDiag->kalDiag(kffs,false);
 //-----------------------------------------------------------------------------
 // total number of hits associated with the trackand the number of bend sites
 //-----------------------------------------------------------------------------
@@ -536,7 +535,7 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 //-----------------------------------------------------------------------------
 // defined bit-packed fNActive word
 //-----------------------------------------------------------------------------
-    track->fNActive   = krep->hits().size() | (nwrong << 16);
+    track->fNActive   = kffs->hits().size() | (nwrong << 16);
     
     mu2e::Doublet*                     d;
     mu2e::DoubletAmbigResolver::Data_t r;
@@ -544,7 +543,7 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
     int   nd, nd_tot(0), nd_os(0), nd_ss(0), ns;
     vector<mu2e::Doublet> list_of_doublets;
 
-    //    _dar->findDoublets(krep,&list_of_doublets);
+    //    _dar->findDoublets(kffs,&list_of_doublets);
 
     nd = list_of_doublets.size();
 //-----------------------------------------------------------------------------
@@ -611,7 +610,7 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
       // s0  = closest_hit->trkLen();
       //      s   = (z-track->fZ0)/(closest_z-track->fZ0)*s0;
 
-      HepPoint    pz(0.,0.,0.); // FIXME      = krep->position(s);
+      HepPoint    pz(0.,0.,0.); // FIXME      = kffs->position(s);
 
       get_station(tracker,&zmap,z,&iplane,&offset);
 
@@ -770,7 +769,6 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 // consider half-ready case when can't use the extrapolator yet; turn it off softly
 //-----------------------------------------------------------------------------
 //    const mu2e::TrkCaloIntersect*  extrk;
-    //    const KalRep *                 krep;
     CLHEP::Hep3Vector                     x1, x2;
     HepPoint                       extr_point;
     CLHEP::Hep3Vector                     extr_mom;
@@ -782,8 +780,8 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
   
 //     for (int iext=0; iext<next; iext++) {
 //       extrk = &list_of_extrapolated_tracks->at(iext);
-//       krep  = extrk->trk().get();
-//       if (krep == track->fKalRep[0]) {
+//       kffs  = extrk->trk().get();
+//       if (kffs == track->fKalRep[0]) {
 // 	if (track->fExtrk == 0) {
 // 	  track->fExtrk = (const mu2e::TrkToCaloExtrapol*) extrk;
 // 	}
@@ -826,8 +824,8 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 //    for (size_t im=0; im<nm; im++) {
 //      tcm   = &tcmcoll->at(im);
 //      extrk = tcm->textrapol();
-//      krep  = extrk->trk().get();
-//      if (krep == track->fKalRep[0]) {
+//      kffs  = extrk->trk().get();
+//      if (kffs == track->fKalRep[0]) {
 //	const mu2e::CaloCluster* cl = tcm->caloCluster();
 //	iv   = cl->diskID();
 //	vint = &track->fDisk[iv];
@@ -947,7 +945,7 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
     const mu2e::TrkCaloHitSeed*  tch;
     TStnTrack::InterData_t*      vtch;
 
-    tch = &krep->caloHit();
+    tch = &kffs->caloHit();
     // for (auto it : hots) {
     //   tch   = itdynamic_cast<const mu2e::TrkCaloHit*> (*it);
     //-----------------------------------------------------------------------------
@@ -1010,12 +1008,7 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 //-----------------------------------------------------------------------------
 Int_t StntupleInitTrackBlock::ResolveLinks(TStnDataBlock* Block, AbsEvent* AnEvent, int Mode) 
 {
-  // Mu2e version, do nothing
-
   int    ev_number, rn_number;
-  char   calo_module_label[100], calo_description[100];
-
-  //  const mu2e::CaloClusterCollection*  list_of_clusters(0);
 
   ev_number = AnEvent->event();
   rn_number = AnEvent->run();
@@ -1027,64 +1020,38 @@ Int_t StntupleInitTrackBlock::ResolveLinks(TStnDataBlock* Block, AbsEvent* AnEve
   if (Block->LinksInitialized()) return 0;
 
   TStnTrackBlock* tb = (TStnTrackBlock*) Block;
-  //  TStnEvent* ev      = tb->GetEvent();
-
-  tb->GetModuleLabel("mu2e::CaloClusterCollection",calo_module_label);
-  tb->GetDescription("mu2e::CaloClusterCollection",calo_description );
 
   art::Handle<mu2e::CaloClusterCollection> cch;
-  if (calo_module_label[0] != 0) {
-    if (calo_description[0] == 0) AnEvent->getByLabel(calo_module_label,cch);
-    else                          AnEvent->getByLabel(calo_module_label,calo_description,cch);
+  if (not fCaloClusterCollTag.empty()) {
+    AnEvent->getByLabel(fCaloClusterCollTag,cch);
   }
 //-----------------------------------------------------------------------------
 // TStnTrackBlock is already initialized
 //-----------------------------------------------------------------------------
-  TStnEvent*           ev;
-  char                 krep_module_label[100];
-  tb->GetModuleLabel("mu2e::KalRepCollection",krep_module_label);
-  
-  TStnTrackSeedBlock   *tsb;
-  //  TStnTrackSeed*       ftrkseed, *trkseed;
+  TStnEvent* ev = Block->GetEvent();
 
-  TStnTrack*           trk;
-
-  //  mu2e::KalSeed*   kseed, *fkseed;
-
-  char                 kseed_block_name[100], tsc_label[100], tsc_description[100] ;
-
-  ev     = Block->GetEvent();
-
-  tb->GetModuleLabel("TrackTsBlockName",kseed_block_name);
-  if (kseed_block_name[0] != 0) {
+  if (not fTrackTsCollTag.empty()) {
 //-----------------------------------------------------------------------------
 // seeds are stored, fill links part: 'TrackTs' collection stores, for each track, 
 // its KalSeed
 //-----------------------------------------------------------------------------
-    tb->GetModuleLabel("TrackTsCollTag"  ,tsc_label);
-    tb->GetDescription("TrackTsCollTag"  ,tsc_description);
+    art::Handle<mu2e::KalSeedCollection>  ksch;
+    mu2e::KalSeedCollection*              list_of_kalSeeds;
 
-    art::Handle<mu2e::KalSeedCollection>  tsch;
-    mu2e::KalSeedCollection*              list_of_trackSeeds;
+    AnEvent->getByLabel(fTrackTsCollTag,ksch);
+    list_of_kalSeeds = (mu2e::KalSeedCollection*) ksch.product();
 
-    if (tsc_description[0] == 0) AnEvent->getByLabel(tsc_label,tsch);
-    else                         AnEvent->getByLabel(tsc_label,tsc_description,tsch);
-    list_of_trackSeeds = (mu2e::KalSeedCollection*) tsch.product();
+    TStnTrackSeedBlock* tsb = (TStnTrackSeedBlock*) ev->GetDataBlock(fTrackTsBlockName.Data());
 
-    tsb    = (TStnTrackSeedBlock*) ev->GetDataBlock(kseed_block_name);
-
-    int    ntrk     = tb->NTracks();
-    int    ntrkseed = tsb->NTrackSeeds();
-
-    const mu2e::KalSeed *ts, *tss;
+    int    ntrk = tb->NTracks();
+    int    nts  = tsb->NTrackSeeds();
 
     for (int i=0; i<ntrk; i++) {
-      trk      = tb->Track(i);
-      ts       = &list_of_trackSeeds->at(i); // seed corresponding to track # i
-
+      TStnTrack* trk = tb->Track(i);
+      const mu2e::KalSeed *ts = &list_of_kalSeeds->at(i); // seed corresponding to track # i
       int  loc(-1);
-      for (int j=0; j<ntrkseed; ++j) {
-	tss = tsb->TrackSeed(j)->fTrackSeed;
+      for (int j=0; j<nts; ++j) {
+	const mu2e::KalSeed* tss = tsb->TrackSeed(j)->fTrackSeed;
 	if (ts == tss) {
 	  loc = j;
 	  break;
@@ -1092,7 +1059,8 @@ Int_t StntupleInitTrackBlock::ResolveLinks(TStnDataBlock* Block, AbsEvent* AnEve
       }
     
       if (loc < 0) {
-	printf(">>> ERROR: %s track %i -> no TrackSeed associated\n", krep_module_label, i);
+	printf(">>> ERROR: %s track %i -> no TrackSeed associated\n", 
+               fKFFCollTag.encode().data(), i);
 	continue;
       }
     
