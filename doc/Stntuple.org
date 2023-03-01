@@ -1,3 +1,4 @@
+#+startup:fold
 # hit <TAB> to expand and collapse the menues
 * ------------------------------------------------------------------------------
 * what is STNTUPLE                                                           
@@ -28,7 +29,6 @@
     of advanced features of the language.
 
   - lets keep it simple :) 
-
 * [[file:./how-to-build.org][how to build Stntuple libraries]]
 * [[file:how-to-make-first-stntuple.org][how to make first Stntuple]] 
 * [[file:stnana.org][stnana]] - STNTUPLE analysis framework                                       
@@ -36,7 +36,7 @@
 * STNTUPLE [[file:how-tos.org][how-to's]]    
 * [[file:event_display.org][STNTUPLE event display]]  
 * STNTUPLE modules      
-* copying and filtering: file:copying_and_filtering.org                                                     
+* copying and filtering: file:copying_and_filtering.org                      
 ** EventFilter                                                               
    - given an event list, filters events from the list 
    - event is defnined by three integers - (run,subrun,number) 
@@ -59,6 +59,12 @@ EventFilter.eventList : [
    users interact only with StntupleMaker
 ** FillStntuple
 ** MuHitDisplay - Stntuple event display module
+* uploading Stntuple's to tape                                               
+- use grim package                                 
+- see [[https://github.com/pavel1murat/grim/blob/main/scripts/upload_stn_dataset]]
+
+  last time we did that for SU2020, so the script can contain some SU2020 remnants
+* news and updates: [[https://app.slack.com/client/T314VMYV8/C013P69F9GR][Mu2e #stntuple channel on Slack]] 
 * ------------------------------------------------------------------------------
 * more technical details
 * ------------------------------------------------------------------------------

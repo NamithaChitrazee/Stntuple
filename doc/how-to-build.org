@@ -7,49 +7,30 @@
   to /mu2e/data/users/...)
 
 #+begin_src  
+# ... assuming you have your muse-based area setup
 git clone https://www.github.com/Mu2e/Stntuple.git 
-cd Stntuple
-git checkout muse
-cd ..
-muse -v setup -q debug            # setup muse in debug mode
+# .. redo the setups - muse needs that after a new package was added
+muse build 
 #+end_src 
 
-- run muse to build libraries :
+* _Building Stntuple libraries in a full test release_                
+
+- in a fresh shell, create a new working area, say 'dev', and clone Offline and Stntuple 
+  to there:
 
 #+begin_src
-muse build [-j 2]  # for example..
-#+end_src
-
-* _Building Stntuple libraries in a full test release_ (su2020)              
-
-- check out Mu2e Offline into dev directory
-
-#+begin_src
-git clone https://www.github.com/Mu2e/Offline.git dev 
-#+end_src
-
-- change directory to dev and clone Stntuple:
-
-#+begin_src  
-cd dev 
+mkdir dev
+cd dev
+git clone https://www.github.com/Mu2e/Offline.git 
 git clone https://www.github.com/Mu2e/Stntuple.git 
-#+end_src 
+#+end_src
 
-- setup Mu2e environment and run local ./buildopts script to set configuration options 
-    for this release to choose the build option (prof or debug), 
-    run "buildopts -h" for help.
+- with *dev* being a current directory, setup Mu2e environment and build
 
 #+begin_src
 source /cvmfs/mu2e.opensciencegrid.org/setupmu2e-art.sh
-./buildopts --build=debug 
-#+end_src
-
-- run local setup script, then run scons to build libraries :
-
-#+begin_src
-source ./setup.sh
-scons Stntuple
-scons -j2
+muse setup -q debug
+muse build
 #+end_src
 * ------------------------------------------------------------------------------
 * next: [[file:./how-to-make-first-stntuple.org][how to make your first stntuple]]
