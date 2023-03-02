@@ -628,6 +628,12 @@ void TTrkVisNode::PaintXY(Option_t* Option) {
     for (int i=0; i<nsim; i++ ) {
       esp = GetEvdSimParticle(i);
       TSimParticle* simp = esp->SimParticle();
+
+      if (vm->IgnoreProtons() != 0) {
+        int pdg_code = simp->PDGCode();
+        if (pdg_code > 2000)                                         continue;
+      }
+
       float mom          = simp->StartMom()->P();
       if ((mom >= vm->MinMcMomentum()) and (mom <= vm->MaxMcMomentum())) {
         esp->PaintXY(Option);
@@ -731,6 +737,12 @@ void TTrkVisNode::PaintRZ(Option_t* Option) {
     for (int i=0; i<nsim; i++ ) {
       esim = (stntuple::TEvdSimParticle*) fListOfSimParticles->At(i);
       TSimParticle* simp = esim->SimParticle();
+
+      if (vm->IgnoreProtons() != 0) {
+        int pdg_code = simp->PDGCode();
+        if (pdg_code > 2000)                                           continue;
+      }
+
       float mom          = simp->StartMom()->P();
       if ((mom >= vm->MinMcMomentum()) and (mom <= vm->MaxMcMomentum())) {
         esim->PaintRZ(Option);
@@ -799,6 +811,12 @@ void TTrkVisNode::PaintTZ(Option_t* Option) {
 
     for (int i=0; i<nsim; i++ ) {
       esim = (stntuple::TEvdSimParticle*) fListOfSimParticles->At(i);
+
+      if (vm->IgnoreProtons() != 0) {
+        int pdg_code = esim->SimParticle()->PDGCode();
+        if (pdg_code > 2000)                                         continue;
+      }
+
       esim->PaintTZ(Option);
     }
   }
@@ -885,6 +903,11 @@ int TTrkVisNode::DistancetoPrimitiveXY(Int_t px, Int_t py) {
     for (int i=0; i<nsim; i++) {
       stntuple::TEvdSimParticle* sim = GetEvdSimParticle(i);
 
+      if (vm->IgnoreProtons() != 0) {
+        int pdg_code = sim->SimParticle()->PDGCode();
+        if (pdg_code > 2000)                                         continue;
+      }
+
       dist = sim->DistancetoPrimitiveXY(px,py);
 
       if (dist < min_dist) {
@@ -936,13 +959,18 @@ Int_t TTrkVisNode::DistancetoPrimitiveTZ(Int_t px, Int_t py) {
   if (vm->DisplaySimParticles()) {
     int nsim = fListOfSimParticles->GetEntries();
     for (int i=0; i<nsim; i++) {
-      stntuple::TEvdSimParticle* esp = GetEvdSimParticle(i);
+      stntuple::TEvdSimParticle* esim = GetEvdSimParticle(i);
 
-      dist = esp->DistancetoPrimitiveTZ(px,py);
+      if (vm->IgnoreProtons() != 0) {
+        int pdg_code = (int) esim->SimParticle()->PDGCode();
+        if (pdg_code > 2000)                                         continue;
+      }
+
+      dist = esim->DistancetoPrimitiveTZ(px,py);
 
       if (dist < min_dist) {
 	min_dist = dist;
-	closest  = esp;
+	closest  = esim;
       }
     }
   }

@@ -125,8 +125,9 @@ protected:
   int                 fDisplayOnlyTCHits;   // will be useless longer term, as the time cluster should 
                                             // include all hits within the time interval, 
                                             // further selections - based on the hit flags
-  int                 fIgnoreComptonHits;   // if 1, do not show hits marked as 'compton'(flag='bgr')
-  int                 fIgnoreProtonHits;    // if 1, do not show hits marked as 'proton' (no 'energysel' flag)
+  int                 fIgnoreComptonHits;   // 1: do not show hits marked as 'compton'(flag='bgr')
+  int                 fIgnoreProtonHits;    // 1: do not show hits marked as 'proton' (no 'energysel' flag)
+  int                 fIgnoreProtons;       // 1: do not show trajectories of MC proton (too many)
 //-----------------------------------------------------------------------------
 //  functions
 //-----------------------------------------------------------------------------
@@ -137,10 +138,9 @@ public:
   virtual ~TStnVisManager();
 
   static TStnVisManager* Instance();
-  // ****** accessors
-
-  //Interface Handlers
-
+//-----------------------------------------------------------------------------
+// interface handlers
+//-----------------------------------------------------------------------------
   virtual int    InitGui  (const char* Title);
   virtual int    InitViews();
 
@@ -177,6 +177,7 @@ public:
   
   int            IgnoreComptonHits  () const { return fIgnoreComptonHits  ; }
   int            IgnoreProtonHits   () const { return fIgnoreProtonHits   ; }
+  int            IgnoreProtons      () const { return fIgnoreProtons      ; }
 
   float          MinMcMomentum      () const { return fMinMcMomentum; }
   float          MaxMcMomentum      () const { return fMaxMcMomentum; }
@@ -199,6 +200,7 @@ public:
   void           SetDisplayOnlyTCHits  (int Flag) { fDisplayOnlyTCHits   = Flag; }
   void           SetIgnoreComptonHits  (int Flag) { fIgnoreComptonHits   = Flag; }
   void           SetIgnoreProtonHits   (int Flag) { fIgnoreProtonHits    = Flag; }
+  void           SetIgnoreProtons      (int Flag) { fIgnoreProtons       = Flag; }
 
   void           SetStations(int IMin, int IMax) override;
 

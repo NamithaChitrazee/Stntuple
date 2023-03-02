@@ -392,11 +392,15 @@ TStnFrame::TStnFrame(const char*  Name,
 //-----------------------------------------------------------------------------
 // ignore compton hits
 //-----------------------------------------------------------------------------
-  cbtn = new TGCheckButton(frame,"low-E e-/e+", kIgnoreComptonHits);
+  cbtn = new TGCheckButton(frame,"lowE e-/e+ hits", kIgnoreComptonHits);
   cbtn->Connect("Clicked()", "TStnVisManager",vm, "DoCheckButton()");
   frame->AddFrame(cbtn, new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
 
-  cbtn = new TGCheckButton(frame,"protons", kIgnoreProtonHits);
+  cbtn = new TGCheckButton(frame,"proton hits", kIgnoreProtonHits);
+  cbtn->Connect("Clicked()", "TStnVisManager",vm, "DoCheckButton()");
+  frame->AddFrame(cbtn, new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
+
+  cbtn = new TGCheckButton(frame,"MC protons", kIgnoreProtons);
   cbtn->Connect("Clicked()", "TStnVisManager",vm, "DoCheckButton()");
   frame->AddFrame(cbtn, new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
 

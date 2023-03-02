@@ -46,11 +46,11 @@ TStnVisManager::TStnVisManager(const char* Name, const char* Title): TVisManager
 
   fListOfDetectors = new TObjArray(10);
 
-  fMinStation  =  0;
-  fMaxStation  = 50;
+  fMinStation          =  0;
+  fMaxStation          = 50;
 					// by default, no timing constraints
-  fTMin        = 0;
-  fTMax        = 1.e5;
+  fTMin                = 0;
+  fTMax                = 1.e5;
   fEvent               = nullptr;
   fBField              = 1.0;                   // in Tesla
 
@@ -65,6 +65,7 @@ TStnVisManager::TStnVisManager(const char* Name, const char* Title): TVisManager
   fDisplayStrawDigiMC  = 0;                    // not sure what this is, check
   fIgnoreComptonHits   = 0;
   fIgnoreProtonHits    = 0;
+  fIgnoreProtons       = 0;
 
   fMinMcMomentum       = 60;
   fMaxMcMomentum       = 1.e10;                // in MeV/c
@@ -1072,6 +1073,7 @@ void TStnVisManager::DoCheckButton() {
   else if (id == kDisplaySH          ) SetDisplayStrawHitsXY (status);
   else if (id == kIgnoreComptonHits  ) SetIgnoreComptonHits  (status);
   else if (id == kIgnoreProtonHits   ) SetIgnoreProtonHits   (status);
+  else if (id == kIgnoreProtons      ) SetIgnoreProtons      (status);
   else {
     printf("WARNING: TStnVisManager::DoCheckButton unknown button ID: %i\n",id);
   }
@@ -1092,20 +1094,24 @@ void TStnVisManager::DoRadioButton() {
   if (state == kButtonUp) new_state = kButtonDown;
   else                    new_state = kButtonUp;
 
-  printf("TStnVisManager::%s radio button ID: %i state: %i new_state: %i\n",
+  printf("TStnVisManager::%s RADIO button ID: %i state: %i new_state: %i\n",
          __func__,id,state,new_state);
   
   if      (id == M_DISPLAY_SH) { 
     if (new_state == kButtonUp) SetDisplayStrawHitsXY(1);
     else                        SetDisplayStrawHitsXY(0);
   }
-  else if (id == M_IGNORE_COMPTON ) {
+  else if (id == M_IGNORE_COMPTON_HITS ) {
     if (new_state == kButtonUp) SetIgnoreComptonHits(1);
     else                        SetIgnoreComptonHits(0);
   }
-  else if (id == M_IGNORE_PROTONS ) {
+  else if (id == M_IGNORE_PROTON_HITS ) {
     if (new_state == kButtonUp) SetIgnoreProtonHits(1);
     else                        SetIgnoreProtonHits(0);
+  }
+  else if (id == M_IGNORE_PROTONS ) {
+    if (new_state == kButtonUp) SetIgnoreProtons(1);
+    else                        SetIgnoreProtons(0);
   }
   else {
     printf("WARNING: TStnVisManager::DoRadioButton unknown button ID: %i\n",id);

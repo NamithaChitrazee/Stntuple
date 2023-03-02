@@ -49,18 +49,21 @@ enum GuiCommandID {
 
 enum GuiButtonID {
 					// checkbutton ID's
-  kDisplayHelices      =  5,
-  kDisplayTracks       =  6,
-  kDisplaySimParticles =  7,
-  kDisplayOnlyTCHits   =  8,
-  kDisplaySH           =  9,
-  kIgnoreComptonHits   = 10,
-  kIgnoreProtonHits    = 11,
-					// radiobutton ID's (not used)...
-  M_DISPLAY_SH         = 21,
-  M_DISPLAY_CH         = 22,
-  M_IGNORE_COMPTON     = 23,
-  M_IGNORE_PROTONS     = 24
+  kDisplayHelices       =  5,
+  kDisplayTracks        =  6,
+  kDisplaySimParticles  =  7,
+  kDisplayOnlyTCHits    =  8,
+  kDisplaySH            =  9,
+  kIgnoreComptonHits    = 10,
+  kIgnoreProtonHits     = 11,
+  kIgnoreProtons        = 12,
+					// not sure what these are... but ...
+                                        // they are needed for something
+  M_DISPLAY_SH          = 21,
+  M_DISPLAY_CH          = 22,
+  M_IGNORE_COMPTON_HITS = 23,
+  M_IGNORE_PROTON_HITS  = 24,
+  M_IGNORE_PROTONS      = 25
 
 };
 
