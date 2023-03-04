@@ -98,13 +98,15 @@ public:
 //-----------------------------------------------------------------------------
 // accessors
 //-----------------------------------------------------------------------------
-  TVector3*                    Pos()         { return &fPos; }
-  TVector2*                    Dir()         { return &fDir; }
-  const mu2e::ComboHit*        ComboHit()    { return fHit;  }
+  TVector3*              Pos()           { return &fPos; }
+  TVector2*              Dir()           { return &fDir; }
+  const mu2e::ComboHit*  ComboHit()      { return fHit;  }
 
-  float                        Z()           { return fPos.Z(); }
-  float                        T()           { return fHit->time(); }
-  float                correctedTime()       { return fHit->correctedTime(); }
+  float                  Z()             { return fPos.Z(); }
+  float                  T()             { return fHit->time(); }
+  float                  correctedTime() { return fHit->correctedTime(); }
+  TLine*                 LineW()         { return &fLineW ; }
+  TLine*                 LineR()         { return &fLineR ; }
 //-----------------------------------------------------------------------------
 // modifiers
 //-----------------------------------------------------------------------------
