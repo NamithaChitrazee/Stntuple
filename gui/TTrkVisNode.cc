@@ -529,37 +529,37 @@ void TTrkVisNode::PaintXY(Option_t* Option) {
     if (nhits > 0) {
       const mu2e::ComboHit* sch0 = &fSchColl->at(0);
       for (int i=0; i<nhits; i++) {
-        stntuple::TEvdStrawHit* evd_sh = GetEvdStrawHit(i);
-        const mu2e::ComboHit*   sch    = evd_sh->StrawHit();
+	stntuple::TEvdStrawHit* evd_sh = GetEvdStrawHit(i);
+	const mu2e::ComboHit*   sch    = evd_sh->StrawHit();
 //-----------------------------------------------------------------------------
 // see in flags need to be checked, use external flags
 //-----------------------------------------------------------------------------
-        int loc  = sch-sch0;
-        const mu2e::StrawHitFlag* flag = &fShfColl->at(loc);
-        if (vm->IgnoreComptonHits()) {
-          if (flag->hasAnyProperty(mu2e::StrawHitFlagDetail::bkg))      continue;
-        }
+	int loc  = sch-sch0;
+	const mu2e::StrawHitFlag* flag = &fShfColl->at(loc);
+	if (vm->IgnoreComptonHits()) {
+	  if (flag->hasAnyProperty(mu2e::StrawHitFlagDetail::bkg))      continue;
+	}
 
-        if (vm->IgnoreProtonHits()) {
-          if (! flag->hasAnyProperty(mu2e::StrawHitFlagDetail::energysel)) continue;
-        }
-        
-        straw     = &tracker->getStraw(sch->strawId());
-        station   = straw->id().getStation();
-        time      = sch->correctedTime();
-        
-        if ((station >= vm->MinStation()) && (station <= vm->MaxStation())) { 
-          if ((time >= tmin) && (time <= tmax)) {
+	if (vm->IgnoreProtonHits()) {
+	  if (! flag->hasAnyProperty(mu2e::StrawHitFlagDetail::energysel)) continue;
+	}
+
+	straw     = &tracker->getStraw(sch->strawId());
+	station   = straw->id().getStation();
+	time      = sch->correctedTime();
+
+	if ((station >= vm->MinStation()) && (station <= vm->MaxStation())) { 
+	  if ((time >= tmin) && (time <= tmax)) {
 //-----------------------------------------------------------------------------
 // check if the hit belongs to the time cluster
 //-----------------------------------------------------------------------------
-            int ok = 1;
-            if (etcl and vm->DisplayOnlyTCHits()) { 
-              ok = TCHit(etcl->TimeCluster(),sch->index());
-            }
-            if (ok  ) evd_sh->PaintXY(Option);
-          }
-        }
+	    int ok = 1;
+	    if (etcl and vm->DisplayOnlyTCHits()) { 
+	      ok = TCHit(etcl->TimeCluster(),sch->index());
+	    }
+	    if (ok  ) evd_sh->PaintXY(Option);
+	  }
+	}
       }
     }
   }
@@ -568,20 +568,20 @@ void TTrkVisNode::PaintXY(Option_t* Option) {
 // display combo hits
 //-----------------------------------------------------------------------------
     int nch = fListOfComboHits->GetEntries();
-    if (nch > 0) {
+    if (nch > 0) { 
       const mu2e::ComboHit* ch0 = &fChColl->at(0);
       for (int i=0; i<nch; i++) {
-        stntuple::TEvdComboHit* evd_ch = (stntuple::TEvdComboHit*) fListOfComboHits->At(i);
-        const mu2e::ComboHit*   ch     = evd_ch->ComboHit();
-        
-        int loc  = ch-ch0;
-        const mu2e::StrawHitFlag* flag = &fChfColl->at(loc);
-        if (vm->IgnoreComptonHits()) {
-          if (flag->hasAnyProperty(mu2e::StrawHitFlagDetail::bkg))      continue;
-        }
-        if (vm->IgnoreProtonHits()) {
-          if (! flag->hasAnyProperty(mu2e::StrawHitFlagDetail::energysel)) continue;
-        }
+	stntuple::TEvdComboHit* evd_ch = (stntuple::TEvdComboHit*) fListOfComboHits->At(i);
+	const mu2e::ComboHit*   ch     = evd_ch->ComboHit();
+
+	int loc  = ch-ch0;
+	const mu2e::StrawHitFlag* flag = &fChfColl->at(loc);
+	if (vm->IgnoreComptonHits()) {
+	  if (flag->hasAnyProperty(mu2e::StrawHitFlagDetail::bkg))      continue;
+	}
+	if (vm->IgnoreProtonHits()) {
+	  if (! flag->hasAnyProperty(mu2e::StrawHitFlagDetail::energysel)) continue;
+	}
 //-----------------------------------------------------------------------------
 // a combined hit doesn't have it's own measured time - that is calculated
 // look at the first straw
@@ -592,7 +592,7 @@ void TTrkVisNode::PaintXY(Option_t* Option) {
         straw     = &tracker->getStraw(sh->strawId());           // first straw hit
         station   = straw->id().getStation();
         time      = ch->correctedTime();
-        
+
         if ((station >= vm->MinStation()) && (station <= vm->MaxStation())) { 
           if ((time >= tmin) && (time <= tmax)) {
             // check if the hit belongs to the time cluster
