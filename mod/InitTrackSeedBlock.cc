@@ -146,18 +146,21 @@ int  StntupleInitTrackSeedBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* E
  //-----------------------------------------------------------------------------
 // find the simparticle that created the majority of the hits
 //-----------------------------------------------------------------------------
-    int     max(0), mostvalueindex(-1), mostvalue= hits_simp_id[0];
     float   dz_most(1e4);
-    for (int k=0; k<(int)hits_simp_id.size(); ++k){
-      int co = (int)std::count(hits_simp_id.begin(), hits_simp_id.end(), hits_simp_id[k]);
-      if ( (co>0) &&  (co>max)) {
-	float  dz      = std::fabs(hits_simp_z[k]);
-	if (dz < dz_most){
-	  dz_most        = dz;
-	  max            = co;
-	  mostvalue      = hits_simp_id[k];
-	  mostvalueindex = hits_simp_index[k];
-	}
+    int     max(0), mostvalueindex(-1), mostvalue(-1);
+    if (hits_simp_id.size() > 0) {
+      mostvalue = hits_simp_id[0];
+      for (int k=0; k<(int)hits_simp_id.size(); ++k){
+        int co = (int)std::count(hits_simp_id.begin(), hits_simp_id.end(), hits_simp_id[k]);
+        if ( (co>0) &&  (co>max)) {
+          float  dz      = std::fabs(hits_simp_z[k]);
+          if (dz < dz_most){
+            dz_most        = dz;
+            max            = co;
+            mostvalue      = hits_simp_id[k];
+            mostvalueindex = hits_simp_index[k];
+          }
+        }
       }
     }
 
