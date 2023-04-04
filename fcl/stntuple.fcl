@@ -91,7 +91,7 @@ services : { @table::Services.SimAndReco
 
 services.SeedService.baseSeed         : 8
 services.SeedService.maxUniqueEngines : 100
-sservices.scheduler.wantSummary        : true
+services.scheduler.wantSummary        : true
 services.TFileService.fileName        : "nts._USER_._DATASET_._DSCONF_.sequencer.root" 
 
 # Limit the amount of "Begin processing the ... record" messages
