@@ -36,7 +36,6 @@ production : {
 	                                                          # in mixing mode, still filter on primary
 #	makeSDPrimary    : { @table::makeSD
 #	    StrawGasStepModule : makeSGSPrimary
-#	    TimeOffsets        : [ @sequence::CommonMC.TimeMapsPrimary ]
 #	}
 
 	generate  : { @table::EventGenerator.producers.egun }      # to avoid unnecessary diagnostics
@@ -368,7 +367,7 @@ production.paths : {
 #------------------------------------------------------------------------------
     production_p1 : [ @sequence::production.gen_g4_pbi,           # includes protonBunchIntensity
 		      GammaFilter,                            # does nothing by default
-		      @sequence::CommonMC.DigiSim      ,      # adds TimeMaps, EWMProducer (name - confusing)
+		      @sequence::CommonMC.DigiSim      ,      # adds EWMProducer (name - confusing)
 		      @sequence::production.digis          ,
 		      compressDigiMCs
 		     ]
@@ -376,7 +375,7 @@ production.paths : {
 	# same as production_p1, but using a calo filter instead of straw digi filter
     production_p1calo : [ @sequence::production.gen_g4_pbi     , 
 			  GammaFilter                      ,  # does nothing by default
-			  @sequence::CommonMC.DigiSim      ,  # TimeMaps, EWMProducer
+			  @sequence::CommonMC.DigiSim      ,  # EWMProducer
 			  @sequence::production.digisCaloFilter,
 			  compressDigiMCs
 			  
@@ -385,7 +384,7 @@ production.paths : {
     production_p10 : [ @sequence::production.gen_g4_pbi,          # includes ProtonBunchIntensity
 		       filterStepPointMomentum ,
 		       GammaFilter,                           # does nothing by default
-		       @sequence::CommonMC.DigiSim       ,    # adds TimeMaps, EWMProducer (name - confusing)
+		       @sequence::CommonMC.DigiSim       ,    # adds EWMProducer (name - confusing)
 		       @sequence::production.digis_no_filter ,    # no StrawDigiMCFilter, for mixing
 		       compressDigiMCs
 		      ]
@@ -398,7 +397,7 @@ production.paths : {
 		     ]
 
     production_p111 : [ @sequence::production.pbi_ewm   ,          # what's left of @sequence::production.gen_g4_time_map,
-			@sequence::CommonMC.TimeMaps, 
+			# @sequence::CommonMC.TimeMaps, 
 			GammaFilter                 ,          # does nothing by default
 			@sequence::production.digis_no_filter,
 			compressDigiMCs
@@ -406,13 +405,13 @@ production.paths : {
 
     production_p12 : [ @sequence::production.gen_g4_pbi,          # includes ProtonBunchIntensity
 		       filterStepPointMomentum,               # 
-		       @sequence::CommonMC.DigiSim            # adds TimeMaps, EWMProducer (name - confusing)
+		       @sequence::CommonMC.DigiSim            # adds EWMProducer (name - confusing)
 		      ]
 
 
     production_p13 : [ g4run , 
 		       filterStepPointMomentum,               # 
-		       @sequence::CommonMC.DigiSim            # adds TimeMaps, EWMProducer (name - confusing)
+		       @sequence::CommonMC.DigiSim            # adds EWMProducer (name - confusing)
 		      ]
 
     production_p14_mustop : [ generate, genCounter, g4run, filterStepPointMomentum, 

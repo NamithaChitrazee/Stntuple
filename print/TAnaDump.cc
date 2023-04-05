@@ -59,7 +59,7 @@
 
 #include "Stntuple/base/TNamedHandle.hh"
 
-#include "Offline/Mu2eUtilities/inc/SimParticleTimeOffset.hh"
+// #include "Offline/Mu2eUtilities/inc/SimParticleTimeOffset.hh"
 #include "Offline/TrkDiag/inc/TrkMCTools.hh"
 
 

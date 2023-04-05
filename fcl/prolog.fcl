@@ -22,7 +22,7 @@ StntupleTModuleFclDefaults : {
 # unlike everywhere else, TAnaDump sets mcTruth to 1 by default
 #------------------------------------------------------------------------------
     TAnaDump : {
-	timeOffsetMaps  : { inputs : [ @sequence::CommonMC.TimeMaps ] }
+	# timeOffsetMaps  : { inputs : [ @sequence::CommonMC.TimeMaps ] }
 	printUtils      : { @table::TrkReco.PrintUtils 
 	    mcTruth     : 1
 	}
