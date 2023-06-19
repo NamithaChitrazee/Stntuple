@@ -129,6 +129,14 @@ TEvdComboHit::TEvdComboHit(const mu2e::ComboHit*      Hit,
   fTZMarker.SetMarkerStyle(style);
   fTZMarker.SetMarkerSize (size );
   fTZMarker.SetMarkerColor(color);
+//-----------------------------------------------------------------------------
+// PhiZ view
+//-----------------------------------------------------------------------------
+  fPhiZMarker.SetX(fPos.Z());
+  fPhiZMarker.SetY(fPos.Phi());
+  fPhiZMarker.SetMarkerStyle(style);
+  fPhiZMarker.SetMarkerSize (size );
+  fPhiZMarker.SetMarkerColor(color);
 }
 
 //-----------------------------------------------------------------------------
@@ -162,6 +170,11 @@ void TEvdComboHit::PaintXY(Option_t* Option) {
 //_____________________________________________________________________________
 void TEvdComboHit::PaintTZ(Option_t* Option) {
   fTZMarker.Paint(Option);
+}
+
+//_____________________________________________________________________________
+void TEvdComboHit::PaintPhiZ(Option_t* Option) {
+  fPhiZMarker.Paint(Option);
 }
 
 //_____________________________________________________________________________

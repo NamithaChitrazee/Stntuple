@@ -27,21 +27,23 @@ public:
 // these are the views. Each view has its own view manager handling multiple, potentially,
 // windows with this view
 //-----------------------------------------------------------------------------
-  virtual void  Paint   (Option_t* option = "");
-  virtual void  PaintXY (Option_t* option = "");
-  virtual void  PaintRZ (Option_t* option = "");
-  virtual void  PaintTZ (Option_t* option = "");
-  virtual void  PaintCal(Option_t* option = "");
-  virtual void  PaintCrv(Option_t* option = "");
-  virtual void  PaintVST(Option_t* option = "");
+  virtual void  Paint    (Option_t* option = "");
+  virtual void  PaintXY  (Option_t* option = "");
+  virtual void  PaintRZ  (Option_t* option = "");
+  virtual void  PaintTZ  (Option_t* option = "");
+  virtual void  PaintPhiZ(Option_t* option = "");
+  virtual void  PaintCal (Option_t* option = "");
+  virtual void  PaintCrv (Option_t* option = "");
+  virtual void  PaintVST (Option_t* option = "");
 
-  virtual int   DistancetoPrimitive   (Int_t px, Int_t py);
-  virtual int   DistancetoPrimitiveXY (Int_t px, Int_t py);
-  virtual int   DistancetoPrimitiveRZ (Int_t px, Int_t py);
-  virtual int   DistancetoPrimitiveTZ (Int_t px, Int_t py);
-  virtual int   DistancetoPrimitiveCal(Int_t px, Int_t py);
-  virtual int   DistancetoPrimitiveCrv(Int_t px, Int_t py);
-  virtual int   DistancetoPrimitiveVST(Int_t px, Int_t py);
+  virtual int   DistancetoPrimitive    (Int_t px, Int_t py);
+  virtual int   DistancetoPrimitiveXY  (Int_t px, Int_t py);
+  virtual int   DistancetoPrimitiveRZ  (Int_t px, Int_t py);
+  virtual int   DistancetoPrimitiveTZ  (Int_t px, Int_t py);
+  virtual int   DistancetoPrimitivePhiZ(Int_t px, Int_t py);
+  virtual int   DistancetoPrimitiveCal (Int_t px, Int_t py);
+  virtual int   DistancetoPrimitiveCrv (Int_t px, Int_t py);
+  virtual int   DistancetoPrimitiveVST (Int_t px, Int_t py);
 
   // void SetSectionToDisplay(int Section) { fSectionToDisplay= Section; }
 

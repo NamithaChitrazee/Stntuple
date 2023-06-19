@@ -116,6 +116,7 @@ TStnFrame::TStnFrame(const char*  Name,
   fMenuOpen->AddEntry("&XY View",            M_OPEN_XY);
   fMenuOpen->AddEntry("&RZ View",            M_OPEN_RZ);
   fMenuOpen->AddEntry("&TZ View",            M_OPEN_TZ);
+  fMenuOpen->AddEntry("&PhiZ View",          M_OPEN_PHIZ);
   fMenuOpen->AddEntry("&Cal View",           M_OPEN_CAL);
   fMenuOpen->AddEntry("&CRV View",           M_OPEN_CRV);
   fMenuOpen->AddEntry("&VST View",           M_OPEN_VST);
@@ -643,6 +644,12 @@ Bool_t TStnFrame::ProcessMessage(Long_t msg, Long_t parm1, Long_t parm2) {
 	printf(" *** TStnFrame::ProcessMessage M_OPEN_TZ: msg = %li parm1 = %li parm2 = %li\n", 
 	       msg,parm1,parm2);
 	fVisManager->OpenView("tz");
+	break;
+      case M_OPEN_PHIZ:
+	
+	printf(" *** TStnFrame::ProcessMessage M_OPEN_PHIZ: msg = %li parm1 = %li parm2 = %li\n", 
+	       msg,parm1,parm2);
+	fVisManager->OpenView("phiz");
 	break;
       case M_OPEN_CAL:
 	

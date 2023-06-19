@@ -63,17 +63,18 @@ public:
   };
 
 protected:
-					// backward pointers to the reconstruction objects
+					  // backward pointers to the reconstruction objects
   const mu2e::ComboHit*      fHit;
-  const mu2e::SimParticle*   fSim;      // 
+  const mu2e::SimParticle*   fSim;        // 
   const mu2e::StrawGasStep*  fStep;
-  TVector3                   fPos;	// position in 3D, Z=zwire
-  TVector2                   fDir;      // direction of the straw
-  double                     fSigW;     // error in the wire direction
-  double                     fSigR;     // error in radial direction
-  TLine                      fLineW;	// paint on XY view
+  TVector3                   fPos;	  // position in 3D, Z=zwire
+  TVector2                   fDir;        // direction of the straw
+  double                     fSigW;       // error in the wire direction
+  double                     fSigR;       // error in radial direction
+  TLine                      fLineW;	  // paint on XY view
   TLine                      fLineR;
-  TMarker                    fTZMarker; // paint on TZ view
+  TMarker                    fTZMarker;   // paint on TZ view
+  TMarker                    fPhiZMarker; // paint on PhiZ view
   int                        fSimID;
   int                        fPdgID;
   int                        fMotherPdgID;
@@ -125,7 +126,7 @@ public:
   virtual void  PaintXY    (Option_t* option = "");
   virtual void  PaintTZ    (Option_t* Option = "");
   // virtual void  Paint      (Option_t* option = "");
-  // virtual void  PaintRZ    (Option_t* option = "");
+  virtual void  PaintPhiZ  (Option_t* option = "");
   // virtual void  PaintCal   (Option_t* option = "");
 
   // virtual void  ExecuteEvent(Int_t event, Int_t px, Int_t py);

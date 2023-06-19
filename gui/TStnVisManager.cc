@@ -230,12 +230,13 @@ int TStnVisManager::GetViewID(const char* View) {
   TString view_id = View;
   view_id.ToLower();
 
-  if      (view_id == "xy" ) return TStnVisManager::kXY;
-  else if (view_id == "rz" ) return TStnVisManager::kRZ;
-  else if (view_id == "tz" ) return TStnVisManager::kTZ;
-  else if (view_id == "cal") return TStnVisManager::kCal;
-  else if (view_id == "crv") return TStnVisManager::kCrv;
-  else if (view_id == "vst") return TStnVisManager::kVST;
+  if      (view_id == "xy"  ) return TStnVisManager::kXY;
+  else if (view_id == "rz"  ) return TStnVisManager::kRZ;
+  else if (view_id == "tz"  ) return TStnVisManager::kTZ;
+  else if (view_id == "phiz") return TStnVisManager::kPhiZ;
+  else if (view_id == "cal" ) return TStnVisManager::kCal;
+  else if (view_id == "crv" ) return TStnVisManager::kCrv;
+  else if (view_id == "vst" ) return TStnVisManager::kVST;
   else {
     printf("TStnVisManager::%s: ERROR: unknown view type : %s\n",__func__,View);
     return -1;
@@ -248,12 +249,13 @@ void TStnVisManager::OpenView(const char* View) {
   TString view_id = View;
   view_id.ToLower();
 
-  if      (view_id == "xy" ) OpenTrkXYView();
-  else if (view_id == "rz" ) OpenTrkRZView();
-  else if (view_id == "tz" ) OpenTrkTZView();
-  else if (view_id == "cal") OpenCalView  ();
-  else if (view_id == "crv") OpenCrvView  ();
-  else if (view_id == "vst") OpenVSTView  ();
+  if      (view_id == "xy"  ) OpenTrkXYView();
+  else if (view_id == "rz"  ) OpenTrkRZView();
+  else if (view_id == "tz"  ) OpenTrkTZView();
+  else if (view_id == "phiz") OpenPhiZView ();
+  else if (view_id == "cal" ) OpenCalView  ();
+  else if (view_id == "crv" ) OpenCrvView  ();
+  else if (view_id == "vst" ) OpenVSTView  ();
   else {
     printf("TStnVisManager::OpenView: ERROR: unknown view type : %s\n",View);
   }
@@ -263,12 +265,13 @@ void TStnVisManager::OpenView(const char* View) {
 void TStnVisManager::OpenView(TStnView* Mother, int Px1, int Py1, int Px2, int Py2) {
   int vtype = Mother->Type();
 
-  if      (vtype == TStnVisManager::kXY ) OpenTrkXYView(Mother,Px1,Py1,Px2,Py2);
-  else if (vtype == TStnVisManager::kRZ ) OpenTrkRZView(Mother,Px1,Py1,Px2,Py2);
-  else if (vtype == TStnVisManager::kTZ ) OpenTrkTZView(Mother,Px1,Py1,Px2,Py2);
-  else if (vtype == TStnVisManager::kCal) OpenCalView  (Mother,Px1,Py1,Px2,Py2);
-  else if (vtype == TStnVisManager::kCrv) OpenCrvView  (Mother,Px1,Py1,Px2,Py2);
-  else if (vtype == TStnVisManager::kVST) OpenVSTView  (Mother,Px1,Py1,Px2,Py2);
+  if      (vtype == TStnVisManager::kXY  ) OpenTrkXYView(Mother,Px1,Py1,Px2,Py2);
+  else if (vtype == TStnVisManager::kRZ  ) OpenTrkRZView(Mother,Px1,Py1,Px2,Py2);
+  else if (vtype == TStnVisManager::kTZ  ) OpenTrkTZView(Mother,Px1,Py1,Px2,Py2);
+  else if (vtype == TStnVisManager::kPhiZ) OpenPhiZView (Mother,Px1,Py1,Px2,Py2);
+  else if (vtype == TStnVisManager::kCal ) OpenCalView  (Mother,Px1,Py1,Px2,Py2);
+  else if (vtype == TStnVisManager::kCrv ) OpenCrvView  (Mother,Px1,Py1,Px2,Py2);
+  else if (vtype == TStnVisManager::kVST ) OpenVSTView  (Mother,Px1,Py1,Px2,Py2);
   else {
     printf("TStnVisManager::OpenView: ERROR: unknown view type : %i\n",vtype);
   }
@@ -436,7 +439,7 @@ Int_t TStnVisManager::OpenTrkRZView(TStnView* Mother, Axis_t x1, Axis_t y1, Axis
 }
 
 //-----------------------------------------------------------------------------
-// open new RZ view of the detector with the default options
+// open new TrkTZ view of the detector with the default options
 //-----------------------------------------------------------------------------
 int TStnVisManager::OpenTrkTZView() {
   // open new TZ view of the detector with the default options
@@ -493,6 +496,87 @@ int TStnVisManager::OpenTrkTZView(TStnView* Mother, Axis_t x1, Axis_t y1, Axis_t
   // TStnFrame* win = new TStnFrame(name, title, this, TStnVisManager::kTZ, xsize+TStnFrame::fGroupFrameWidth, ysize);
   xsize = (800./ysize)*xsize;
   TStnFrame* win = new TStnFrame(name, title, this, TStnVisManager::kTZ, xsize+TStnFrame::fGroupFrameWidth, 800);
+
+  TCanvas* c = win->GetCanvas();
+  fListOfCanvases->Add(c);
+
+  TString name1(name);
+  name1 += "_1";
+  TPad* p1 = (TPad*) c->FindObject(name1);
+  p1->Range(x1, y1, x2, y2);
+  p1->cd();
+  Mother->Draw();
+
+  TString name_title(name);
+  name1 += "_title";
+  TPad* title_pad = (TPad*) c->FindObject(name_title);
+  title_pad->cd();
+  if (fTitleNode) fTitleNode->Draw();
+
+  c->Modified();
+  c->Update();
+  return 0;
+}
+
+//-----------------------------------------------------------------------------
+// open new PhiZ view of the detector with the default options
+//-----------------------------------------------------------------------------
+int TStnVisManager::OpenPhiZView() {
+  // open new TZ view of the detector with the default options
+
+  int n = fListOfCanvases->GetSize();
+
+  char name[100], title[100];
+
+  sprintf(name,  "phiz_view_%i", n);
+  sprintf(title, "PhiZ view number %i", n);
+
+  TStnFrame* win = new TStnFrame(name, title, this, TStnVisManager::kXY, 1100+TStnFrame::fGroupFrameWidth, 800);
+  TCanvas* c = win->GetCanvas();
+  fListOfCanvases->Add(c);
+
+  TString name1(name);
+  name1 += "_1";
+  TPad* p1 = (TPad*) c->FindObject(name1);
+  p1->Range(-1600., -M_PI, 1600., M_PI);
+  p1->cd();
+
+  TStnView* v = FindView(TStnVisManager::kPhiZ,-1);
+
+  v->Draw();
+
+  TString name_title(name);
+  name1 += "_title";
+  TPad* title_pad = (TPad*) c->FindObject(name_title);
+  title_pad->cd();
+  if (fTitleNode) fTitleNode->Draw();
+
+  c->Modified();
+  c->Update();
+  return 0;
+}
+
+//-----------------------------------------------------------------------------
+// open new PhiZ view of the detector 
+//-----------------------------------------------------------------------------
+int TStnVisManager::OpenPhiZView(TStnView* Mother, Axis_t x1, Axis_t y1, Axis_t x2, Axis_t y2) {
+
+  int n = fListOfCanvases->GetSize();
+
+  char name[100], title[100];
+
+  sprintf(name,  "phiz_view_%i", n);
+  sprintf(title, "PHIZ view number %i", n);
+
+  // try to preserve the aspect ratio
+  Int_t   xsize, ysize;
+
+  xsize = x2-x1;
+  ysize = (int) (xsize*abs((y2 - y1)/(x2 - x1)) + 20);
+
+  // TStnFrame* win = new TStnFrame(name, title, this, TStnVisManager::kTZ, xsize+TStnFrame::fGroupFrameWidth, ysize);
+  xsize = (800./ysize)*xsize;
+  TStnFrame* win = new TStnFrame(name, title, this, TStnVisManager::kPhiZ, xsize+TStnFrame::fGroupFrameWidth, 800);
 
   TCanvas* c = win->GetCanvas();
   fListOfCanvases->Add(c);

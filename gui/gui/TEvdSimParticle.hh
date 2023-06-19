@@ -47,10 +47,11 @@ public:
 //-----------------------------------------------------------------------------
 // modifiers
 //-----------------------------------------------------------------------------
-  virtual int DistancetoPrimitive   (int px, int py);
-  virtual int DistancetoPrimitiveXY (int px, int py);
-  virtual int DistancetoPrimitiveRZ (int px, int py);
-  virtual int DistancetoPrimitiveTZ (int px, int py);
+  virtual int DistancetoPrimitive    (int px, int py);
+  virtual int DistancetoPrimitiveXY  (int px, int py);
+  virtual int DistancetoPrimitiveRZ  (int px, int py);
+  virtual int DistancetoPrimitiveTZ  (int px, int py);
+  virtual int DistancetoPrimitivePhiZ(int px, int py);
 
   //  virtual void  ExecuteEvent(Int_t event, Int_t px, Int_t py)
 //-----------------------------------------------------------------------------
@@ -59,6 +60,7 @@ public:
   virtual void  PaintXY  (Option_t* option = "");
   virtual void  PaintRZ  (Option_t* option = "");
   virtual void  PaintTZ  (Option_t* option = "");
+  virtual void  PaintPhiZ(Option_t* option = "");
 //-----------------------------------------------------------------------------
 // overloaded methods of TObject
 //-----------------------------------------------------------------------------

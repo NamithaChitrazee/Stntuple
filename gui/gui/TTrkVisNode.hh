@@ -172,16 +172,18 @@ public:
 //-----------------------------------------------------------------------------
   virtual int  InitEvent();
 
-  virtual void PaintXY (Option_t* option = "");
-  virtual void PaintRZ (Option_t* option = "");
-  virtual void PaintTZ (Option_t* option = "");
-  virtual void PaintVST(Option_t* option = "");
+  virtual void PaintXY  (Option_t* option = "");
+  virtual void PaintRZ  (Option_t* option = "");
+  virtual void PaintTZ  (Option_t* option = "");
+  virtual void PaintPhiZ(Option_t* option = "");
+  virtual void PaintVST (Option_t* option = "");
 //-----------------------------------------------------------------------------
 // overloaded methods of TObject
 //-----------------------------------------------------------------------------
-  virtual int  DistancetoPrimitiveXY(Int_t px, Int_t py);
-  virtual int  DistancetoPrimitiveRZ(Int_t px, Int_t py);
-  virtual int  DistancetoPrimitiveTZ(Int_t px, Int_t py);
+  virtual int  DistancetoPrimitiveXY  (Int_t px, Int_t py);
+  virtual int  DistancetoPrimitiveRZ  (Int_t px, Int_t py);
+  virtual int  DistancetoPrimitiveTZ  (Int_t px, Int_t py);
+  virtual int  DistancetoPrimitivePhiZ(Int_t px, Int_t py);
 
   virtual void Clear(const char* Opt = "")       ; // **MENU**
   virtual void Print(const char* Opt = "") const ; // **MENU**

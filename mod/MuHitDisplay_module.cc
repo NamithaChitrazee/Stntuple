@@ -336,7 +336,13 @@ void MuHitDisplay::InitVisManager() {
   vtz->AddNode(tc_node);
   vm->AddView(vtz);
 //-----------------------------------------------------------------------------
-// 4. VST view : TTrkNode only, so far
+// 4. TZ view : TrkNode - for now, hits only 
+//-----------------------------------------------------------------------------
+  TStnView* vphiz = new TStnView(TStnVisManager::kPhiZ,-1,"PhiZView","PhiZ View");
+  vphiz->AddNode(tnode);
+  vm->AddView(vphiz);
+//-----------------------------------------------------------------------------
+// 5. VST view : TTrkNode only, so far
 //-----------------------------------------------------------------------------
   TStnView* vst = new TStnView(TStnVisManager::kVST,-1,"VSTView","VST View");
   vst->AddNode(tnode);

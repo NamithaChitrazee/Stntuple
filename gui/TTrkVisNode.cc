@@ -831,6 +831,78 @@ void TTrkVisNode::PaintTZ(Option_t* Option) {
 }
 
 //-----------------------------------------------------------------------------
+// PhiZ view is only for the pattern recognition / time cluster finding
+// display reconstructed tracks and combo hits 
+//-----------------------------------------------------------------------------
+void TTrkVisNode::PaintPhiZ(Option_t* Option) {
+
+  TStnVisManager* vm = TStnVisManager::Instance();
+
+  double phimin = -M_PI; // vm->TMin(); 
+  double phimax =  M_PI; // vm->TMax();
+
+  stntuple::TEvdTimeCluster* etcl = vm->SelectedTimeCluster();
+
+  // if (etcl) {
+  //   tmin = etcl->TMin(); // FIXME!
+  //   tmax = etcl->TMax(); // FIXME!
+  // }
+
+  int nhits = fListOfComboHits->GetEntries();
+  if (nhits > 0) {
+    const mu2e::ComboHit* ch0 = &fChColl->at(0);
+
+    for (int i=0; i<nhits; i++) {
+      stntuple::TEvdComboHit* ech = (stntuple::TEvdComboHit*) fListOfComboHits->At(i);
+      const mu2e::ComboHit*   ch  = ech->ComboHit();
+
+      int loc = ch-ch0;
+      const mu2e::StrawHitFlag* flag = &fChfColl->at(loc);
+      if (vm->IgnoreComptonHits()) {
+        if (flag->hasAnyProperty(mu2e::StrawHitFlagDetail::bkg))      continue;
+      }
+      
+      if (vm->IgnoreProtonHits()) {
+        if (! flag->hasAnyProperty(mu2e::StrawHitFlagDetail::energysel)) continue;
+      }
+      
+      float phi = ech->Pos()->Phi();
+      
+      if ((phi >= phimin) && (phi <= phimax)) {
+        // check if the hit belongs to the time cluster
+        int ok = 1;
+        if (etcl and vm->DisplayOnlyTCHits()) { 
+          ok = TCHit(etcl->TimeCluster(),ech->ComboHit()->index(0));
+        }
+        if (ok) ech->PaintPhiZ(Option);
+      }
+    }
+  }
+//-----------------------------------------------------------------------------
+// SimParticle's
+//-----------------------------------------------------------------------------
+  if (vm->DisplaySimParticles()) {
+    stntuple::TEvdSimParticle* esim;
+    int nsim(0);
+
+    if ( (fListOfSimParticles) != 0 )  nsim = fListOfSimParticles->GetEntriesFast();
+
+    for (int i=0; i<nsim; i++ ) {
+      esim = (stntuple::TEvdSimParticle*) fListOfSimParticles->At(i);
+
+      if (vm->IgnoreProtons() != 0) {
+        int pdg_code = esim->SimParticle()->PDGCode();
+        if (pdg_code > 2000)                                         continue;
+      }
+
+      esim->PaintPhiZ(Option);
+    }
+  }
+
+  gPad->Modified();
+}
+
+//-----------------------------------------------------------------------------
 // VST view : display all straws 
 //-----------------------------------------------------------------------------
 void TTrkVisNode::PaintVST(Option_t* Option) {
@@ -973,6 +1045,59 @@ Int_t TTrkVisNode::DistancetoPrimitiveTZ(Int_t px, Int_t py) {
       }
 
       dist = esim->DistancetoPrimitiveTZ(px,py);
+
+      if (dist < min_dist) {
+	min_dist = dist;
+	closest  = esim;
+      }
+    }
+  }
+
+  SetClosestObject(closest,min_dist);
+
+  return min_dist;
+}
+
+//-----------------------------------------------------------------------------
+Int_t TTrkVisNode::DistancetoPrimitivePhiZ(Int_t px, Int_t py) {
+
+  // static TVector3 global;
+  // global.SetXYZ(gPad->AbsPixeltoX(px),gPad->AbsPixeltoY(py),0);
+
+  TObject* closest(nullptr);
+
+  int  x1, y1, dx1, dy1, min_dist(9999), dist;
+
+  TStnVisManager* vm = TStnVisManager::Instance();
+
+  int nhits = fListOfComboHits->GetEntries();
+  for (int i=0; i<nhits; i++) {
+    stntuple::TEvdComboHit* hit = (stntuple::TEvdComboHit*) fListOfComboHits->At(i);
+    x1  = gPad->XtoAbsPixel(hit->Z());
+    y1  = gPad->YtoAbsPixel(hit->Pos()->Phi());
+    dx1 = px-x1;
+    dy1 = py-y1;
+
+    dist  = (int) sqrt(dx1*dx1+dy1*dy1);
+    if (dist < min_dist) {
+      min_dist = dist;
+      closest  = hit;
+    }
+  }
+//-----------------------------------------------------------------------------
+// simparticles are represented by lines
+//-----------------------------------------------------------------------------
+  if (vm->DisplaySimParticles()) {
+    int nsim = fListOfSimParticles->GetEntries();
+    for (int i=0; i<nsim; i++) {
+      stntuple::TEvdSimParticle* esim = GetEvdSimParticle(i);
+
+      if (vm->IgnoreProtons() != 0) {
+        int pdg_code = (int) esim->SimParticle()->PDGCode();
+        if (pdg_code > 2000)                                         continue;
+      }
+
+      dist = esim->DistancetoPrimitivePhiZ(px,py);
 
       if (dist < min_dist) {
 	min_dist = dist;

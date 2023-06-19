@@ -38,9 +38,10 @@ public:
     kXY        =  1,
     kRZ        =  2,
     kTZ        =  3,
-    kCal       =  4,
-    kCrv       =  5,
-    kVST       =  6			// VST view
+    kPhiZ      =  4,
+    kCal       =  5,
+    kCrv       =  6,
+    kVST       =  7			// VST view
   };
 
 //-----------------------------------------------------------------------------
@@ -62,9 +63,9 @@ public:
 
   enum WidgetIdentities{
     TIMESLIDER_ID = 10,
-    TIMELOW_DISP = 11,
+    TIMELOW_DISP  = 11,
     TIMEHIGH_DISP = 12,
-    UPDATER_BTN = 13
+    UPDATER_BTN   = 13
   };
 
 //-----------------------------------------------------------------------------
@@ -251,6 +252,9 @@ public:
 
   Int_t   OpenTrkTZView();
   Int_t   OpenTrkTZView(TStnView* Mother, Axis_t x1, Axis_t y1, Axis_t x2, Axis_t y2);
+
+  Int_t   OpenPhiZView();
+  Int_t   OpenPhiZView(TStnView* Mother, Axis_t x1, Axis_t y1, Axis_t x2, Axis_t y2);
 
   Int_t   OpenCalView();
   Int_t   OpenCalView  (TStnView* Mother, Axis_t x1, Axis_t y1, Axis_t x2, Axis_t y2);

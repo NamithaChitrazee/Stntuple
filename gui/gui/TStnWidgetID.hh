@@ -38,6 +38,7 @@ enum GuiCommandID {
   M_OPEN_XY,
   M_OPEN_RZ,
   M_OPEN_TZ,
+  M_OPEN_PHIZ,
   M_OPEN_CAL,
   M_OPEN_CRV,
   M_OPEN_VST,
