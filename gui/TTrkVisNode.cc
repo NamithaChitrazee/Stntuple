@@ -838,15 +838,21 @@ void TTrkVisNode::PaintPhiZ(Option_t* Option) {
 
   TStnVisManager* vm = TStnVisManager::Instance();
 
+  mu2e::GeomHandle<mu2e::Tracker> ttHandle;
+  const mu2e::Tracker* tracker = ttHandle.get();
+
+  double tmin   = vm->TMin(); 
+  double tmax   = vm->TMax();
+
   double phimin = -M_PI; // vm->TMin(); 
   double phimax =  M_PI; // vm->TMax();
 
   stntuple::TEvdTimeCluster* etcl = vm->SelectedTimeCluster();
 
-  // if (etcl) {
-  //   tmin = etcl->TMin(); // FIXME!
-  //   tmax = etcl->TMax(); // FIXME!
-  // }
+  if (etcl) {
+    tmin = etcl->TMin(); // FIXME!
+    tmax = etcl->TMax(); // FIXME!
+  }
 
   int nhits = fListOfComboHits->GetEntries();
   if (nhits > 0) {
@@ -866,15 +872,26 @@ void TTrkVisNode::PaintPhiZ(Option_t* Option) {
         if (! flag->hasAnyProperty(mu2e::StrawHitFlagDetail::energysel)) continue;
       }
       
-      float phi = ech->Pos()->Phi();
+      int index = ch->index(0);
+      const mu2e::ComboHit* sh = &fSchColl->at(index);
+
+      const mu2e::Straw* straw = &tracker->getStraw(sh->strawId()); // first straw hit
+      int station = straw->id().getStation();
+      double time = ch->correctedTime();
+
+      if ((station >= vm->MinStation()) && (station <= vm->MaxStation())) { 
+        if ((time >= tmin) && (time <= tmax)) {
+          float phi = ech->Pos()->Phi();
       
-      if ((phi >= phimin) && (phi <= phimax)) {
-        // check if the hit belongs to the time cluster
-        int ok = 1;
-        if (etcl and vm->DisplayOnlyTCHits()) { 
-          ok = TCHit(etcl->TimeCluster(),ech->ComboHit()->index(0));
+          if ((phi >= phimin) && (phi <= phimax)) {
+                                        // check if the hit belongs to the time cluster
+            int ok = 1;
+            if (etcl and vm->DisplayOnlyTCHits()) { 
+              ok = TCHit(etcl->TimeCluster(),ech->ComboHit()->index(0));
+            }
+            if (ok) ech->PaintPhiZ(Option);
+          }
         }
-        if (ok) ech->PaintPhiZ(Option);
       }
     }
   }
