@@ -60,16 +60,19 @@ mu2e -c Stntuple/fcl/display.fcl -s dig.mu2e.CeEndpointDigiTriggered.MDC2020n_10
      saved in STNTUPLE and displayed will be only particles pre-selected 
      from that list , still with N(straw hits) > 0 and E > Emin
 ** plugins                                                                   
-   the following FCL parameter of a STNTUPLE module (any module class inheriting from TModule)
+  -  MuHitDisplay can execute ROOT scripts in an interpreted mode.
+  - the following FCL parameter of a STNTUPLE module (any module class inheriting from TModule)
 
 #+begin_src
    interactiveMode : 2
    rootMacro       : "Stntuple/mod/scripts/display_001.C"
 #+end_src
 
-   makes the module to execute an interpreted function "display_001(int MOde, TModule* Module)" 
-   each time the module is called, assuming the module calls proper hooks of the TModule
-   search the source of [[file:../mod/MuHitDisplay_module.cc][Stntuple/mod/MuHitDisplay_module.cc]]   for "TModule"
+   - makes the module to execute a function "display_001(int Mode, TModule* Module)" 
+     each time MuHitDisplay is called 
+
+   - the same is true for any module inheriting from [[file:../mod/TModule.cc][Stntuple/mod/TModule.cc]], assuming the module calls proper 
+     TModule hooks. Search the source of [[file:../mod/MuHitDisplay_module.cc][Stntuple/mod/MuHitDisplay_module.cc]] for "TModule"
 
    see example: [[file:../mod/scripts/display_001.C][Stntuple/mod/scripts/display_001.C]] 
 #+begin_src
