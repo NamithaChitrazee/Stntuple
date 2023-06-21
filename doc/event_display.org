@@ -1,16 +1,18 @@
 #
-* STNTUPLE event display                                                     
-** how to run:                                                               
+* *MuHitDisplay* : STNTUPLE event display                                    
+** how to run                                                                
 #+begin_src
 mu2e -c Stntuple/fcl/display.fcl -s dig.mu2e.CeEndpointDigiTriggered.MDC2020n_10pc.001210_00000000.art 
 #+end_src
-** event display module:                                                     
-   [[file:../mod/MuHitDisplay_module.cc]]                   
+** event display module                                                      
+   [[file:../mod/MuHitDisplay_module.cc]] 
+
+   module FCL defaults: file:../fcl/prolog.fcl::/module_type:MuHitDisplay/
 
    TStnVisManager-specific settings: file:../fcl/prolog.fcl::/visManager/
 
-   - visManager.defaultView : view opened in teh first window, "xy", "vst", etc
-                              defautl: "xy"
+   - visManager.defaultView : view opened in the first window, "xy", "vst", etc
+     - default: "xy"
 
    - visManager.displayStrawDigiMC
    - visManager.bField      : used to display trajectories in the tracker,
@@ -58,7 +60,7 @@ mu2e -c Stntuple/fcl/display.fcl -s dig.mu2e.CeEndpointDigiTriggered.MDC2020n_10
    - if, however, *primaryParticleTag* is set not non-empty string, 
      saved in STNTUPLE and displayed will be only particles pre-selected 
      from that list , still with N(straw hits) > 0 and E > Emin
-** plugins:                                                                  
+** plugins                                                                   
    the following FCL parameter of a STNTUPLE module (any module class inheriting from TModule)
 
 #+begin_src
@@ -84,21 +86,27 @@ mu2e -c Stntuple/fcl/display.fcl -s dig.mu2e.CeEndpointDigiTriggered.MDC2020n_10
                    = 2 : stop only in the end of run
 #+end_src
     
-** quick notes about internals                                               
-
-  - Several views : derived from TStnView - XYView, RZView, TZView....
-  - each view displays geometry and several nodes 
-  - a node controls interactive cbehavior - DistanceToPrimitive
-  - each note "knows" how to paint itself in each view PaintXY, PaintRZ, etc 
-  - 3D views: need a simplified geometry, work in progress 
 ** views                                                                     
-  - display supports multiple views
+  - display supports multiple views. Currently available are:
+    - XY view   : tracker+calorimeter
+    - TZ view   : tracker hits, time clusters, MC particles
+    - PhiZ view : tracker hits
+    - Cal view  : clusters, hits in individual crystals
+    - CRV view  : 
+    - RZ view   : tracker hits 
+    - VST view  : tracker VST geometry
   - by default, a view prints a list of all its nodes
 ** printing                                                                  
 - prints : under the "print" section of the shutter
 - right click on a view pops up a context sensitive menu, a TStnView print prints 
   all nodes (objects) displayed in the active view
 
+** quick notes about internals                                               
+  - Several views : derived from TStnView - XYView, RZView, TZView
+  - each view displays geometry and several nodes 
+  - a node controls interactive cbehavior - DistanceToPrimitive
+  - each note "knows" how to paint itself in each view PaintXY, PaintRZ, etc 
+  - 3D views: need a simplified geometry, work in progress 
 ** command line printing                                                     
 #+begin_quote   print time cluster collection                                
    d = TAnaDump::Instance()
