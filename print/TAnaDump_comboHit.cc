@@ -116,16 +116,16 @@ void TAnaDump::printComboHitCollection(const char* StrawHitCollTag   ,
     return;
   }
 
-  art::Handle<mu2e::StrawHitFlagCollection> shfcH;
-  const mu2e::StrawHitFlagCollection*       shfc(nullptr);
-  fEvent->getByLabel("FlagBkgHits:ComboHits",shfcH);
+  // art::Handle<mu2e::StrawHitFlagCollection> shfcH;
+  // const mu2e::StrawHitFlagCollection*       shfc(nullptr);
+  // fEvent->getByLabel("FlagBkgHits:ComboHits",shfcH);
 
-  if (shfcH.isValid()) shfc = shfcH.product();
-  else {
-    printf("ERROR: cant find StrawHitFlagCollection tag=FlagBkgHits:ComboHits, EXIT\n");
-    print_shf_colls();
-    return;
-  }
+  // if (shfcH.isValid()) shfc = shfcH.product();
+  // else {
+  //   printf("ERROR: cant find StrawHitFlagCollection tag=FlagBkgHits:ComboHits, EXIT\n");
+  //   print_shf_colls();
+  //   return;
+  // }
 
   art::InputTag sdmc_tag = StrawDigiMCCollTag;
   if (sdmc_tag == "") sdmc_tag = fSdmcCollTag;
@@ -165,7 +165,9 @@ void TAnaDump::printComboHitCollection(const char* StrawHitCollTag   ,
       step = mcdigi->strawGasStep(mu2e::StrawEnd::hv ).get();
     }
                                         // flags back to a separate coll
-    flags = *((int*) &shfc->at(i));
+                                        // and back again to the hit payload
+    //    flags = *((int*) &shfc->at(i));
+    flags = *((int*) &hit->flag());
     if (banner_printed == 0) {
       printComboHit(hit, step, "banner");
       banner_printed = 1;

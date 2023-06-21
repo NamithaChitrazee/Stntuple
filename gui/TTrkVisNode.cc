@@ -527,21 +527,21 @@ void TTrkVisNode::PaintXY(Option_t* Option) {
 //-----------------------------------------------------------------------------
     int nhits = fListOfStrawHits->GetEntries();
     if (nhits > 0) {
-      const mu2e::ComboHit* sch0 = &fSchColl->at(0);
+      // const mu2e::ComboHit* sch0 = &fSchColl->at(0);
       for (int i=0; i<nhits; i++) {
 	stntuple::TEvdStrawHit* evd_sh = GetEvdStrawHit(i);
 	const mu2e::ComboHit*   sch    = evd_sh->StrawHit();
 //-----------------------------------------------------------------------------
 // see in flags need to be checked, use external flags
 //-----------------------------------------------------------------------------
-	int loc  = sch-sch0;
-	const mu2e::StrawHitFlag* flag = &fShfColl->at(loc);
+	// int loc  = sch-sch0;
+	const mu2e::StrawHitFlag flag = sch->flag(); // &fShfColl->at(loc);
 	if (vm->IgnoreComptonHits()) {
-	  if (flag->hasAnyProperty(mu2e::StrawHitFlagDetail::bkg))      continue;
+	  if (flag.hasAnyProperty(mu2e::StrawHitFlagDetail::bkg))      continue;
 	}
 
 	if (vm->IgnoreProtonHits()) {
-	  if (! flag->hasAnyProperty(mu2e::StrawHitFlagDetail::energysel)) continue;
+	  if (! flag.hasAnyProperty(mu2e::StrawHitFlagDetail::energysel)) continue;
 	}
 
 	straw     = &tracker->getStraw(sch->strawId());
@@ -569,18 +569,18 @@ void TTrkVisNode::PaintXY(Option_t* Option) {
 //-----------------------------------------------------------------------------
     int nch = fListOfComboHits->GetEntries();
     if (nch > 0) { 
-      const mu2e::ComboHit* ch0 = &fChColl->at(0);
+      // const mu2e::ComboHit* ch0 = &fChColl->at(0);
       for (int i=0; i<nch; i++) {
 	stntuple::TEvdComboHit* evd_ch = (stntuple::TEvdComboHit*) fListOfComboHits->At(i);
 	const mu2e::ComboHit*   ch     = evd_ch->ComboHit();
 
-	int loc  = ch-ch0;
-	const mu2e::StrawHitFlag* flag = &fChfColl->at(loc);
+	// int loc  = ch-ch0;
+	const mu2e::StrawHitFlag flag = ch->flag(); // &fChfColl->at(loc);
 	if (vm->IgnoreComptonHits()) {
-	  if (flag->hasAnyProperty(mu2e::StrawHitFlagDetail::bkg))      continue;
+	  if (flag.hasAnyProperty(mu2e::StrawHitFlagDetail::bkg))      continue;
 	}
 	if (vm->IgnoreProtonHits()) {
-	  if (! flag->hasAnyProperty(mu2e::StrawHitFlagDetail::energysel)) continue;
+	  if (! flag.hasAnyProperty(mu2e::StrawHitFlagDetail::energysel)) continue;
 	}
 //-----------------------------------------------------------------------------
 // a combined hit doesn't have it's own measured time - that is calculated
@@ -778,20 +778,20 @@ void TTrkVisNode::PaintTZ(Option_t* Option) {
 
   int nhits = fListOfComboHits->GetEntries();
   if (nhits > 0) {
-    const mu2e::ComboHit* ch0 = &fChColl->at(0);
+    // const mu2e::ComboHit* ch0 = &fChColl->at(0);
 
     for (int i=0; i<nhits; i++) {
       stntuple::TEvdComboHit* ech = (stntuple::TEvdComboHit*) fListOfComboHits->At(i);
       const mu2e::ComboHit*   ch  = ech->ComboHit();
 
-      int loc = ch-ch0;
-      const mu2e::StrawHitFlag* flag = &fChfColl->at(loc);
+      // int loc = ch-ch0;
+      const mu2e::StrawHitFlag flag = ch->flag(); // &fChfColl->at(loc);
       if (vm->IgnoreComptonHits()) {
-        if (flag->hasAnyProperty(mu2e::StrawHitFlagDetail::bkg))      continue;
+        if (flag.hasAnyProperty(mu2e::StrawHitFlagDetail::bkg))      continue;
       }
       
       if (vm->IgnoreProtonHits()) {
-        if (! flag->hasAnyProperty(mu2e::StrawHitFlagDetail::energysel)) continue;
+        if (! flag.hasAnyProperty(mu2e::StrawHitFlagDetail::energysel)) continue;
       }
       
       float time  = ech->correctedTime();
@@ -856,20 +856,20 @@ void TTrkVisNode::PaintPhiZ(Option_t* Option) {
 
   int nhits = fListOfComboHits->GetEntries();
   if (nhits > 0) {
-    const mu2e::ComboHit* ch0 = &fChColl->at(0);
+    // const mu2e::ComboHit* ch0 = &fChColl->at(0);
 
     for (int i=0; i<nhits; i++) {
       stntuple::TEvdComboHit* ech = (stntuple::TEvdComboHit*) fListOfComboHits->At(i);
       const mu2e::ComboHit*   ch  = ech->ComboHit();
 
-      int loc = ch-ch0;
-      const mu2e::StrawHitFlag* flag = &fChfColl->at(loc);
+      // int loc = ch-ch0;
+      const mu2e::StrawHitFlag flag = ch->flag(); // &fChfColl->at(loc);
       if (vm->IgnoreComptonHits()) {
-        if (flag->hasAnyProperty(mu2e::StrawHitFlagDetail::bkg))      continue;
+        if (flag.hasAnyProperty(mu2e::StrawHitFlagDetail::bkg))      continue;
       }
       
       if (vm->IgnoreProtonHits()) {
-        if (! flag->hasAnyProperty(mu2e::StrawHitFlagDetail::energysel)) continue;
+        if (! flag.hasAnyProperty(mu2e::StrawHitFlagDetail::energysel)) continue;
       }
       
       int index = ch->index(0);

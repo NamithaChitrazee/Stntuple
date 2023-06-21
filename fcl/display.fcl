@@ -13,13 +13,17 @@ process_name : Display
 source       : { module_type : RootInput   }
 
 physics : {
-    producers  : { @table::stntuple.producers }
+    producers  : { @table::stntuple.producers 
+        FlagBkgHits : { @table::stntuple.producers.DeltaFinder }
+    }
     filters    : { @table::stntuple.filters   }
     analyzers  : { @table::stntuple.analyzers }
 
     p1 : [ @sequence::CaloReco.Reco,
 	   @sequence::CaloCluster.Reco,
-	   @sequence::TrkHitReco.PrepareHits
+	   @sequence::TrkHitReco.PrepareHits   ## [ PBTFSD, makeSH, makePH, FlagBkgHits ] 
+                                               #  see Offline/TrkHitReco/prolog.fcl
+           , TZClusterFinder
 	  ]
 
     e1 : [ MuHitDisplay ]
@@ -43,5 +47,7 @@ outputs.detectorOutput.fileName           : "sim.user.display.xxx.000001.art"
 # see https://github.com/Mu2e/Stntuple/blob/muse/doc/event_display.org for more details
 #------------------------------------------------------------------------------
 physics.analyzers.MuHitDisplay.primaryParticleTag : ""
+physics.analyzers.MuHitDisplay.timeClusterCollTag : "TZClusterFinder"
+physics.analyzers.MuHitDisplay.comboHitCollTag    : "FlagBkgHits"
 # physics.analyzers.MuHitDisplay.minSimpMomentum    : 100
 # physics.analyzers.MuHitDisplay.rootMacro          : "Stntuple/mod/scripts/display_001.C"
