@@ -68,7 +68,7 @@ mu2e -c Stntuple/fcl/display.fcl -s dig.mu2e.CeEndpointDigiTriggered.MDC2020n_10
    rootMacro       : "Stntuple/mod/scripts/display_001.C"
 #+end_src
 
-   - makes the module to execute a function "display_001(int Mode, TModule* Module)" 
+     makes the module to execute a function "display_001(int Mode, TModule* Module)" 
      each time MuHitDisplay is called 
 
    - the same is true for any module inheriting from [[file:../mod/TModule.cc][Stntuple/mod/TModule.cc]], assuming the module calls proper 

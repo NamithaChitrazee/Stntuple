@@ -54,7 +54,7 @@ int StntupleInitTriggerBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Even
     // block->fPaths.Init(nbits);
 
     for (int i=0; i<block->fNPaths; i++) {
-      const std::string& name = trn.getTrigPath(i);
+      const std::string& name = trn.getTrigPathName(i);
 
       if (trn.accepted(name)) {
 	//-----------------------------------------------------------------------------

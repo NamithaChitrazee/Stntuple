@@ -19,8 +19,6 @@
 #include "TSystem.h"
 #include "TTime.h"
 
-// Framework includes.
-
 #include "art/Framework/Core/EDAnalyzer.h"
 #include "art/Framework/Core/ModuleMacros.h"
 #include "art/Framework/Principal/Event.h"
@@ -30,17 +28,58 @@
 
 #include "Stntuple/obj/TStnTriggerTable.hh"
 #include "Stntuple/obj/TStnDataBlock.hh"
+#include "Stntuple/obj/TStnHeaderBlock.hh"
 #include "Stntuple/obj/TStnNode.hh"
 #include "Stntuple/obj/TStnEvent.hh"
 #include "Stntuple/obj/TStnErrorLogger.hh"
 #include "Stntuple/alg/TStntuple.hh"
 
-#include "Stntuple/mod/InitStntuple_module.hh"
 #include "Stntuple/mod/InitStntupleDataBlocks.hh"
 
-// ClassImp(InitStntuple)
+// class TObjArray;
+
+#include "Stntuple/mod/StntupleModule.hh"
 
 namespace mu2e {
+class InitStntuple : public StntupleModule {
+//------------------------------------------------------------------------------
+//  data members
+//------------------------------------------------------------------------------
+protected:
+
+  Int_t                    fLastRun;
+  Float_t                  fSumInstLum; //! avg inst lum for evaluating
+  Int_t                    fnLum;       //! exe speed
+  Float_t                  fCpuSpeed;   //! MHz of CPU
+
+//------------------------------------------------------------------------------
+// function members
+//------------------------------------------------------------------------------
+public:
+					// constructors and destructor
+
+  InitStntuple(fhicl::ParameterSet const& Pset);
+
+  ~InitStntuple();
+				        // ****** accessors
+//-----------------------------------------------------------------------------
+// overloaded virtual functions of EDFilter
+//-----------------------------------------------------------------------------
+  virtual void beginRun(const art::Run&   r);
+  virtual void analyze (const AbsEvent&   e);
+  virtual void endRun  (const art::Run&   r);
+  virtual void beginJob();
+  virtual void endJob  ();
+					// ****** functions of the module
+
+  int          ProcessNewRun      (const art::Run* ARun);
+  int          InitTriggerTable   (int RunNumber);
+  // int       InitRunSummary     ();
+					// ****** setters
+  //  ClassDef(InitStntuple,0)
+};
+
+
 //------------------------------------------------------------------------------
 // constructors
 //------------------------------------------------------------------------------
@@ -84,9 +123,8 @@ void InitStntuple::beginJob() {
   THistModule::afterBeginJob();
 }
 
-
 //------------------------------------------------------------------------------
-int InitStntuple::InitTriggerTable() {
+int InitStntuple::InitTriggerTable(int RunNumber) {
   // string        trigger_name;
   // string        trigger_table_name;
   // unsigned long bit;
@@ -103,27 +141,50 @@ int InitStntuple::InitTriggerTable() {
   trigger_table = (TStnTriggerTable*) dbm->GetTable("TriggerTable");
 
   trigger_table->Delete();
-
-  //  if (gblEnv->monteFlag() == false || (gblEnv->monteFlag() == true && gblEnv->runNumber() > 100000)) {
 //-----------------------------------------------------------------------------
 // data run, so far all trigger tags (versions) are set to 1, 
-// trigger bit assignement is arbitrary
+// trigger bit assignment is arbitrary
 //-----------------------------------------------------------------------------
-  trigger_table->AddTrigger(new TStnTrigger( 0, 0,"RecoPath"                   ,1));
-  trigger_table->AddTrigger(new TStnTrigger( 1, 1,"cprSeedDeM_trigger"         ,1));
-  trigger_table->AddTrigger(new TStnTrigger( 2, 2,"tprSeedDeM_trigger"         ,1));
-  trigger_table->AddTrigger(new TStnTrigger( 3, 3,"cprLowPSeedDeM_trigger"     ,1));
-  trigger_table->AddTrigger(new TStnTrigger( 4, 4,"tprLowPSeedDeM_trigger"     ,1));
-  trigger_table->AddTrigger(new TStnTrigger( 5, 5,"cprCosmicSeedDeM_trigger"   ,1));
-  trigger_table->AddTrigger(new TStnTrigger( 6, 6,"tprCosmicSeedDeM_trigger"   ,1));
-  trigger_table->AddTrigger(new TStnTrigger( 7, 7,"tprHelixCalibIPADeM_trigger",1));
-  trigger_table->AddTrigger(new TStnTrigger( 8, 8,"tprHelixIPADeM_trigger"     ,1));
-  trigger_table->AddTrigger(new TStnTrigger( 9, 9,"caloCalibCosmic_trigger"    ,1));
-  trigger_table->AddTrigger(new TStnTrigger(10,10,"caloMVACE_trigger"          ,1));
-  trigger_table->AddTrigger(new TStnTrigger(11,11,"unbiased_trigger"           ,1));
-  trigger_table->AddTrigger(new TStnTrigger(12,12,"caloPhoton_trigger"         ,1));
-  trigger_table->AddTrigger(new TStnTrigger(31,31,"p1"                         ,1)); // a kludge to get rid of su2020 warnings
-			      //  }
+  if (RunNumber < 1200) {
+    trigger_table->AddTrigger(new TStnTrigger( 0, 0,"RecoPath"                   ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 1, 1,"cprSeedDeM_trigger"         ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 2, 2,"tprSeedDeM_trigger"         ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 3, 3,"cprLowPSeedDeM_trigger"     ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 4, 4,"tprLowPSeedDeM_trigger"     ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 5, 5,"cprCosmicSeedDeM_trigger"   ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 6, 6,"tprCosmicSeedDeM_trigger"   ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 7, 7,"tprHelixCalibIPADeM_trigger",1));
+    trigger_table->AddTrigger(new TStnTrigger( 8, 8,"tprHelixIPADeM_trigger"     ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 9, 9,"caloCalibCosmic_trigger"    ,1));
+    trigger_table->AddTrigger(new TStnTrigger(10,10,"caloMVACE_trigger"          ,1));
+    trigger_table->AddTrigger(new TStnTrigger(11,11,"unbiased_trigger"           ,1));
+    trigger_table->AddTrigger(new TStnTrigger(12,12,"caloPhoton_trigger"         ,1));
+    trigger_table->AddTrigger(new TStnTrigger(31,31,"p1"                         ,1)); // a kludge to get rid of su2020 warnings
+  }
+  else if (RunNumber <= 1210) {
+//-----------------------------------------------------------------------------
+// runs 1200-1210: this may or may not be correct, consider the following 
+// just an example
+//-----------------------------------------------------------------------------
+    trigger_table->AddTrigger(new TStnTrigger(   0,   0,"MixPath"                          ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 100, 100,"tprDeM_highP_stopTarg_trigger"    ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 101, 101,"tprDeP_highP_stopTarg_trigger"    ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 110, 110,"tprDeM_lowP_stopTarg_trigger"     ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 111, 111,"tprDeP_lowP_stopTarg_trigger"     ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 120, 120,"tprHelixDeM_ipa_trigger"          ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 121, 121,"tprHelixDeM_ipa_phiScaled_trigger",1));
+    
+    trigger_table->AddTrigger(new TStnTrigger( 150, 150,"cprDeM_highP_stopTarg_trigger"    ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 151, 151,"cprDeP_highP_stopTarg_trigger"    ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 160, 160,"cprDeM_lowP_stopTarg_trigger"     ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 161, 161,"cprDeP_lowP_stopTarg_trigger"     ,1));
+
+    trigger_table->AddTrigger(new TStnTrigger( 220, 220,"caloFast_rmc_trigger"             ,1));
+  }
+  else {
+    printf("ERROR: Run Number = %8i, no trigger table defined\n",RunNumber);
+  }
+
   return 0;
 }
 
@@ -131,10 +192,12 @@ int InitStntuple::InitTriggerTable() {
 Int_t InitStntuple::ProcessNewRun(const art::Run* ARun) {
 
   // InitRunSummary     ();
-  InitTriggerTable   ();
+  int rn = ARun->run();
+
+  InitTriggerTable   (rn);
   // InitDeadList       ();
 
-  TStntuple::Init(ARun->run());
+  TStntuple::Init(rn);
 
   return 0;
 }

@@ -1,6 +1,6 @@
 # -*- mode:tcl -*-
 #------------------------------------------------------------------------------
-# S4 Sim file s- inputs for mixing
+# s4_stn.fcl: stntuple output of the digitization
 #------------------------------------------------------------------------------
 BEGIN_PROLOG
   TRIGGER_PATHS                   : [ p1 ]
@@ -12,13 +12,12 @@ process_name : S4Stnmaker
 
 source       : { module_type : RootInput fileNames : ["undefined", "undefined"] }
 
-outputs      : { @table::Stntuple.outputs   }
-producers    : { @table::Stntuple.producers }
-filters      : { @table::Stntuple.filters   }
-analyzers    : { @table::Stntuple.analyzers }
-paths        : { @table::Stntuple.paths     }
+producers    : { @table::stntuple.producers }
+filters      : { @table::stntuple.filters   }
+analyzers    : { @table::stntuple.analyzers }
+paths        : { @table::stntuple.paths     }
 
-physics : { @table::Stntuple.physics 
+physics : { 
     
     analyzers  : { @table::analyzers 
 	StntupleMaker: { @table::analyzers.StntupleMaker
@@ -31,7 +30,7 @@ physics : { @table::Stntuple.physics
 	    makeSimp         : 1
 	    makeStepPointMC  : 1
 	    makeTracks       : 0
-	    makeTrigger      : 0
+	    makeTrigger      : 1
 
 	    simpCollTag      : "compressDigiMCs"
 
@@ -44,10 +43,10 @@ physics : { @table::Stntuple.physics
     @table::paths
     p1 : [ @sequence::TrkHitReco.PrepareHits ]
     
-
-    trigger_paths : [ p1 ]
-    out           : [ ]                   # [defaultOutput]/[]
-    end_paths     : [ stntuple_p0 , out ]
+    trigger_paths : [    ]
+    out           : [    ]                             # [defaultOutput]/[]
+    e1            : [ @sequence::stntuple.paths.p0 ]
+    end_paths     : [ e1 , out ]
 }
 
 #------------------------------------------------------------------------------
@@ -56,6 +55,6 @@ physics : { @table::Stntuple.physics
 # physics.out                               : [ detectorOutput ]
 # outputs.detectorOutput.SelectEvents       : [ path_gen_digi_reco_stn_dem_dmm ]
 
-services.TFileService.fileName            : "nts.user.s4_stn.project.sequencer.hist"
+services.TFileService.fileName              : "nts.user.s4_stn.project.sequencer.hist"
 physics.analyzers.InitStntuple.histFileName : "nts.user.s4_stn.project.sequencer.stn"
-outputs.detectorOutput.fileName           : "sim.user.s4_stn.project.sequencer.art"
+outputs.detectorOutput.fileName             : "sim.user.s4_stn.project.sequencer.art"
