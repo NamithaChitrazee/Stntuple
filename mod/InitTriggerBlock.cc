@@ -13,7 +13,6 @@
 //-----------------------------------------------------------------------------
 int StntupleInitTriggerBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int Mode) {
 
-  int const nbits(32);
   int       ev, rn, sr; 
 
   ev = Event->event();
@@ -25,13 +24,12 @@ int StntupleInitTriggerBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Even
   TStnTriggerBlock* block = (TStnTriggerBlock*) Block;
 //-----------------------------------------------------------------------------
 // number of paths is variable, but paths have predefined bit numbers assigned
-// assume bit ID <= 32
 //-----------------------------------------------------------------------------
   block->f_EventNumber  = ev;
   block->f_RunNumber    = rn;
   block->f_SubrunNumber = sr;
   block->fNPaths        = 0;
-  block->fPaths.Init(nbits);
+  block->fPaths.Init(fNTriggerBits);
 
   const art::TriggerResults*       tr(nullptr);
   art::Handle<art::TriggerResults> trH; 

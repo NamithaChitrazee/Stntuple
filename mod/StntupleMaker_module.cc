@@ -134,6 +134,7 @@ protected:
   art::InputTag            fPbiTag;
   string                   fPrimaryParticleTag;
   string                   fTriggerResultsTag;
+  int                      fNTriggerBits;
 
   vector<string>           fKsfBlockName;
   vector<string>           fKsfCollTag;
@@ -181,13 +182,13 @@ protected:
   GenId                    fGenId        ;  // generated process ID
   int                      fPdgId        ;  // PDG ID of the simparticle to be stored, 0 by default
   
-  double                   fMinTActive   ;  // start of the active window
-  double                   fMinECrystal  ;  // 
-  double                   fMinSimpMomentum; // min tot momentum of a particle to be stored in SIMP block
-  double                   fSimpMaxZ     ; // max Z of a particle to be stored in SIMP block
+  double                   fMinTActive   ;       // start of the active window
+  double                   fMinECrystal  ;       // 
+  double                   fMinSimpMomentum;     // min tot momentum of a particle to be stored in SIMP block
+  double                   fSimpMaxZ     ;       // max Z of a particle to be stored in SIMP block
 
   string                   fCutHelixSeedCollTag; // helix collection to cut on
-  int                      fMinNHelices    ; // min number of helices (for cosmics)
+  int                      fMinNHelices    ;     // min number of helices (for cosmics)
 
   TNamed*                  fVersion;
 
@@ -271,7 +272,9 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
 
   , fPbiTag                  (PSet.get<art::InputTag> ("pbiTag"    ))
   , fPrimaryParticleTag      (PSet.get<string>        ("primaryParticleTag"  ))
+
   , fTriggerResultsTag       (PSet.get<string>        ("triggerResultsTag"   ))
+  , fNTriggerBits            (PSet.get<int>           ("nTriggerBits"        ))
 
   , fKsfBlockName            (PSet.get<vector<string>>("trackSeedBlockName"  ))
   , fKsfCollTag              (PSet.get<vector<string>>("trackSeedCollTag"    ))
@@ -739,6 +742,7 @@ void StntupleMaker::beginJob() {
   if (fMakeTrigger) {
     fInitTriggerBlock = new StntupleInitTriggerBlock();
     fInitTriggerBlock->SetTriggerResultsTag(fTriggerResultsTag);
+    fInitTriggerBlock->SetNTriggerBits     (fNTriggerBits);
 
     AddDataBlock("TriggerBlock","TStnTriggerBlock",
 		 fInitTriggerBlock,

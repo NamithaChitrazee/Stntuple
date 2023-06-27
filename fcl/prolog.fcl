@@ -92,6 +92,7 @@ StntupleMakerTemplate : { module_type:StntupleMaker
     simpCollTag          : @local::STN_COMPRESS_MCS              # was "g4run" before
     primaryParticleTag   : @local::STN_COMPRESS_MCS              # this is new, to be passed to InitSimpBlock
     triggerResultsTag    : "TriggerResults"                      # assume TriggerResults produced at digi step
+    nTriggerBits         : 250                                   # this is a kludge due to no trigger table stored
     vdHitsCollTag        : @local::STN_VDHITS_COLL_TAG           # was "g4run" before
     minSimpMomentum      : 40.0                                  # MeV , minSimpMomentum < 0: store all with straw hits
     simpMaxZ             : 1800.0                                # not used

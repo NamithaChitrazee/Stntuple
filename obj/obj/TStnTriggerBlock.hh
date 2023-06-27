@@ -52,6 +52,9 @@ public:
 
   Int_t    PathPassed(Int_t I) { return (fPaths.GetNBits() > I) ? fPaths.GetBit(I) : 0 ; }
 
+//-----------------------------------------------------------------------------
+// this could be precalculated
+//-----------------------------------------------------------------------------
   Int_t    NPassedPaths();
 					// ****** modifiers
 

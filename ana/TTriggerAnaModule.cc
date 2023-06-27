@@ -103,7 +103,8 @@ void TTriggerAnaModule::BookTriggerHistograms(HistBase_t* Hist, const char* Fold
   //  char title[200];
   TriggerHist_t* hist = (TriggerHist_t*) Hist;
 
-  HBook1F(hist->fBits     ,"bits"    ,Form("%s: fired trigegr bits" ,Folder), 50,    0,  50,Folder);
+  HBook1F(hist->fBits        ,"bits"    ,Form("%s: fired trigger bits" ,Folder), 300,    0,  300,Folder);
+  HBook1F(hist->fNPassedPaths,"npassed" ,Form("%s: N(passed paths)"    ,Folder), 100,    0,  100,Folder);
 }
 
 //-----------------------------------------------------------------------------
@@ -327,6 +328,9 @@ void TTriggerAnaModule::FillTriggerHistograms(HistBase_t* Hist) {
     int passed = fTriggerBlock->PathPassed(i);
     if (passed) hist->fBits->Fill(i);
   }
+
+  int n_passed_paths = fTriggerBlock->NPassedPaths();
+  hist->fNPassedPaths->Fill(n_passed_paths);
 }
 
 //_____________________________________________________________________________

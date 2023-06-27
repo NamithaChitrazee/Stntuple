@@ -67,7 +67,7 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
       nsh    = shColl->size();
     }
     else {
-      mf::LogWarning(oname) << " WARNING: no StrawHitCollection tag=" 
+      mf::LogWarning(oname) << " WARNING line " << __LINE__ << ": no StrawHitCollection tag=" 
 			    << fShCollTag.encode().data() <<  " found";
     }
   }
@@ -78,7 +78,7 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
     bool ok = AnEvent->getByLabel(fStrawDigiMCCollTag,mcdH);
     if (ok) mcdigis = mcdH.product();
     else {
-      mf::LogWarning(oname) << " WARNING: no StrawDigiMCCollection tag=" 
+      mf::LogWarning(oname) << " WARNING line " << __LINE__ << ": no StrawDigiMCCollection tag=" 
 			    << fShCollTag.encode().data() <<  " found";
     }
   }
@@ -89,7 +89,7 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
   if (! fSimpCollTag.empty()) {
     bool ok = AnEvent->getByLabel(fSimpCollTag,simp_handle);
     if (! ok) {
-      mf::LogWarning(oname) << " WARNING in " << oname << ":" << __LINE__ 
+      mf::LogWarning(oname) << " WARNING line " << __LINE__ 
 			    << ": SimpCollection:" 
 			    << fSimpCollTag.encode().data() << " NOT FOUND";
       return -1;

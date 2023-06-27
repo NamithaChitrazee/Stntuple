@@ -74,6 +74,18 @@ Int_t TStnTriggerBlock::GetListOfPassedTriggers(const TStnTriggerTable* Table,
 
 
 //_____________________________________________________________________________
+int TStnTriggerBlock::NPassedPaths() {
+
+  int nbits = fPaths.GetNBits();
+  int n_passed(0);
+
+  for (int i=0; i<nbits; i++) {
+    n_passed += fPaths.GetBit(i);
+  }
+  return n_passed;
+}
+
+//_____________________________________________________________________________
 void TStnTriggerBlock::Clear(Option_t* opt) {
   fNPaths   = -1;
   fNModSeq  = -1;
