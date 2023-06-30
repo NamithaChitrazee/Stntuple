@@ -292,8 +292,8 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 // in all cases define momentum at lowest Z - ideally, at the tracker entrance
 // 'entlen' - trajectory length, corresponding to the first point in Z (?) 
 //-----------------------------------------------------------------------------
-    double  h1_fltlen(1.e6), hn_fltlen(1.e6), sent, sexit;
-    const mu2e::TrkStrawHitSeed *first(nullptr), *last(nullptr);
+    // double  h1_fltlen(1.e6), hn_fltlen(1.e6), sent, sexit;
+    // const mu2e::TrkStrawHitSeed *first(nullptr), *last(nullptr);
 
     const std::vector<mu2e::TrkStrawHitSeed>* hots = &kffs->hits();
     int n_kffs_hits = hots->size();
@@ -301,40 +301,36 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
     // const TrkHit* first = kffs->firstHit()->kalHit()->hit();
     // const TrkHit* last  = kffs->lastHit ()->kalHit()->hit();
 
-    for (int ih=0; ih<n_kffs_hits; ++ih) {
-      const mu2e::TrkStrawHitSeed* hit =  &hots->at(ih);
-      if ((hit != nullptr) and (hit->flag().hasAnyProperty(mu2e::StrawHitFlagDetail::active))) {
-	if (first == nullptr) first = hit;
-	last = hit;
-      }
-    }
+    // for (int ih=0; ih<n_kffs_hits; ++ih) {
+    //   const mu2e::TrkStrawHitSeed* hit =  &hots->at(ih);
+    //   if ((hit != nullptr) and (hit->flag().hasAnyProperty(mu2e::StrawHitFlagDetail::active))) {
+    //     if (first == nullptr) first = hit;
+    //     last = hit;
+    //   }
+    // }
 
-    if (first) h1_fltlen = first->trkLen();
-    if (last ) hn_fltlen = last->trkLen();
+    // if (first) h1_fltlen = first->trkLen();
+    // if (last ) hn_fltlen = last->trkLen();
 
-    sent        = std::min(h1_fltlen,hn_fltlen);
-    sexit       = std::max(h1_fltlen,hn_fltlen);
+    // sent        = std::min(h1_fltlen,hn_fltlen);
+    // sexit       = std::max(h1_fltlen,hn_fltlen);
 //-----------------------------------------------------------------------------
-// find segments corresponding to entry and exit points
+// find segments corresponding to entry and exit points in the tracker
 //-----------------------------------------------------------------------------
     const mu2e::KalSegment *kseg(nullptr), *kseg_exit(nullptr);
 
-    double min_ds1(1.e6), min_ds2(1.e6);
+    double zmin(1.e6), zmax(-1.e6);
 
     for(auto const& ks : kffs->segments() ) {
-      double smin = ks.timeToFlt(ks.tmin());
-      double smax = ks.timeToFlt(ks.tmax());
-
-      double ds1 = fabs(sent-(smin+smax)/2);
-      if (ds1 < min_ds1) {
-	kseg    = &ks;
-	min_ds1 = ds1;
+      double z = ks.position3().z();
+      if (z < zmin) {
+	kseg = &ks;
+	zmin = z  ;  
       }
 
-      double ds2 = fabs(sexit-(smin+smax)/2);
-      if (ds2 < min_ds2) {
+      if (z > zmax) {
 	kseg_exit = &ks;
-	min_ds2   = ds2;
+	zmax      = z;
       }
     }
 

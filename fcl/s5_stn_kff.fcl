@@ -1,0 +1,76 @@
+# -*- mode:tcl -*-
+#------------------------------------------------------------------------------
+# S4 Sim file s- inputs for mixing
+#------------------------------------------------------------------------------
+BEGIN_PROLOG
+  TRIGGER_PATHS                   : [ p1 ]
+END_PROLOG
+
+#include "Stntuple/fcl/stntuple.fcl"
+
+process_name : S5Stn
+
+source       : { module_type : RootInput fileNames : ["undefined", "undefined"] }
+
+physics : { 
+    producers  : { @table::stntuple.producers }
+    filters    : { @table::stntuple.filters   }
+    
+    analyzers  : { @table::stntuple.analyzers 
+	StntupleMaker: { @table::stntuple.analyzers.StntupleMaker
+#------------------------------------------------------------------------------
+# disable everything, enable StepPointMC's, VDET block is just yet another StepPointMC block
+#------------------------------------------------------------------------------
+	    makeClusters     : 1
+	    makeCrvClusters  : 0  # default: 1
+	    makePid          : 0
+	    makeSimp         : 1
+	    makeStepPointMC  : 1
+	    makeHelices      : 1
+	    makeTimeClusters : 1
+	    makeTracks       : 1
+	    makeTrackSeeds   : 1
+	    makeTrigger      : 1
+
+	    simpCollTag      : "compressDigiMCs"
+
+	    spmcBlockName    : [ "SpmcBlock"     , "VDetBlock"             , "IPABlock"             ]
+	    spmcCollTag      : [ "g4run:tracker" , "g4run:virtualdetector" , "g4run:protonabsorber" ]
+	    statusG4Tag      : [ "g4run"         , "g4run"                 , "g4run"                ]
+#------------------------------------------------------------------------------
+# so far, positive and negative helices reside in different collections, to be merged
+#------------------------------------------------------------------------------
+	    helixCollTag       : [ "MHFinderDmu" ]
+	    helixBlockName     : [ "HelixBlock"  ]
+	    helixKsCollTag     : [ "KSFDmu"      ]
+
+	    timeClusterCollTag   : ["TZClusterFinder" , "PhiClusterFinder" ]  ## 
+	    timeClusterBlockName : ["TimeClusterBlock", "PhiClusterBlock"  ]  ##
+
+            trackCollTag         : [ "KFFDmu" ]
+            trackFitType         : 1                 # output of BTRK fits
+
+            trackSeedCollTag     : [ "KSFDmu" ]
+            trackTsCollTag       : [ "KSFDmu" ]
+
+            triggerResultsTag    : "TriggerResults::Mix"  # no product name
+	    primaryParticleTag   : ""
+	}
+    }
+
+    @table::stntuple.paths
+
+    p1 : [ @sequence::TrkHitReco.PrepareHits ]
+    
+    trigger_paths : [ p1 ]
+    out           : [ ]                                  # [defaultOutput]/[]
+    e1            : [ @sequence::stntuple.paths.p0 ]
+    end_paths     : [ e1 , out ]
+}
+
+#------------------------------------------------------------------------------
+services.GeometryService.inputFile          : "pbar2m/common/geom_baseline.txt"
+
+services.TFileService.fileName              : "nts.user.pbar1.pbar2m.sequencer.hist"
+physics.analyzers.InitStntuple.histFileName : "nts.user.pbar1.pbar2m.sequencer.stn"
+outputs.defaultOutput.fileName              : "sim.user.pbar1.pbar2m.sequencer.art"
