@@ -191,7 +191,7 @@ public:
 //-----------------------------------------------------------------------------
 //  transient data members, all the persistent ones should go above
 //-----------------------------------------------------------------------------
-  const mu2e::TrkToCaloExtrapol* fExtrk;              //! 
+  const mu2e::TrkToCaloExtrapol* fExtrk;              //!
   const mu2e::CaloCluster*       fClosestCaloCluster; //!
 
   InterData_t*                   fVMinS;	      //! intersection with min S

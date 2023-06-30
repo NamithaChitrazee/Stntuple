@@ -56,6 +56,7 @@
 #include "Stntuple/mod/InitStrawHitBlock.hh"
 #include "Stntuple/mod/InitStepPointMCBlock.hh"
 #include "Stntuple/mod/InitTrackBlock.hh"
+#include "Stntuple/mod/InitTrackBlock_KK.hh"
 #include "Stntuple/mod/InitTrackSeedBlock.hh"
 #include "Stntuple/mod/InitTrackStrawHitBlock.hh"
 #include "Stntuple/mod/InitTriggerBlock.hh"
@@ -130,6 +131,7 @@ protected:
 
   vector<string>           fHelixBlockName;
   vector<string>           fHelixSeedCollTag;
+  vector<art::InputTag>    fHelixKsCollTag;
 
   art::InputTag            fPbiTag;
   string                   fPrimaryParticleTag;
@@ -141,9 +143,13 @@ protected:
 
   vector<string>           fTrackBlockName;
   vector<string>           fTrackCollTag;
+  int                      fTrackFitType;
 
   vector<string>           fTrackTsBlockName;  // for each track block, the tag  of the corresponding TrackSeed coll
   vector<string>           fTrackTsCollTag;    // for each track block, the name of the corresponding TrackSeed block
+
+  vector<string>           fTrackHsBlockName;  // KinKal fits: for each track block, 
+                                               // the name of the corresponding Stntuple HelixSeed block
 
   vector<string>           fTciCollTag;        // collection produced by TrackCaloIntersection module
   vector<string>           fTcmCollTag;        // collection produced by TrackCaloMatching     module
@@ -179,16 +185,16 @@ protected:
 //-----------------------------------------------------------------------------
 // cut-type parameters
 //-----------------------------------------------------------------------------
-  GenId                    fGenId        ;  // generated process ID
-  int                      fPdgId        ;  // PDG ID of the simparticle to be stored, 0 by default
+  GenId                    fGenId          ;     // generated process ID
+  int                      fPdgId          ;     // PDG ID of the simparticle to be stored, 0 by default
   
-  double                   fMinTActive   ;       // start of the active window
-  double                   fMinECrystal  ;       // 
+  double                   fMinTActive     ;     // start of the active window
+  double                   fMinECrystal    ;     // 
   double                   fMinSimpMomentum;     // min tot momentum of a particle to be stored in SIMP block
-  double                   fSimpMaxZ     ;       // max Z of a particle to be stored in SIMP block
+  double                   fSimpMaxZ       ;     // max Z of a particle to be stored in SIMP block
 
   string                   fCutHelixSeedCollTag; // helix collection to cut on
-  int                      fMinNHelices    ;     // min number of helices (for cosmics)
+  int                      fMinNHelices        ; // min number of helices (for cosmics)
 
   TNamed*                  fVersion;
 
@@ -269,6 +275,7 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
   , fTClCollTag              (PSet.get<vector<string>>("timeClusterCollTag"  ))
   , fHelixBlockName          (PSet.get<vector<string>>("helixBlockName"      ))
   , fHelixSeedCollTag        (PSet.get<vector<string>>("helixCollTag"        ))
+  , fHelixKsCollTag          (PSet.get<vector<art::InputTag>>("helixKsCollTag"))
 
   , fPbiTag                  (PSet.get<art::InputTag> ("pbiTag"    ))
   , fPrimaryParticleTag      (PSet.get<string>        ("primaryParticleTag"  ))
@@ -281,8 +288,13 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
 
   , fTrackBlockName          (PSet.get<vector<string>>("trackBlockName"      ))
   , fTrackCollTag            (PSet.get<vector<string>>("trackCollTag"        ))
+  , fTrackFitType            (PSet.get<int>           ("trackFitType"        ))
+
   , fTrackTsBlockName        (PSet.get<vector<string>>("trackTsBlockName"    ))
   , fTrackTsCollTag          (PSet.get<vector<string>>("trackTsCollTag"      ))
+
+  , fTrackHsBlockName        (PSet.get<vector<string>>("trackHsBlockName"    ))
+
   , fTciCollTag              (PSet.get<vector<string>>("tciCollTag"          ))
   , fTcmCollTag              (PSet.get<vector<string>>("tcmCollTag"          ))
   , fTrkQualCollTag          (PSet.get<vector<string>>("trkQualCollTag"      ))
@@ -534,17 +546,20 @@ void StntupleMaker::beginJob() {
 
     for (int i=0; i<nblocks; i++) {
       const char* block_name = fHelixBlockName[i].data();
-      StntupleInitHelixBlock* init_block = new StntupleInitHelixBlock();
+
+      StntupleInitHelixBlock* init_block(nullptr);
+      init_block = new StntupleInitHelixBlock();
+
       fInitHelixBlock->Add(init_block);
 
       init_block->SetHSeedCollTag(fHelixSeedCollTag[i]);
       init_block->SetSdmcCollTag (fSdmcCollTag );
       init_block->SetTclBlockName(fTClBlockName   [i]);
+      init_block->SetTrackFitType(fTrackFitType);
 
       if (i < nks_blocks) {
-        art::InputTag tag = fKsfCollTag[i];
-        init_block->SetKsfCollTag  (tag);
-        init_block->SetKsfBlockName(fKsfBlockName[i]);
+        init_block->SetKsCollTag   (fHelixKsCollTag[i]);
+        init_block->SetKsfBlockName(fKsfBlockName  [i]);
       }
 
       AddDataBlock(block_name,"TStnHelixBlock",init_block,
@@ -701,16 +716,21 @@ void StntupleMaker::beginJob() {
   }
 //-----------------------------------------------------------------------------
 // track branches: for ROOT v3 to use streamers one has to specify split=-1
+// KinKal fit links track directly to the helix, no more TrackSeeds
 //-----------------------------------------------------------------------------
   if (fMakeTracks) {
     int nblocks = fTrackBlockName.size();
 
+    StntupleInitTrackBlock* init_block(nullptr);
     for (int i=0; i<nblocks; i++) {
       const char* block_name = fTrackBlockName[i].data();
-      StntupleInitTrackBlock* init_block = new StntupleInitTrackBlock();
+
+      if      (fTrackFitType == 1) init_block = new StntupleInitTrackBlock   ();
+      else if (fTrackFitType == 2) init_block = new StntupleInitTrackBlock_KK();
+
       fInitTrackBlock->Add(init_block);
 
-      init_block->SetCaloClusterCollTag (fCaloClusterMaker);
+      // init_block->SetCaloClusterCollTag (fCaloClusterMaker);
       init_block->SetSsChCollTag        (fShCollTag       );
       init_block->SetKFFCollTag         (fTrackCollTag[i] );  // tracks saved as lists of KalSeeds
       init_block->SetPIDProductCollTag  (fPidCollTag[i]   );
@@ -729,10 +749,21 @@ void StntupleMaker::beginJob() {
 // if nshortblocks != 0, for each track we store an index to that tracks's seed
 //-----------------------------------------------------------------------------
       if (db) {
-	if (fTrackTsBlockName.size() > 0) {
-	  init_block->SetTrackTsBlockName(fTrackTsBlockName[i].data());
-	  init_block->SetTrackTsCollTag  (fTrackTsCollTag  [i]);
-	}
+        if (fTrackFitType == 1) {
+//-----------------------------------------------------------------------------
+// BTRK fits
+//-----------------------------------------------------------------------------
+          if (fTrackTsBlockName.size() > 0) {
+            init_block->SetTrackTsBlockName(fTrackTsBlockName[i].data());
+            init_block->SetTrackTsCollTag  (fTrackTsCollTag  [i]);
+          }
+        }
+        else if (fTrackFitType == 2) {
+//-----------------------------------------------------------------------------
+// KinKal fits
+//-----------------------------------------------------------------------------
+          init_block->SetTrackHsBlockName(fTrackHsBlockName[i].data());
+        }
       }
     }
   }

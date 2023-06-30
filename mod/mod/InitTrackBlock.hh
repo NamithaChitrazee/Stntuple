@@ -61,6 +61,8 @@ public:
   TString         fTrackTsBlockName;
   art::InputTag   fTrackTsCollTag;
 
+  TString         fTrackHsBlockName;
+
   mu2e::AlgorithmIDCollection*             list_of_algs               ;
   const mu2e::KalSeedCollection*           list_of_kffs               ;
   const mu2e::TrkQualCollection*           list_of_trk_qual           ;
@@ -93,6 +95,7 @@ public:
   void   SetDoubletAmbigResolver    (mu2e::DoubletAmbigResolver* Dar) { _dar   = Dar; }
 
   void   SetTrackTsBlockName        (const char* Name) { fTrackTsBlockName     = Name; }
+  void   SetTrackHsBlockName        (const char* Name) { fTrackHsBlockName     = Name; }
 
   void   InitTrackerZMap(const mu2e::Tracker* Tracker, ZMap_t* Map);
   void   get_station    (const mu2e::Tracker* Tracker, ZMap_t* Map, double Z, int* Plane, int* Offset);

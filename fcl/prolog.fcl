@@ -88,6 +88,7 @@ StntupleMakerTemplate : { module_type:StntupleMaker
 # TSimpBlock initialization parameters
 # vdHitsCollTag is used by TStnTrackBlock and TSimpBlock, hits on virtual detectors 
 # are stored in SpmcBlockVDet block, so all three have to be consistent
+# for datasets with pileup, "TriggerResults::Mix" 
 #------------------------------------------------------------------------------
     simpCollTag          : @local::STN_COMPRESS_MCS              # was "g4run" before
     primaryParticleTag   : @local::STN_COMPRESS_MCS              # this is new, to be passed to InitSimpBlock
@@ -108,11 +109,17 @@ StntupleMakerTemplate : { module_type:StntupleMaker
     tcShCollTag          : [ "makeSH"             ]              # time clusters could be searched for using straw hits
     tcChCollTag          : [ "makePH"             ]              # only
 #------------------------------------------------------------------------------
-# ultimately all downstream helices will be in one block, upstream ones - in another
+# ultimately all downstream helices will be in one block, upstream ones - in another 
+# specify list of KalSeeds corresponding to Helices explicitly - it could be either 
+# a list of "intermediate" KalSeeds in case of BTRK fits, 
+# or a lit of "final" tracks in case of KinKal fits
 #------------------------------------------------------------------------------
-    helixBlockName       : [ "MHDeM"      ]
-    helixCollTag         : [ "HelixBlock" ]
-
+    helixBlockName       : [ "MHDeM"        ]
+    helixCollTag         : [ "HelixBlock"   ]
+    helixKsCollTag       : [ "KSFDeM"       ]                    # KalSeed collection corresponding to helices
+#------------------------------------------------------------------------------
+# intermediate track seed fits - going away
+#------------------------------------------------------------------------------
     trackSeedBlockName   : [ "KSFBlock"     ]
     trackSeedCollTag     : [ "KSFDeM"       ]
 #------------------------------------------------------------------------------
@@ -120,8 +127,12 @@ StntupleMakerTemplate : { module_type:StntupleMaker
 #------------------------------------------------------------------------------
     trackBlockName       : [ "TrackBlock"   ]
     trackCollTag         : [ "KFFDeM"       ]
+    trackFitType         : 1                         ## 1:BTRK(KFF) 2:KinKal(KK)
+
     trackTsBlockName     : [ "KSFBlock"     ]
-    trackTsCollTag       : [ "KSFDeM"       ]
+    trackTsCollTag       : [ "KSFDeM"       ]        ## has to be defined for BTRK   fits
+    trackHsBlockName     : [ "HelixBlock"   ]        ## has to be defined for KinKal fits
+
     tciCollTag           : [ "TrkExtrapol"  ]
     tcmCollTag           : [ "CaloMatching" ]
     trkQualCollTag       : [ "TrackQual"    ]

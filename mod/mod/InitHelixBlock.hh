@@ -35,9 +35,10 @@ public:
   art::InputTag   fAlgorithmIDCollTag;
   art::InputTag   fSdmcCollTag;
   art::InputTag   fHSeedCollTag;        // helix seed  coll tag
-  art::InputTag   fKsfCollTag;          // helix KSF   coll tag, to find assns
-  TString         fKsfBlockName;        // KalSeedFit  block name
+  art::InputTag   fKsCollTag;           // helix KSF coll tag, to find assns
+  TString         fKsfBlockName;        // KalSeedFit  block name for BTRK
   TString         fTclBlockName;        // TimeCluster block name
+  int             fTrackFitType;        // for KinKal, 
 
   const mu2e::HelixSeedCollection*         fListOfHSeeds;
 
@@ -48,11 +49,12 @@ public:
 //-----------------------------------------------------------------------------
 public:
 
-  void   SetHSeedCollTag   (std::string& Tag ) { fHSeedCollTag = art::InputTag(Tag); }
-  void   SetSdmcCollTag    (art::InputTag& Tag) { fSdmcCollTag = Tag; }
-  void   SetKsfCollTag     (art::InputTag& Tag) { fKsfCollTag = Tag; }
-  void   SetKsfBlockName   (std::string& Name) { fKsfBlockName = Name.data()       ; }
-  void   SetTclBlockName   (std::string& Name) { fTclBlockName = Name.data()       ; }
+  void   SetHSeedCollTag   (std::string&  Tag ) { fHSeedCollTag = art::InputTag(Tag); }
+  void   SetSdmcCollTag    (art::InputTag& Tag) { fSdmcCollTag  = Tag;                }
+  void   SetKsCollTag      (art::InputTag& Tag) { fKsCollTag    = Tag;                }
+  void   SetKsfBlockName   (std::string&  Name) { fKsfBlockName = Name.data();        }
+  void   SetTclBlockName   (std::string&  Name) { fTclBlockName = Name.data();        }
+  void   SetTrackFitType   (int           Type) { fTrackFitType = Type;               }
 
   virtual int InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mode);
   virtual int ResolveLinks (TStnDataBlock* Block, AbsEvent* Evt, int Mode);

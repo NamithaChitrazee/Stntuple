@@ -11,32 +11,30 @@ Digitize: {
     @table::CrvDAQPackage.producers
 
     compressDigiMCs : {
-	module_type                :   CompressDigiMCs
-	strawDigiMCTag             :   @local::DigiCompressionTags.commonStrawDigiMCTag
-	crvDigiMCTag               :   @local::DigiCompressionTags.commonCrvDigiMCTag
-	simParticleTags            : [ @local::DigiCompressionTags.primarySimParticleTag ]
-	mcTrajectoryTag            :   @local::DigiCompressionTags.primarySimParticleTag
-	extraStepPointMCTags       : [ "g4run:virtualdetector", 
-				       "g4run:stoppingtarget" ,
-				       "g4run:protonabsorber" 
-				      ]
-	timeMapTags                : [ ]
-	caloShowerStepTags         :   @local::DigiCompressionTags.primaryCaloShowerStepTags
-	caloShowerSimTag           :   @local::DigiCompressionTags.commonCaloShowerSimTag
-	caloShowerROTag            :   @local::DigiCompressionTags.commonCaloShowerROTag
-	primaryParticleTag         : "FindMCPrimary"
-	keepAllGenParticles        : true
-	rekeySimParticleCollection : true
-	noCompression              : false
+      module_type : CompressDigiMCs
+      strawDigiMCTag : @local::DigiCompressionTags.commonStrawDigiMCTag
+      crvDigiMCTag : @local::DigiCompressionTags.commonCrvDigiMCTag
+      simParticleTags : [ @local::DigiCompressionTags.primarySimParticleTag ]
+      mcTrajectoryTag : @local::DigiCompressionTags.primarySimParticleTag
+      extraStepPointMCTags : @local::DigiCompressionTags.commonExtraStepPointMCTags
+      timeMapTags : [ ]
+      caloShowerStepTags : @local::DigiCompressionTags.primaryCaloShowerStepTags
+      caloShowerSimTag : @local::DigiCompressionTags.commonCaloShowerSimTag
+      caloShowerROTag : @local::DigiCompressionTags.commonCaloShowerROTag
+      primaryParticleTag : "FindMCPrimary"
+      keepAllGenParticles : true
+      rekeySimParticleCollection : true
+      noCompression : false
 
       # Unused options
       strawDigiMCIndexMapTag : ""
-      crvDigiMCIndexMapTag   : ""
-      caloClusterMCTag       : ""
-      crvCoincClusterMCTag   : ""
+      crvDigiMCIndexMapTag : ""
+      caloClusterMCTag : ""
+      crvCoincClusterMCTags : [  ]
     }
-    PBISim : { module_type: ProtonBunchIntensityFlat
-      mean      : 1
+    PBISim : {
+      module_type: ProtonBunchIntensityFlat
+      mean : 1
       halfWidth : 0
     }
   }
@@ -52,7 +50,7 @@ Digitize: {
       MinParticleMom : 80.0
       MaxParticleMom : 200.0
       StrawDigiMCCollection : compressDigiMCs
-      particleTypes : [ 11,-11, 13, -13] # e+-, mu+-
+      particleTypes : [ 11,-11, 13, -13, 211, -211] # e+-, mu+-, pi+-
     }
     # Untriggered stream prescaler; stream-dependent
     UntriggeredPrescale : {
@@ -62,30 +60,20 @@ Digitize: {
     }
   }
 
-    analyzers: {
-      digiCompressionCheck : @local::DigiCompression.Check
-    }
+  analyzers: {
+    digiCompressionCheck : @local::DigiCompression.Check
+  }
 
-    DigitizeSequence : [
-			PBISim,
-			@sequence::CommonMC.DigiSim,
-			@sequence::TrackerMC.DigiSim,
-			@sequence::CaloMC.DigiSim,
-			@sequence::CrvDAQPackage.CrvDAQSequence,
-			compressDigiMCs 
-		       ]
-    
-    DigitizeSequenceNoCRV : [
-			     PBISim,
-			     @sequence::CommonMC.DigiSim,
-			     @sequence::TrackerMC.DigiSim,
-			     @sequence::CaloMC.DigiSim,
-#			     @sequence::CrvDAQPackage.CrvDAQSequence,
-			     compressDigiMCs 
-		       ]
-    
+  DigitizeSequence : [
+    PBISim,
+    @sequence::CommonMC.DigiSim,
+    @sequence::TrackerMC.DigiSim,
+    @sequence::CaloMC.DigiSim,
+    @sequence::CrvDAQPackage.CrvDAQSequence,
+    compressDigiMCs ]
 
-    UntriggeredSequence : [ UntriggeredPrescale, Triggerable ]
+  UntriggeredSequence : [
+    UntriggeredPrescale, Triggerable ]
 
   TriggerProducts : [
     "keep mu2e::TriggerInfo_*_*_*",
@@ -115,6 +103,7 @@ Digitize: {
     "keep mu2e::HelixSeeds_TT*_*_*",
     "keep mu2e::TimeClusters_TT*_*_*",
     "keep mu2e::CaloClusters_CaloClusterFast_*_*",
+    "keep mu2e::CosmicLivetime_*_*_*",
     "keep mu2e::ProtonBunchIntensity*_*_*_*"
   ]
   #
@@ -208,9 +197,32 @@ Digitize.Proditions : { @table::Proditions
     }
 }
 #------------------------------------------------------------------------------
-# redefinitions
+# redefinitions: from JobConfig/digitize/epilog.fcl, digitization jobs will use Digitize.producers
 #------------------------------------------------------------------------------
-Digitize.producers.CrvPhotons.crvStepModuleLabels : [ "" ]
-Digitize.producers.CrvPhotons.crvStepProcessNames : [ "" ]
-Digitize.producers.EWMProducer.SpillType          : 1         # on-spill
+# Module labels needed for compressed detector steps
+Digitize.producers.makeSD.StrawGasStepModule                  : "compressDetStepMCs"
+Digitize.producers.CaloShowerROMaker.caloShowerStepCollection : ["compressDetStepMCs"]
+Digitize.producers.compressDigiMCs.simParticleTags            : ["compressDetStepMCs"]
+Digitize.producers.compressDigiMCs.caloShowerStepTags         : ["compressDetStepMCs"]
+Digitize.producers.compressDigiMCs.extraStepPointMCTags       : ["compressDetStepMCs:virtualdetector", "compressDetStepMCs:stoppingtarget", "compressDetStepMCs:protonabsorber" ]
+Digitize.producers.compressDigiMCs.mcTrajectoryTag            : "compressDetStepMCs"
+Digitize.producers.CrvPhotons.crvStepModuleLabels             : [ "compressDetStepMCs" ]
+Digitize.producers.CrvPhotons.crvStepProcessNames             : [ "" ]
+#
+Digitize.producers.EWMProducer.SpillType                      : 1         # on-spill
+#------------------------------------------------------------------------------
+# redefinition of the services - digitization jobs will use Digitize.services
+#------------------------------------------------------------------------------
+Digitize.services :  { @table::Services.SimAndReco }
+Digitize.services.GeometryService.bFieldFile     : "Offline/Mu2eG4/geom/bfgeom_reco_v01.txt"
+# setup proditions; as new proditions are added to the database this file MUST be updated or reco won't see them
+Digitize.services.ProditionsService.alignedTracker.useDb: true
+Digitize.services.ProditionsService.alignedTracker.verbose: 0
+Digitize.services.ProditionsService.trackerStatus.Settings.useDb: true
+Digitize.services.ProditionsService.trackerStatus.Settings.verbose: 0
+Digitize.services.ProditionsService.strawElectronics.useDb: true
+Digitize.services.ProditionsService.strawElectronics.verbose: 0
+# don't use database time offsets in digitization
+Digitize.services.ProditionsService.strawElectronics.overrideDbTimeOffsets : true
+
 END_PROLOG

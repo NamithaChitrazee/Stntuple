@@ -363,15 +363,18 @@ Int_t StntupleInitHelixBlock::ResolveLinks(TStnDataBlock* Block, AbsEvent* AnEve
 					// do not do initialize links 2nd time
 
   if (Block->LinksInitialized()) return 0;
-
+//-----------------------------------------------------------------------------
+// for BTRK   fits (mode=1) this is trackseed <--> helix associations
+// for KinKal fits (mode=2) this is track     <--> helix associations
+//-----------------------------------------------------------------------------
   art::Handle<mu2e::KalHelixAssns> ksfhaH;
   const mu2e::KalHelixAssns* ksfha;
-  AnEvent->getByLabel(fKsfCollTag, ksfhaH);
+  AnEvent->getByLabel(fKsCollTag, ksfhaH);
   ksfha = ksfhaH.product();
 
   TStnEvent*      ev = Block->GetEvent();
   TStnHelixBlock* hb = (TStnHelixBlock*) Block;
-  int nhelices = hb->NHelices();
+  int             nh = hb->NHelices();
 //-----------------------------------------------------------------------------
 // this is a hack, to be fixed soon
 //-----------------------------------------------------------------------------
@@ -383,8 +386,8 @@ Int_t StntupleInitHelixBlock::ResolveLinks(TStnDataBlock* Block, AbsEvent* AnEve
   if (tsb) ntseeds = tsb->NTrackSeeds();
   if (tcb) ntpeaks = tcb->NTimeClusters();
 
-  for (int i=0; i<nhelices; ++i) {
-    TStnHelix*      hel = hb->Helix(i);
+  for (int i=0; i<nh; i++) {
+    TStnHelix* hel = hb->Helix(i);
     const mu2e::HelixSeed* hs1 = hel->fHelix;
 //-----------------------------------------------------------------------------
 // looking for the seed in associations - a helix may not have a seed
@@ -397,13 +400,25 @@ Int_t StntupleInitHelixBlock::ResolveLinks(TStnDataBlock* Block, AbsEvent* AnEve
         break;
       }
     }
+//-----------------------------------------------------------------------------
+// if I knew the collection tag, I could use that instead 
+//-----------------------------------------------------------------------------
+    const mu2e::KalSeedCollection* kscoll(nullptr);
 
+    if (not fKsCollTag.empty()) {
+      art::Handle<mu2e::KalSeedCollection> kscoll_h;
+      AnEvent->getByLabel(fKsCollTag,kscoll_h);
+      if (kscoll_h.isValid()) kscoll = kscoll_h.product();
+    }
+
+//-----------------------------------------------------------------------------
+// if everything is consistent, kscoll has nkseeds elements in it
+//-----------------------------------------------------------------------------
     int ksfIndex(-1);
 
-    if (ksf != nullptr) {
+    if (kscoll != nullptr) {
       for (int j=0; j<ntseeds; ++j){
-        TStnTrackSeed* tseed = tsb->TrackSeed(j);
-        const mu2e::KalSeed* ks2   = tseed->fTrackSeed;
+        const mu2e::KalSeed* ks2 = &kscoll->at(j);
         if (ks2 == ksf) {
           ksfIndex = j;
           break;

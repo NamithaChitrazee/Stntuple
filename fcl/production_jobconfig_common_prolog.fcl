@@ -1,48 +1,34 @@
 # -*- mode:tcl -*-
+#------------------------------------------------------------------------------
+# cloned Production/JobConfig/common/prolog.fcl minus includes
 # common prolog for all production jobs.
-# defined Common table
-#
+# common epiloc.fcl is trivial and is absorbed by Stntuple/fcl/stntuple.fcl
+#------------------------------------------------------------------------------
 BEGIN_PROLOG
 Common: {
-    producers : {
-	g4run    : { @table::g4run                                    # defined in Mu2eG4/fcl/prolog.fcl
-	    physics: { @table::g4run.physics 
-		physicsListName   : "ShieldingM_EMZ"                  # "QGSP_BERT" for fast
-		minRangeRegionCuts: { CalorimeterMother : 0.1}        # coarse stepping to save time
-	    }
+  producers : {
+    g4run: @local::mu2eg4runDefaultSingleStage
+    genCounter: { module_type: GenEventCounter }
+  }
 
-	    SDConfig         : { @table::g4run.SDConfig 
-		enableSD: [ @sequence::g4run.SDConfig.enableSD, stoppingtarget, protonabsorber ]
-	    }
-
-            TrajectoryControl: @local::mu2eg4DefaultTrajectories
-	}
-	genCounter: { module_type: GenEventCounter }
-#-------------------------------------------------------------------------------
-# every simulated event shoudl have the bunch intensity stored, even if zero
-#-------------------------------------------------------------------------------
-        protonBunchIntensity : { module_type: ProtonBunchIntensityFlat
-            mean      : 0.
-            halfWidth : 0.
-        }
+  filters : {
+    g4statusFilter: {
+      module_type: FilterStatusG4
+      input: "g4run"
+      maxAcceptedStatus: 1  #  status 2 and above means StepPointMCCollection may have non-dereferencable pointers
     }
 
-    filters : {
-	g4statusFilter: { module_type: FilterStatusG4
-	    input: "g4run"
-	    maxAcceptedStatus: 1  #  status 2 and above means StepPointMCCollection may have non-dereferencable pointers
-	}
-	
-	g4consistentFilter: { module_type: FilterStatusG4
-	    input: "g4run"
-	    maxAcceptedStatus: 9  #  status 10 and above means StepPointMCCollection may have non-dereferencable pointers
-	}
+    g4consistentFilter: {
+      module_type: FilterStatusG4
+      input: "g4run"
+      maxAcceptedStatus: 9  #  status 10 and above means StepPointMCCollection may have non-dereferencable pointers
     }
-    analyzers: {
-	genCountLogger: { module_type: GenEventCountReader makeHistograms: false }
-    }
-
-    g4Sequence       :  [ g4run   , g4consistentFilter ]
-    generateSequence :  [ generate, genCounter         ]
+  }
+  analyzers: {
+    genCountLogger: { module_type: GenEventCountReader makeHistograms: false }
+  }
+  g4Sequence :  [ g4run, g4consistentFilter ]
+  generateSequence :  [ generate, genCounter ]
+  BaseSeed : 8
 }
 END_PROLOG

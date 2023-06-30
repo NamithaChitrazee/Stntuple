@@ -1,6 +1,6 @@
 #
 * ------------------------------------------------------------------------------
-* STNTUPLE package organization                           
+* STNTUPLE package organization                                              
 
   Stntuple includes several subpackages, each subpackage builds a separate library
 

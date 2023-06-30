@@ -27,34 +27,34 @@ BEGIN_PROLOG
   GEN_ID              : "particleGun"                        #    ignore GEN_ID check
 END_PROLOG
 #------------------------------------------------------------------------------
-#include "Offline/fcl/minimalMessageService.fcl"
-#include "Offline/fcl/standardProducers.fcl"
 #include "Offline/fcl/standardServices.fcl"
 #include "Offline/fcl/TrkCaloDt.fcl"
-#include "Offline/ProditionsService/fcl/prolog.fcl"
 #------------------------------------------------------------------------------
 # simulation prologs
 #------------------------------------------------------------------------------
+#include "Offline/EventGenerator/fcl/prolog.fcl"
 #include "Offline/Mu2eG4/fcl/prolog.fcl"
 #include "Offline/CommonMC/fcl/prolog.fcl"
 #include "Offline/TrackerMC/fcl/prolog.fcl"
 #include "Offline/CaloMC/fcl/prolog.fcl"
 #include "Offline/CRVResponse/fcl/prolog.fcl"
+#include "Offline/EventMixing/fcl/prolog.fcl"
 #include "Offline/Filters/fcl/prolog.fcl"
 #include "Offline/Compression/fcl/prolog.fcl"
 #------------------------------------------------------------------------------
 # reconstruction prologs
 #------------------------------------------------------------------------------
+#include "Offline/Mu2eKinKal/fcl/prolog.fcl"
 #include "Offline/TrkDiag/fcl/prolog.fcl"
-#include "Offline/TrackCaloMatching/fcl/prolog.fcl"
-#include "Offline/ParticleID/fcl/prolog.fcl"
+# // #include "Offline/TrackCaloMatching/fcl/prolog.fcl"
+# // #include "Offline/ParticleID/fcl/prolog.fcl"
 #include "Offline/TrkHitReco/fcl/prolog.fcl"
 #include "Offline/TrkReco/fcl/prolog.fcl"
 #include "Offline/TrkPatRec/fcl/prolog.fcl"
-#include "Offline/Mu2eKinKal/fcl/prolog.fcl"
 #include "Offline/CaloReco/fcl/prolog.fcl"
 #include "Offline/CaloCluster/fcl/prolog.fcl"
 #include "Offline/CalPatRec/fcl/prolog.fcl"
+#include "Offline/CalPatRec/fcl/prolog_common.fcl"
 #------------------------------------------------------------------------------
 # trigger prologs
 #------------------------------------------------------------------------------
@@ -65,12 +65,12 @@ END_PROLOG
 #------------------------------------------------------------------------------
 # templates: do not include prologs, 
 # define table and sequence templates combining information from multiples packages
+#
 # services are initialized in Stntuple/fcl/stntuple_templates.fcl
 # (1): services section (Services.SimAndReco and Services.Sim today are the same)
 #       add time tracker template
 #
 # include-less clones on Production fcls with all templates
-# assume that '_prolog' files don't have BEGIN_PROLOG/END_PROLOG clauses
 #------------------------------------------------------------------------------
 #include "Stntuple/fcl/production_jobconfig_common_prolog.fcl" 
 #include "Stntuple/fcl/production_jobconfig_digitize_prolog.fcl" 
@@ -78,7 +78,7 @@ END_PROLOG
 #include "Stntuple/fcl/production_jobconfig_reco_prolog.fcl"   
 #include "Stntuple/fcl/stntuple_templates.fcl"
 #------------------------------------------------------------------------------
-services : { @table::Services.SimAndReco 
+services : { @table::Services.SimAndReco
     TimeTracker : {
 	printSummary : true
 	dbOutput : {
@@ -92,18 +92,18 @@ services : { @table::Services.SimAndReco
 services.SeedService.baseSeed         : 8
 services.SeedService.maxUniqueEngines : 100
 services.scheduler.wantSummary        : true
-services.TFileService.fileName        : "nts._USER_._DATASET_._DSCONF_.sequencer.root" 
+services.TFileService.fileName        : "nts._user_._dataset_._dsconf_._sequencer_.root" 
 
 # Limit the amount of "Begin processing the ... record" messages
 services.message.destinations.log.categories.ArtReport.reportEvery : 1
 services.message.destinations.log.categories.ArtReport.limit       : 10000
 services.message.destinations.log.categories.ArtReport.timespan    : 300
+services.message.destinations.log.outputStatistics                 : true
 # services.DbService : @local::DbEmpty
 #------------------------------------------------------------------------------
 # here come templates
 #------------------------------------------------------------------------------
 # include "Stntuple/fcl/trigger_templates.fcl"
-# # onclude "Stntuple/fcl/mixing_templates.fcl"
 #include "Stntuple/fcl/production_templates.fcl"
 #include "Stntuple/fcl/stntuple_templates.fcl"
 #------------------------------------------------------------------------------

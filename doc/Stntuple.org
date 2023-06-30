@@ -35,7 +35,21 @@
 * [[file:stntuple-datasets.org][STNTUPLE datasets]]
 * STNTUPLE [[file:how-tos.org][how-to's]]    
 * [[file:event_display.org][STNTUPLE event display]]  
-* STNTUPLE modules      
+* STNTUPLE modules and their parameters                                      
+** InitStntuple
+** StntupleMaker                                                             
+  - defines absolute majority of the configuration parameters
+  - *triggerResultsTag*  : defines the tag of the TriggerResults object      
+    used to retrieve the trigger bits
+    - each art job generates a TriggerResults object, only one makes sense.
+    - thus need to choose it by specifying the process name explicitly
+    - example:  "TriggerResults::Mix"  # no product name
+  - *primaryParticleTag* :                                                   
+    - this is the tag of the PrimaryParticle object
+    - still don't know what the PrimaryParticle is, ask Dave
+  - *helixCollTag* :                                                         
+    - list of ntupled helix collction tags (art sequence, in square brackets)
+** FillStntuple
 * copying and filtering: file:copying_and_filtering.org                      
 ** EventFilter                                                               
    - given an event list, filters events from the list 

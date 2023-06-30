@@ -268,7 +268,6 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
   for (int itrk=0; itrk<ntrk; itrk++) {
     track          = data->NewTrack();
     const mu2e::KalSeed* kffs = &list_of_kffs->at(itrk);
-    // AnEvent->get(ptr.id(), handle);
 //-----------------------------------------------------------------------------
 // track-only-based particle ID, initialization ahs already happened in the constructor
 //-----------------------------------------------------------------------------
@@ -280,7 +279,6 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
       track->fRSlopeErr    = pidp->GetResidualsSlopeError();
     }
 
-    // const KalRep* kffs = ptr.get();
     track->fKalRep[0] = (mu2e::KalSeed*) kffs;
     mask = (0x0001 << 16) | 0x0000;
 
