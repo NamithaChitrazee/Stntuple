@@ -47,7 +47,7 @@
 
 2) check that the value of [[file:../mod/StntupleMaker_module.cc::"genId"][genId]], if requested, corresponds to the generated process ID
 
-   checks which usually fail: [[file:../mod/InitSimpBlock.cc::fGenProcessID > 0]] or [[file:../mod/InitSimpBlock.cc::fPdgID       != 0]]
+3) checks which usually fail: [[file:../mod/InitSimpBlock.cc::fGenProcessID > 0]] or [[file:../mod/InitSimpBlock.cc::fPdgID       != 0]]
 
    see [[file:../../Offline/MCDataProducts/inc/GenId.hh][Offline/MCDataProducts/inc/GenId.hh]] for the definitions
 

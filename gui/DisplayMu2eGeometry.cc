@@ -573,15 +573,12 @@ void DisplayMu2eGeometry::DrawCRV() {
 
 //-----------------------------------------------------------------------------
 void DisplayMu2eGeometry::SetTrackerColors() {
-  static TString name[] = {
-    "TTrackerSupport",
-    "TTrackerEndRingUpstream",
-    ""
-  };
   
-  SetRecursiveColorTranspByName(fTrkMother,"TTracker",kYellow   ,80);
+  SetRecursiveColorTranspByName(fTrkMother,"TTracker",kYellow   ,90);
   SetRecursiveColorTranspByName(fTrkMother,"Plane"   ,kYellow   ,90);
-  SetRecursiveColorTranspByName(fTrkMother,"Panel"   ,kGray     ,50);         // 99
+  SetRecursiveColorTranspByName(fTrkMother,"Panel"   ,kGray     ,20);         // 99
+
+  SetRecursiveColorTranspByName(fTrkMother,"ThinSupportRing"        ,kYellow ,10);         // 99
   
   SetRecursiveColorTranspByName(fTrkMother,"TTrackerEndRingUpstream",kGray  ,0);
   SetRecursiveColorTranspByName(fTrkMother,"TTrackerSupport"        ,kGray  ,0);
@@ -593,7 +590,16 @@ void DisplayMu2eGeometry::SetTrackerColors() {
 void DisplayMu2eGeometry::DrawStrawTracker() {
 
   HideBuilding(0);
+//-----------------------------------------------------------------------------
+// restore things inside the tracker
+//-----------------------------------------------------------------------------
+  // SetRecursiveVisibilityByName(fTrkMother,"NorthRailDS"       ,0);
+  // SetRecursiveVisibilityByName(fTrkMother,"SouthRailDS"       ,0);
+  SetRecursiveVisibilityByName(fTrkMother,"TrackerSupport"    ,1);
+  SetRecursiveVisibilityByName(fTrkMother,"TTrackerEndRing"   ,1);
+  SetRecursiveVisibilityByName(fTrkMother,"ThinSupportRing"   ,1);
 
+  
   SetTrackerColors();
   gm->GetVolume("TrackerMother")->Draw("ogl");
 }
