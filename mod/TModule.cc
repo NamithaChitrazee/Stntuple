@@ -70,7 +70,7 @@ TModule::TModule(fhicl::ParameterSet const& PSet, const char* Name):
 
     cint->LoadMacro(_rootMacro.data(),&rc);
     if (rc != 0) {
-      printf("MuHitDisplay:beginJob ERROR : failed to load %s\n",_rootMacro.data());
+      printf("TModule:beginJob ERROR : failed to load %s\n",_rootMacro.data());
     }
     else {
       vector<string> res, r2;
@@ -87,6 +87,71 @@ TModule::TModule(fhicl::ParameterSet const& PSet, const char* Name):
     }
   }
 };
+
+// //-----------------------------------------------------------------------------
+// TModule::TModule(const art::EDAnalyzer::Table<Config>& config, const char* Name):
+//   art::EDAnalyzer(config),
+//   TNamed(Name,Name),
+//   fFclDebugBits   (config().debugBits()      ),
+//   fInteractiveMode(config().interactiveMode()),
+//   _rootMacro      (config().rootMacro()      )
+// {
+
+//   int    n, index;
+//   static char* dummy[100];
+
+//   fFile   = 0;
+//   fFolder = new TFolder(GetName(),GetName());
+
+//   memset(fDebugBit,0,kNDebugBits*sizeof(int));
+
+//   fAnaRint         = TAnaRint::Instance(0,dummy);
+// //-----------------------------------------------------------------------------
+// // pass parameters to TAnaDump
+// //-----------------------------------------------------------------------------
+//   fhicl::ParameterSet tadPset = config().tanaDump();
+
+//   fDump                       = TAnaDump::Instance(&tadPset);
+
+//   const char* key;
+//                                         // a flag is an integer!
+//   n = fFclDebugBits.get_names().size();
+//   for (int i=0; i<n; i++) {
+//     key                = fFclDebugBits.get_names().at(i).data();
+//     sscanf(key,"bit%i" ,&index );
+
+//     fDebugBit[index]  = fFclDebugBits.get<int>(key);
+
+//     printf("... TModule: bit=%3i is set to %i \n",index,fDebugBit[index]);
+//   }
+
+// //-----------------------------------------------------------------------------
+// // plugin initialization - figure out the function name
+// //-----------------------------------------------------------------------------
+//   fFunction = nullptr;
+//   if (_rootMacro.length() > 0) {
+//     TInterpreter::EErrorCode rc;
+//     TInterpreter* cint = gROOT->GetInterpreter();
+
+//     cint->LoadMacro(_rootMacro.data(),&rc);
+//     if (rc != 0) {
+//       printf("MuHitDisplay:beginJob ERROR : failed to load %s\n",_rootMacro.data());
+//     }
+//     else {
+//       vector<string> res, r2;
+      
+//       boost::algorithm::split(res,_rootMacro, boost::is_any_of("/"));
+
+//       int n = res.size();
+// 					// last is the macro itself, strip the path
+//       string ww = res[n-1];
+
+//       boost::algorithm::split(r2,ww, boost::is_any_of("."));
+
+//       fFunction = new TString(r2[0].data());
+//     }
+//   }
+// };
 
 //-----------------------------------------------------------------------------
 TModule::~TModule() {

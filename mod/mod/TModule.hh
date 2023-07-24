@@ -21,9 +21,7 @@
 #include "TProfile.h"
 
 #include "Stntuple/obj/AbsEvent.hh"
-
-// namespace murat {
-
+// #include "Stntuple/print/TAnaDump.hh"
 
 class TAnaRint;
 class TAnaDump;
@@ -33,6 +31,16 @@ class TModule : public art::EDAnalyzer, public TNamed {
   enum { kNDebugBits = 100 };
 
 public:
+
+    struct Config {
+      using Name    = fhicl::Name;
+      using Comment = fhicl::Comment;
+      fhicl::Atom<int>                       interactiveMode{Name("interactiveMode"), Comment("1: interactive mode"  ) };
+      // fhicl::Sequence<std::string>           rootMacro      {Name("rootMacro"      ), Comment("good hit mask"        ) };
+      fhicl::Atom<std::string>               rootMacro      {Name("rootMacro"      ), Comment("good hit mask"        ) };
+      fhicl::Table<fhicl::ParameterSet>      debugBits      {Name("debugBits"      ), Comment("debug bits"           ) };
+      //      fhicl::Table<TAnaDump::Config>         tanaDump       {Name("TAnaDump"       ), Comment("TAnaDumpParameters"   ) };
+    };
 					// there are some initializations which need 
 					// to be done just once
   static int          fgInitialized;
@@ -68,9 +76,11 @@ public:
 					// each TModule adds a folder to gROOT
   TFolder*            fFolder;
 //-----------------------------------------------------------------------------
-// methods - do not overload ::filter...
+// methods 
 //-----------------------------------------------------------------------------
-  explicit     TModule(fhicl::ParameterSet const& pset, const char* Name);
+  TModule(const fhicl::ParameterSet&    pset, const char* Name);
+  //   explicit TModule(const art::EDAnalyzer::Table<TModule::Config>& config, const char* Name);
+
   virtual      ~TModule();
 
   virtual int  beforeBeginJob();
@@ -126,5 +136,4 @@ public:
   
 };
 
-// }  // end namespace murat
 #endif

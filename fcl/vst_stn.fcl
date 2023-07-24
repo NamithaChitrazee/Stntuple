@@ -49,7 +49,7 @@ physics : {
     p1            : [    ]
     trigger_paths : [ p1 ]
     out           : [    ]                               # [defaultOutput]/[]
-    end_paths     : [ stntuple_p0 , out ]
+    end_paths     : [ p0 , out ]
 }
 #------------------------------------------------------------------------------
 # output file names

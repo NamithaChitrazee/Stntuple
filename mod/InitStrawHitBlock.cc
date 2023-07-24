@@ -35,8 +35,8 @@ int InitStrawHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int 
 // straw hit information
 // combo hits are needed for 
 //-----------------------------------------------------------------------------
-  art::Handle<mu2e::ComboHitCollection>             chch;
-  const mu2e::ComboHitCollection*                   chc (nullptr);
+  // art::Handle<mu2e::ComboHitCollection>             chch;
+  // const mu2e::ComboHitCollection*                   chc (nullptr);
 
   art::Handle<mu2e::StrawHitCollection>             shch;
   const mu2e::StrawHitCollection*                   shc (nullptr);
@@ -51,10 +51,10 @@ int InitStrawHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int 
 // assume that straw hits and combo hits are created by the same module - why ?
 //-----------------------------------------------------------------------------
   if (! fShCollTag.empty() != 0) {
-    bool ok = Event->getByLabel(fShCollTag,chch);
-    if (ok) chc = chch.product();
+    // bool ok = Event->getByLabel(fShCollTag,chch);
+    // if (ok) chc = chch.product();
     
-    ok = Event->getByLabel(fShCollTag,shch);
+    bool ok = Event->getByLabel(fShCollTag,shch);
     if (ok) { 
       shc   = shch.product();
       nhits = shc->size();
@@ -106,22 +106,18 @@ int InitStrawHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int 
 
   if (nhits > 0) {
 
-    const mu2e::ComboHit* ch0 = &chc->at(0);
+    // const mu2e::ComboHit* ch0 = &chc->at(0);
  
     for (int i=0; i<nhits; i++) {
       const mu2e::StrawHit* sh = &shc->at(i);
-      const mu2e::ComboHit* ch = &chc->at(i);
+      // const mu2e::ComboHit* ch = &chc->at(i);
 
       int sd_flag = 0;
       if (sdc) sd_flag = *((int*) &sdc->at(i).digiFlag());
 
-      size_t ih  = ch-ch0;
-      vector<StrawDigiIndex> shids;
-      chc->fillStrawDigiIndices((const art::Event&)*Event,ih,shids);
-
       step = nullptr;
       if (sdmcc) {  
-	const mu2e::StrawDigiMC* mcdigi = &sdmcc->at(shids[0]);
+	const mu2e::StrawDigiMC* mcdigi = &sdmcc->at(i);
 	step = mcdigi->earlyStrawGasStep().get();
       }
 

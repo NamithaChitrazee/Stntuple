@@ -18,7 +18,7 @@
 #include "Stntuple/obj/TGenpBlock.hh"
 #include "Stntuple/mod/InitGenpBlock.hh"
 
-#include "Stntuple/mod/THistModule.hh"
+// #include "Stntuple/mod/THistModule.hh"
 
 
 #include "messagefacility/MessageLogger/MessageLogger.h"

@@ -21,7 +21,7 @@
 
 #include "Offline/Mu2eUtilities/inc/SimParticleTimeOffset.hh"
 
-#include "Stntuple/mod/THistModule.hh"
+// #include "Stntuple/mod/THistModule.hh"
 #include "Stntuple/base/TNamedHandle.hh"
 
 //-----------------------------------------------------------------------------
@@ -30,7 +30,7 @@ Int_t StntupleInitMu2eVDetDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent, int
   static int    initialized(0);
   static char   oname[] = "StntupleInitMu2eVirtualDataBlock";
 
-  static mu2e::SimParticleTimeOffset* _timeOffsets(NULL);
+  //  static mu2e::SimParticleTimeOffset* _timeOffsets(NULL);
 
   static char   step_module_label[100], step_description[100];
   int           ev_number, rn_number, nhits;
@@ -50,9 +50,9 @@ Int_t StntupleInitMu2eVDetDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent, int
     data->GetModuleLabel("TimeOffsetMapsHandle",module_name);
     data->GetDescription("TimeOffsetMapsHandle",time_offsets_name);
 
-   THistModule*  m  = static_cast<THistModule*>  (THistModule::GetListOfModules()->FindObject(module_name));
-   TNamedHandle* nh = static_cast<TNamedHandle*> (m->GetFolder()->FindObject(time_offsets_name));
-   _timeOffsets     = static_cast<mu2e::SimParticleTimeOffset*> (nh->Object());
+   // THistModule*  m  = static_cast<THistModule*>  (THistModule::GetListOfModules()->FindObject(module_name));
+   // TNamedHandle* nh = static_cast<TNamedHandle*> (m->GetFolder()->FindObject(time_offsets_name));
+   // _timeOffsets     = static_cast<mu2e::SimParticleTimeOffset*> (nh->Object());
   }
 
 //-----------------------------------------------------------------------------
@@ -66,8 +66,8 @@ Int_t StntupleInitMu2eVDetDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent, int
 
   static mu2e::GlobalConstantsHandle<mu2e::ParticleDataList> pdt;
 
-  mu2e::ConditionsHandle<mu2e::AcceleratorParams> accPar("ignored");
-  double _mbtime = accPar->deBuncherPeriod;
+  // mu2e::ConditionsHandle<mu2e::AcceleratorParams> accPar("ignored");
+  // double _mbtime = accPar->deBuncherPeriod;
   
   if (step_module_label[0] != 0) {
     if (step_description[0] != 0) 
@@ -84,7 +84,7 @@ Int_t StntupleInitMu2eVDetDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent, int
   }
 
   // load simulation time offsets for this event: timeOffsets may not be defined yet (stages 1, 2, 3)
-  if (_timeOffsets) _timeOffsets->updateMap(*AnEvent);
+  //  if (_timeOffsets) _timeOffsets->updateMap(*AnEvent);
 
 //-----------------------------------------------------------------------------
 //
@@ -114,17 +114,18 @@ Int_t StntupleInitMu2eVDetDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent, int
     if (!(sim->fromGenerator())) goto NEXT_VHIT;
 
     vdIndex   = step->volumeId();
-    if (_timeOffsets) {
-//-----------------------------------------------------------------------------
-// time - within the microbunch
-//-----------------------------------------------------------------------------
-      double tx = _timeOffsets->timeWithOffsetsApplied(*step);
-      time = fmod(tx,_mbtime);
-    }
-    else              time =  step->time();
+//     if (_timeOffsets) {
+// //-----------------------------------------------------------------------------
+// // time - within the microbunch
+// //-----------------------------------------------------------------------------
+//       double tx = _timeOffsets->timeWithOffsetsApplied(*step);
+//       time = fmod(tx,_mbtime);
+//     }
+//     else              time =  step->time();
 
-    pdg_id    = sim->pdgId();
-    info = &pdt->particle(pdg_id);
+    time   = step->time();
+    pdg_id = sim->pdgId();
+    info   = &pdt->particle(pdg_id);
     
     mass      = info->mass();
     energy    = sqrt(step->momentum().mag2() + mass*mass);

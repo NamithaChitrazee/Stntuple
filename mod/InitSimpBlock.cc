@@ -31,7 +31,7 @@
 #include "Stntuple/mod/InitStntupleDataBlocks.hh"
 
 
-#include "Stntuple/mod/THistModule.hh"
+// #include "Stntuple/mod/THistModule.hh"
 #include "Stntuple/base/TNamedHandle.hh"
 
 #include "Stntuple/mod/InitSimpBlock.hh"

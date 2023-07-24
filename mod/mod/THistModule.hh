@@ -28,6 +28,19 @@ class THistModule : public TModule {
 //------------------------------------------------------------------------------
 //  static data members
 //------------------------------------------------------------------------------
+public:
+    struct Config { 
+      using Name    = fhicl::Name; 
+      using Comment = fhicl::Comment;
+
+      fhicl::Atom<int>                  bufferSize      {Name("bufferSize"      ),Comment("buffer size"       ) };
+      fhicl::Atom<int>                  maxFileSize     {Name("maxFileSize"     ),Comment("max file size"     ) };
+      // fhicl::Sequence<TString>          histFileName    {Name("histFileName"    ),Comment("hist file name"    ) };
+      fhicl::Atom<TString>              histFileName    {Name("histFileName"    ),Comment("hist file name"    ) };
+      fhicl::Atom<int>                      splitLevel      {Name("splitLevel"      ),Comment("split level"       ) };
+      fhicl::Atom<int>                      compressionLevel{Name("compressionLevel"),Comment("compression level" ) };
+      //      art::EDAnalyzer::Table<TModule::Config> tmodule  {Name("TModule"         ),Comment("TModule parameters") };
+    };
 protected:
 					// there are some initializations 
 					// which need to be done just once
@@ -47,19 +60,20 @@ protected:
 //------------------------------------------------------------------------------
 					// name of the directory in a ROOT file
 					// associated with the module
-  TString       fDirName;
+  TString           fDirName;
 					// list of histograms/ntuples owned by
 					// the module
-  TObjArray*    fHistogramList;
+  TObjArray*        fHistogramList;
 					// cache for cd() command
-  TDirectory*   fOldDir;
+  TDirectory*       fOldDir;
 //------------------------------------------------------------------------------
 //  methods of the class
 //------------------------------------------------------------------------------
 public:
 					// ****** constructors and destructor
 
-  THistModule(fhicl::ParameterSet const& PSet, const char* Name);
+  explicit THistModule(const fhicl::ParameterSet&    PSet, const char* Name);
+  explicit THistModule(const art::EDAnalyzer::Table<Config>& config, const char* Name);
 
   ~THistModule( );
 //-----------------------------------------------------------------------------

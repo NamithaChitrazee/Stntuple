@@ -20,7 +20,7 @@
 #include "Offline/RecoDataProducts/inc/StrawHit.hh"
 #include "Offline/RecoDataProducts/inc/ComboHit.hh"
 
-#include "Stntuple/mod/THistModule.hh"
+// #include "Stntuple/mod/THistModule.hh"
 #include "Offline/MCDataProducts/inc/ProtonBunchIntensity.hh"
 
 void stntuple_get_version(char* ver, char* test);

@@ -76,7 +76,7 @@ END_PROLOG
 #include "Stntuple/fcl/production_jobconfig_digitize_prolog.fcl" 
 #include "Stntuple/fcl/production_jobconfig_primary_prolog.fcl"
 #include "Stntuple/fcl/production_jobconfig_reco_prolog.fcl"   
-#include "Stntuple/fcl/stntuple_templates.fcl"
+# \\ #include "Stntuple/fcl/stntuple_templates.fcl"
 #------------------------------------------------------------------------------
 services : { @table::Services.SimAndReco
     TimeTracker : {

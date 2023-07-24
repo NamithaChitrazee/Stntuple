@@ -149,6 +149,16 @@ TAnaDump::TAnaDump(const fhicl::ParameterSet* PSet) {
   _printUtils = new mu2e::TrkPrintUtils(PSet->get<fhicl::ParameterSet>("printUtils",fhicl::ParameterSet()));
 }
 
+// //-----------------------------------------------------------------------------
+// TAnaDump::TAnaDump(const fhicl::Table<Config>& config) {
+
+//   fEvent                  = nullptr;
+//   fListOfObjects          = new TObjArray();
+//   fFlagBgrHitsModuleLabel = "FlagBkgHits";
+//   fSdmcCollTag            = "compressDigiMCs";
+//   _printUtils             = new mu2e::TrkPrintUtils(config().printUtils());
+// }
+
 //------------------------------------------------------------------------------
 TAnaDump* TAnaDump::Instance(const fhicl::ParameterSet* PSet) {
   static TAnaDump::Cleaner cleaner;

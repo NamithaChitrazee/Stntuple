@@ -68,7 +68,7 @@
 #include "Stntuple/base/TNamedHandle.hh"
 #include "Stntuple/alg/TStntuple.hh"
 
-#include "Offline/Mu2eUtilities/inc/SimParticleTimeOffset.hh"
+// #include "Offline/Mu2eUtilities/inc/SimParticleTimeOffset.hh"
 #include "Offline/TrkReco/inc/DoubletAmbigResolver.hh"
 #include "Offline/MCDataProducts/inc/GenId.hh"
 #include "Offline/RecoDataProducts/inc/HelixSeed.hh"
@@ -199,10 +199,10 @@ protected:
   TNamed*                  fVersion;
 
   TNamedHandle*            fDarHandle;
-  TNamedHandle*            fTimeOffsetMapsHandle;
+  //   TNamedHandle*            fTimeOffsetMapsHandle;
 
   DoubletAmbigResolver*    fDar;
-  SimParticleTimeOffset*   fTimeOffsets;
+  //   SimParticleTimeOffset*   fTimeOffsets;
 //------------------------------------------------------------------------------
 // function members
 //------------------------------------------------------------------------------
@@ -354,9 +354,9 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
 //-----------------------------------------------------------------------------
 // fTimeOffsets is owned by the TAnaDump singleton
 //-----------------------------------------------------------------------------
-  fTimeOffsets          = TModule::fDump->TimeOffsets();
+//  fTimeOffsets          = TModule::fDump->TimeOffsets();
 
-  fTimeOffsetMapsHandle = new TNamedHandle("TimeOffsetMapsHandle",fTimeOffsets);
+//  fTimeOffsetMapsHandle = new TNamedHandle("TimeOffsetMapsHandle",fTimeOffsets);
   fDar                  = new DoubletAmbigResolver (PSet.get<fhicl::ParameterSet>("DoubletAmbigResolver"),0.,0,0);
   fDarHandle            = new TNamedHandle("DarHandle",fDar);
   // fKalDiag              = new KalDiag     (PSet.get<fhicl::ParameterSet>("KalDiag",fhicl::ParameterSet()));
@@ -620,7 +620,7 @@ void StntupleMaker::beginJob() {
 
       init_block->SetSpmcCollTag(fSpmcCollTag[i]);
       init_block->SetStatusG4Tag(fStatusG4Tag[i]);
-      init_block->SetTimeOffsets(fTimeOffsets);
+      //      init_block->SetTimeOffsets(fTimeOffsets);
 
       TStnDataBlock* db = AddDataBlock(block_name,
 				       "TStepPointMCBlock",

@@ -68,6 +68,40 @@ THistModule::THistModule(fhicl::ParameterSet const& PSet, const char* Name):
   fgModuleList->Add(this);
 }
 
+//-----------------------------------------------------------------------------
+THistModule::THistModule(const art::EDAnalyzer::Table<Config>& config, const char* Name) : 
+  //  TModule(config().tmodule,Name)
+  TModule(config.get_PSet(),Name)
+{
+  fOldDir        = NULL;
+  fHistogramList = new TObjArray(10);
+
+  fgBufferSize          = config().bufferSize     ();
+  fgMaxFileSize         = config().maxFileSize     ();
+  fgFileName            = config().histFileName    ();
+  fgSplitLevel          = config().splitLevel      ();
+  fgCompressionLevel    = config().compressionLevel();
+
+  // fgBufferSize       = PSet.get<int>        ("bufferSize"      ,fgBufferSize);
+  // fgSplitLevel       = PSet.get<int>        ("splitLevel"      ,fgSplitLevel);
+  // fgCompressionLevel = PSet.get<int>        ("compressionLevel",fgCompressionLevel);
+
+  fHistogramList->SetName("HistogramList");
+  fFolder->Add(fHistogramList);
+
+  fFolder->AddFolder("Hist","Hist");
+
+  if (fgModuleList == 0) {
+    fgModuleList = new TObjArray(10);
+    //    framework()->actions()->append(new THistModuleAction());
+//-----------------------------------------------------------------------------
+// do not append the histograms to the directory list of objects to allow
+// using short histogram names
+//-----------------------------------------------------------------------------
+    TH1::AddDirectory(kFALSE);
+  }
+  fgModuleList->Add(this);
+}
 
 //______________________________________________________________________________
 THistModule::~THistModule() {

@@ -15,6 +15,9 @@
 
 #ifndef __CINT__
 
+#include "fhiclcpp/types/Name.h"
+#include "fhiclcpp/types/Comment.h"
+
 #include "art/Framework/Principal/Event.h"
 
 #include "Offline/MCDataProducts/inc/CaloMCTruthAssns.hh"
@@ -68,19 +71,31 @@ class KalRep;
 class TAnaDump : public TObject {
 public:
 
-  const art::Event*               fEvent;
-  TObjArray*                      fListOfObjects;
-  TString                         fFlagBgrHitsModuleLabel;
-  art::InputTag                   fSdmcCollTag;
-  mu2e::SimParticleTimeOffset*    fTimeOffsets;
-  const mu2e::StrawDigiMCCollection*    _mcdigis;
-  double                          fTmp[100];  // for testing
+#ifndef __CINT__
+  struct Config {
+    using Name    = fhicl::Name;
+    using Comment = fhicl::Comment;
+    // fhicl::Atom<int>                       interactiveMode{Name("interactiveMode"), Comment("1: interactive mode"  ) };
+    //    fhicl::Sequence<std::string>           rootMacro      {Name("rootMacro"      ), Comment("good hit mask"        ) };
+    // fhicl::Table<fhicl::ParameterSet>      debugBits      {Name("debugBits"      ), Comment("debug bits"           ) };
+    // fhicl::Table<TrkReco>         printUtils    (Name("printUtils"       ), Comment("print Utils"   ) );
+  };
+#endif
 
-  mu2e::TrkPrintUtils*            _printUtils;
+  const art::Event*                  fEvent;
+  TObjArray*                         fListOfObjects;
+  TString                            fFlagBgrHitsModuleLabel;
+  art::InputTag                      fSdmcCollTag;
+  mu2e::SimParticleTimeOffset*       fTimeOffsets;
+  const mu2e::StrawDigiMCCollection* _mcdigis;
+  double                             fTmp[100];  // for testing
+
+  mu2e::TrkPrintUtils*               _printUtils;
 
 private:
 
-  TAnaDump(const fhicl::ParameterSet* Pset = NULL);
+  TAnaDump(const fhicl::ParameterSet*  Pset = NULL);
+  // TAnaDump(const fhicl::Table<Config>& config     );
   ~TAnaDump();
   
   class  Cleaner {
@@ -100,7 +115,7 @@ public:
 //-----------------------------------------------------------------------------
 // accessors
 //-----------------------------------------------------------------------------
-  mu2e::SimParticleTimeOffset*   TimeOffsets() { return fTimeOffsets; }
+  // mu2e::SimParticleTimeOffset*   TimeOffsets() { return fTimeOffsets; }
   const art::Event*              Event      () { return fEvent      ; }
 //-----------------------------------------------------------------------------
 // other methods
@@ -110,8 +125,8 @@ public:
 
   void   SetEvent(const art::Event* Evt) { fEvent = Evt; }
 
-  void   SetFlagBgrHitsModuleLabel(const char* Tag) { fFlagBgrHitsModuleLabel = Tag; }
-  void   SetStrawDigiMCCollTag    (art::InputTag& Tag) { fSdmcCollTag = Tag; }
+  void   SetFlagBgrHitsModuleLabel(const char*    Tag) { fFlagBgrHitsModuleLabel = Tag; }
+  void   SetStrawDigiMCCollTag    (art::InputTag& Tag) { fSdmcCollTag            = Tag; }
 
   double evalWeight(const mu2e::ComboHit*      Hit       ,
 		    CLHEP::Hep3Vector&         StrawDir  ,
