@@ -55,7 +55,7 @@ void TAnaDump::printKalSeed(const mu2e::KalSeed* KalSeed           ,
       if (cluster != 0) clusterEnergy = cluster->energyDep();
       printf("%5i %16p %3i %2.0f %8.3f %8.5f %7.3f %6.3f %9.3f %9.3f",
 	     -1,
-	     KalSeed,
+	     static_cast<void*>(KalSeed),
 	     nhits,q,
 	     mom, pt, t0, t0err, kalSeg.fmin(), kalSeg.fmax() );
 

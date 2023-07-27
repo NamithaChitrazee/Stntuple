@@ -145,7 +145,7 @@ void  hist_data_t::init() {
 // get histogram file for a given dataset ID
 //-----------------------------------------------------------------------------
 hist_file_t* hist_data_t::get_hist_file(const char* DsID, const char* JobName) {
-  printf("hist_data::get_hist_file dsid: %s  job: %s fBook = %p\n",DsID,JobName,fBook);
+  printf("hist_data::get_hist_file dsid: %s  job: %s fBook = %p\n",DsID,JobName,static_cast<void*>(fBook));
   
   hist_file_t* hf = fBook->FindHistFile(DsID,"",JobName);
   
