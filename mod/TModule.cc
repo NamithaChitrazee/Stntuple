@@ -284,7 +284,7 @@ int TModule::ExecuteMacro(int Mode) {
   // sprintf(par,"%s(%i,(TModule*) %p)",Function(),Mode,this);
   // cint->ProcessLine(par);
 
-  sprintf(par,"%i,(TModule*)%p",Mode,this);
+  sprintf(par,"%i,(TModule*)%p",Mode,static_cast<void*>(this));
   cint->Execute(Function(),par);
 
   return 0;

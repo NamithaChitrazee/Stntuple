@@ -260,7 +260,7 @@ void TEvdCrvBar::Print(Option_t* Opt) const {
     
     tempPulse = lastPulseInWindow(SiPM);
     if (tempPulse) {
-      printf("thresh %f , tL %f , tH %f , %p \n", fthreshold, ftimeLow, ftimeHigh, tempPulse);
+      printf("thresh %f , tL %f , tH %f , %p \n", fthreshold, ftimeLow, ftimeHigh, static_cast<const void*>(tempPulse));
       printf("%i	%i	%i	%f	%f \n", barIndex.asInt(), SiPM, fSectionID, tempPulse->GetPulseTime(), tempPulse->GetPEs());
     }
   }
