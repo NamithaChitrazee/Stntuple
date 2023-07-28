@@ -312,7 +312,7 @@ double TKinLH::lh_sig(double P) {
 //-----------------------------------------------------------------------------
 double TKinLH::f_bgr(double* X, double * P) {
   return 1./P[0];
-};
+}
 
 
 double TKinLH::f_sig(double* X, double * P) {

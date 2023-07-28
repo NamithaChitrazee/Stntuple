@@ -13,7 +13,7 @@ namespace {
     if ((index(Token,'e') < 0) && (index(Token,'E') < 0)) sscanf(Token,"%f",&Var);
     else                                                  sscanf(Token,"%e",&Var);
   }
-};
+}
 
 //-----------------------------------------------------------------------------
 int create_ntuple(const char* Filename, TNtuple*& Ntuple, int Debug) {

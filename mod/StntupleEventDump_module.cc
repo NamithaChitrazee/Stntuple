@@ -145,4 +145,4 @@ namespace mu2e {
 }
 
 using mu2e::StntupleEventDump;
-DEFINE_ART_MODULE(StntupleEventDump);
+DEFINE_ART_MODULE(StntupleEventDump)

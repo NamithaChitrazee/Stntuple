@@ -13,7 +13,7 @@
 
 namespace mu2e {
   class Tracker;
-};
+}
 
 namespace stntuple {
 class InitTrackStrawHitBlock : public TStnInitDataBlock {

@@ -14,7 +14,7 @@
 
 namespace mu2e {
   class SimParticle;
-};
+}
 
 class TSimParticle : public TObject {
 public:

@@ -86,7 +86,7 @@ TModule::TModule(fhicl::ParameterSet const& PSet, const char* Name):
       fFunction = new TString(r2[0].data());
     }
   }
-};
+}
 
 // //-----------------------------------------------------------------------------
 // TModule::TModule(const art::EDAnalyzer::Table<Config>& config, const char* Name):
@@ -159,7 +159,7 @@ TModule::~TModule() {
     delete fFile;
     fFile  = NULL;
   }
-};
+}
 
 
 //______________________________________________________________________________
@@ -169,7 +169,7 @@ int TModule::beforeBeginJob() {
 
 //-----------------------------------------------------------------------------
 void TModule::beginJob() {
-};
+}
 
 
 //______________________________________________________________________________
@@ -187,7 +187,7 @@ int TModule::beforeBeginRun(const art::Run& aRun) {
 //-----------------------------------------------------------------------------
 void TModule::beginRun(const art::Run &  Rn) {
   ExecuteMacro(0);
-};
+}
 
 //-----------------------------------------------------------------------------
 int TModule::afterBeginRun(const art::Run& aRun) {
@@ -214,7 +214,7 @@ void TModule::analyze  (const art::Event& Evt) {
 
     fAnaRint->GetInteractiveMode(fInteractiveMode);
   }
-};
+}
 
 //______________________________________________________________________________
 int TModule::afterEvent(const AbsEvent& event) {
@@ -243,7 +243,7 @@ void TModule::endRun(const art::Run &  Rn) {
 
     fAnaRint->GetInteractiveMode(fInteractiveMode);
   }
-};
+}
 
 
 //______________________________________________________________________________
@@ -258,7 +258,7 @@ int TModule::beforeEndJob() {
 
 //-----------------------------------------------------------------------------
 void TModule::endJob  () {
-};
+}
 
 //______________________________________________________________________________
 int TModule::afterEndJob() {

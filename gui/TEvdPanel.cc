@@ -36,7 +36,7 @@ ClassImp(stntuple::TEvdPanel)
 
 namespace {
   static int fgLocalDebug = 0;
-};
+}
 
 namespace stntuple {
 //_____________________________________________________________________________

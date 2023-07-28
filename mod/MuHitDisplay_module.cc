@@ -574,4 +574,4 @@ int MuHitDisplay::getCRVSection(int shieldNumber) {
 }
 
 using mu2e::MuHitDisplay;
-DEFINE_ART_MODULE(MuHitDisplay);
+DEFINE_ART_MODULE(MuHitDisplay)

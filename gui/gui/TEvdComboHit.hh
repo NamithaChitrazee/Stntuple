@@ -23,7 +23,7 @@ namespace mu2e {
   class ComboHit;
   class StrawDigiMC;
   class SimParticle;
-};
+}
 
 namespace stntuple {
 

@@ -15,7 +15,7 @@ TStnHexagon::TStnHexagon() {
   fLineColor = 1;
   fFillColor = 0;
   fFillStyle = 0;
-};
+}
 
 //-----------------------------------------------------------------------------
 TStnHexagon::~TStnHexagon() {

@@ -13,7 +13,7 @@
 namespace mu2e {
   class Plane;
   class Tracker;
-};
+}
 
 namespace  stntuple {
 

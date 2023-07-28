@@ -10,7 +10,7 @@ class TStnDataBlock;
 namespace stntuple { 
   class InitStrawHitBlock;
   class InitTrackStrawHitBlock;
-};
+}
 
 Int_t StntupleInitMu2eCalDataBlock       (TStnDataBlock* blk, AbsEvent* evt, int mode);
 Int_t StntupleInitMu2eClusterBlock       (TStnDataBlock* blk, AbsEvent* evt, int mode);

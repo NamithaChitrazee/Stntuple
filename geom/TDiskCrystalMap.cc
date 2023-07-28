@@ -15,7 +15,7 @@ TDiskCrystalMap::TDiskCrystalMap() {
   fIndex        = NULL;
   fIndexMap     = NULL;
   fNInside      = NULL;
-};
+}
 
 
 //-----------------------------------------------------------------------------
@@ -36,7 +36,7 @@ TDiskCrystalMap::~TDiskCrystalMap() {
   if (fIndex)    delete fIndex;
   if (fIndexMap) delete fIndexMap;
   if (fNInside ) delete fNInside;
-};
+}
 
 
 //-----------------------------------------------------------------------------
@@ -84,5 +84,5 @@ void TDiskCrystalMap::Print(Option_t* Opt) const {
   }
 
   if (ip != 0) printf("\n");
-};
+}
 
