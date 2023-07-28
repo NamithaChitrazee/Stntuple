@@ -221,7 +221,7 @@ void TAnaDump::printHelixSeed(const mu2e::HelixSeed* Helix          ,
       if (cluster != 0) clusterEnergy = cluster->energyDep();
       printf("%5i %12p %3i %2i %4i %8.3f %8.3f %7.3f %7.3f",
 	     -1,
-	     static_cast<void*>(Helix),
+	     static_cast<const void*>(Helix),
 	     nhits,
 	     nLoops, 
 	     nhitsLoopChecked,
