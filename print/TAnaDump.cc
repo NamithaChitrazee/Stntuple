@@ -245,7 +245,7 @@ void TAnaDump::printCaloCluster(const mu2e::CaloCluster* Cl,
 
     printf(" %3i %3i %-16p %2i %6i %3i %8.3f %8.3f %10.3f %10.3f %10.3f %10.3f %10.3f %10.3f\n",
 	   row, col,
-	   static_cast<void*>(Cl),
+	   static_cast<const void*>(Cl),
 	   Cl->diskID(),
 	   -999, 
 	   nh,
@@ -436,7 +436,7 @@ void TAnaDump::printCaloProtoCluster(const mu2e::CaloProtoCluster* Cluster, cons
   if ((opt == "") || (opt.Index("data") >= 0)) {
 
     printf("%16p  %3i %5i %5i %10.3f %10.3f\n",
-	   static_cast<void*>(Cluster),
+	   static_cast<const void*>(Cluster),
 	   section_id,
 	   nh,
 	   Cluster->isSplit(),
@@ -531,7 +531,7 @@ void TAnaDump::printCrvCoincidence(const mu2e::CrvCoincidence* Coin,
   int np          = list_of_pulses->size();
 
   printf("---------------------------------------------------------------------\n");
-  printf("Coinc Addr: %-16p Sector: %5i N(pulses): %5i\n",static_cast<void*>(Coin), sector, np);
+  printf("Coinc Addr: %-16p Sector: %5i N(pulses): %5i\n",static_cast<const void*>(Coin), sector, np);
 
   const mu2e::CrvRecoPulse* pulse(NULL);
   printCrvRecoPulse(pulse, "banner");
@@ -620,7 +620,7 @@ void TAnaDump::printCrvCoincidenceCluster(const mu2e::CrvCoincidenceCluster* CCl
     float t2        = CCl->GetEndTime();
     int   npe       = CCl->GetPEs();
 
-    printf("%-16p %5i %5i %5i %10.3f %10.3f %10.3f %10.3f %10.3f\n",static_cast<void*>(CCl),sector,np,npe,t1,t2,x,y,z);
+    printf("%-16p %5i %5i %5i %10.3f %10.3f %10.3f %10.3f %10.3f\n",static_cast<const void*>(CCl),sector,np,npe,t1,t2,x,y,z);
 
     const mu2e::CrvRecoPulse* pulse(NULL);
     const mu2e::CrvRecoPulse* otherpulse1(NULL);
@@ -851,7 +851,7 @@ void TAnaDump::printCrvRecoPulse(const mu2e::CrvRecoPulse* Pulse,
     int sipm_number = Pulse->GetSiPMNumber();
 
     printf("%-16p %5i %5i %8.3f %8.3f %8.3f %10.3f %8.3f %5i %5i %5i",
-     	   static_cast<void*>(Pulse),
+     	   static_cast<const void*>(Pulse),
 	   npes,
 	   npes_height,
 	   time,
@@ -2209,7 +2209,7 @@ void TAnaDump::printTrackClusterMatch(const mu2e::TrackClusterMatch* Tcm, const 
     double chi2  = Tcm->chi2();
 
     printf("%5i %16p  %16p  %8.3f %8.3f %8.3f %8.3f %8.3f\n",
-	   disk,  static_cast<void*>(cl),  static_cast<void*>(tex),  chi2,Tcm->du(),Tcm->dv(),Tcm->dt(),Tcm->ep());
+	   disk,  static_cast<const void*>(cl),  static_cast<const void*>(tex),  chi2,Tcm->du(),Tcm->dv(),Tcm->dt(),Tcm->ep());
   }
 }
 
