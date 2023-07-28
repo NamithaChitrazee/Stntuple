@@ -13,7 +13,7 @@
 namespace mu2e {
   class Straw;
   class Tracker;
-};
+}
 
 
 namespace stntuple {

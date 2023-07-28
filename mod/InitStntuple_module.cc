@@ -300,4 +300,4 @@ void InitStntuple::endJob() {
 
 } //end namespace mu2e
 
-DEFINE_ART_MODULE(mu2e::InitStntuple);
+DEFINE_ART_MODULE(mu2e::InitStntuple)

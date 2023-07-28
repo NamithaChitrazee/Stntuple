@@ -15,7 +15,7 @@ TStnSquare::TStnSquare() {
   fLineColor = 1;
   fFillColor = 0;
   fFillStyle = 0;
-};
+}
 
 //-----------------------------------------------------------------------------
 TStnSquare::~TStnSquare() {

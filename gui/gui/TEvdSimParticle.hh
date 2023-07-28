@@ -16,7 +16,7 @@
 
 namespace mu2e {
   class StrawGasStep;
-};
+}
 
 namespace stntuple {
 class TEvdSimParticle: public TObject {

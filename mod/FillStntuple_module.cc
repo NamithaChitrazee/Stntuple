@@ -280,4 +280,4 @@ void FillStntuple::analyze(const AbsEvent& anEvent) {
 
 using mu2e::FillStntuple;
 
-DEFINE_ART_MODULE(FillStntuple);
+DEFINE_ART_MODULE(FillStntuple)

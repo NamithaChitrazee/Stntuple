@@ -158,5 +158,5 @@ public:
 
   ClassDef(TFeldmanCousins,0)
 };
-};
+}
 #endif

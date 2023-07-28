@@ -859,4 +859,4 @@ void StntupleMaker::GetDefTrackCollName(char* Name) {
 
 using mu2e::StntupleMaker;
 
-DEFINE_ART_MODULE(StntupleMaker);
+DEFINE_ART_MODULE(StntupleMaker)

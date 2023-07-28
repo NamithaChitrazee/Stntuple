@@ -13,7 +13,7 @@
 namespace mu2e {
   class Panel;
   class Tracker;
-};
+}
 
 namespace stntuple {
 

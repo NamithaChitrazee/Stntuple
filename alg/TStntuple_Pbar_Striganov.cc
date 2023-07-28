@@ -20,7 +20,7 @@ double TStntuple::PBar_Striganov_Ed3SigdP3(double PBeam, double PLab, double ThL
   float pbeam(PBeam), plab(PLab), thlab(ThLab);
   double xsec = pa2pbarx_ (&plab,&thlab,&pbeam);
   return xsec;
-};
+}
 
 //-----------------------------------------------------------------------------
 // for given PBeam, PLab and ThLab, returns d^2Sigma(pA->pbarX)/dP/dTheta on Ta
@@ -30,7 +30,7 @@ double TStntuple::PBar_Striganov_d2N(double PBeam, double PLab, double ThLab) {
   float pbeam(PBeam), plab(PLab), thlab(ThLab);
   double xsec = pbar_d2n_(&pbeam,&plab,&thlab);
   return xsec;
-};
+}
 
 //-----------------------------------------------------------------------------
 void TStntuple::PBar_Striganov_SetP2Max(double P2Max) {

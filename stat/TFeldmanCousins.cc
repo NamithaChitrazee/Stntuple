@@ -1196,4 +1196,4 @@ int TFeldmanCousins::UpperLimit(model_t* Model, double SMin, double SMax, double
 }
 
   
-};
+}
