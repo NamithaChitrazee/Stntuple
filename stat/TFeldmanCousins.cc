@@ -4,6 +4,7 @@
 // fDebug.fTestCoverage   = 2: print missed
 // fDebug.fConstructBelt >= 2: print within the range
 ///////////////////////////////////////////////////////////////////////////////
+#include <vector>
 #include "Stntuple/stat/TFeldmanCousins.hh"
 #include "TCanvas.h"
 #include "TMatrixD.h"
@@ -972,7 +973,7 @@ int TFeldmanCousins::TestCoverage(double MuB, double SMin, double SMax, int NPoi
   
   if (rc < 0) return rc;
 
-  float x[NPoints+2], y[NPoints+2];
+  std::vector<float> x(NPoints+2), y(NPoints+2);
 
   x[0] = SMin;
   y[0] = 0;
@@ -1014,7 +1015,7 @@ int TFeldmanCousins::TestCoverage(double MuB, double SMin, double SMax, int NPoi
   y[NPoints+1] = 0;
 
   if (fHist.fCoverage) delete fHist.fCoverage;
-  fHist.fCoverage = new TGraph(NPoints+2,x,y);
+  fHist.fCoverage = new TGraph(NPoints+2,x.data(),y.data());
   fHist.fCoverage->SetTitle(Form("coverage, MuB = %10.3f\n",MuB));
   
   return rc;
