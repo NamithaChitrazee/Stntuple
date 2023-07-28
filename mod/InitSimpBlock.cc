@@ -103,7 +103,7 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
   std::vector<int>  vid, vin;
   int               np_with_straw_hits(0);  // number of particles with straw hits
                                             // straw hit ID's, per particle
-  std::vector<int>* vshid[nsh+1];
+  std::vector< std::vector<int>* > vshid(nsh+1);
 
   vid.reserve(nsh);
   vin.reserve(nsh);

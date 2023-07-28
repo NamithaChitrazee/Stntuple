@@ -4,6 +4,7 @@
 // fDebuglevel.fTestCoverage = 2: print missed
 ///////////////////////////////////////////////////////////////////////////////
 #include <algorithm>
+#include <vector>
 #include "TMath.h"
 #include "TCanvas.h"
 #include "TROOT.h"
@@ -314,7 +315,7 @@ int TBelt::test_coverage(double MuB, double SMin, double SMax, int NPoints) {
   rc = construct_belt(MuB,0,35,35001);
   if (rc < 0) return rc;
 
-  float x[NPoints+2], y[NPoints+2];
+  std::vector<float> x(NPoints+2), y(NPoints+2);
 
   x[0] = SMin;
   y[0] = 0;
@@ -354,7 +355,7 @@ int TBelt::test_coverage(double MuB, double SMin, double SMax, int NPoints) {
   y[NPoints+1] = 0;
   
   if (fHist.fCoverage) delete fHist.fCoverage;
-  fHist.fCoverage = new TGraph(NPoints+2,x,y);
+  fHist.fCoverage = new TGraph(NPoints+2,x.data(),y.data());
   fHist.fCoverage->SetTitle(Form("TBelt coverage test #mu_{B} = %10.3f",MuB));
   
   return rc;
