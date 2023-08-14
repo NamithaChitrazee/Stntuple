@@ -21,10 +21,6 @@
 #include "TGenParticle.hh"
 #include "TBuffer.h"
 
-#include "Stntuple/mod/InitStntupleDataBlocks.hh"
-
-// class TStnEvent;
-
 class TGenpBlock: public TStnDataBlock {
   friend class StntupleInitGenpBlock;
 protected:
