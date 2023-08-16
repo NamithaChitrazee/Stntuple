@@ -19,8 +19,6 @@
 #include "Offline/GlobalConstantsService/inc/GlobalConstantsHandle.hh"
 #include "Offline/GlobalConstantsService/inc/ParticleDataList.hh"
 
-#include "Offline/Mu2eUtilities/inc/SimParticleTimeOffset.hh"
-
 // #include "Stntuple/mod/THistModule.hh"
 #include "Stntuple/base/TNamedHandle.hh"
 
@@ -29,8 +27,6 @@ Int_t StntupleInitMu2eVDetDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent, int
 {
   static int    initialized(0);
   static char   oname[] = "StntupleInitMu2eVirtualDataBlock";
-
-  //  static mu2e::SimParticleTimeOffset* _timeOffsets(NULL);
 
   static char   step_module_label[100], step_description[100];
   int           ev_number, rn_number, nhits;
@@ -50,9 +46,6 @@ Int_t StntupleInitMu2eVDetDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent, int
     data->GetModuleLabel("TimeOffsetMapsHandle",module_name);
     data->GetDescription("TimeOffsetMapsHandle",time_offsets_name);
 
-   // THistModule*  m  = static_cast<THistModule*>  (THistModule::GetListOfModules()->FindObject(module_name));
-   // TNamedHandle* nh = static_cast<TNamedHandle*> (m->GetFolder()->FindObject(time_offsets_name));
-   // _timeOffsets     = static_cast<mu2e::SimParticleTimeOffset*> (nh->Object());
   }
 
 //-----------------------------------------------------------------------------
@@ -83,8 +76,6 @@ Int_t StntupleInitMu2eVDetDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent, int
     return -1;
   }
 
-  // load simulation time offsets for this event: timeOffsets may not be defined yet (stages 1, 2, 3)
-  //  if (_timeOffsets) _timeOffsets->updateMap(*AnEvent);
 
 //-----------------------------------------------------------------------------
 //
@@ -114,15 +105,6 @@ Int_t StntupleInitMu2eVDetDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent, int
     if (!(sim->fromGenerator())) goto NEXT_VHIT;
 
     vdIndex   = step->volumeId();
-//     if (_timeOffsets) {
-// //-----------------------------------------------------------------------------
-// // time - within the microbunch
-// //-----------------------------------------------------------------------------
-//       double tx = _timeOffsets->timeWithOffsetsApplied(*step);
-//       time = fmod(tx,_mbtime);
-//     }
-//     else              time =  step->time();
-
     time   = step->time();
     pdg_id = sim->pdgId();
     info   = &pdt->particle(pdg_id);
