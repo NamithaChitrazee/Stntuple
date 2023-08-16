@@ -59,7 +59,6 @@
 
 #include "Stntuple/base/TNamedHandle.hh"
 
-// #include "Offline/Mu2eUtilities/inc/SimParticleTimeOffset.hh"
 #include "Offline/TrkDiag/inc/TrkMCTools.hh"
 
 
@@ -138,14 +137,6 @@ TAnaDump::TAnaDump(const fhicl::ParameterSet* PSet) {
   fFlagBgrHitsModuleLabel = "FlagBkgHits";
   fSdmcCollTag            = "compressDigiMCs";
 
-  // if (PSet) {
-  //   fhicl::ParameterSet to_maps = PSet->get<fhicl::ParameterSet>("timeOffsetMaps" );
-  //   fTimeOffsets = new mu2e::SimParticleTimeOffset(to_maps);
-  // }
-  // else {
-  //   fTimeOffsets = NULL;
-  // }
-
   _printUtils = new mu2e::TrkPrintUtils(PSet->get<fhicl::ParameterSet>("printUtils",fhicl::ParameterSet()));
 }
 
@@ -172,7 +163,6 @@ TAnaDump* TAnaDump::Instance(const fhicl::ParameterSet* PSet) {
 TAnaDump::~TAnaDump() {
   fListOfObjects->Delete();
   delete fListOfObjects;
-  //  delete fTimeOffsets;
   delete _printUtils;
 }
 
@@ -1772,13 +1762,7 @@ void TAnaDump::printStrawGasStep(const mu2e::StrawGasStep* Step, const char* Opt
 
     float stepTime;
 
-    // if (fTimeOffsets) {
-    //   fTimeOffsets->updateMap(*fEvent);
-    //   stepTime = fTimeOffsets->timeWithOffsetsApplied(*Step);
-    // }
-    // else {
     stepTime = Step->time();
-    //}
 
     printf(" %8.3f  %8.3f %8.3f  %9.3f %10i  %10i  %10i  %10i",
 	   Step->ionizingEdep(),
@@ -2041,16 +2025,8 @@ void TAnaDump::printStepPointMC(const mu2e::StepPointMC* Step, const char* Detec
     art::Handle<mu2e::PhysicalVolumeInfoMultiCollection> volumes;
     fEvent->getRun().getByLabel("g4run", volumes);
 
-//2014-26-11 gianipez added the timeoffsets to the steppoints time
-
     double stepTime(-9999.);
-    // if (fTimeOffsets) {
-    //   fTimeOffsets->updateMap(*fEvent);
-    //   stepTime = fTimeOffsets->timeWithOffsetsApplied(*Step);
-    // }
-    // else {
     stepTime = Step->time();
-    //}
 
     //    const mu2e::PhysicalVolumeInfo& pvinfo = volumes->at(sim->startVolumeIndex());
     //    const mu2e::PhysicalVolumeInfo& pvinfo = volumes->at(Step->volumeId()); - sometimes crashes..

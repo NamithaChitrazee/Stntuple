@@ -62,7 +62,6 @@ namespace mu2e {
   class TrackClusterMatch;
   class TrkCaloHit;
   class TrkStrawHit;
-  class SimParticleTimeOffset;
   class TrkPrintUtils;
 }
 
@@ -86,7 +85,6 @@ public:
   TObjArray*                         fListOfObjects;
   TString                            fFlagBgrHitsModuleLabel;
   art::InputTag                      fSdmcCollTag;
-  mu2e::SimParticleTimeOffset*       fTimeOffsets;
   const mu2e::StrawDigiMCCollection* _mcdigis;
   double                             fTmp[100];  // for testing
 
@@ -115,7 +113,6 @@ public:
 //-----------------------------------------------------------------------------
 // accessors
 //-----------------------------------------------------------------------------
-  // mu2e::SimParticleTimeOffset*   TimeOffsets() { return fTimeOffsets; }
   const art::Event*              Event      () { return fEvent      ; }
 //-----------------------------------------------------------------------------
 // other methods
