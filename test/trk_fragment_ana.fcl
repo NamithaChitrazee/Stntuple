@@ -42,7 +42,7 @@ physics : {
 	TrkFragmentAna : { module_type:TrkFragmentAna
 	    @table::StntupleTModuleFclDefaults
 	    
-	    trkTag              : "daq:TRK"   # 
+	    trkfCollTag         : "daq:TRK"   # 
 #	    diagLevel           : 2           # print one line per event
 	    diagLevel           : 3           # print the whole event
             minNBytes           : 4800
@@ -98,8 +98,8 @@ services.scheduler.wantSummary                   : true
 
 # physics.analyzers.TrkFragmentAna.diagLevel       : 2 # print one line per event
 physics.analyzers.TrkFragmentAna.diagLevel       : 3 # event dump
-physics.analyzers.TrkFragmentAna.interactiveMode : 0
-physics.analyzers.TrkFragmentAna.rootMacro       : "display_001.C"
+physics.analyzers.TrkFragmentAna.interactiveMode : 1
+# physics.analyzers.TrkFragmentAna.rootMacro       : "display_001.C"
 
 #physics.producers.makeSD.diagLevel        : 10
 #physics.producers.CaloDigiMaker.diagLevel : 10

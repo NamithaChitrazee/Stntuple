@@ -58,7 +58,7 @@ namespace mu2e {
       bool           valid       :  1;   ///< Whether the DTC believes the packet to be valid
     };
 
-    struct DtcDataHeaderPacket_t : public DtcDMAPacket_t {  // 8 16-byte words in tota
+    struct DtcDataHeaderPacket_t : public DtcDMAPacket_t {  // 8 16-byte words in total
       uint16_t            nPackets     : 11;
       uint16_t            unused       :  5;
       uint16_t            eventTag[3];             // DTC_EventWindowTag
@@ -73,11 +73,16 @@ namespace mu2e {
     };
 
     DtcDataBlock_t*  _trkFragment;
+
     int              _diagLevel;
     int              _minNBytes;
     int              _maxNBytes;
+    int              _dataHeaderOffset;
 
     art::InputTag    _trkfCollTag;
+    int              _dumpDTCRegisters;
+    
+    int              _error; 
 
     struct EventHist_t {
       TH1F*         nbtot;
@@ -99,11 +104,12 @@ namespace mu2e {
       TH1F*         time[2];
       TH1F*         tot [2];
       TH1F*         pmp;
+      TH1F*         dt;                 // distance between the two pulses (if more than one)
+      TH1F*         wf[10];
     };
                                         // assume one panel
     struct WaveformHist_t {
       ChannelHist_t     channel[kNChannels];
-      TH1F*             h_wf   [kNChannels][10];
     };
 
     struct Hist_t {
@@ -113,6 +119,15 @@ namespace mu2e {
     } _Hist;
 
     int _nwf[100];
+
+    struct ChData_t {
+      int  nhits;
+      TrackerFragment::TrackerDataPacket* hit[100];
+    };
+
+    struct Data_t {
+      ChData_t  channel[kNChannels];
+    } _data;
 
     // struct Config {
     //   fhicl::Atom<int>               diagLevel{fhicl::Name("diagLevel"), fhicl::Comment("diagnostic level")};
@@ -128,8 +143,11 @@ namespace mu2e {
     virtual void beginJob() override;
     virtual void endJob  () override;
     
-    virtual void analyze        (const art::Event& e) override;
+    virtual void analyze         (const art::Event& e) override;
     void         analyze_fragment(const artdaq::Fragment* Fragment,FragmentHist_t* Hist);
+
+    // NWords: number of 2-byte words
+    void         printFragment   (const artdaq::Fragment* Fragment, int NWords);
   };
 }
 #endif

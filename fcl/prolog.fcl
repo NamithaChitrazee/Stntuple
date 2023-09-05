@@ -179,7 +179,7 @@ MuHitDisplay: { module_type:MuHitDisplay                 # class name;
     sdCollTag                    : "compressDigiMCs"                 # standard MC choice
     swCollTag                    : "compressDigiMCs"                 # standard MC choice
     sdmcCollTag                  : "compressDigiMCs"                 #  was "makeSD"
-    shfCollTag                   : "FlagBkgHits:StrawHits"           # straw hit flags
+##    shfCollTag                   : "FlagBkgHits:StrawHits"           # straw hit flags
     spmcCollTag                  : "compressDigiMCs:virtualdetector" # was g4run
     simpCollTag                  : "compressDigiMCs"                 # was g4run
 
@@ -722,6 +722,12 @@ Stntuple : {
 	    diagLevel           : 0           # print nothing
             minNBytes           : -1
             maxNBytes           : 1000000
+#------------------------------------------------------------------------------
+# old format: offset 0x08 =  0  (16 bytes = (0x00 + 0x08) in 2-byte words)
+# new format: offset 0x28 = 40  (80 bytes = (0x20 + 0x08) in 2-byte words)
+#------------------------------------------------------------------------------
+            dataHeaderOffset    : 32
+            dumpDTCRegisters    :  0
 #------------------------------------------------------------------------------
 # if rootMacro is non-empty, it defines the name of a ROOT macro to be executed 
 # in interpreted mode in the art event loop
