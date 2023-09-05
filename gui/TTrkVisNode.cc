@@ -168,15 +168,15 @@ int TTrkVisNode::InitEvent() {
     fChColl = nullptr;
   }
 
-  art::Handle<mu2e::StrawHitFlagCollection> chfcH;
-  event->getByLabel(art::InputTag(fChfCollTag), chfcH);
-  if (chfcH.isValid()) fChfColl = chfcH.product();
-  else {
-    mf::LogWarning("TTrkVisNode::InitEvent") << " WARNING:" << __LINE__ 
-                                             << " : mu2e::StrawHitFlagCollection " 
-                                             << fChfCollTag << " not found";
-    fChfColl = nullptr;
-  }
+  // art::Handle<mu2e::StrawHitFlagCollection> chfcH;
+  // event->getByLabel(art::InputTag(fChfCollTag), chfcH);
+  // if (chfcH.isValid()) fChfColl = chfcH.product();
+  // else {
+  //   mf::LogWarning("TTrkVisNode::InitEvent") << " WARNING:" << __LINE__ 
+  //                                            << " : mu2e::StrawHitFlagCollection " 
+  //                                            << fChfCollTag << " not found";
+  //   fChfColl = nullptr;
+  // }
 
   art::Handle<mu2e::ComboHitCollection> schcH;
   event->getByLabel(art::InputTag(fShCollTag), schcH);
@@ -188,15 +188,15 @@ int TTrkVisNode::InitEvent() {
     fSchColl = nullptr;
   }
 
-  art::Handle<mu2e::StrawHitFlagCollection> shfcH;
-  event->getByLabel(art::InputTag(fShfCollTag), shfcH);
-  if (shfcH.isValid()) fShfColl = shfcH.product();
-  else {
-    mf::LogWarning("TTrkVisNode::InitEvent") << " WARNING:" << __LINE__ 
-                                             << " : mu2e::StrawHitFlagCollection " 
-                                             << fShfCollTag << " not found";
-    fShfColl = nullptr;
-  }
+  // art::Handle<mu2e::StrawHitFlagCollection> shfcH;
+  // event->getByLabel(art::InputTag(fShfCollTag), shfcH);
+  // if (shfcH.isValid()) fShfColl = shfcH.product();
+  // else {
+  //   mf::LogWarning("TTrkVisNode::InitEvent") << " WARNING:" << __LINE__ 
+  //                                            << " : mu2e::StrawHitFlagCollection " 
+  //                                            << fShfCollTag << " not found";
+  //   fShfColl = nullptr;
+  // }
 
   art::Handle<mu2e::StrawHitCollection> shcH;
   event->getByLabel(art::InputTag(fShCollTag), shcH);

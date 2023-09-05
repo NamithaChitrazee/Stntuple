@@ -39,7 +39,7 @@ MuHitDisplay::MuHitDisplay(fhicl::ParameterSet const& pset) :
   _crvRecoPulseCollTag         (pset.get<string>("crvRecoPulsesCollTag")),
   			        
   _shCollTag                   (pset.get<art::InputTag>("strawHitCollTag")),
-  _shfCollTag                  (pset.get<string>("shfCollTag")),
+  //  _shfCollTag                  (pset.get<string>("shfCollTag")),
   _comboHitCollTag             (pset.get<string>("comboHitCollTag")),
   _chfCollTag                  (pset.get<string>("chfCollTag")),
   _sdCollTag                   (pset.get<string>("sdCollTag")),            // straw digi
@@ -281,9 +281,9 @@ void MuHitDisplay::InitVisManager() {
   TTrkVisNode* tnode = new TTrkVisNode ("TrkVisNode", fTracker, NULL);
 
   tnode->SetShCollTag       (_shCollTag);
-  tnode->SetShfCollTag      (_shfCollTag     );
+  //  tnode->SetShfCollTag      (_shfCollTag     );
   tnode->SetChCollTag       (_comboHitCollTag);
-  tnode->SetChfCollTag      (_chfCollTag     );
+  //  tnode->SetChfCollTag      (_chfCollTag     );
   tnode->SetKsCollTag       (_kffCollTag     );
   tnode->SetSdmcCollTag     (_sdmcCollTag    );
   tnode->SetSimpColl        (&_simpColl      );
@@ -474,11 +474,11 @@ int MuHitDisplay::getData(const art::Event* Evt) {
       _sdmcColl = nullptr;
     }
     
-    art::Handle<mu2e::StrawHitFlagCollection> shfcH;
-    Evt->getByLabel(_shfCollTag, shfcH);
+    // art::Handle<mu2e::StrawHitFlagCollection> shfcH;
+    // Evt->getByLabel(_shfCollTag, shfcH);
     
-    if (shfcH.isValid()) _shfColl = shfcH.product();
-    else                 _shfColl = nullptr;
+    // if (shfcH.isValid()) _shfColl = shfcH.product();
+    // else                 _shfColl = nullptr;
 //-----------------------------------------------------------------------------
 // calorimeter hit data
 //-----------------------------------------------------------------------------
