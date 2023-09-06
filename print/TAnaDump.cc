@@ -1676,7 +1676,7 @@ void TAnaDump::printStrawHitCollection(const char* StrawHitCollTag   ,
     const mu2e::StrawHit* hit = &shc->at(i);
 
     vector<StrawDigiIndex> shids;
-    chc->fillStrawDigiIndices(*(fEvent),i,shids);
+    chc->fillStrawDigiIndices(i,shids);
 
     const mu2e::StrawDigiMC* mcdigi = &_mcdigis->at(shids[0]);
 

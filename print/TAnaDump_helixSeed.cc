@@ -267,7 +267,7 @@ void TAnaDump::printHelixSeed(const mu2e::HelixSeed* Helix          ,
 	int  hitIndex                 = helHit->index(0);     // index of the first straw hit
       
 	vector<StrawDigiIndex> shids;
-	Helix->hits().fillStrawDigiIndices(*(fEvent),i,shids);
+	Helix->hits().fillStrawDigiIndices(i,shids);
 
 	const mu2e::ComboHit* hit     = &shcol->at(hitIndex);
  
