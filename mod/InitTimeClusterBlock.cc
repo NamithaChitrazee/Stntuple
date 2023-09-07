@@ -152,7 +152,7 @@ int  StntupleInitTimeClusterBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent*
       for (int ish=0; ish<nsh; ish++) {
 	int i2 = hit->index(ish);
 	std::vector<StrawDigiIndex> shids;
-	sschc->fillStrawDigiIndices((const art::Event&) *Evt,i2,shids);
+	sschc->fillStrawDigiIndices(i2,shids);
       
 	const mu2e::StrawDigiMC* mcdigi = &mcdigis->at(shids[0]);
       

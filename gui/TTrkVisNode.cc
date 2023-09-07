@@ -340,7 +340,7 @@ int TTrkVisNode::InitEvent() {
       const mu2e::ComboHit* hit = &fChColl->at(ihit);
       size_t ish  = hit-hit0;
       std::vector<StrawDigiIndex> shids;
-      fChColl->fillStrawDigiIndices(*event,ish,shids);
+      fChColl->fillStrawDigiIndices(ish,shids);
 //-----------------------------------------------------------------------------
 // handle MC truth, if that is present
 //-----------------------------------------------------------------------------

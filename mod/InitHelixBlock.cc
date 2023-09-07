@@ -163,7 +163,7 @@ int  StntupleInitHelixBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt, 
       if (hit->_flag.hasAnyProperty(mu2e::StrawHitFlag::outlier))         continue;
 
       std::vector<StrawDigiIndex> shids;
-      hits->fillStrawDigiIndices(*(Evt),j,shids);
+      hits->fillStrawDigiIndices(j,shids);
       
       for (size_t k=0; k<shids.size(); ++k) {
       	const mu2e::StrawDigiMC* sdmc = &sdmcColl->at(shids[k]);
