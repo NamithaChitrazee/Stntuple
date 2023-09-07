@@ -266,22 +266,15 @@ void TAnaDump::printHelixSeed(const mu2e::HelixSeed* Helix          ,
 	const mu2e::ComboHit*  helHit = &Helix->hits().at(i);
 	int  hitIndex                 = helHit->index(0);     // index of the first straw hit
       
-	vector<StrawDigiIndex> shids;
-	Helix->hits().fillStrawDigiIndices(i,shids);
-
+	// vector<StrawDigiIndex> shids;
+	// Helix->hits().fillStrawDigiIndices(i,shids);
+                                                              // single straw hit
 	const mu2e::ComboHit* hit     = &shcol->at(hitIndex);
- 
-	const mu2e::StrawDigiMC* sdmc = &mcdigis->at(shids[0]);
+                                                              // ind and hitIndex should be the same
+        int ind = hit->index(0);
+ 	const mu2e::StrawDigiMC*  sdmc = &mcdigis->at(ind);
+	const mu2e::StrawGasStep* step = sdmc->earlyStrawGasStep().get();
 
-	const mu2e::StrawGasStep* step(nullptr);
-
-	if (sdmc->wireEndTime(mu2e::StrawEnd::cal) < sdmc->wireEndTime(mu2e::StrawEnd::hv)) {
-	  step = sdmc->strawGasStep(mu2e::StrawEnd::cal).get();
-	}
-	else {
-	  step = sdmc->strawGasStep(mu2e::StrawEnd::hv ).get();
-	}
-    
 	if (banner_printed == 0) {
 	  printHelixHit(helHit, hit, step, "banner", -1, 0);
 	  banner_printed = 1;

@@ -67,8 +67,8 @@ int  StntupleInitTimeClusterBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent*
   art::Handle<mu2e::ComboHitCollection>    chcH;
   const mu2e::ComboHitCollection*          chc(nullptr);
 
-  art::Handle<mu2e::ComboHitCollection>    sschcH;
-  const mu2e::ComboHitCollection*          sschc(nullptr);
+  // art::Handle<mu2e::ComboHitCollection>    sschcH;
+  //  const mu2e::ComboHitCollection*          sschc(nullptr);
 
   if (! fChCollTag.empty()) {
     bool ok = Evt->getByLabel(fChCollTag,chcH);
@@ -84,12 +84,12 @@ int  StntupleInitTimeClusterBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent*
 //-----------------------------------------------------------------------------
 // single straw hit collection (also ComboHit's
 //-----------------------------------------------------------------------------
-  if (! fShCollTag.empty()) {
-    bool ok = Evt->getByLabel(fShCollTag,sschcH);
-    if (ok) {
-      sschc          = sschcH.product();
-    }
-  }
+  // if (! fShCollTag.empty()) {
+  //   bool ok = Evt->getByLabel(fShCollTag,sschcH);
+  //   if (ok) {
+  //     sschc          = sschcH.product();
+  //   }
+  // }
 
   art::Handle<mu2e::StrawDigiMCCollection> sdmccH;
   const mu2e::StrawDigiMCCollection*       mcdigis(nullptr);
@@ -150,11 +150,8 @@ int  StntupleInitTimeClusterBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent*
 //-----------------------------------------------------------------------------
       int nsh = hit->nStrawHits();
       for (int ish=0; ish<nsh; ish++) {
-	int i2 = hit->index(ish);
-	std::vector<StrawDigiIndex> shids;
-	sschc->fillStrawDigiIndices(i2,shids);
-      
-	const mu2e::StrawDigiMC* mcdigi = &mcdigis->at(shids[0]);
+	int ind = hit->index(ish);
+	const mu2e::StrawDigiMC* mcdigi = &mcdigis->at(ind);
       
         step = mcdigi->earlyStrawGasStep().get();
 

@@ -328,7 +328,7 @@ int TTrkVisNode::InitEvent() {
 // the rest makes sense only if nhits > 0
 //-----------------------------------------------------------------------------
   if (nch > 0) { 
-    const mu2e::ComboHit* hit0 = &fChColl->at(0);
+    //    const mu2e::ComboHit* hit0 = &fChColl->at(0);
 
     float                     mc_mom(-1.), mc_mom_z(-1.);
     int                       mother_pdg_id(0);
@@ -338,14 +338,12 @@ int TTrkVisNode::InitEvent() {
 
     for (int ihit=0; ihit<nch; ihit++ ) {
       const mu2e::ComboHit* hit = &fChColl->at(ihit);
-      size_t ish  = hit-hit0;
-      std::vector<StrawDigiIndex> shids;
-      fChColl->fillStrawDigiIndices(ish,shids);
 //-----------------------------------------------------------------------------
 // handle MC truth, if that is present
 //-----------------------------------------------------------------------------
       if (fSdmcColl != nullptr) {
-	const mu2e::StrawDigiMC* mcdigi = &fSdmcColl->at(shids[0]);
+        int ind = hit->indexArray().at(0);
+	const mu2e::StrawDigiMC* mcdigi = &fSdmcColl->at(ind);
 
 	step = mcdigi->earlyStrawGasStep().get();
 

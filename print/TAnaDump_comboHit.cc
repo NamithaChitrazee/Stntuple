@@ -146,24 +146,19 @@ void TAnaDump::printComboHitCollection(const char* StrawHitCollTag   ,
 
   int flags;
   
-  const mu2e::ComboHit* hit0 = &shc->at(0);
+  //  const mu2e::ComboHit* hit0 = &shc->at(0);
  
   int banner_printed = 0;
   for (int i=0; i<nhits; i++) {
     hit         = &shc->at(i);
-    size_t ish  = hit-hit0;
-    vector<StrawDigiIndex> shids;
-    shc->fillStrawDigiIndices(ish,shids);
+    int ind     = hit->index(0);
+    // size_t ish  = hit-hit0;
+    // vector<StrawDigiIndex> shids;
+    // shc->fillStrawDigiIndices(ish,shids);
 
-    const mu2e::StrawDigiMC* mcdigi = &mcdigis->at(shids[0]);
-    const mu2e::StrawGasStep* step (nullptr);
+    const mu2e::StrawDigiMC*  sdmc = &mcdigis->at(ind);
+    const mu2e::StrawGasStep* step = sdmc->earlyStrawGasStep().get();
 
-    if (mcdigi->wireEndTime(mu2e::StrawEnd::cal) < mcdigi->wireEndTime(mu2e::StrawEnd::hv)) {
-      step = mcdigi->strawGasStep(mu2e::StrawEnd::cal).get();
-    }
-    else {
-      step = mcdigi->strawGasStep(mu2e::StrawEnd::hv ).get();
-    }
                                         // flags back to a separate coll
                                         // and back again to the hit payload
     //    flags = *((int*) &shfc->at(i));

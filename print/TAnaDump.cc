@@ -1669,23 +1669,12 @@ void TAnaDump::printStrawHitCollection(const char* StrawHitCollTag   ,
  
   int nhits = shc->size();
 
-  const mu2e::StrawGasStep* step (nullptr);
   int                       flags;
   int                       banner_printed(0);
   for (int i=0; i<nhits; i++) {
     const mu2e::StrawHit* hit = &shc->at(i);
-
-    vector<StrawDigiIndex> shids;
-    chc->fillStrawDigiIndices(i,shids);
-
-    const mu2e::StrawDigiMC* mcdigi = &_mcdigis->at(shids[0]);
-
-    if (mcdigi->wireEndTime(mu2e::StrawEnd::cal) < mcdigi->wireEndTime(mu2e::StrawEnd::hv)) {
-      step = mcdigi->strawGasStep(mu2e::StrawEnd::cal).get();
-    }
-    else {
-      step = mcdigi->strawGasStep(mu2e::StrawEnd::hv ).get();
-    }
+    const mu2e::StrawDigiMC*  sdmc = &_mcdigis->at(i);
+    const mu2e::StrawGasStep* step = sdmc->earlyStrawGasStep().get();
 					// assuming it doesn't move beyond 32 bits
     flags = *((int*) &chc->at(i).flag());
     if (banner_printed == 0) {

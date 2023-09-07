@@ -162,26 +162,18 @@ int  StntupleInitHelixBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt, 
       // get the MC truth info
       if (hit->_flag.hasAnyProperty(mu2e::StrawHitFlag::outlier))         continue;
 
-      std::vector<StrawDigiIndex> shids;
-      hits->fillStrawDigiIndices(j,shids);
+      int nsh = hit->indexArray().size();
       
-      for (size_t k=0; k<shids.size(); ++k) {
-      	const mu2e::StrawDigiMC* sdmc = &sdmcColl->at(shids[k]);
-
-	const mu2e::StrawGasStep* step (nullptr);
-	if (sdmc->wireEndTime(mu2e::StrawEnd::cal) < sdmc->wireEndTime(mu2e::StrawEnd::hv)) {
-	  step = sdmc->strawGasStep(mu2e::StrawEnd::cal).get();
-	}
-	else {
-	  step = sdmc->strawGasStep(mu2e::StrawEnd::hv ).get();
-	}
-
+      for (int k=0; k<nsh; k++) {
+        int ind = hit->index(k);
+      	const mu2e::StrawDigiMC*  sdmc = &sdmcColl->at(ind);
+	const mu2e::StrawGasStep* step = sdmc->earlyStrawGasStep().get();
       	if (step) {
       	  art::Ptr<mu2e::SimParticle> const& simptr = step->simParticle(); 
       	  int sim_id        = simptr->id().asInt();
       	  float   dz        = step->position().z();// - trackerZ0;
       	  hits_simp_id.push_back   (sim_id); 
-      	  hits_simp_index.push_back(shids[k]);
+      	  hits_simp_index.push_back(ind);
       	  hits_simp_z.push_back(dz);
       	  break;
       	}
