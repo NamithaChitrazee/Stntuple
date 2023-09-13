@@ -46,7 +46,9 @@ namespace mu2e {
 
   class TrkFragmentAna : public THistModule {
 
-    enum { kNChannels = 96 };
+    enum { kNChannels          = 96,
+           kMaxNHitsPerChannel = 20
+    };
 
   public:
     struct DtcDMAPacket_t {              // 2 16-byte words
@@ -81,6 +83,8 @@ namespace mu2e {
 
     art::InputTag    _trkfCollTag;
     int              _dumpDTCRegisters;
+    int              _referenceChannel;
+    int              _analyzeFragments;
     
     int              _error; 
 
@@ -104,8 +108,11 @@ namespace mu2e {
       TH1F*         time[2];
       TH1F*         tot [2];
       TH1F*         pmp;
-      TH1F*         dt;                 // distance between the two pulses (if more than one)
-      TH1F*         wf[10];
+      TH1F*         dt0;                 // T0 distance between the two consequtive pulses
+      TH1F*         dt1;                 // T1 distance between the two consequtive pulses
+      TH1F*         dt0r;                // T0(ich,0)-T0(ref,0)
+      TH1F*         dt1r;                // T1(ich,0)-distance between the two pulses (if more than one)
+      TH1F*         wf[kMaxNHitsPerChannel];
     };
                                         // assume one panel
     struct WaveformHist_t {
@@ -140,11 +147,14 @@ namespace mu2e {
     // explicit TrkFragmentAna(const art::EDAnalyzer::Table<Config>& config);
     virtual ~TrkFragmentAna() {}
     
+    virtual void beginRun(const art::Run& ARun);
+
     virtual void beginJob() override;
     virtual void endJob  () override;
     
     virtual void analyze         (const art::Event& e) override;
     void         analyze_fragment(const artdaq::Fragment* Fragment,FragmentHist_t* Hist);
+    void         book_histograms (int RunNumber);
 
     // NWords: number of 2-byte words
     void         printFragment   (const artdaq::Fragment* Fragment, int NWords);

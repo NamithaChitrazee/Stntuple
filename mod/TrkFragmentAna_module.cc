@@ -17,6 +17,12 @@ unsigned int reverseBits(unsigned int num) {
 }
 
 //-----------------------------------------------------------------------------
+unsigned int correctedTDC(unsigned int TDC) {
+  uint32_t corrected_tdc = ((TDC & 0xFFFF00) + (0xFF  - (TDC & 0xFF)));
+  return corrected_tdc;
+}
+
+//-----------------------------------------------------------------------------
 // NWords : the number of short words
 //-----------------------------------------------------------------------------
   void TrkFragmentAna::printFragment(const artdaq::Fragment* Frag, int NWords) {
@@ -52,47 +58,64 @@ unsigned int reverseBits(unsigned int num) {
     _maxNBytes       (PSet.get<int>         ("maxNBytes"       )), 
     _dataHeaderOffset(PSet.get<int>         ("dataHeaderOffset")), 
     _trkfCollTag     (PSet.get<std::string> ("trkfCollTag"     )),
-    _dumpDTCRegisters(PSet.get<int>         ("dumpDTCRegisters"))
+    _dumpDTCRegisters(PSet.get<int>         ("dumpDTCRegisters")),
+    _referenceChannel(PSet.get<int>         ("referenceChannel")),
+    _analyzeFragments(PSet.get<int>         ("analyzeFragments"))
   {
   }
 
-//--------------------------------------------------------------------------------
-// book histograms
-//--------------------------------------------------------------------------------
-void TrkFragmentAna::beginJob() {
+//-----------------------------------------------------------------------------
+void TrkFragmentAna::book_histograms(int RunNumber) {
   art::ServiceHandle<art::TFileService> tfs;
 
   art::TFileDirectory top_dir     = tfs->mkdir("trk");
   art::TFileDirectory frag_dir    = tfs->mkdir("trk/frag_0");
 
-  _Hist.event.nhits       = top_dir.make<TH1F>("nhits"   , "nhits total"  , 1000, 0.,  1000.);
-  _Hist.event.nhits_vs_ch = top_dir.make<TH1F>("nh_vs_ch", "nh vs ch"     ,  100, 0.,   100.);
-  _Hist.event.nbtot       = top_dir.make<TH1F>("nbtot"   , "nbytes total" ,10000, 0., 10000.);
-  _Hist.event.nfrag       = top_dir.make<TH1F>("nfrag"   , "n fragments"  ,  100, 0.,   100.);
+  _Hist.event.nhits       = top_dir.make<TH1F>("nhits"    , Form("run %06i: nhits total" ,RunNumber), 1000, 0.,  1000.);
+  _Hist.event.nhits_vs_ch = top_dir.make<TH1F>("nh_vs_ch" , Form("run %06i: nh vs ch"    ,RunNumber),  100, 0.,   100.);
+  _Hist.event.nbtot       = top_dir.make<TH1F>("nbtot"    , Form("run %06i: nbytes total",RunNumber),10000, 0., 10000.);
+  _Hist.event.nfrag       = top_dir.make<TH1F>("nfrag"    , Form("run %06i: n fragments" ,RunNumber),  100, 0.,   100.);
 
-  _Hist.frag.nbytes       = frag_dir.make<TH1F>("nbytes"  , "n bytes"     ,10000,    0., 10000.);
-  _Hist.frag.dsize        = frag_dir.make<TH1F>("dsize"   , "size()-nb"   ,  200, -100.,   100.);
-  _Hist.frag.npackets     = frag_dir.make<TH1F>("npackets", "n packets"   , 1000,    0.,  1000.);
-  _Hist.frag.nhits        = frag_dir.make<TH1F>("nhits"   , "n hits"      ,  300,    0.,   300.);
-  _Hist.frag.valid        = frag_dir.make<TH1F>("valid"   , "valid"       ,    2,    0.,     2.);
+  _Hist.frag.nbytes       = frag_dir.make<TH1F>("nbytes"  , Form("run %06i: n bytes"     ,RunNumber),10000,    0., 10000.);
+  _Hist.frag.dsize        = frag_dir.make<TH1F>("dsize"   , Form("run %06i: size()-nb"   ,RunNumber),  200, -100.,   100.);
+  _Hist.frag.npackets     = frag_dir.make<TH1F>("npackets", Form("run %06i: n packets"   ,RunNumber), 1000,    0.,  1000.);
+  _Hist.frag.nhits        = frag_dir.make<TH1F>("nhits"   , Form("run %06i: n hits"      ,RunNumber),  300,    0.,   300.);
+  _Hist.frag.valid        = frag_dir.make<TH1F>("valid"   , Form("run %06i: valid"       ,RunNumber),    2,    0.,     2.);
 
   printf("[mu2e::TrkFragmentAna] pointer to the module: 0x%8p\n",(void*) this);
 
   for (int i=0; i<kNChannels; i++) {
     art::TFileDirectory chan_dir = tfs->mkdir(Form("trk/frag_0/ch_%02i",i));
-    _Hist.channel[i].nhits   = chan_dir.make<TH1F>(Form("ch_%02i_nhits" ,i),Form("Channel %02i nhits"  ,i),100, 0.,   100.);
-    _Hist.channel[i].time[0] = chan_dir.make<TH1F>(Form("ch_%02i_time0" ,i),Form("Channel %02i time[0]",i),250, 0., 100000.);
-    _Hist.channel[i].time[1] = chan_dir.make<TH1F>(Form("ch_%02i_time1" ,i),Form("Channel %02i time[0]",i),250, 0., 100000.);
-    _Hist.channel[i].tot [0] = chan_dir.make<TH1F>(Form("ch_%02i_tot0"  ,i),Form("Channel %02i time[0]",i),100, 0.,   100.);
-    _Hist.channel[i].tot [1] = chan_dir.make<TH1F>(Form("ch_%02i_tot1"  ,i),Form("Channel %02i time[0]",i),100, 0.,   100.);
-    _Hist.channel[i].pmp     = chan_dir.make<TH1F>(Form("ch_%02i_pmp"   ,i),Form("Channel %02i pmp"    ,i),100, 0.,    10.);
-    _Hist.channel[i].dt      = chan_dir.make<TH1F>(Form("ch_%02i_dt"    ,i),Form("Channel %02i T(i+1)-T(i)",i),5000,  0.,50);
+    _Hist.channel[i].nhits   = chan_dir.make<TH1F>(Form("ch_%02i_nhits",i),Form("run %06i: ch %02i nhits"  ,RunNumber,i),100, 0.,    100.);
+    _Hist.channel[i].time[0] = chan_dir.make<TH1F>(Form("ch_%02i_time0",i),Form("run %06i: ch %02i time[0]",RunNumber,i),250, 0., 100000.);
+    _Hist.channel[i].time[1] = chan_dir.make<TH1F>(Form("ch_%02i_time1",i),Form("run %06i: ch %02i time[0]",RunNumber,i),250, 0., 100000.);
+    _Hist.channel[i].tot [0] = chan_dir.make<TH1F>(Form("ch_%02i_tot0" ,i),Form("run %06i: ch %02i time[0]",RunNumber,i),100, 0.,    100.);
+    _Hist.channel[i].tot [1] = chan_dir.make<TH1F>(Form("ch_%02i_tot1" ,i),Form("run %06i: ch %02i time[0]",RunNumber,i),100, 0.,    100.);
+    _Hist.channel[i].pmp     = chan_dir.make<TH1F>(Form("ch_%02i_pmp"  ,i),Form("run %06i: ch %02i pmp"    ,RunNumber,i),100, 0.,     10.);
+    _Hist.channel[i].dt0     = chan_dir.make<TH1F>(Form("ch_%02i_dt0"  ,i),Form("run %06i: ch %02i T0(i+1)-T0(i)",RunNumber,i)      ,50000,  0.,50);
+    _Hist.channel[i].dt1     = chan_dir.make<TH1F>(Form("ch_%02i_dt1"  ,i),Form("run %06i: ch %02i T1(i+1)-T1(i)",RunNumber,i)      ,50000,  0.,50);
+    _Hist.channel[i].dt0r    = chan_dir.make<TH1F>(Form("ch_%02i_dt0r" ,i),Form("run %06i: ch %02i T0(ich,0)-T0(ref,0)",RunNumber,i),50000,-25.,25);
+    _Hist.channel[i].dt1r    = chan_dir.make<TH1F>(Form("ch_%02i_dt1r" ,i),Form("run %06i: ch %02i T1(ich,0)-T1(ref,0)",RunNumber,i),50000,-25.,25);
 
-    for (int j=0; j<10; j++) {
-      _Hist.channel[i].wf[j] = chan_dir.make<TH1F>(Form("h_wf_ch_%02i_%i",i,j),Form("Channel [%02i][%i] waveform",i,j),20, 0.,20.);
+    for (int j=0; j<kMaxNHitsPerChannel; j++) {
+      _Hist.channel[i].wf[j] = chan_dir.make<TH1F>(Form("h_wf_ch_%02i_%i",i,j),Form("run %06i: ch [%02i][%i] waveform",RunNumber,i,j),20, 0.,20.);
     }
   }
 
+}
+
+//-----------------------------------------------------------------------------
+void TrkFragmentAna::beginRun(const art::Run& aRun) {
+  int rn  = aRun.run();
+
+  if (rn <= 285) _dataHeaderOffset =  0;
+  else           _dataHeaderOffset = 32;
+
+  book_histograms(rn);
+}
+
+//--------------------------------------------------------------------------------
+void TrkFragmentAna::beginJob() {
 }
 
 //-----------------------------------------------------------------------------
@@ -126,8 +149,7 @@ void TrkFragmentAna::analyze(const art::Event& event) {
     nfrag      += 1;
     nbtot      += nbytes;
 
-
-    analyze_fragment(&frag,&_Hist.frag);
+    if (_analyzeFragments) analyze_fragment(&frag,&_Hist.frag);
 
     if (_diagLevel > 2) {
       printf("%s: ---------- TRK fragment # %3i nbytes: %5i fsize: %5i\n",__func__,ifrag,nbytes,fsize);
@@ -193,10 +215,7 @@ void TrkFragmentAna::analyze(const art::Event& event) {
     Hist->nhits->Fill(nhits);
     Hist->valid->Fill(dh->valid);
 
-    int nhits_ch[kNChannels];
-
     for (int i=0; i<kNChannels; i++) {
-      nhits_ch[i]            = 0;
       _data.channel[i].nhits = 0;
     }
 
@@ -204,30 +223,37 @@ void TrkFragmentAna::analyze(const art::Event& event) {
 //-----------------------------------------------------------------------------
 // first packet, 16 bytes, or 8 ushort's is the data header packet
 //-----------------------------------------------------------------------------
-      TrackerFragment::TrackerDataPacket* hit = (TrackerFragment::TrackerDataPacket*) (data+ihit*0x10+_dataHeaderOffset+0x08);
+      TrackerFragment::TrackerDataPacket* hit ;
+      hit     = (TrackerFragment::TrackerDataPacket*) (data+ihit*0x10+_dataHeaderOffset+0x08);
       int ich = hit->StrawIndex;
 
       float tdc_sf(5/256.); // TDC bin width (from Richie)
 
-      // fix the channel number
-      //    printf("channel #: %3i\n",ich);
-    
       if (ich > 128) ich = ich-128;
 
       if (ich > 95) {
+        printf ("ERROR in %s: ich = %i, BAIL OUT\n",__func__,ich);
         _error = -1;
-        printf ("ERROR: ich = %i, BAIL OUT\n",ich);
         return;
       }
 
-      nhits_ch[ich] += 1;
-
       int nh = _data.channel[ich].nhits;
-      _data.channel[ich].hit[nh] = hit;
-      _data.channel[ich].nhits += 1;
 
-      _Hist.channel[ich].time[0]->Fill(hit->TDC0()*tdc_sf);
-      _Hist.channel[ich].time[1]->Fill(hit->TDC1()*tdc_sf);
+      if (nh >= kMaxNHitsPerChannel) {
+        printf ("ERROR in %s: ich = %i, N(hits) >= %i BAIL OUT\n",__func__,ich,kMaxNHitsPerChannel);
+        _error = -2;
+        return;
+      }
+
+      _data.channel[ich].hit[nh] = hit;
+      _data.channel[ich].nhits  += 1;
+
+      uint32_t corr_tdc0 = correctedTDC(hit->TDC0());
+      uint32_t corr_tdc1 = correctedTDC(hit->TDC1());
+
+      _Hist.channel[ich].time[0]->Fill(corr_tdc0*tdc_sf);
+      _Hist.channel[ich].time[1]->Fill(corr_tdc1*tdc_sf);
+
       _Hist.channel[ich].tot [0]->Fill(hit->TOT0);
       _Hist.channel[ich].tot [1]->Fill(hit->TOT1);
       _Hist.channel[ich].pmp    ->Fill(hit->PMP);
@@ -256,9 +282,9 @@ void TrkFragmentAna::analyze(const art::Event& event) {
       adc[13] = reverseBits(ahit->ADC10A + (ahit->ADC10B << 6));
       adc[14] = reverseBits(ahit->ADC11);
 
-      _Hist.channel[ich].wf[ihit]->Reset();
+      _Hist.channel[ich].wf[nh]->Reset();
       for (int is=0; is<15; is++) {
-        _Hist.channel[ich].wf[ihit]->Fill(is,adc[is]);
+        _Hist.channel[ich].wf[nh]->Fill(is,adc[is]);
       }
     }
 
@@ -266,8 +292,50 @@ void TrkFragmentAna::analyze(const art::Event& event) {
       int nh = _data.channel[i].nhits;
       _Hist.channel[i].nhits->Fill(nh);
       for (int ih=1; ih<nh; ih++) {
-        int dt = (_data.channel[i].hit[ih]->TDC0()-_data.channel[i].hit[ih-1]->TDC0())*5/256.*1.e-3;
-        _Hist.channel[i].dt->Fill(dt);
+        uint32_t corr_tdc0_ih  = correctedTDC(_data.channel[i].hit[ih]->TDC0());
+        uint32_t corr_tdc1_ih  = correctedTDC(_data.channel[i].hit[ih]->TDC1());
+        uint32_t corr_tdc0_ih1 = correctedTDC(_data.channel[i].hit[ih-1]->TDC0());
+        uint32_t corr_tdc1_ih1 = correctedTDC(_data.channel[i].hit[ih-1]->TDC1());
+
+        int dt0 = (corr_tdc0_ih-corr_tdc0_ih1)*5/256.*1.e-3;
+        _Hist.channel[i].dt0->Fill(dt0);
+        int dt1 = (corr_tdc1_ih-corr_tdc1_ih1)*5/256.*1.e-3;
+        _Hist.channel[i].dt1->Fill(dt1);
+      }
+    }
+//-----------------------------------------------------------------------------
+// reference channel first
+//-----------------------------------------------------------------------------
+    int nhr = _data.channel[_referenceChannel].nhits;
+    if (nhr == 0) {
+      float dt = -1e6;
+      for (int i=0; i<kNChannels; i++) {
+        int nh = _data.channel[i].nhits;
+        _Hist.channel[i].nhits->Fill(nh);
+        if (nh > 0) { 
+          _Hist.channel[i].dt0r->Fill(dt);
+          _Hist.channel[i].dt1r->Fill(dt);
+        }
+      }
+    }
+    else {
+//-----------------------------------------------------------------------------
+// there is at least one hit in the reference channel
+//-----------------------------------------------------------------------------
+      float t0r = correctedTDC(_data.channel[_referenceChannel].hit[0]->TDC0());
+      float t1r = correctedTDC(_data.channel[_referenceChannel].hit[0]->TDC1());
+
+      for (int i=0; i<kNChannels; i++) {
+        int nh = _data.channel[i].nhits;
+        _Hist.channel[i].nhits->Fill(nh);
+        if (nh > 0) {
+          uint32_t t0 = correctedTDC(_data.channel[i].hit[0]->TDC0());
+          float dt0r  = (t0-t0r)*5/256.*1.e-3;
+          _Hist.channel[i].dt0r->Fill(dt0r);
+          uint32_t t1 = correctedTDC(_data.channel[i].hit[0]->TDC1());
+          float dt1r  = (t1-t1r)*5/256.*1.e-3;
+          _Hist.channel[i].dt1r->Fill(dt1r);
+        }
       }
     }
 //-----------------------------------------------------------------------------
@@ -275,7 +343,8 @@ void TrkFragmentAna::analyze(const art::Event& event) {
 //-----------------------------------------------------------------------------
     _Hist.event.nhits->Fill(nhits);
     for (int ich=0; ich<kNChannels; ich++) {
-      for (int ihit=0; ihit<nhits_ch[ich]; ihit++) {
+      int nh = _data.channel[ich].nhits;
+      for (int ihit=0; ihit<nh; ihit++) {
         _Hist.event.nhits_vs_ch->Fill(ich);
       }
     }
