@@ -233,14 +233,14 @@ int upper_limit::make_prob_hist() {
   if (fHist.fProb    ) delete fHist.fProb;
   if (fHist.fInterval) delete fHist.fInterval;
   
-  // fHist.fProb     = new  TH1D("h_prob","prob"    ,MaxNx,-0.5,MaxNx-.5);
-  // fHist.fInterval = new  TH1D("h_intr","interval",MaxNx,-0.5,MaxNx-.5);
+  // fHist.fProb     = new  TH1D("h_prob","prob"    ,double(MaxNx),-0.5,double(MaxNx)-.5);
+  // fHist.fInterval = new  TH1D("h_intr","interval",double(MaxNx),-0.5,double(MaxNx)-.5);
 
   TString title = Form("prob vs N, muB:%5.2f muS:%7.4f CL:%5.3f Nobs:%3i",fMuB,fMuS,fCL,fNObs);
-  fHist.fProb     = new  TH1D(Form("h_prob_%s",GetName()),title.Data(),MaxNx,-0.5,MaxNx-0.5);
+  fHist.fProb     = new  TH1D(Form("h_prob_%s",GetName()),title.Data(),double(MaxNx),-0.5,double(MaxNx)-0.5);
 
   title = Form("Interval muB:%5.2f muS:%7.4f CL:%5.3f Nobs:%3i",fMuB,fMuS,fCL,fNObs);
-  fHist.fInterval = new  TH1D(Form("h_intr_%s",GetName()),title.Data(),MaxNx,-0.5,MaxNx-0.5);
+  fHist.fInterval = new  TH1D(Form("h_intr_%s",GetName()),title.Data(),double(MaxNx),-0.5,double(MaxNx)-0.5);
 
   title = Form("log(Prob) muB:%5.2f muS:%7.4f CL:%5.3f Nobs:%3i",fMuB,fMuS,fCL,fNObs);
   fHist.fLh       = new  TH1D(Form("h_llh_%s" ,GetName()),"log(Prob)",5000,-10,40);
@@ -278,11 +278,11 @@ void upper_limit::make_belt_hist(int NObs) {
   
   b->fLo   = new TH1D(Form("h_belt_lo_%s_%02i",GetName(),NObs),
                       Form("Upper-limit belt MuB = %10.3f CL = %5.2f Nobs:%3i",fMuB,fCL,fNObs),
-                      MaxNx,-0.5,MaxNx-0.5);
+                      double(MaxNx),-0.5,double(MaxNx)-0.5);
 
   b->fHi   = new TH1D(Form("h_belt_hi_%s_%02i",GetName(),NObs),
                       Form("Upper-limit belt MuB = %10.3f CL = %5.2f Nobs:%3i",fMuB,fCL,fNObs),
-                      MaxNx,-0.5,MaxNx-0.5);
+                      double(MaxNx),-0.5,double(MaxNx)-0.5);
 
   for (int ix=0; ix<MaxNx; ix++) {
     double dx = b->fSign[ix][1]-b->fSign[ix][0];

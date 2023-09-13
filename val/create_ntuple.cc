@@ -10,7 +10,7 @@
 namespace {
 //-----------------------------------------------------------------------------
   void parse_number(const char* Token, float& Var) {
-    if ((index(Token,'e') < 0) && (index(Token,'E') < 0)) sscanf(Token,"%f",&Var);
+    if ((index(Token,'e') == nullptr ) && (index(Token,'E') == nullptr )) sscanf(Token,"%f",&Var);
     else                                                  sscanf(Token,"%e",&Var);
   }
 }

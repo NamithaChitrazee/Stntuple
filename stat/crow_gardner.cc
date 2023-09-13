@@ -340,14 +340,14 @@ int crow_gardner::make_prob_hist() {
   if (fHist.fProb    ) delete fHist.fProb;
   if (fHist.fInterval) delete fHist.fInterval;
   
-  // fHist.fProb     = new  TH1D("h_prob","prob"    ,MaxNx,-0.5,MaxNx-.5);
-  // fHist.fInterval = new  TH1D("h_intr","interval",MaxNx,-0.5,MaxNx-.5);
+  // fHist.fProb     = new  TH1D("h_prob","prob"    ,double(MaxNx),-0.5,double(MaxNx)-.5);
+  // fHist.fInterval = new  TH1D("h_intr","interval",double(MaxNx),-0.5,double(MaxNx)-.5);
 
   TString title = Form("prob vs N, muB:%5.2f muS:%7.4f CL:%5.3f Nobs:%3i",fMuB,fMuS,fCL,fNObs);
-  fHist.fProb     = new  TH1D(Form("h_prob_%s",GetName()),title.Data(),MaxNx,-0.5,MaxNx-0.5);
+  fHist.fProb     = new  TH1D(Form("h_prob_%s",GetName()),title.Data(),double(MaxNx),-0.5,double(MaxNx)-0.5);
 
   title = Form("Interval muB:%5.2f muS:%7.4f CL:%5.3f Nobs:%3i",fMuB,fMuS,fCL,fNObs);
-  fHist.fInterval = new  TH1D(Form("h_intr_%s",GetName()),title.Data(),MaxNx,-0.5,MaxNx-0.5);
+  fHist.fInterval = new  TH1D(Form("h_intr_%s",GetName()),title.Data(),double(MaxNx),-0.5,double(MaxNx)-0.5);
 
   title = Form("log(Prob) muB:%5.2f muS:%7.4f CL:%5.3f Nobs:%3i",fMuB,fMuS,fCL,fNObs);
   fHist.fLh       = new  TH1D(Form("h_llh_%s" ,GetName()),"log(Prob)",5000,-10,40);
@@ -387,11 +387,11 @@ void crow_gardner::make_belt_hist(int NObs) {
   
   belt->fLo   = new TH1D(Form("h_belt_lo_%s_%02i",GetName(),NObs),
                          Form("Crow-Gardner belt MuB = %10.3f CL = %5.2f Nobs:%3i",fMuB,fCL,fNObs),
-                         MaxNx,-0.5,MaxNx-0.5);
+                         double(MaxNx),-0.5,double(MaxNx)-0.5);
   
   belt->fHi   = new TH1D(Form("h_belt_hi_%s_%02i",GetName(),NObs),
                          Form("Crow-Gardner belt MuB = %10.3f CL = %5.2f Nobs:%3i",fMuB,fCL,fNObs),
-                         MaxNx,-0.5,MaxNx-0.5);
+                         double(MaxNx),-0.5,double(MaxNx)-0.5);
   
   for (int ix=0; ix<MaxNx; ix++) {
     double dx = belt->fSign[ix][1]-belt->fSign[ix][0];

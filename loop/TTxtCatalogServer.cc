@@ -23,7 +23,7 @@ TStnCatalogServer(Url,Rsh,Print)
 {
   TString  prefix; // initializes to ""
   TString  cmd; 
-  char     hostname[200];
+  char     hostname[200]="";
   //-----------------------------------------------------------------------------
 //  now can use $USER on caf
 //-----------------------------------------------------------------------------
