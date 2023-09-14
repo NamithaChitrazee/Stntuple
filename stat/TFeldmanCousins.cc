@@ -44,12 +44,12 @@ TFeldmanCousins::TFeldmanCousins(const char* Name, double CL, int DebugLevel):
 //-----------------------------------------------------------------------------
 // book histograms
 //-----------------------------------------------------------------------------
-  fHist.fBgProb    = new TH1D(Form("h_bg_prob_%s"   ,GetName()),"h_bg_prob"   ,MaxNx,-0.5,MaxNx-0.5);
-  fHist.fBsProb    = new TH1D(Form("h_bs_prob_%s"   ,GetName()),"h_bs_prob"   ,MaxNx,-0.5,MaxNx-0.5);
-  // fHist.fCumBgProb = new TH1D(Form("h_cumbg_prob_%s",GetName()),"h_cumbg_prob",MaxNx,-0.5,MaxNx-0.5);
-  // fHist.fCumBsProb = new TH1D(Form("h_cumbs_prob_%s",GetName()),"h_cumbs_prob",MaxNx,-0.5,MaxNx-0.5);
+  fHist.fBgProb    = new TH1D(Form("h_bg_prob_%s"   ,GetName()),"h_bg_prob"   ,double(MaxNx),-0.5,double(MaxNx)-0.5);
+  fHist.fBsProb    = new TH1D(Form("h_bs_prob_%s"   ,GetName()),"h_bs_prob"   ,double(MaxNx),-0.5,double(MaxNx)-0.5);
+  // fHist.fCumBgProb = new TH1D(Form("h_cumbg_prob_%s",GetName()),"h_cumbg_prob",double(MaxNx),-0.5,double(MaxNx)-0.5);
+  // fHist.fCumBsProb = new TH1D(Form("h_cumbs_prob_%s",GetName()),"h_cumbs_prob",double(MaxNx),-0.5,double(MaxNx)-0.5);
 
-  fHist.fProb      = new TH1D(Form("h_prob_2D_%s"    ,GetName()),"h prob 2D"  ,MaxNx,-0.5,MaxNx-0.5);
+  fHist.fProb      = new TH1D(Form("h_prob_2D_%s"    ,GetName()),"h prob 2D"  ,double(MaxNx),-0.5,double(MaxNx)-0.5);
   fHist.fBelt      = nullptr;
   fHist.fBeltLo    = nullptr;
   fHist.fBeltHi    = nullptr;
@@ -778,9 +778,9 @@ void TFeldmanCousins::MakeProbHist() {
     delete fHist.fBsProb;
   }
   
-  fHist.fProb      = new TH1D(Form("h_prob_2D_%s"   ,GetName()),"h prob 2D",MaxNx,-0.5,MaxNx-0.5);
-  fHist.fBgProb    = new TH1D(Form("h_bg_prob_%s"   ,GetName()),"h_bg_prob",MaxNx,-0.5,MaxNx-0.5);
-  fHist.fBsProb    = new TH1D(Form("h_bs_prob_%s"   ,GetName()),"h_bs_prob",MaxNx,-0.5,MaxNx-0.5);
+  fHist.fProb      = new TH1D(Form("h_prob_2D_%s"   ,GetName()),"h prob 2D",double(MaxNx),-0.5,double(MaxNx)-0.5);
+  fHist.fBgProb    = new TH1D(Form("h_bg_prob_%s"   ,GetName()),"h_bg_prob",double(MaxNx),-0.5,double(MaxNx)-0.5);
+  fHist.fBsProb    = new TH1D(Form("h_bs_prob_%s"   ,GetName()),"h_bs_prob",double(MaxNx),-0.5,double(MaxNx)-0.5);
 //-----------------------------------------------------------------------------
 // [re]-initialize 1D histograms with the probabilities and integral probabilities
 //-----------------------------------------------------------------------------
@@ -801,11 +801,11 @@ void TFeldmanCousins::MakeBeltHist() {
   
   fHist.fBeltLo   = new TH1D(Form("h_belt_lo_%s",GetName()),
                              Form("Feldman-Cousins belt lo MuB = %10.3f\n",fMuB),
-                             MaxNx,-0.5,MaxNx-0.5);
+                             double(MaxNx),-0.5,double(MaxNx)-0.5);
 
   fHist.fBeltHi   = new TH1D(Form("h_belt_hi_%s",GetName()),
                              Form("Feldman-Cousins belt    MuB = %10.3f\n",fMuB),
-                             MaxNx,-0.5,MaxNx-0.5);
+                             double(MaxNx),-0.5,double(MaxNx)-0.5);
 
   for (int ix=0; ix<MaxNx; ix++) {
     double dx = fBelt.fSign[ix][1]-fBelt.fSign[ix][0];

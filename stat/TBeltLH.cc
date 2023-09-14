@@ -178,10 +178,10 @@ int TBeltLH::make_prob_hist() {
   if (fHist.fInterval) delete fHist.fInterval;
   
   TString title = Form("prob vs N, muB:%5.2f muS:%7.4f CL:%5.3f Nobs:%3i",fMuB,fMuS,fCL,fNObs);
-  fHist.fProb     = new TH1D(Form("h_prob_%s",GetName()),title.Data(),MaxNx,-0.5,MaxNx-0.5);
+  fHist.fProb     = new TH1D(Form("h_prob_%s",GetName()),title.Data(),double(MaxNx),-0.5,double(MaxNx)-0.5);
 
   title = Form("Interval muB:%5.2f muS:%7.4f CL:%5.3f Nobs:%3i",fMuB,fMuS,fCL,fNObs);
-  fHist.fInterval = new TH1D(Form("h_prob_i_%s",GetName()),title.Data(),MaxNx,-0.5,MaxNx-0.5);
+  fHist.fInterval = new TH1D(Form("h_prob_i_%s",GetName()),title.Data(),double(MaxNx),-0.5,double(MaxNx)-0.5);
 
   fHist.fInterval->SetFillStyle(3004);
   fHist.fInterval->SetFillColor(kRed+2);

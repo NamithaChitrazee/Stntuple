@@ -394,7 +394,7 @@ void TDFCModule::PrintCatalog(const char* Opt) {
   // filename size date nevents low_run low_event high_run high_event
   char  cmd[1000], fn[1000];
 
-  if ((strcmp(Opt,"") == 0) || (strstr(Opt,"banner") > 0)) {
+  if ((strcmp(Opt,"") == 0) || (strstr(Opt,"banner") != nullptr)) {
     printf("----------------------------------------------------------------");
     printf("------------------------------------------------------------\n");
     printf("  MetaData    filename                         size       date  ");
@@ -403,7 +403,7 @@ void TDFCModule::PrintCatalog(const char* Opt) {
     printf("------------------------------------------------------------\n");
   }
 
-  if ((strcmp(Opt,"") == 0) || (strstr(Opt,"data") > 0)) {
+  if ((strcmp(Opt,"") == 0) || (strstr(Opt,"data") != nullptr)) {
 
     sprintf(cmd,"echo %s | awk -F / '{print $NF}'",fFileName.Data());
     FILE* f = gSystem->OpenPipe(cmd,"r");
@@ -453,7 +453,7 @@ void TDFCModule::PrintCatalog(const char* Opt) {
     }
     
     if (PrintLevel() != 0 &&
-	((strcmp(Opt,"") == 0) || (strstr(Opt,"foot") > 0))) {
+	((strcmp(Opt,"") == 0) || (strstr(Opt,"foot") != nullptr))) {
       printf("--------------------------------------------------------------");
       printf("----------------------------------------------------------\n");
     }
@@ -522,7 +522,7 @@ void TDFCModule::PrintCatalog(const char* Opt) {
     printf("</getfileinfo>\n");
     
     if (PrintLevel() != 0 &&
-	((strcmp(Opt,"") == 0) || (strstr(Opt,"foot") > 0))) {
+	((strcmp(Opt,"") == 0) || (strstr(Opt,"foot") != nullptr))) {
       printf("--------------------------------------------------------------");
       printf("----------------------------------------------------------\n");
     }

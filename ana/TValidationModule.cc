@@ -635,7 +635,7 @@ void TValidationModule::FillEventHistograms(EventHist_t* Hist) {
   if (fNClusters > 0) cluster = fClusterBlock->Cluster(0);
 
   TStnTrack* track(0);
-  if (fNTracks > 0) track = fTrackBlock->Track(0);
+  if (fNTracks[0] > 0 ) track = fTrackBlock->Track(0);
 
   if (cluster) {
     emax   = cluster->Energy();
