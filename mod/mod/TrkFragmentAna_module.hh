@@ -88,11 +88,20 @@ namespace mu2e {
     
     int              _error; 
 
+    int              _adc_index_0 [kNChannels]; // seq num of the channel 'i' in the readout sequence
+    int              _adc_index_1 [kNChannels]; // fixed map, seq num of the channel 'i' in the readout sequence
+    double           _gen_offset  [kNChannels];
+
+    double           _freq; // generator frequency, defined by the run number
+    double           _dt;   // expected distance between the two pulses
+
     struct EventHist_t {
       TH1F*         nbtot;
       TH1F*         nfrag;
       TH1F*         nhits;
-      TH1F*         nhits_vs_ch;
+      TH1F*         nhits_vs_ich;
+      TH1F*         nhits_vs_adc[2];
+      TH1F*         error;
     };
 
     struct FragmentHist_t {
@@ -101,6 +110,9 @@ namespace mu2e {
       TH1F*         npackets;
       TH1F*         nhits;
       TH1F*         valid;
+      TH2F*         nh_vs_ch;
+      TH2F*         dt0r_vs_ch[2];
+      TH2F*         dt1r_vs_ch[2];
     };
                                         // assume one panel
     struct ChannelHist_t {
@@ -110,6 +122,7 @@ namespace mu2e {
       TH1F*         pmp;
       TH1F*         dt0;                 // T0 distance between the two consequtive pulses
       TH1F*         dt1;                 // T1 distance between the two consequtive pulses
+      TH1F*         dt2;                 // T2 = (dt1+dt2)/2
       TH1F*         dt0r;                // T0(ich,0)-T0(ref,0)
       TH1F*         dt1r;                // T1(ich,0)-distance between the two pulses (if more than one)
       TH1F*         wf[kMaxNHitsPerChannel];
@@ -129,7 +142,7 @@ namespace mu2e {
 
     struct ChData_t {
       int  nhits;
-      TrackerFragment::TrackerDataPacket* hit[100];
+      TrackerFragment::DataPacket* hit[100];
     };
 
     struct Data_t {
