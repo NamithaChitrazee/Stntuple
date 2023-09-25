@@ -70,9 +70,9 @@ int StntupleInitCrvClusterBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* E
     int    np     = list_of_pulses->size();
     int    npe    = ralph_ccc->GetPEs();
 
-    double x      = ralph_ccc->GetAvgCounterPos().x();
-    double y      = ralph_ccc->GetAvgCounterPos().y();
-    double z      = ralph_ccc->GetAvgCounterPos().z();
+    double x      = ralph_ccc->GetAvgHitPos().x();
+    double y      = ralph_ccc->GetAvgHitPos().y();
+    double z      = ralph_ccc->GetAvgHitPos().z();
     float  t1     = ralph_ccc->GetStartTime();
     float  t2     = ralph_ccc->GetEndTime();
 

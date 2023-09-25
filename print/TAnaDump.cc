@@ -603,9 +603,9 @@ void TAnaDump::printCrvCoincidenceCluster(const mu2e::CrvCoincidenceCluster* CCl
     int sector      = CCl->GetCrvSectorType();
     int np          = list_of_pulses->size();
 
-    float x         = CCl->GetAvgCounterPos().x();
-    float y         = CCl->GetAvgCounterPos().y();
-    float z         = CCl->GetAvgCounterPos().z();
+    float x         = CCl->GetAvgHitPos().x();
+    float y         = CCl->GetAvgHitPos().y();
+    float z         = CCl->GetAvgHitPos().z();
     float t1        = CCl->GetStartTime();
     float t2        = CCl->GetEndTime();
     int   npe       = CCl->GetPEs();
