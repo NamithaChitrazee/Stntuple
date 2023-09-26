@@ -344,7 +344,7 @@ Reconstruction.filters.CalHelixFinderDmu.StrawHitFlagCollectionLabel : "FlagBkgH
 Reconstruction.producers.CaloHitTruthMatch.caloShowerSimCollection : "compressDigiMCs"
 Reconstruction.producers.CaloHitTruthMatch.primaryParticle         : "compressDigiMCs"
 # fix time map lookup
-Reconstruction.producers.CrvCoincidenceClusterMatchMC.timeOffsets.inputs :  [ @sequence::DigiCompression.TimeMaps ]
+# Reconstruction.producers.CrvCoincidenceClusterMatchMC.timeOffsets.inputs :  [ @sequence::DigiCompression.TimeMaps ]
 
 
 # physics.producers.EWMProducer.SpillType          : 1
