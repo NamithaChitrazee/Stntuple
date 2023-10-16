@@ -1,16 +1,25 @@
-#
+#+startup:fold
 _Stntuple How-To's_ 
 
-1) how to report a problem                                                   
+** how to report a problem                                                   
 
    don't to that. If you happened to be the first one to hit a problem, analyse it, 
    find a solution, and report a solution
 
-2) [[file:how-to-print-branch-sizes.org][how to print sizes of different STNTUPLE branches]]
-3) [[file:how-to-debug.org][how to debug an Stntuple job with GDB]]
-4) how to display Mu2e geometry
+** [[file:how-to-print-branch-sizes.org][how to print sizes of different STNTUPLE branches]]
+** [[file:how-to-debug.org][how to debug an Stntuple job with GDB]]
+** how to display Mu2e geometry                                              
    - assume you have a .gdml file named, for example, geometry.gdml
    - load [[file:../scripts/draw_mu2e_geometry.C][Stntuple/scripts/draw_mu2e_geometry.C]], read instructions on top of the file
+** how to strip events given a run-subrun-event list                         
+- use [[file:../fcl/event_filter.fcl][Stntuple/fcl/event_filter.fcl]] as a template
+#+begin_src
+cp Stntuple/fcl/event_filter.fcl ./my_event_filter.fcl
+#+end_src
+- modify my_event_filter.fcl to define your event list
+#+begin_src 
+mu2e -c ./my_event_filter.fcl -s <input_file> -o <output_file>
+#+end_src 
 * ------------------------------------------------------------------------------
 * back to the top: [[file:Stntuple.org][Stntuple.org]]
 * ------------------------------------------------------------------------------
