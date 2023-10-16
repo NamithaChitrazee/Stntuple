@@ -16,7 +16,7 @@ _Stntuple How-To's_
 #+begin_src
 cp Stntuple/fcl/event_filter.fcl ./my_event_filter.fcl
 #+end_src
-- modify my_event_filter.fcl to define your event list
+- modify my_event_filter.fcl to define your event list, then run 
 #+begin_src 
 mu2e -c ./my_event_filter.fcl -s <input_file> -o <output_file>
 #+end_src 
