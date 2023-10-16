@@ -327,7 +327,6 @@ production.paths : {
 		     ]
 
     production_p111 : [ @sequence::production.pbi_ewm   ,          # what's left of @sequence::production.gen_g4_time_map,
-			# @sequence::CommonMC.TimeMaps, 
 			GammaFilter                 ,          # does nothing by default
 			@sequence::production.digis_no_filter,
 			compressDigiMCs
@@ -345,16 +344,14 @@ production.paths : {
 		      ]
 
     production_p14_mustop : [ generate, genCounter, g4run, filterStepPointMomentum, 
-			      # protonTimeMap, muonTimeMap, 
 			      CaloShowerStepFromStepPt
 			     ]                                # path for producing mixing inputs from muon captures
 
     production_p14_flash : [ g4run, filterStepPointMomentum
-			     # protonTimeMap, 
 			     # CaloShowerStepFromStepPt
 			    ]                                 # path for producing the mixing input from beam flash 
 
-    production_p15_flash : [ protonTimeMap           , 
+    production_p15_flash : [
 			     filterStepPointMomentum ,        # filter again, now - on time, need step points...
 			     CaloShowerStepFromStepPt
 			    ]                                 # path for producing the mixing input from beam flash 

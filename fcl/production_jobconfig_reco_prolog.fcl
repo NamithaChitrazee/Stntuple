@@ -217,7 +217,6 @@ Reconstruction : {
       crvDigiMCTag : "compressDigiMCs"
       simParticleTags : [ "compressDigiMCs" ]
       extraStepPointMCTags : ["compressDigiMCs:virtualdetector", "compressDigiMCs:stoppingtarget", "compressDigiMCs:protonabsorber" ]
-      timeMapTags : [ ]
       caloShowerStepTags : [ ]
       caloShowerSimTag : ""
       caloShowerROTag : ""

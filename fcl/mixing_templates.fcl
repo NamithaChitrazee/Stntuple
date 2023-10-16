@@ -327,7 +327,6 @@ CRVCut : { module_type : CompressStepPointMCs
     maxTime            : 1695
     minEdep            : 10.0e-6
     maxEdep            : 1.0e6
-    # timeMapTags        : [ "protonTimeMap" ]  ## no more timemaps
     diagLevel          : 0
 }
 #------------------------------------------------------------------------------
@@ -335,11 +334,6 @@ CRVCut : { module_type : CompressStepPointMCs
 #------------------------------------------------------------------------------
 Mixing : {
     # input time maps from cut mix inputs.  All are needed
-#    protonTimeMaps    : [ "flashMixerTrkCal:protonTimeMap" ]                       # maps for non-CRV mixing
-#    protonTimeMapsCRV : [ "PSMixerCRV:protonTimeMap", "DSMixerCRV:protonTimeMap"]  # maps for CRV mixing
-
-    # cosmic time maps from primary generation
-#    cosmicTimeMaps : ["cosmicTimeMapPrimary"]
 
     # calo tags.  flashMixer is different because they are filtered
     # NB: caloMixerTags <-> TrkCalMixSequence : thre should be one-to-one correspondence, as 
@@ -401,9 +395,6 @@ Mixing : { @table::Mixing
 
 #	CaloShowerStepROFromShowerStepPrimary: { @table::CaloShowerStepROFromShowerStep
 #	    caloCrystalShowerInputs : [ "CaloShowerStepFromStepPtPrimary:calorimeter" ]
-#	    TimeOffsets             : {
-#		inputs : [ @sequence::CommonMC.TimeMapsPrimary ]
-#	    }
 #	}
 
 	# CaloDigiFromShowerPrimary: { @table::CaloDigiFromShower
@@ -471,7 +462,6 @@ Mixing : { @table::Mixing
 #------------------------------------------------------------------------------
 Mixing.CreatePrimarySequence : [ @sequence::Primary.GenAndG4        ,
 				 EWMProducer                        ,        # @sequence::CommonMC.PrimaryDigiSim
-				 # @sequence::CommonMC.TimeMapsPrimary,        # 
 				 makeSGSPrimary, makeSDPrimary      , 
 				 StrawDigiMCFilter                           # for sig+mbs, filter on makeSDPrimary
 				]
@@ -496,7 +486,6 @@ Mixing.pbi_mix_crv         : [ protonBunchIntensity               ,
 Mixing.pbi_mix_digi_nocrv  : [ protonBunchIntensity               ,
 			       EWMProducer                        ,
 			       @sequence::Mixing.TrkCalMixSequence,
-			       # @sequence::CommonMC.TimeMaps       ,
 			       @sequence::TrackerMC.DigiSim       ,
 			       # @sequence::CaloDigiMC.DigiSim
 			      ]
@@ -504,7 +493,6 @@ Mixing.pbi_mix_digi_nocrv  : [ protonBunchIntensity               ,
 Mixing.pbi_mix_digi_crv    : [ protonBunchIntensity               ,
 			       EWMProducer                        ,
 			       @sequence::Mixing.CRVMixSequence   ,
-			       # @sequence::CommonMC.TimeMaps       ,
 			       @sequence::TrackerMC.DigiSim       ,
 			       # @sequence::CaloDigiMC.DigiSim      ,
 			       @sequence::CrvDAQPackage.CrvResponseSequence 
@@ -512,13 +500,11 @@ Mixing.pbi_mix_digi_crv    : [ protonBunchIntensity               ,
 
 Mixing.pbi_digi_crv        : [ protonBunchIntensity               ,
 			       EWMProducer                        , 
-			       # @sequence::CommonMC.TimeMaps       ,
 			       @sequence::CrvDAQPackage.CrvResponseSequence 
 			      ]
 
 Mixing.pbi_digi_nocrv      : [ protonBunchIntensity               ,
 			       EWMProducer                        , 
-			       # @sequence::CommonMC.TimeMaps       ,
 			       @sequence::TrackerMC.DigiSim       ,
 			       # @sequence::CaloDigiMC.DigiSim
 			      ]
@@ -527,9 +513,6 @@ Mixing.pbi_mix_digi_all    : [ protonBunchIntensity               ,
 			       EWMProducer                        , 
 			       @sequence::Mixing.TrkCalMixSequence,
 			       @sequence::Mixing.CRVMixSequence   ,
-			       # -----
-			       # @sequence::CommonMC.TimeMaps       ,
-			       # -----
 			       @sequence::TrackerMC.DigiSim       ,
 			       # @sequence::CaloDigiMC.DigiSim      ,
 			       @sequence::CrvDAQPackage.CrvResponseSequence 
@@ -547,14 +530,12 @@ Mixing.signal_minbias       : [ @sequence::Mixing.CreatePrimarySequence,
 Mixing.signal_nocrv         : [ # -- @sequence::Mixing.CreatePrimarySequence,
 			        @sequence::Primary.GenAndG4        ,
 				EWMProducer                        ,        # @sequence::CommonMC.PrimaryDigiSim
-				# @sequence::CommonMC.TimeMapsPrimary,        # 
 				makeSGSPrimary, makeSDPrimary      ,        # this is @sequence::TrackerMC.DigiSimPrimary
 				StrawDigiMCFilter                  ,        # for sig+mbs, filter on makeSDPrimary
 			        # -- 
 				# --- @sequence::Mixing.pbi_digi_nocrv       ,
 				protonBunchIntensity               ,
 				EWMProducer                        , 
-				# @sequence::CommonMC.TimeMaps       ,     # no more time maps
 				# --
 				makeSGS, makeSD ,                           # this is @sequence::TrackerMC.DigiSim       ,
 				# @sequence::CaloDigiMC.DigiSim      ,
