@@ -307,7 +307,7 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
   , fCaloCrystalHitMaker     (PSet.get<string>        ("caloCrystalHitsMaker"))
   , fCaloClusterMaker        (PSet.get<string>        ("caloClusterMaker"    ))
 
-  , fGenId(GenId::findByName (PSet.get<std::string>   ("genId"              )))
+  , fGenId(GenId::findByName (PSet.get<std::string>   ("genId"               ),"unknown"))
   , fPdgId                   (PSet.get<int>           ("pdgId"               ))
 
   , fMinTActive              (PSet.get<double>        ("minTActive"          ))
