@@ -271,10 +271,12 @@ void TSpmcAnaModule::BookHistograms() {
 
   book_spmc_histset[ 900] = 1;		// all particles , VD=9
   book_spmc_histset[ 913] = 1;		// mu-   in VD=9
+  book_spmc_histset[ 914] = 1;		// mu+   in VD=9
   book_spmc_histset[ 921] = 1;		// pbars in VD=9
 
   book_spmc_histset[9100] = 1;		// all particles , VD=91
   book_spmc_histset[9113] = 1;		// mu- in VD=91
+  book_spmc_histset[9114] = 1;		// mu+ in VD=91
   book_spmc_histset[9121] = 1;		// pbars in VD=91
 
   for (int i=0; i<kNStepPointMCHistSets; i++) {
@@ -643,7 +645,9 @@ void TSpmcAnaModule::FillStepPointMCHistograms(HistBase_t* Hist, TStepPointMC* S
 
   // hack for stage 2:
 
-  if (fabs(z-2929.) < 0.1) x = x+3904;
+  //  if (fabs(z-2929.) < 0.1) x = x+3904;
+  // it looks this is always the case now
+  x = x+3904;
 
   hist->fYVsX->Fill(x,y,Weight);		// useful for stage 2
   hist->fYVsZ->Fill(z,y,Weight);		// useful for stage 1
@@ -825,8 +829,10 @@ void TSpmcAnaModule::FillHistograms() {
       if (pdg_code == -2212) FillSimpHistograms(fHist.fSimp[521],simp,sd);
     }
 
-    //    if ((pend == 0) && (vid1 > 2500) && (vid1 < 2600)) {
-    if ((pend == 0) && (vid1 > 2900) && (vid1 < 3000)) {
+    // if ((pend == 0) && (vid1 > 2500) && (vid1 < 2600)) {
+    // if ((pend == 0) && (vid1 > 2800) && (vid1 < 3000)) {
+// 2023-10-19 : ST volumes start from 2980
+    if ((pend == 0) && (vid1 >= 2950) && (vid1 < 3050)) {
 //-----------------------------------------------------------------------------
 // particle stopped in the stopping target
 // stopping target foil volume indices change in time...
@@ -1047,12 +1053,14 @@ void TSpmcAnaModule::FillHistograms() {
     if (spmc->VolumeID() == 9) {
       FillStepPointMCHistograms(fHist.fStepPointMC[900],spmc,&spmc_data);
       if (pdg_code ==    13) FillStepPointMCHistograms(fHist.fStepPointMC[913],spmc,&spmc_data);
+      if (pdg_code ==   -13) FillStepPointMCHistograms(fHist.fStepPointMC[914],spmc,&spmc_data);
       if (pdg_code == -2212) FillStepPointMCHistograms(fHist.fStepPointMC[921],spmc,&spmc_data);
     }
 
     if (spmc->VolumeID() == 91) {
       FillStepPointMCHistograms(fHist.fStepPointMC[9100],spmc,&spmc_data);
       if (pdg_code ==    13) FillStepPointMCHistograms(fHist.fStepPointMC[9113],spmc,&spmc_data);
+      if (pdg_code ==   -13) FillStepPointMCHistograms(fHist.fStepPointMC[9114],spmc,&spmc_data);
       if (pdg_code == -2212) FillStepPointMCHistograms(fHist.fStepPointMC[9121],spmc,&spmc_data);
     }
   }
