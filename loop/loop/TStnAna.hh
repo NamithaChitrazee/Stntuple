@@ -210,12 +210,11 @@ public:
 //-----------------------------------------------------------------------------
 // other methods
 //-----------------------------------------------------------------------------
-  void          Help       (const char* Item  = 0);
-  void          PrintStat  (Int_t NEvents, const char* BranchName = "");
-  int           SaveFolder (TFolder* Folder, TDirectory* Dir);
-  void          SaveHist   (const char* Filename, Int_t Mode = 2);
-  Int_t         MergeHistograms(const char* ListOfFiles, 
-				const char* OutputFile);
+  void          Help           (const char* Item  = 0);
+  void          PrintStat      (Int_t       NEvents    , const char* BranchName = "");
+  static int    SaveFolder     (TFolder*    Folder     , TDirectory* Dir);
+  void          SaveHist       (const char* Filename   , Int_t Mode = 2);
+  Int_t         MergeHistograms(const char* ListOfFiles, const char* OutputFile);
 //-----------------------------------------------------------------------------
 // visualization
 //-----------------------------------------------------------------------------
