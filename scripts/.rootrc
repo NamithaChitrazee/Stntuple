@@ -37,6 +37,10 @@ Stntuple.Catalog   https://mu2e.fnal.gov/public/hep/computing/Stntuple/cafdfc
 # +Stntuple.Catalog   http://home.fnal.gov/~gianipez/cafdfc 
 # +Stntuple.Catalog   http://home.fnal.gov/~rdonghia/cafdfc 
 #------------------------------------------------------------------------------
+# geometry - extracted from the Offline
+#------------------------------------------------------------------------------
+Stntuple.GeometryData $(MU2E_BASE_RELEASE)/Stntuple/geom/data
+#------------------------------------------------------------------------------
 # name of the oracle server (used by TStnCatalogServer)
 #------------------------------------------------------------------------------
 Stntuple.OracleServer          cdfofprd
