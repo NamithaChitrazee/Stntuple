@@ -25,7 +25,7 @@ public:
   float           fEDepNio;
   float           fTime;
   float           fStepLength;
-  float           fProperTime;          // added in V2;
+  float           fProperTime;          // added in V2;   T(proper)/tau
 
   TVector3        fPos;			// starting point of the step
   TVector3        fMom;

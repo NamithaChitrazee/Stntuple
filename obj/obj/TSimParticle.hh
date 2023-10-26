@@ -30,8 +30,8 @@ public:
   float           fMomTargetEnd;
   float           fMomTrackerFront;	// entrance to ST
 
-  float           fStartProperTime;     // ** addeed in V4
-  float           fEndProperTime;       // ** addeed in V4
+  float           fStartProperTime;     // ** added in V4  T(proper)/tau
+  float           fEndProperTime;       // ** added in V4  T(proper)/tau
 
   TLorentzVector  fStartPos;
   TLorentzVector  fStartMom;
