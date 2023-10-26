@@ -7,27 +7,28 @@
 
 #include "art/Framework/Principal/Handle.h"
 
+#include "Offline/GlobalConstantsService/inc/GlobalConstantsHandle.hh"
+#include "Offline/GlobalConstantsService/inc/ParticleDataList.hh"
+
 #include "Offline/MCDataProducts/inc/StatusG4.hh"
 #include "Offline/MCDataProducts/inc/StepPointMC.hh"
 
 #include "Stntuple/obj/TStepPointMCBlock.hh"
+
+#include "Stntuple/mod/StntupleUtilities.hh"
 #include "Stntuple/mod/InitStepPointMCBlock.hh"
 //-----------------------------------------------------------------------------
 int StntupleInitStepPointMCBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent, int Mode) 
 {
-  // const char* oname = {"StntupleInitMu2eStepPointMCBlock"};
 
   art::Handle<mu2e::StepPointMCCollection> spmcch;
-  const mu2e::StepPointMCCollection*       spmcc(0);
+  const mu2e::StepPointMCCollection*       spmcc(nullptr);
+  const mu2e::StepPointMC*                 spmc (nullptr);
 
   TStepPointMCBlock* spmc_block = (TStepPointMCBlock*) Block;
   spmc_block->Clear();
-//-----------------------------------------------------------------------------
-// load simulation time offsets for this event: timeOffsets may not be defined yet (stages 1, 2, 3)
-//-----------------------------------------------------------------------------
-//  if (fTimeOffsets) fTimeOffsets->updateMap(*AnEvent);
 
-  const mu2e::StepPointMC*                    spmc;
+  auto const& ptable = mu2e::GlobalConstantsHandle<mu2e::ParticleDataList>();
 //-----------------------------------------------------------------------------
 //  const art::Provenance*                 prov;
 //  art::Selector  selector(art::ProductInstanceNameSelector(""));
@@ -36,7 +37,6 @@ int StntupleInitStepPointMCBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* 
 //   for (std::vector<art::Handle<mu2e::SimParticleCollection>> ::const_iterator it = list_of_sp.begin();
 //        it != list_of_sp.end(); it++) {
 //     handle = it.operator -> ();
-
 
   art::Handle<mu2e::StatusG4>  sg4h;
   const mu2e::StatusG4*        sg4;
@@ -97,7 +97,7 @@ int StntupleInitStepPointMCBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* 
 // if spmc_block->fGenProcessID is set, store only hits of the particles from 
 // the signal process
 //-----------------------------------------------------------------------------
-      if ((spmc_block->GenProcessID() > 0) && (generator_id != spmc_block->GenProcessID())) continue;
+      if ((spmc_block->GenProcessID() > 1) && (generator_id != spmc_block->GenProcessID())) continue;
 
       id            = sim->id().asInt();
       gen_index     = sim->generatorIndex();
@@ -108,19 +108,14 @@ int StntupleInitStepPointMCBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* 
 
       edep_tot      = spmc->totalEDep();
       edep_nio      = spmc->nonIonizingEDep();
+      time          = spmc->time();
 
-      //      if (fTimeOffsets) {
-//-----------------------------------------------------------------------------
-// time - within the microbunch
-//-----------------------------------------------------------------------------
-      //   double tx = fTimeOffsets->timeWithOffsetsApplied(*spmc);
-      //   time = fmod(tx+fMbTime,fMbTime);
-      // }
-      // else 
-      time =  spmc->time();
+      double tau = ptable->particle(sim->pdgId()).lifetime()*1.e9;  // convert to ns
+      if (tau == 0) tau = 1.e20;
 
-      float proper_time = spmc->properTime();
-      step_length = spmc->stepLength();
+      double ptime  = (spmc->properTime() + stntuple::get_proper_time(sim))/tau;
+
+      step_length   = spmc->stepLength();
 
       spmc_block->NewStepPointMC(volume_id, gen_index, 
 				 id       , pdg_code       ,
@@ -128,7 +123,7 @@ int StntupleInitStepPointMCBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* 
 				 creation_code, end_process_code,
 				 edep_tot,edep_nio,
 				 time, 
-				 proper_time,
+				 ptime,
 				 step_length,
 				 spmc->position().x(),
 				 spmc->position().y(),

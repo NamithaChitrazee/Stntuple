@@ -12,6 +12,9 @@
 #include "art/Framework/Principal/Selector.h"
 #include "canvas/Utilities/InputTag.h"
 
+#include "Offline/GlobalConstantsService/inc/GlobalConstantsHandle.hh"
+#include "Offline/GlobalConstantsService/inc/ParticleDataList.hh"
+
 #include "Offline/GeometryService/inc/GeometryService.hh"
 #include "Offline/GeometryService/inc/GeomHandle.hh"
 #include "Offline/GeometryService/inc/VirtualDetector.hh"
@@ -28,6 +31,7 @@
 
 #include "Stntuple/obj/TSimpBlock.hh"
 
+#include "Stntuple/mod/StntupleUtilities.hh"
 #include "Stntuple/mod/InitStntupleDataBlocks.hh"
 
 
@@ -46,10 +50,10 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
 
   std::vector<art::Handle<mu2e::SimParticleCollection>> list_of_sp;
 
-  const mu2e::SimParticleCollection*       simp_coll(0);
-  const mu2e::SimParticle*                 sim(0);
-  const mu2e::StrawHitCollection*          shColl(nullptr);
-  const mu2e::StrawDigiMCCollection*       mcdigis(nullptr);
+  const mu2e::SimParticleCollection*       simp_coll(nullptr);
+  const mu2e::SimParticle*                 sim      (nullptr);
+  const mu2e::StrawHitCollection*          shColl   (nullptr);
+  const mu2e::StrawDigiMCCollection*       mcdigis  (nullptr);
 
   double        px, py, pz, energy;
   int           id, parent_id, process_id, nsh(0), nhits;
@@ -58,6 +62,8 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
 
   TSimpBlock* simp_block = (TSimpBlock*) Block;
   simp_block->Clear();
+
+  auto const& ptable = mu2e::GlobalConstantsHandle<mu2e::ParticleDataList>();
 
   art::Handle<mu2e::StrawHitCollection> shcH;
   if (! fShCollTag.empty()) {
@@ -83,8 +89,6 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
     }
   }
 
-  mu2e::GeomHandle<mu2e::VirtualDetector> vdg;
-
   art::Handle<mu2e::SimParticleCollection> simp_handle;
   if (! fSimpCollTag.empty()) {
     bool ok = AnEvent->getByLabel(fSimpCollTag,simp_handle);
@@ -93,6 +97,25 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
 			    << ": SimpCollection:" 
 			    << fSimpCollTag.encode().data() << " NOT FOUND";
       return -1;
+    }
+  }
+
+  mu2e::GeomHandle<mu2e::VirtualDetector> vdg;
+
+  int nvdhits(0);
+  art::Handle<mu2e::StepPointMCCollection> vdhcH;
+  const mu2e::StepPointMCCollection*       vdhc(nullptr);
+
+  if (! fVDHitsCollTag.empty()) {
+    AnEvent->getByLabel(fVDHitsCollTag,vdhcH);
+    if (!vdhcH.isValid()) {
+      mf::LogWarning(oname) << " WARNING in " << oname << ":" << __LINE__ 
+                            << ": StepPointMCCollection:" 
+                            << fVDHitsCollTag.encode().data() << " NOT FOUND";
+    }
+    else {
+      vdhc    = vdhcH.product();
+      nvdhits = vdhc->size();
     }
   }
 //-----------------------------------------------------------------------------
@@ -243,14 +266,34 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
 				       process_id);
       simp->SetStartMom(px, py, pz, energy);
       simp->SetStartPos(sp.x(),sp.y(),sp.z(),sim->startGlobalTime());
-      simp->SetStartProperTime(sim->startProperTime());
+//-----------------------------------------------------------------------------
+// proper time: if StepPointMC collection is defined, make an attempt to correct 
+// things for multistage simulation, where the proper time is calculated 
+// for each stage separately
+//-----------------------------------------------------------------------------
+      // double tau               = gc->getParticleLifetime(sim->pdgId());
+      double tau = ptable->particle(sim->pdgId()).lifetime()*1.e9;  // convert to ns
+      if (tau == 0) tau = 1.e20;
+
+      double start_proper_time = sim->startProperTime();
+      double dpt               = stntuple::get_proper_time(sim);
+
+      start_proper_time = start_proper_time+dpt;
+
+      simp->SetStartProperTime(start_proper_time/tau);
+
       simp->SetEndMom  (sim->endMomentum().x(),
 			sim->endMomentum().y(),
 			sim->endMomentum().z(),
 			sim->endMomentum().e());
       const CLHEP::Hep3Vector ep = sim->endPosition();
       simp->SetEndPos(ep.x(),ep.y(),ep.z(),sim->endGlobalTime());
-      simp->SetEndProperTime(sim->endProperTime());
+
+      double end_proper_time = sim->endProperTime();
+
+      end_proper_time = end_proper_time+dpt;
+
+      simp->SetEndProperTime(end_proper_time/tau);
 
       simp->SetNStrawHits(nhits);
       simp->SetSimParticle(sim);
@@ -259,50 +302,38 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
 // particle parameters at virtual detectors -stored only for those which have 
 // VD hits stored
 //-----------------------------------------------------------------------------
-      if (vdg->nDet() > 0) {
-	art::Handle<mu2e::StepPointMCCollection> vdhits;
-	AnEvent->getByLabel(fVDHitsCollTag,vdhits);
-	if (!vdhits.isValid()) {
-	  mf::LogWarning(oname) << " WARNING in " << oname << ":" << __LINE__ 
-				<< ": StepPointMCCollection:" 
-				<< fVDHitsCollTag.encode().data() << " NOT FOUND";
-	}
-	else {
-	  int nvdhits = vdhits->size();
-	  for (int i=0; i<nvdhits; i++) {
-	    const mu2e::StepPointMC* hit = &(*vdhits)[i];
+      for (int i=0; i<nvdhits; i++) {
+        const mu2e::StepPointMC* hit = &(*vdhc)[i];
 	    
-	    mu2e::VirtualDetectorId vdid(hit->volumeId());
+        mu2e::VirtualDetectorId vdid(hit->volumeId());
 	    
-	    if (vdid.id() == mu2e::VirtualDetectorId::ST_Out) {
+        if (vdid.id() == mu2e::VirtualDetectorId::ST_Out) {
 	      
-	      const mu2e::SimParticle* sim = hit->simParticle().get();
+          const mu2e::SimParticle* sim = hit->simParticle().get();
 	      
-	      if (sim == NULL) {
-		printf(">>> ERROR: %s sim == NULL\n",oname);
-	      }
-	      int sim_id = sim->id().asInt();
-	      if (sim_id == id) {
-		simp->SetMomTargetEnd(hit->momentum().mag());
-	      }
-	    }
-	    else if (vdid.isTrackerFront()) {
-	      art::Ptr<mu2e::SimParticle> const& simptr = hit->simParticle();
-	      const mu2e::SimParticle* sim = simptr.get();
-	      
-	      if (sim == NULL) {
-		printf("[%s] ERROR: sim == NULL. CONTINUE.\n",oname);
-	      }
-	      else {
-		int sim_id = sim->id().asInt();
-		if (sim_id == id) {
-		  simp->SetMomTrackerFront(hit->momentum().mag());
-		}
-	      }
-	    }
-	    
-	  }
-	}
+          if (sim == NULL) {
+            printf(">>> ERROR: %s sim == NULL\n",oname);
+          }
+          int sim_id = sim->id().asInt();
+          if (sim_id == id) {
+            simp->SetMomTargetEnd(hit->momentum().mag());
+          }
+        }
+        else if (vdid.isTrackerFront()) {
+          art::Ptr<mu2e::SimParticle> const& simptr = hit->simParticle();
+          const mu2e::SimParticle* sim = simptr.get();
+	  
+          if (sim == NULL) {
+            printf("[%s] ERROR: sim == NULL. CONTINUE.\n",oname);
+          }
+          else {
+            int sim_id = sim->id().asInt();
+            if (sim_id == id) {
+              simp->SetMomTrackerFront(hit->momentum().mag());
+            }
+          }
+        }
+	
       }
     }
 //-----------------------------------------------------------------------------

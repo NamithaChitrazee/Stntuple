@@ -110,8 +110,8 @@ protected:
 //-----------------------------------------------------------------------------
 // module parameters
 //-----------------------------------------------------------------------------
-  string                   fGenpCollTag;
-  string                   fSimpCollTag;
+  art::InputTag            fGenpCollTag;
+  art::InputTag            fSimpCollTag;
 
   art::InputTag            fChCollTag;
   art::InputTag            fShCollTag;
@@ -123,7 +123,7 @@ protected:
   string                   fCrvCoincidenceCollTag;          //
   string                   fCrvCoincidenceClusterCollTag;   //
 
-  string                   fVdhCollTag;                     // hits on virtual detectors (StepPointMCCollection)
+  art::InputTag            fVdhCollTag;                     // hits on virtual detectors (StepPointMCCollection)
 
   vector<string>           fTClBlockName;                   // time cluster block names
   vector<string>           fTClCollTag;                     // time cluster coll tags
@@ -133,7 +133,7 @@ protected:
   vector<art::InputTag>    fHelixKsCollTag;
 
   art::InputTag            fPbiTag;
-  string                   fPrimaryParticleTag;
+  art::InputTag            fPrimaryParticleTag;
   string                   fTriggerResultsTag;
   int                      fNTriggerBits;
 
@@ -160,7 +160,7 @@ protected:
   vector<string>           fTrackSHBlockName;
 
   vector<string>           fSpmcBlockName;
-  vector<string>           fSpmcCollTag;
+  vector<art::InputTag>    fSpmcCollTag;
   vector<string>           fStatusG4Tag;
 
   string                   fCaloCrystalHitMaker;
@@ -255,8 +255,8 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
   , fMakeCrvPulses           (PSet.get<int>           ("makeCrvPulses"       ))
   , fMakeCrvClusters         (PSet.get<int>           ("makeCrvClusters"     ))
   
-  , fGenpCollTag             (PSet.get<string>        ("genpCollTag"         ))
-  , fSimpCollTag             (PSet.get<string>        ("simpCollTag"         ))
+  , fGenpCollTag             (PSet.get<art::InputTag> ("genpCollTag"         ))
+  , fSimpCollTag             (PSet.get<art::InputTag> ("simpCollTag"         ))
 
   , fChCollTag               (PSet.get<art::InputTag> ("chCollTag"     ))
   , fShCollTag               (PSet.get<art::InputTag> ("shCollTag"     ))
@@ -268,7 +268,7 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
   , fCrvCoincidenceCollTag       (PSet.get<string>    ("crvCoincidenceCollTag"       ))
   , fCrvCoincidenceClusterCollTag(PSet.get<string>    ("crvCoincidenceClusterCollTag"))
 
-  , fVdhCollTag              (PSet.get<string>        ("vdHitsCollTag"       ))
+  , fVdhCollTag              (PSet.get<art::InputTag> ("vdHitsCollTag"       ))
   , fTClBlockName            (PSet.get<vector<string>>("timeClusterBlockName"))
   , fTClCollTag              (PSet.get<vector<string>>("timeClusterCollTag"  ))
   , fHelixBlockName          (PSet.get<vector<string>>("helixBlockName"      ))
@@ -276,7 +276,7 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
   , fHelixKsCollTag          (PSet.get<vector<art::InputTag>>("helixKsCollTag"))
 
   , fPbiTag                  (PSet.get<art::InputTag> ("pbiTag"    ))
-  , fPrimaryParticleTag      (PSet.get<string>        ("primaryParticleTag"  ))
+  , fPrimaryParticleTag      (PSet.get<art::InputTag> ("primaryParticleTag"  ))
 
   , fTriggerResultsTag       (PSet.get<string>        ("triggerResultsTag"   ))
   , fNTriggerBits            (PSet.get<int>           ("nTriggerBits"        ))
@@ -300,9 +300,9 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
   , fPidCollTag              (PSet.get<vector<string>>("pidCollTag"          ))
   , fTrackSHBlockName        (PSet.get<vector<string>>("trackSHBlockName"    ))
   
-  , fSpmcBlockName           (PSet.get<vector<string>>("spmcBlockName"       ))
-  , fSpmcCollTag             (PSet.get<vector<string>>("spmcCollTag"         ))
-  , fStatusG4Tag             (PSet.get<vector<string>>("statusG4Tag"         ))
+  , fSpmcBlockName           (PSet.get<vector<string>>       ("spmcBlockName"       ))
+  , fSpmcCollTag             (PSet.get<vector<art::InputTag>>("spmcCollTag"         ))
+  , fStatusG4Tag             (PSet.get<vector<string>>       ("statusG4Tag"         ))
 
   , fCaloCrystalHitMaker     (PSet.get<string>        ("caloCrystalHitsMaker"))
   , fCaloClusterMaker        (PSet.get<string>        ("caloClusterMaker"    ))

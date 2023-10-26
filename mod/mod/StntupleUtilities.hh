@@ -4,13 +4,13 @@
 #ifndef StntupleUtilities_hh
 #define StntupleUtilities_hh
 
-#include "Stntuple/mod/InitStntupleDataBlocks.hh"
+#include "Offline/MCDataProducts/inc/StepPointMC.hh"
 
-void StntupleGetProcessName     (const char* string, 
-				 char*       ProcessName, 
-				 char*       Description,
-				 char*       CollType = 0);
+#include <vector>
 
-// void StntupleSetProcessName     (StorableObject* Obj, const char* ProcessName);
+namespace stntuple {
 
+  double get_proper_time(const mu2e::SimParticle* Simp);
+
+}
 #endif

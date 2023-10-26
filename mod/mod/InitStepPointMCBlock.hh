@@ -20,8 +20,8 @@ public:
 //-----------------------------------------------------------------------------
 public:
 
-  void   SetSpmcCollTag(std::string& Tag) { fSpmcCollTag = art::InputTag(Tag); }
-  void   SetStatusG4Tag(std::string& Tag) { fStatusG4Tag = art::InputTag(Tag); }
+  void   SetSpmcCollTag(art::InputTag& Tag) { fSpmcCollTag = Tag; }
+  void   SetStatusG4Tag(std::string&   Tag) { fStatusG4Tag = art::InputTag(Tag); }
 
   void   SetMbTime            (float MbTime) { fMbTime = MbTime; }
   
