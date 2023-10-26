@@ -98,7 +98,11 @@ StntupleMakerTemplate : { module_type:StntupleMaker
     simpMaxZ             : 1800.0                                # not used
 
     genpCollTag          : @local::STN_COMPRESS_MCS              # save signal-only: "generate" 
-    genId                : @local::GEN_ID                        # defined in Stntuple/fcl/stntuple.fcl, by default, store all simparticles
+#------------------------------------------------------------------------------
+# cant input "unknown" from FCL, so try to set default in C++ - doesn't work
+# as might need to be able to redefine GENID consistently
+#------------------------------------------------------------------------------
+    genId                : @local::GEN_ID                        # default: in Stntuple/mod/StntupleMaker_module.cc
     pdgId                : @local::PDG_ID                        # defined in Stntuple/fcl/stntuple.fcl, by default, don't check PDG ID
 #------------------------------------------------------------------------------
 # time clusters
