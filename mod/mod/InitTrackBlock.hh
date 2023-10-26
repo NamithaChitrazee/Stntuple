@@ -82,11 +82,11 @@ public:
 
   void   SetAlgorithmIDCollTag      (std::string& Tag) { fAlgorithmIDCollTag   = art::InputTag(Tag); }
   void   SetCaloClusterCollTag      (std::string& Tag) { fCaloClusterCollTag   = art::InputTag(Tag); }
-  void   SetSsChCollTag             (art::InputTag& Tag) { fSsChCollTag      = Tag; }
+  void   SetSsChCollTag             (art::InputTag& Tag) { fSsChCollTag        = Tag; }
   void   SetKFFCollTag              (std::string& Tag) { fKFFCollTag           = art::InputTag(Tag); }
   void   SetPIDProductCollTag       (std::string& Tag) { fPIDProductCollTag    = art::InputTag(Tag); }
-  void   SetVdhCollTag              (std::string& Tag) { fVdhCollTag           = art::InputTag(Tag); }
-  void   SetStrawDigiMCCollTag      (art::InputTag& Tag) { fStrawDigiMCCollTag   = Tag; }
+  void   SetVdhCollTag              (art::InputTag& Tag) { fVdhCollTag         = Tag; }
+  void   SetStrawDigiMCCollTag      (art::InputTag& Tag) { fStrawDigiMCCollTag = Tag; }
   void   SetTciCollTag              (std::string& Tag) { fTciCollTag           = art::InputTag(Tag); }
   void   SetTcmCollTag              (std::string& Tag) { fTcmCollTag           = art::InputTag(Tag); }
   void   SetTrkQualCollTag          (std::string& Tag) { fTrkQualCollTag       = art::InputTag(Tag); }

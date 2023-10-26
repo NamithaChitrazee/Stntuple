@@ -102,15 +102,15 @@ private:
   string        _ksfCollTag;
   string        _kffCollTag;
   string        _trackCollTag;
-  string        _simpCollTag;
+  art::InputTag _simpCollTag;
   string        _timeClusterCollTag;
   string        _phiClusterCollTag;
   string        _caloHitCollTag;
   string        _trkExtrapol;
   string        _trkCalMatch;
   string        _pidCollTag;
-  string        _ppTag;			// primary particle tag
-  string        _vdHitsCollTag;
+  art::InputTag _ppTag;			// primary particle tag
+  art::InputTag _vdHitsCollTag;
   string        _defaultView;           // view open in the first window
   
   GenId         _generatorID;
