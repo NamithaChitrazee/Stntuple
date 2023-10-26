@@ -47,7 +47,7 @@
 
    checks which usually fail: [[file:../mod/InitSimpBlock.cc::fGenProcessID > 0]] or [[file:../mod/InitSimpBlock.cc::fPdgID       != 0]]
 
-   see [[file:../../MCDataProducts/inc/GenId.hh][MCDataProducts/inc/GenId.hh]] for the definitions
+   see [[file:../../Offline/MCDataProducts/inc/GenId.hh][Offline/MCDataProducts/inc/GenId.hh]] for the definitions
 
   *Explanation*                                                   
 
