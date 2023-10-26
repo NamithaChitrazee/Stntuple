@@ -15,7 +15,7 @@
 
 #include "Stntuple/obj/TStnHeaderBlock.hh"
 #include "Stntuple/mod/InitHeaderBlock.hh"
-#include <Stntuple/mod/StntupleUtilities.hh>
+// #include <Stntuple/mod/StntupleUtilities.hh>
 
 #include "Offline/RecoDataProducts/inc/StrawHit.hh"
 #include "Offline/RecoDataProducts/inc/ComboHit.hh"
