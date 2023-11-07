@@ -67,6 +67,7 @@ Bool_t TEvdMainFrame::ProcessMessage(Long_t msg, Long_t parm1, Long_t parm2) {
 	}
 	break;
       }
+      break;
     default:
       if (vm->DebugLevel() > 0) {
 	printf(" *** TStnFrame::ProcessMessage msg: %li parm1: %li parm2: %li\n",
