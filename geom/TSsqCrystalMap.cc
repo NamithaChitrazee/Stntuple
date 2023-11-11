@@ -155,11 +155,6 @@ TSsqCrystalMap::TSsqCrystalMap(double Size, double RMin, double RMax) :
 
 
 //-----------------------------------------------------------------------------
-TSsqCrystalMap::~TSsqCrystalMap() {
-}
-
-
-//-----------------------------------------------------------------------------
 int TSsqCrystalMap::GetRing(int I) {
   return -1;
 }

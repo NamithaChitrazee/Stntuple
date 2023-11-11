@@ -16,7 +16,6 @@ public:
 
   void Set(int L, int K) { fL = L; fK = K; }
 
-  ~TDiskIndex() {}
 };
 
 #endif
