@@ -45,6 +45,7 @@ def local_build():
                         'mu2e_DataProducts',
                         'mu2e_CaloMC',
                         'mu2e_BTrkData',
+                        'mu2e_Mu2eInterfaces',
                         
 #                            'HepPDT',
 #                        'HepPID',
