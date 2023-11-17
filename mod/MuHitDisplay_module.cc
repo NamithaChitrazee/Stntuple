@@ -26,6 +26,7 @@
 #include "Stntuple/obj/TSimpBlock.hh"
 #include "Stntuple/mod/InitSimpBlock.hh"
 
+
 namespace mu2e {
 //-----------------------------------------------------------------------------
 MuHitDisplay::MuHitDisplay(fhicl::ParameterSet const& pset) :
@@ -154,8 +155,7 @@ void MuHitDisplay::beginRun(const art::Run& Run) {
   mu2e::GeomHandle<mu2e::Tracker> handle;
   fTracker = handle.get();
 
-  mu2e::ConditionsHandle<mu2e::AcceleratorParams> accPar("ignored");
-  float mbtime = accPar->deBuncherPeriod;
+  float mbtime = GlobalConstantsHandle<PhysicsParams>()->getNominalDRPeriod();
 
   TStnVisManager* vm = TStnVisManager::Instance();
   vm->SetMbTime(mbtime);
