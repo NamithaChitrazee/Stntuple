@@ -21,9 +21,10 @@
 #include "art/Framework/Principal/Selector.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
-#include "Offline/ConditionsService/inc/ConditionsHandle.hh"
-#include "Offline/ConditionsService/inc/AcceleratorParams.hh"
 #include "Offline/TrackerConditions/inc/StrawResponse.hh"
+
+#include "Offline/GlobalConstantsService/inc/GlobalConstantsHandle.hh"
+#include "Offline/GlobalConstantsService/inc/PhysicsParams.hh"
 
 #include "Offline/GeometryService/inc/GeometryService.hh"
 #include "Offline/GeometryService/inc/GeomHandle.hh"

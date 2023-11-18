@@ -26,8 +26,8 @@
 #include "TFolder.h"
 #include "TSystem.h"
 
-#include "Offline/ConditionsService/inc/ConditionsHandle.hh"
-#include "Offline/ConditionsService/inc/AcceleratorParams.hh"
+#include "Offline/GlobalConstantsService/inc/GlobalConstantsHandle.hh"
+#include "Offline/GlobalConstantsService/inc/PhysicsParams.hh"
 
 #include "Stntuple/obj/TStnEvent.hh"
 #include "Stntuple/obj/TStnNode.hh"
@@ -395,8 +395,7 @@ void StntupleMaker::beginRun(const art::Run& aRun) {
 //-----------------------------------------------------------------------------
 // StepPointMC collections - set mbtime - have to do that at beginRun()
 //-----------------------------------------------------------------------------
-  mu2e::ConditionsHandle<mu2e::AcceleratorParams> accPar("ignored");
-  float mbtime = accPar->deBuncherPeriod;
+  float mbtime = GlobalConstantsHandle<PhysicsParams>()->getNominalDRPeriod();
 
   if (fMakeStepPointMC) {
     int nblocks = fSpmcBlockName.size();

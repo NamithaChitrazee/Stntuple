@@ -4,10 +4,6 @@
 
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
-// conditions
-#include "Offline/ConditionsService/inc/ConditionsHandle.hh"
-#include "Offline/ConditionsService/inc/AcceleratorParams.hh"
-
 #include "Stntuple/mod/InitStntupleDataBlocks.hh"
 #include "Stntuple/obj/TVDetDataBlock.hh"
 
@@ -59,9 +55,6 @@ Int_t StntupleInitMu2eVDetDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent, int
 
   static mu2e::GlobalConstantsHandle<mu2e::ParticleDataList> pdt;
 
-  // mu2e::ConditionsHandle<mu2e::AcceleratorParams> accPar("ignored");
-  // double _mbtime = accPar->deBuncherPeriod;
-  
   if (step_module_label[0] != 0) {
     if (step_description[0] != 0) 
       AnEvent->getByLabel(step_module_label, step_description, step_handle);
