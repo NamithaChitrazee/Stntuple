@@ -798,7 +798,7 @@ int TTrackAnaModule::Event(int ientry) {
 //-----------------------------------------------------------------------------
 // track residuals
 //-----------------------------------------------------------------------------
-    TStnTrack::InterData_t*  vr = track->fVMaxEp; 
+    TStnTrack::InterData_t*  vr = &track->fTrkCaloHit; 
 
     tp->fEcl       = -1.e6;
     tp->fEp        = -1.e6;
