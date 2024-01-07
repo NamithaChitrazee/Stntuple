@@ -50,7 +50,8 @@ TEvdComboHit::TEvdComboHit(const mu2e::ComboHit*      Hit,
   TObject(),
   fHit(Hit),
   fPos(Hit->pos().x(),Hit->pos().y(),Hit->pos().z()),
-  fDir(Hit->wdir().x(),Hit->wdir().y())
+  //  fDir(Hit->wdir().x(),Hit->wdir().y())
+  fDir(Hit->uDir().x(),Hit->uDir().y())
 {
   fSim         = Sim;
   fStep        = Step;
