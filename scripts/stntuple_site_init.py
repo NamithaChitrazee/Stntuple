@@ -57,6 +57,8 @@ def stntuple_gen_rootcint(source, target, env, for_signature):
     includes = includes + ' -I'+os.environ['BOOST_INC'   ];
     includes = includes + ' -I'+os.environ.get('TBB_INC');
     includes = includes + ' -I'+os.environ.get('MESSAGEFACILITY_INC');
+    includes = includes + ' -I'+os.environ.get('ARTDAQ_CORE_INC');
+    includes = includes + ' -I'+os.environ.get('ARTDAQ_CORE_MU2E_INC');
 
     dict     = str(target[0]);
     tmp_lib_dir = os.path.dirname(dict);
