@@ -33,7 +33,7 @@ mu2e -c Stntuple/fcl/display.fcl -s dig.mu2e.CeEndpointDigiTriggered.MDC2020n_10
 | magenta   |            | everything else |
 |-----------+------------+-----------------|
 
-** commands:                                                                 
+** interactive commands                                                      
 
   - process next event: type ".q" at the ROOT prompt
 
@@ -59,7 +59,7 @@ mu2e -c Stntuple/fcl/display.fcl -s dig.mu2e.CeEndpointDigiTriggered.MDC2020n_10
    - if, however, *primaryParticleTag* is set not non-empty string, 
      saved in STNTUPLE and displayed will be only particles pre-selected 
      from that list , still with N(straw hits) > 0 and E > Emin
-** plugins                                                                   
+** plugin macros                                                             
   -  MuHitDisplay can execute ROOT scripts in an interpreted mode.
   - the following FCL parameter of a STNTUPLE module (any module class inheriting from TModule)
 
@@ -109,13 +109,15 @@ mu2e -c Stntuple/fcl/display.fcl -s dig.mu2e.CeEndpointDigiTriggered.MDC2020n_10
   - a node controls interactive cbehavior - DistanceToPrimitive
   - each note "knows" how to paint itself in each view PaintXY, PaintRZ, etc 
   - 3D views: need a simplified geometry, work in progress 
-** command line printing                                                     
+** printing in interactive mode                                              
+- see [[file:../print/print/Stntuple_print_functions.hh][Stntuple/print/print/Stntuple_print_functions.hh]] for the list of functions which could be called
+- contribute if you need more! 
 #+begin_quote   print time cluster collection                                
    d = TAnaDump::Instance()
    d->printTimeClusterCollection("TZClusterFinder","makePH","DeltaFinder::ComboHits",1,"makeSD")    
 #+end_quote               
 
-  printing available collection names :
+  - print available collection names :
 
 #+begin_quote
   print_ch_colls()
