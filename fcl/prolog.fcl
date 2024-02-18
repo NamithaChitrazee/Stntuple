@@ -710,6 +710,17 @@ Stntuple : {
 #------------------------------------------------------------------------------
 # 
 #------------------------------------------------------------------------------
+        StntupleRecoAna : { module_type : StntupleRecoAna
+            @table::StntupleTModuleFclDefaults                  # defaults of the base class
+            sschCollTag : "makeSH"
+            chCollTag   : "makeSH"
+            tcCollTag   : "TZClusterFinder"
+            sdmcCollTag : "CompressDigiMCs"
+            debugLevel  : 0
+        }
+#------------------------------------------------------------------------------
+# 
+#------------------------------------------------------------------------------
 	MuHitDisplay    : { @table::MuHitDisplay }
     }
 }
