@@ -58,8 +58,8 @@ void THelixAnaModule::BookTimeClusterHistograms   (TimeClusterHist_t*   Hist, co
  
   HBook1F(Hist->fNHits         ,"nhits"      ,Form("%s: # of straw hits"              ,Folder), 150,   0,   150,Folder);
   HBook1F(Hist->fNComboHits    ,"ncombohits" ,Form("%s: # of combo hits"              ,Folder), 150,   0,   150,Folder);
-  HBook1F(Hist->fT0            ,"t0"         ,Form("%s: TimeCluster; t_{0}[ns]"       ,Folder), 800, 400,  1700,Folder);
-  HBook1F(Hist->fClusterEnergy ,"clusterE"   ,Form("%s: cluster energy; E [MeV]      ",Folder), 400,   0,  200,Folder);  
+  HBook1F(Hist->fT0            ,"t0"         ,Form("%s: TimeCluster; t_{0}[ns]"       ,Folder), 400,   0,  2000,Folder);
+  HBook1F(Hist->fClusterEnergy ,"clusterE"   ,Form("%s: cluster energy; E [MeV]      ",Folder), 400,   0,   200,Folder);  
 }
 
 //-----------------------------------------------------------------------------
