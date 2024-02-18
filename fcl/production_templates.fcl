@@ -173,7 +173,7 @@ production.calo_hit_reco        : [ CaloRecoDigiFromDigi ,CaloCrystalHitFromHit 
 production.calo_cluster_reco    : [ CaloProtoClusterFromCrystalHit, CaloClusterFromProtoCluster ]
 
 production.calo_reco            : [ @sequence::production.calo_hit_reco,
-				@sequence::production.calo_cluster_reco ]
+                                    @sequence::production.calo_cluster_reco ]
 
 # track hit reconstruction
 production.trk_hit_reco         : [ makeSH, makePH, FlagBkgHits]
@@ -358,7 +358,7 @@ production.paths : {
 #------------------------------------------------------------------------------
 # p2: read digis, do reconstruction: run downstream electron and muon reco paths
 #------------------------------------------------------------------------------
-    production_p2 : [ @sequence::production.calo_reco,
+    production_p2 : [ @sequence::production.calo_reco,        ## 
 		      @sequence::production.trk_hit_reco,
 		      @sequence::production.trk_reco_de ,
 		      @sequence::production.trk_reco_dmu , 
@@ -383,6 +383,76 @@ production.paths : {
 		       @sequence::production.helix_reco_de,
 		       @sequence::production.helix_reco_ue
 		      ]
+#------------------------------------------------------------------------------
+# p20: default Production track reconstruction
+#------------------------------------------------------------------------------
+    p20 : [                                     ## @sequence::Reconstruction.RecoPath includes:
+           @sequence::Reconstruction.CaloReco,  ##   @sequence::Reconstruction.CaloReco includes:
+                                                ##     @sequence::CaloReco.Reco
+                                                ##     @sequence::CaloCluster.Reco
+           @sequence::Reconstruction.TrkReco,   ##   @sequence::Reconstruction.TrkReco includes:
+                                                ##     @sequence::TrkHitReco.PrepareHits includes:
+                                                ##       PBTFSD, makeSH, makePH, makeSTH, FlagBkgHits
+           @sequence::Reconstruction.CrvReco,   ##   @sequence::Reconstruction.CrvReco includes:
+                                                ##     @sequence::CrvRecoPackage.CrvRecoSequence
+           @sequence::Reconstruction.TrackReco  ##   @sequence::Reconstruction.TrackReco includes:
+                                                ##     @sequence::Reconstruction.DeReco includes: 
+                                                ##       TimeClusterFinderDe, HelixFinderDe,
+                                                ##       CalTimePeakFinder, CalHelixFinderDe,
+                                                ##       MHDeM, MHDeP,
+                                                ##       KKDeM, KKDeP
+                                                ##     @sequence::Reconstruction.UeReco # includes
+                                                ##       TimeClusterFinderUe, HelixFinderUe,
+                                                ##       MHUeM, MHUeP,
+                                                ##       KKUeM, KKUeP
+                                                ##     @sequence::Reconstruction.DmuReco # includes:
+                                                ##       TimeClusterFinderDmu, HelixFinderDmu,  # TrkPatRec
+                                                ##       CalTimePeakFinderDmu, CalHelixFinderDmu,
+                                                ##       MHDmuM, MHDmuP,
+                                                ##       KKDmuM, KKDmuP
+                                                ##     @sequence::Reconstruction.UmuReco # includes:
+                                                ##       TimeClusterFinderUmu, HelixFinderUmu,
+                                                ##       MHUmuM, MHUmuP,
+                                                ##       KKUmuM, KKUmuP
+          ]
+#------------------------------------------------------------------------------
+# p21: downstream electron/muon reconstruction (both signs)
+#      - no upstream reco
+#      - no CRV reco
+#      - use TZClusterFinder instead of TimeClusterFinderDe / TimeClusterFinderDmu
+#------------------------------------------------------------------------------
+    p21 : [                                     ## @sequence::Reconstruction.RecoPath includes:
+           @sequence::Reconstruction.CaloReco,  ##   @sequence::Reconstruction.CaloReco includes:
+                                                ##     @sequence::CaloReco.Reco
+                                                ##     @sequence::CaloCluster.Reco
+           @sequence::Reconstruction.TrkReco,   ##   @sequence::Reconstruction.TrkReco includes:
+                                                ##     @sequence::TrkHitReco.PrepareHits includes:
+                                                ##       PBTFSD, makeSH, makePH, makeSTH, FlagBkgHits
+           ## @sequence::Reconstruction.CrvReco,   ##   @sequence::Reconstruction.CrvReco includes:
+                                                ##     @sequence::CrvRecoPackage.CrvRecoSequence
+           ## @sequence::Reconstruction.TrackReco  ##   @sequence::Reconstruction.TrackReco includes:
+                                                ##        @sequence::Reconstruction.DeReco # includes: 
+           TZClusterFinder,                     ##          TimeClusterFinderDe, 
+           HelixFinderDe,                       ##          HelixFinderDe,
+           CalTimePeakFinder, CalHelixFinderDe, ##          CalTimePeakFinder, CalHelixFinderDe,
+           MHDeM, MHDeP,                        ##          MHDeM, MHDeP,
+           MHFinderDe  , 
+           KKDeMHPar   ,                        ##          KKDeM, KKDeP
+                                                ##     @sequence::Reconstruction.UeReco # includes
+                                                ##       TimeClusterFinderUe, HelixFinderUe,
+                                                ##       MHUeM, MHUeP,
+                                                ##       KKUeM, KKUeP
+                                                ##     @sequence::Reconstruction.DmuReco # includes:
+           HelixFinderDmu,                      ##       TimeClusterFinderDmu, HelixFinderDmu,  # TrkPatRec
+           CalTimePeakFinderMu, CalHelixFinderDmu, ##    CalTimePeakFinderMu, CalHelixFinderDmu,
+           MHDmuM, MHDmuP,                      ##       MHDmuM, MHDmuP,
+           MHFinderDmu   ,
+           KKDmuMHPar                           ##       KKDmuM, KKDmuP
+                                                ##     @sequence::Reconstruction.UmuReco # includes:
+                                                ##       TimeClusterFinderUmu, HelixFinderUmu,
+                                                ##       MHUmuM, MHUmuP,
+                                                ##       KKUmuM, KKUmuP
+          ]
 #------------------------------------------------------------------------------
 # p31: read digis, reconstruct helices - both directions, 
 #      assume muon-only reco (for ppbar events)
@@ -424,6 +494,24 @@ production.paths : {
             , KKDmuMHPar                            # Seed fit (chisquared, no drift)
            ]
 #------------------------------------------------------------------------------
+# p33: reco path for pi+ --> e+ nu : read digis, reconstruct helices,
+#------------------------------------------------------------------------------
+    p33 : [ @sequence::Reconstruction.CaloReco, 
+            # @sequence::Reconstruction.TrkReco ,     # PBTFSD, makeSH, makePH, FlagBkgHits
+            @sequence::TrkHitReco.PrepareHits ,     # PBTFSD, makeSH, makePH, FlagBkgHits
+            # ------------ @sequence::Reconstruction.DmuReco  
+            # TimeClusterFinderDmu, 
+            TZClusterFinder, 
+            # PhiClusterFinder,
+            CalTimePeakFinder,
+            HelixFinderDe,                         		 
+            CalHelixFinderDe
+            , MHDeM , MHDeP                         # 1st step: RobustHelixFinder(M/P)+CalHelixFinder(M/P)
+            , MHFinderDe                            # 2nd step: MHDeM + MHDeP
+            , KSFDe                                 # Seed fit (chisquared, no drift)
+            , KFFDe                                 # final Kalman filter fit
+           ]
+#------------------------------------------------------------------------------
 # p100: concatenation job, trigger path is empty
 #------------------------------------------------------------------------------
     production_p100 : [ ]
@@ -434,6 +522,6 @@ production.paths : {
 # production.producers.TimeClusterFinderUe.PrefilterCluster : false
 # production.producers.TimeClusterFinderUe.MinKeepHitMVA    : -100.
 #------------------------------------------------------------------------------
-# introduce blind time - start of digitization
+# introduce blind time - start of the digitization
 #------------------------------------------------------------------------------
 services.DbService.verbose                                   : 0

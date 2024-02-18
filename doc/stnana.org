@@ -1,20 +1,24 @@
 # use <TAB> to expand and collapse the menus
 * ------------------------------------------------------------------------------
 * STNANA: Stntuple interactive analysis framework                            
-  main components:
+- main components:
+-   *stnana* : an interactive event loop utility 
+-   user analysis packages which contain *stnana* user analysis modules
+* stnana analysis modules                                                    
+- for starters, see the code in [[file:../ana][Stntuple/ana]]                        
+- modules there are example of modules run in stnana event loop 
+- don't edit modules in Stntuple/ana - those are examples for everyone
+- consider them templates, copy to your own package and modify to fit your needs
+-   make your own package: 
+- each module books and fills multiple histogram sets
+- for each analysis module, description of its histogram sets can be found in module::BookHistograms function
+-   for example, see file:../ana/THelixAnaModule.cc::/book_timecluster_histset/
+* steps to follow                                                            
 
-  - *stnana* : an interactive event loop utility 
-  - user analysis packages which contain the code used by *stnana*
-* examples of stnana analysis modules                                        
-  for starters, see the code in file:../ana/  
-  Modules there are example of modules run in stnana event loop
-* steps to proceed :                                                         
-
-  1) [[file:analysis_packages.org][create your own analysis package and compile its code into a shared library]]
-
+  1) [[file:analysis_packages.org][create your own analysis package]]
   2) start ROOT session, load [[file:../scripts/stnana.C][Stntuple/scripts/stnana.C]] , run the analysis job
 
-** example 1 :              
+** example 1                                                                 
 
 #+begin_src C                            
 root.exe
@@ -28,7 +32,7 @@ root [1] stnana("file","","","nts._USER_.cele0s81b2.su2020.001000_00000000.stn",
   - process 100 events
   - save output histograms to *eminus_gun_stnmaker.hist*
 
-** example 2   :            
+** example 2                                                                 
 
 The following example runs the job configured by function named *track_ana()* defined in [[file:../ana/scripts/validation.C][Stntuple/ana/scripts/trk.C]] 
 on first 10000 events of the dataset defined by the book="detsim" and dsname="cnvs0202".

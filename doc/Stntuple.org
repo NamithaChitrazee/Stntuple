@@ -1,4 +1,15 @@
 #+startup:fold
+# ------------------------------------------------------------------------------
+# how to use this documentation:
+# ------------------------------
+# the best way is to pull the Stntuple code and use emacs to browse the .org files 
+# in that case all links are handled correctly
+#
+# browsing documentation on GitHub: 
+# ---------------------------------
+# GitHub supports the org mode, but doesn't handle correctly the ord-mode links 
+# with searches in them
+#
 # hit <TAB> to expand and collapse the menues
 * ------------------------------------------------------------------------------
 * what is STNTUPLE                                                           
@@ -35,7 +46,7 @@
 * [[file:stntuple-datasets.org][STNTUPLE datasets]]
 * STNTUPLE [[file:how-tos.org][how-to's]]    
 * [[file:event_display.org][STNTUPLE event display]]  
-* STNTUPLE modules and their parameters                                      
+* STNTUPLE Offline modules and their parameters                              
 ** InitStntuple
 ** StntupleMaker                                                             
   - defines absolute majority of the configuration parameters
