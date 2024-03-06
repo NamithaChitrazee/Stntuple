@@ -40,6 +40,8 @@
     of advanced features of the language.
 
   - lets keep it simple :) 
+* news, support: Mu2e #stntuple slack channel                                
+    https://app.slack.com/client/T314VMYV8/C013P69F9GR                              
 * [[file:./how-to-build.org][how to build Stntuple libraries]]
 * [[file:how-to-make-first-stntuple.org][how to make first Stntuple]] 
 * [[file:stnana.org][stnana]] - STNTUPLE analysis framework                                       

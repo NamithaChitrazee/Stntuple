@@ -7,9 +7,10 @@
   to /mu2e/data/users/...)
 
 #+begin_src  
-# ... assuming you have your muse-based area setup
+# ... assuming you have your muse-based area setup 
+# other repos needed: Offline, Production, mu2e_trig_config
 git clone https://www.github.com/Mu2e/Stntuple.git 
-# .. redo the setups - muse needs that after a new package was added
+# .. redo the setups in a new shell - muse needs that after a new package was added
 muse build 
 #+end_src 
 
