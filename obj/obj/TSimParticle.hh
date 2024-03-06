@@ -24,7 +24,7 @@ public:
   int             fStartVolumeIndex;
   int             fTerminationCode;
   int             fEndVolumeIndex;
-  int             fNStrawHits;
+  int             fNStrawHits;          // N(straw hits) + (sim stage << 16)
   int             fGeneratorID;	        // ** MC generator ID, added in V2
 
   float           fMomTargetEnd;
@@ -68,7 +68,8 @@ public:
 //-----------------------------------------------------------------------------
   int    CreationCode() const { return fCreationCode; }
   int    GeneratorID () const { return fGeneratorID;  }
-  int    NStrawHits  () const { return fNStrawHits;   }
+  int    NStrawHits  () const { return (fNStrawHits      ) & 0xffff; }
+  int    SimStage    () const { return (fNStrawHits >> 16) & 0xffff; }
   int    Number      () const { return fNumber;       }
   int    ParentID    () const { return fParentID;     }
   int    PDGCode     () const { return fPdgCode;      }
@@ -89,7 +90,8 @@ public:
 //------------------------------------------------------------------------------
 //  missing TParticle accessors and setters
 //------------------------------------------------------------------------------
-  void     SetNStrawHits(int N) { fNStrawHits = N; }
+  void     SetNStrawHits(int          N    ) { fNStrawHits = (fNStrawHits & 0xffff0000) | N; }
+  void     SetSimStage  (unsigned int Stage) { fNStrawHits = (fNStrawHits & 0x0000ffff) | ( Stage << 16); }
 
   void     SetMomTargetEnd   (double P) { fMomTargetEnd    = P; }
   void     SetMomTrackerFront(double P) { fMomTrackerFront = P; }

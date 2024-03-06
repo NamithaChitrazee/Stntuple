@@ -296,6 +296,7 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
       simp->SetEndProperTime(end_proper_time/tau);
 
       simp->SetNStrawHits(nhits);
+      simp->SetSimStage(sim->simStage());
       simp->SetSimParticle(sim);
       simp->SetShid(v_shid);
 //-----------------------------------------------------------------------------
