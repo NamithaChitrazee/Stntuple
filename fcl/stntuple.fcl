@@ -53,10 +53,15 @@ END_PROLOG
 #include "Offline/CaloCluster/fcl/prolog.fcl"
 #include "Offline/CalPatRec/fcl/prolog.fcl"
 #include "Offline/CalPatRec/fcl/prolog_common.fcl"
+#include "Offline/CosmicReco/fcl/prolog.fcl"
 #------------------------------------------------------------------------------
 # trigger prologs
 #------------------------------------------------------------------------------
-#include "Offline/Trigger/fcl/prolog_trigger.fcl"
+##  #include "Offline/Trigger/fcl/prolog_trigger.fcl"
+#include "mu2e_trig_config/core/trigProducers.fcl"
+#include "mu2e_trig_config/core/trigFilters.fcl"
+#include "mu2e_trig_config/core/trigMCProductionSequences.fcl"
+#include "mu2e_trig_config/core/trigSequences.fcl"
 
 #include "Stntuple/fcl/prolog.fcl"
 #include "pbar2m/fcl/prolog.fcl"
@@ -140,7 +145,7 @@ stntuple : {
 	@table::Digitize.producers
 	@table::Reconstruction.producers
 	@table::Stntuple.producers 
-	@table::Trigger.producers 
+	@table::TrigProducers.producers 
 	# 
 	compressDigiMCs : { @table::Digitize.producers.compressDigiMCs       # defined in Filters/fcl/
 	    crvDigiMCTag         : ""
@@ -153,7 +158,7 @@ stntuple : {
         @table::Digitize.filters
 	@table::Reconstruction.filters
 	@table::Stntuple.filters   
-	@table::Trigger.filters
+	@table::TrigFilters.filters
     }
 
     analyzers: { 
@@ -247,6 +252,11 @@ output_products : {
     reco :                [
 			  ]
 }
+#------------------------------------------------------------------------------
+# 2024-03-06 : reflect temporary change in the DB usage policy in offline 
+#------------------------------------------------------------------------------
+services.DbService.purpose: MDC2020_perfect
+services.DbService.version: v1_1
 #------------------------------------------------------------------------------
 # output file names 
 #------------------------------------------------------------------------------
