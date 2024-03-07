@@ -294,11 +294,13 @@ int StntupleInitTrackSeedBlock::ResolveLinks(TStnDataBlock* Block, AbsEvent* AnE
 // looking for the seed in associations
 //-----------------------------------------------------------------------------
     const mu2e::HelixSeed* hs(nullptr);
-    for (auto ass: *ksfha) {
-      const mu2e::KalSeed* qsf = ass.first.get();
-      if (qsf == ksf) {
-        hs = ass.second.get();
+    if (ksfha){
+      for (auto ass: *ksfha) {
+        const mu2e::KalSeed* qsf = ass.first.get();
+        if (qsf == ksf) {
+          hs = ass.second.get();
         break;
+        }
       }
     }
 

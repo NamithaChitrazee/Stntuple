@@ -399,11 +399,13 @@ Int_t StntupleInitHelixBlock::ResolveLinks(TStnDataBlock* Block, AbsEvent* AnEve
 // looking for the seed in associations - a helix may not have a seed
 //-----------------------------------------------------------------------------
     const mu2e::KalSeed* ksf(nullptr);
-    for (auto ass: *ksfha) {
-      const mu2e::HelixSeed* hs2 = ass.second.get();
-      if (hs1 == hs2) {
-        ksf = ass.first.get();
-        break;
+    if (ksfha){
+      for (auto ass: *ksfha) {
+        const mu2e::HelixSeed* hs2 = ass.second.get();
+        if (hs1 == hs2) {
+          ksf = ass.first.get();
+          break;
+        }
       }
     }
 //-----------------------------------------------------------------------------
