@@ -276,8 +276,8 @@ void TSimParticle::Print(Option_t* Opt) const {
     printf("-----------------------------------------------------");
     printf("------------------------------------------------------------------------------------------");
     printf("-----------------------------------------------------------------------------------------------\n");
-    printf("   i name                      PDG    ID GenID PrntID");
-    printf("     p0x       p0y       p0z      p0    vol0     v0x        v0y      v0z      t0   t0p/tau");
+    printf("   i name                      PDG  ID/Stg GenID Prnt");
+    printf("      p0x       p0y       p0z      p0    vol0     v0x        v0y      v0z      t0   t0p/tau");
     printf("      p1x       p1y       p1z      p1    vol1     v1x        v1y      v1z      t1   t1p/tau Nsh\n");
     printf("-----------------------------------------------------");
     printf("------------------------------------------------------------------------------------------");
@@ -295,7 +295,7 @@ void TSimParticle::Print(Option_t* Opt) const {
     else          printf(" %-19s","*** unknown ***");
 
     printf("%10i"  ,fPdgCode);
-    printf("%6i"   ,GetUniqueID());
+    printf("%4i/%2i",GetUniqueID(),SimStage());
     printf("%6i"   ,fGeneratorID);
     printf("%6i"   ,fParentID);
     printf("%10.3f",fStartMom.Px());
@@ -318,7 +318,7 @@ void TSimParticle::Print(Option_t* Opt) const {
     printf("%10.3f",fEndPos.Z());
     printf("%10.3e",fEndPos.T());
     printf("%6.2f" ,fEndProperTime);
-    printf("%4i"   ,fNStrawHits);
+    printf("%4i"  ,NStrawHits());
     printf("\n");
   }
 }

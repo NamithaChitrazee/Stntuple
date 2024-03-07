@@ -252,6 +252,23 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
       double ptot      = sim->startMomentum().vect().mag();
       energy           = sim->startMomentum().e();
 //-----------------------------------------------------------------------------
+// more on parent ID
+//-----------------------------------------------------------------------------
+      const mu2e::SimParticle* parent = sim->parent().get();
+      if (parent != nullptr) {
+//-----------------------------------------------------------------------------
+// try to find parent among already stored in SimpBlock particles
+//-----------------------------------------------------------------------------
+        int np = simp_block->NParticles();
+        for (int i=np-1; i>=0; i--) {
+          TSimParticle* p = simp_block->Particle(i);
+          if (p->SimParticle() == parent) {
+            parent_id = i;
+            break;
+          }
+        }
+      }
+//-----------------------------------------------------------------------------
 // by default, do not store low energy SimParticles not making hits in the tracker
 //-----------------------------------------------------------------------------
       const CLHEP::Hep3Vector sp = sim->startPosition();
