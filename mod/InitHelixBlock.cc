@@ -32,6 +32,7 @@
 #include "Offline/GeometryService/inc/GeomHandle.hh"
 
 #include "Offline/CalorimeterGeom/inc/Calorimeter.hh"
+#include "Offline/TrackerGeom/inc/Tracker.hh"
 
 #include "Offline/RecoDataProducts/inc/TimeCluster.hh"
 #include "Offline/RecoDataProducts/inc/HelixSeed.hh"
@@ -45,6 +46,7 @@
 #include "Offline/MCDataProducts/inc/SimParticle.hh"
 #include "Offline/MCDataProducts/inc/StepPointMC.hh"
 #include "Offline/TrkDiag/inc/TrkMCTools.hh"
+#include "Offline/Mu2eUtilities/inc/HelixTool.hh"
 
 
 using namespace ROOT::Math;
@@ -96,6 +98,8 @@ int  StntupleInitHelixBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt, 
   TDatabasePDG* pdg_db = TDatabasePDG::Instance();
 
   static  CLHEP::Hep3Vector zaxis(0.0,0.0,1.0); // unit in z direction
+  mu2e::GeomHandle<mu2e::Tracker> th;
+  const mu2e::Tracker* trackerGeom = th.get();
 
   for (int i=0; i<nhelices; i++) {
     std::vector<int>     hits_simp_id, hits_simp_index, hits_simp_z;
@@ -153,7 +157,7 @@ int  StntupleInitHelixBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt, 
     int      nStrawHits(0);
     float    first_hit_z(0), last_hit_z(0);
     
-    for (int j=0; j<nhits; ++j) {      //this is a loop is over ComboHits
+    for (int j=0; j<nhits; ++j) {      //this is a loop over the ComboHits
       hit       = &hits->at(j);
 
       if(j==0) first_hit_z = hit->pos().z();
@@ -162,21 +166,19 @@ int  StntupleInitHelixBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt, 
       // get the MC truth info
       if (hit->_flag.hasAnyProperty(mu2e::StrawHitFlag::outlier))         continue;
 
-      int nsh = hit->indexArray().size();
-      
-      for (int k=0; k<nsh; k++) {
-        int ind = hit->index(k);
-      	const mu2e::StrawDigiMC*  sdmc = &sdmcColl->at(ind);
-	const mu2e::StrawGasStep* step = sdmc->earlyStrawGasStep().get();
-      	if (step) {
-      	  art::Ptr<mu2e::SimParticle> const& simptr = step->simParticle(); 
-      	  int sim_id        = simptr->id().asInt();
-      	  float   dz        = step->position().z();// - trackerZ0;
-      	  hits_simp_id.push_back   (sim_id); 
-      	  hits_simp_index.push_back(ind);
-      	  hits_simp_z.push_back(dz);
-      	  break;
-      	}
+      std::vector<StrawDigiIndex> shids;
+      tmpHel->hits().fillStrawDigiIndices(j,shids);
+
+      for (size_t k=0; k<shids.size(); ++k) {
+        const mu2e::StrawDigiMC* sdmc = &sdmcColl->at(shids[k]);
+        auto const& spmcp = sdmc->earlyStrawGasStep();
+        art::Ptr<mu2e::SimParticle> const& simptr = spmcp->simParticle();
+        int sim_id        = simptr->id().asInt();
+        float   dz        = spmcp->position().z();// - trackerZ0;
+        hits_simp_id.push_back   (sim_id);
+        hits_simp_index.push_back(shids[k]);
+        hits_simp_z.push_back(dz);
+        break;
       }
       nStrawHits += hit->nStrawHits();
     } 
@@ -187,15 +189,27 @@ int  StntupleInitHelixBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt, 
     helix->fNLoops = (last_hit_z - first_hit_z)/(fabs(helix->fLambda)*2.*M_PI);
 
 //-----------------------------------------------------------------------------
+// evaluate the following Helix paramters: TZSlope, TZSlope error, TZChi2NDof
+// and the hitRatio (expected/measured)
+//-----------------------------------------------------------------------------
+    mu2e::HelixTool helTool(tmpHel, trackerGeom);
+    float           hSlope(0), hSlopeError(0), chi2ndof(0);
+    helTool.dirOfProp(hSlope, hSlopeError, chi2ndof);
+
+    helix->fTZSlope      = hSlope;
+    helix->fTZSlopeError = hSlopeError;
+    helix->fChi2TZNDof   = chi2ndof;
+    helix->fHitRatio     = helTool.hitRatio();
+
+//-----------------------------------------------------------------------------
 // find the SimParticle that created the majority of the hits
 //-----------------------------------------------------------------------------
     int     max(0), mostvalueindex(-1), mostvalue(-1), id_max(0);
     float   dz_most(1e4);
-    if (hits_simp_id.size()>0) mostvalue = hits_simp_id[0];
     
     for (int  k=0; k<(int)hits_simp_id.size(); ++k){
       int co = (int)std::count(hits_simp_id.begin(), hits_simp_id.end(), hits_simp_id[k]);
-      if ( (co>0) && (co>=max)) {
+      if ( (co>0) && (co>max)) {
 	float  dz      = std::fabs(hits_simp_z[k]);
 	if (dz < dz_most){
 	  dz_most        = dz;
@@ -227,7 +241,7 @@ int  StntupleInitHelixBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt, 
     
     const mu2e::StrawDigiMC* sdmc = &sdmcColl->at(mostvalueindex);
 
-    const mu2e::StrawGasStep* step = sdmc->earlyStrawGasStep().get();
+    auto const& step = sdmc->earlyStrawGasStep();
     // if (sdmc->wireEndTime(mu2e::StrawEnd::cal) < sdmc->wireEndTime(mu2e::StrawEnd::hv)) {
     //   step = sdmc->strawGasStep(mu2e::StrawEnd::cal).get();
     // }
@@ -237,31 +251,30 @@ int  StntupleInitHelixBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt, 
 
     const mu2e::SimParticle* sim(nullptr);
 
-    if (step) {
-      art::Ptr<mu2e::SimParticle> const& simptr = step->simParticle(); 
-      helix->fSimpPDG1    = simptr->pdgId();
-      art::Ptr<mu2e::SimParticle> mother = simptr;
-      part   = pdg_db->GetParticle(helix->fSimpPDG1);
-
-      while(mother->hasParent()) mother = mother->parent();
-      sim = mother.operator ->();
-
-      helix->fSimpPDGM1   = sim->pdgId();
+    art::Ptr<mu2e::SimParticle> const& simptr = step->simParticle(); 
+    helix->fSimpPDG1    = simptr->pdgId();
+    art::Ptr<mu2e::SimParticle> mother = simptr;
+    part   = pdg_db->GetParticle(helix->fSimpPDG1);
     
-      double   px = step->momvec().x();
-      double   py = step->momvec().y();
-      double   pz = step->momvec().z();
-      double   mass  (-1.);
-      double   energy(-1.);
-      if (part) {
-    	mass   = part->Mass();
-    	energy = sqrt(px*px+py*py+pz*pz+mass*mass);
-      }
-      helix->fMom1.SetPxPyPzE(px,py,pz,energy);
-
-      CLHEP::Hep3Vector sp = simptr->startPosition();
-      helix->fOrigin1.SetXYZT(sp.x(),sp.y(),sp.z(),simptr->startGlobalTime());
+    while(mother->hasParent()) mother = mother->parent();
+    sim = mother.operator ->();
+    
+    helix->fSimpPDGM1   = sim->pdgId();
+    
+    double   px = step->momentum().x();
+    double   py = step->momentum().y();
+    double   pz = step->momentum().z();
+    double   mass  (-1.);
+    double   energy(-1.);
+    if (part) {
+      mass   = part->Mass();
+      energy = sqrt(px*px+py*py+pz*pz+mass*mass);
     }
+    helix->fMom1.SetPxPyPzE(px,py,pz,energy);
+    
+    CLHEP::Hep3Vector sp = simptr->startPosition();
+    helix->fOrigin1.SetXYZT(sp.x(),sp.y(),sp.z(),simptr->startGlobalTime());
+    
     
     //look for the second most frequent hit
     if (max != int(hits_simp_id.size()) ){  //nhits){
@@ -360,13 +373,14 @@ Int_t StntupleInitHelixBlock::ResolveLinks(TStnDataBlock* Block, AbsEvent* AnEve
 // for KinKal fits (mode=2) this is track     <--> helix associations
 //-----------------------------------------------------------------------------
   art::Handle<mu2e::KalHelixAssns> ksfhaH;
-  const mu2e::KalHelixAssns* ksfha;
+  const mu2e::KalHelixAssns* ksfha(0);
   AnEvent->getByLabel(fKsCollTag, ksfhaH);
-  ksfha = ksfhaH.product();
+  if (ksfhaH.isValid()) ksfha = ksfhaH.product();
 
   TStnEvent*      ev = Block->GetEvent();
   TStnHelixBlock* hb = (TStnHelixBlock*) Block;
-  int             nh = hb->NHelices();
+  int             nh(0);
+  if (ksfha) nh = hb->NHelices();
 //-----------------------------------------------------------------------------
 // this is a hack, to be fixed soon
 //-----------------------------------------------------------------------------

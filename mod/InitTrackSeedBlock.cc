@@ -51,7 +51,12 @@ int  StntupleInitTrackSeedBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* E
 
   art::Handle<mu2e::KalSeedCollection> ksfcH;
   Evt->getByLabel(fKsfCollTag, ksfcH);
-  const mu2e::KalSeedCollection*  ksfColl = ksfcH.product();
+  const mu2e::KalSeedCollection*  ksfColl(0);
+  int nts(0);
+  if (ksfcH.isValid()){
+    ksfColl = ksfcH.product();
+    nts     = ksfColl->size();    
+  }
 
   art::Handle<mu2e::ComboHitCollection> sschcH;
   Evt->getByLabel(fSschCollTag,sschcH);
@@ -68,7 +73,6 @@ int  StntupleInitTrackSeedBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* E
   TParticlePDG*        part(0);
   TDatabasePDG*        pdg_db = TDatabasePDG::Instance();
  
-  int nts = ksfColl->size();    
   for (int i=0; i<nts; i++) {
     std::vector<int>     hits_simp_id, hits_simp_index, hits_simp_z;
     
@@ -272,9 +276,9 @@ int StntupleInitTrackSeedBlock::ResolveLinks(TStnDataBlock* Block, AbsEvent* AnE
   if (Block->LinksInitialized()) return 0;
 
   art::Handle<mu2e::KalHelixAssns> ksfhaH;
-  const mu2e::KalHelixAssns* ksfha;
+  const mu2e::KalHelixAssns* ksfha(0);
   AnEvent->getByLabel(fKsfCollTag, ksfhaH);
-  ksfha = ksfhaH.product();
+  if (ksfhaH.isValid()) ksfha = ksfhaH.product();
 
   TStnTrackSeedBlock* tsb = (TStnTrackSeedBlock*) Block;
   TStnEvent*          ev  = Block->GetEvent();

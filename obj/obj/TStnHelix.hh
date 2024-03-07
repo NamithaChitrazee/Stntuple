@@ -43,8 +43,11 @@ class TStnHelix : public TObject {
     kNFreeIntsV4   =  3,	        // v4: added helicity
     kNFreeFloatsV4 = 10,                //
 
-    kNFreeInts     =  3,	        // v5: added number of loops
-    kNFreeFloats   =  9			//
+    kNFreeIntsV5   =  3,	        // v5: added number of loops
+    kNFreeFloatsV5 =  9,                //
+
+    kNFreeInts     =  3,	        // v6: added TZSlope, TZSlope error, TZChi2NDof, hitRatio (expected/collected)
+    kNFreeFloats   =  5			// 
   };
 
 public:
@@ -92,6 +95,10 @@ public:
   float			    fClusterY;      
   float			    fClusterZ;      
   float                     fNLoops;
+  float                     fTZSlope;
+  float                     fTZSlopeError;
+  float                     fChi2TZNDof;
+  float                     fHitRatio; // expected hits in the tracker/hits_collected
   float                     fFloat[kNFreeFloats]; // provision for future I/O expansion
 //-----------------------------------------------------------------------------
 // transients
@@ -148,6 +155,12 @@ public:
 
   float   NLoops        () { return fNLoops;       }
 
+  float   TZSlope       () { return fTZSlope;      }
+  float   TZSlopeError  () { return fTZSlopeError; }
+  float   TZSlopeSig    () { return std::fabs(fTZSlope/fTZSlopeError);      }
+  float   Chi2TZNDof(){ return fChi2TZNDof;   }
+  float   HitRatio      () { return fHitRatio;     }
+  
   TLorentzVector  Mom1     () { return fMom1; }
   TLorentzVector  Origin1  () { return fOrigin1; }
   TLorentzVector  Mom2     () { return fMom2; }
@@ -171,8 +184,9 @@ public:
   void ReadV2(TBuffer& R__b);
   void ReadV3(TBuffer& R__b);   // 2018-12-05 P.M.
   void ReadV4(TBuffer& R__b);   // 2019-02-27 G.P.
+  void ReadV5(TBuffer& R__b);   // 2024-03-07 G.P.
 
-  ClassDef(TStnHelix,5);
+  ClassDef(TStnHelix,6);
 };
 
 #endif

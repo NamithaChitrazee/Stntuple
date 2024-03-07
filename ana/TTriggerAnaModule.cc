@@ -66,7 +66,25 @@ void TTriggerAnaModule::BookTimeClusterHistograms(HistBase_t* Hist, const char* 
 void TTriggerAnaModule::BookHelixHistograms(HistBase_t* Hist, const char* Folder) {
   //  char name [200];
   //  char title[200];
-  //  TrackSeedHist_t* hist = (TrackSeedHist_t*) Hist;
+  HelixHist_t* hist = (HelixHist_t*) Hist;
+
+  HBook1F(hist->fNHits      ,"nHits"      ,Form("%s: nHits"         ,Folder), 200,    0,  200,Folder);
+  HBook1F(hist->fNComboHits ,"nComboHits" ,Form("%s: nComboHits"    ,Folder), 100,    0,  100,Folder);
+  HBook1F(hist->fLambda     ,"lambda"     ,Form("%s: lambda"        ,Folder),1500,  -1500, 1500,Folder);
+  HBook1F(hist->fD0         ,"d0"         ,Form("%s: d0"            ,Folder),1000,-1000, 1000,Folder);
+  HBook1F(hist->fNLoops     ,"nLoops"     ,Form("%s: nLoops"        ,Folder), 100,    0,   25,Folder);
+  HBook1F(hist->fP          ,"p"          ,Form("%s: momentum"      ,Folder), 500,    0,  500,Folder);
+  HBook1F(hist->fPt         ,"pt"         ,Form("%s: tMomentum"     ,Folder), 500,    0,  500,Folder);
+  HBook1F(hist->fT0         ,"T0"         ,Form("%s: T0"            ,Folder), 1000,    0,  2000,Folder);
+  HBook1F(hist->fChi2XYNDof  ,"Chi2XY"    ,Form("%s: Chi2XY/NDof"   ,Folder),  100,    0,    20,Folder);
+  HBook1F(hist->fChi2PhiZNDof,"Chi2PhiZ"  ,Form("%s: Chi2PhiZ/NDof",Folder),   100,    0,    20,Folder);
+  HBook1F(hist->fChi2TZNDof ,"Chi2TZ"     ,Form("%s: Chi2TZ/NDof"   ,Folder),  100,    0,    20,Folder);
+  HBook1F(hist->fSimpPDG1   ,"PDG"        ,Form("%s: PDG"     ,Folder), 500,    -500,  500,Folder);
+  HBook1F(hist->fDp         ,"deltaP"     ,Form("%s: Delta P (Reconstructed - MC)"     ,Folder), 500,    -500,  500,Folder);
+  HBook1F(hist->fDpt        ,"deltaPt"    ,Form("%s: Delta Pt (Reconstructed - MC)"     ,Folder), 500,    -500,  500,Folder);
+  HBook1F(hist->fTZSlope    ,"tzSlope"    ,Form("%s: TZ slope"      ,Folder), 2000,    -1,  1,Folder);
+  HBook1F(hist->fTZSlopeSig ,"tzSlopeSig" ,Form("%s: TZ slope significance",Folder), 200,    0,  20,Folder);
+  HBook1F(hist->fHitRatio   ,"hitRatio"   ,Form("%s: Hit ratio"     ,Folder), 100,    0,  2,Folder);
 }
 
 //-----------------------------------------------------------------------------
@@ -75,10 +93,17 @@ void TTriggerAnaModule::BookTrackSeedHistograms(HistBase_t* Hist, const char* Fo
   //  char title[200];
   TrackSeedHist_t* hist = (TrackSeedHist_t*) Hist;
 
-  HBook1F(hist->fP      ,"p"    ,Form("%s: mom"    ,Folder), 1100,    0,  110,Folder);
+  HBook1F(hist->fP      ,"p"    ,Form("%s: mom"    ,Folder), 500,    0,  500,Folder);
   HBook1F(hist->fNHits  ,"nhits",Form("%s: N(hits)",Folder),  200,    0,  200,Folder);
   HBook1F(hist->fChi2Dof,"chi2d",Form("%s: Chi2/DOF" ,Folder),  200,    0,   40,Folder);
-  HBook1F(hist->fD0     ,"d0"   ,Form("%s: D0"       ,Folder),  200, -200,  200,Folder);
+  HBook1F(hist->fD0     ,"d0"   ,Form("%s: D0"       ,Folder),  1000, -1000,  1000,Folder);
+  HBook1F(hist->fPt     ,"pt"   ,Form("%s: trans mom"       ,Folder),  500, 0,  500,Folder);
+  HBook1F(hist->fT0     ,"T0"   ,Form("%s: T0"       ,Folder),  1000, 0,  2000,Folder);
+  HBook1F(hist->fZ0     ,"Z0"   ,Form("%s: Z0"       ,Folder),  3000, -3000,  3000,Folder);
+  HBook1F(hist->fNLoops ,"NLoops"   ,Form("%s: NLoops"       ,Folder),  25, 0,  50,Folder);
+  HBook1F(hist->fSimpPDG1    ,"PDG"   ,Form("%s: PDG"       ,Folder),  500, -500,  500,Folder);
+  HBook1F(hist->fDp     ,"delta p"   ,Form("%s: Delta P (Reconstructed - MC)"       ,Folder),  500, -500,  500,Folder);
+  HBook1F(hist->fDpt     ,"delta pt"   ,Form("%s: Delta Pt (Reconstructed - MC)"       ,Folder),  500, -500,  500,Folder);
 }
 
 //-----------------------------------------------------------------------------
@@ -124,6 +149,20 @@ void TTriggerAnaModule::BookEventHistograms(stntuple::HistBase_t* Hist, const ch
   HBook1F(hist->fNTracks    ,"ntrk"  ,Form("%s: N(tracks)"     ,Folder),   10, 0,    10,Folder);
   HBook1F(hist->fMcMom     ,"mc_mom"   ,Form("%s: MC Particle Momentum"            ,Folder),1000,  0,200,Folder);
   HBook1F(hist->fMcCosTh   ,"mc_costh" ,Form("%s: MC Particle Cos(Theta) Lab"      ,Folder),100,-1,1,Folder);
+  HBook1F(hist->fDtHelix        ,"hDeltaT0"       ,Form("%s: Helix Delta T0"                         ,Folder),500,-500,500,Folder);
+  HBook1F(hist->fDpHelix        ,"hDeltaP"       ,Form("%s: Helix Delta P"                         ,Folder), 500, -500, 500, Folder);
+  HBook1F(hist->fDptHelix       ,"hDeltaPt"      ,Form("%s: Helix Delta Pt"                        ,Folder), 500, -500, 500, Folder);
+  HBook1F(hist->fDradiusHelix   ,"hDeltaRadius"  ,Form("%s: Helix Delta Radius"                    ,Folder), 500, -500, 500, Folder);
+  HBook1F(hist->fDd0Helix       ,"hDeltaD0"      ,Form("%s: Helix Delta abs(D0)"                    ,Folder),1000,-1000,1000, Folder);
+  HBook1F(hist->fDrcenterHelix  ,"hDeltaRcenter"   ,Form("%s: Helix Delta Rcenter"                 ,Folder),1000,-1000,1000, Folder);
+  HBook1F(hist->fDtTrack        ,"tDeltaT0"       ,Form("%s: Track Delta T0"                         ,Folder),500,-500,500,Folder);
+  HBook1F(hist->fDpTrack        ,"tDeltaP"       ,Form("%s: Track Delta P"                         ,Folder),500,-500,500,Folder);
+  HBook1F(hist->fDptTrack        ,"tDeltaPt"       ,Form("%s: Track Delta Pt"                         ,Folder),500,-500,500,Folder);
+  HBook1F(hist->fDz0Track        ,"tDeltaZ0"       ,Form("%s: Track Delta Z0"                         ,Folder),300,-3000,3000,Folder);
+  HBook1F(hist->fDd0Track        ,"tDeltaD0"       ,Form("%s: Track Delta abs(D0)"                         ,Folder),1000,-1000,1000,Folder);
+  HBook1F(hist->fHelixPEff        ,"hPEff"       ,Form("%s: Helix P Efficiency"                         ,Folder),10,0,10,Folder);
+  //HBook1F(hist->fHelixDeltaTEff   ,"hDeltaTEff"       ,Form("%s: Helix Delta T0 Efficiency"                         ,Folder),10,0,10,Folder);
+  //HBook1F(hist->fHelixPEff        ,"hD0Eff"       ,Form("%s: Helix Delta D0 Efficiency"                         ,Folder),10,0,10,Folder);
 }
 
 //_____________________________________________________________________________
@@ -147,7 +186,6 @@ void TTriggerAnaModule::BookHistograms() {
   book_event_histset[ 0] = 1;		// all events
   book_event_histset[ 1] = 1;		// events with N(seeds) > 0
   book_event_histset[ 2] = 1;		// events with N(good seeds) > 0
-
   book_event_histset[11] = 1;		// events with N(good seeds) > 0, DIO-weighted
 
   for (int i=0; i<kNEventHistSets; i++) {
@@ -160,12 +198,13 @@ void TTriggerAnaModule::BookHistograms() {
     }
   }
 //-----------------------------------------------------------------------------
-// book track seed histograms
+// book time cluster histograms
 //-----------------------------------------------------------------------------
   int book_tpeak_histset[kNTimeClusterHistSets];
   for (int i=0; i<kNTimeClusterHistSets; i++) book_tpeak_histset[i] = 0;
 
   book_tpeak_histset[ 0] = 1;		// all time clusters
+  book_tpeak_histset[ 1] = 1;		// nhits>20
 
   for (int i=0; i<kNTimeClusterHistSets; i++) {
     if (book_tpeak_histset[i] != 0) {
@@ -174,6 +213,29 @@ void TTriggerAnaModule::BookHistograms() {
       if (! fol) fol = hist_folder->AddFolder(folder_name,folder_name);
       fHist.fTimeCluster[i] = new TimeClusterHist_t;
       BookTimeClusterHistograms(fHist.fTimeCluster[i],Form("Hist/%s",folder_name));
+    }
+  }
+//-----------------------------------------------------------------------------
+// book helix histograms
+//-----------------------------------------------------------------------------
+  int book_helix_histset[kNHelixHistSets];
+  for (int i=0; i<kNHelixHistSets; i++) book_helix_histset[i] = 0;
+
+  book_helix_histset[ 0] = 1;		// all helices
+  book_helix_histset[ 1] = 1;           //helix with a twin helix within deltaT plus/minus 10 ns
+  book_helix_histset[ 2] = 1;           //helix with a twin helix with deltaT > 40 ns
+  book_helix_histset[ 3] = 1;           //helix with a twin helix with deltaT > 100ns
+  book_helix_histset[ 4] = 1;           //helix with bad Chi2XY
+  book_helix_histset[ 5] = 1;           //helix with bad Chi2PhiZ
+  book_helix_histset[ 6] = 1;           //helix with p>=80 MeV/c
+
+  for (int i=0; i<kNHelixHistSets; i++) {
+    if (book_helix_histset[i] != 0) {
+      sprintf(folder_name,"helix_%i",i);
+      fol = (TFolder*) hist_folder->FindObject(folder_name);
+      if (! fol) fol = hist_folder->AddFolder(folder_name,folder_name);
+      fHist.fHelix[i] = new HelixHist_t;
+      BookHelixHistograms(fHist.fHelix[i],Form("Hist/%s",folder_name));
     }
   }
 //-----------------------------------------------------------------------------
@@ -247,7 +309,6 @@ void TTriggerAnaModule::FillEventHistograms(HistBase_t* Hist, double Weight) {
 //   TLorentzVector    mom;
 
   EventHist_t* hist = (EventHist_t*) Hist;
-
   int event_number = GetHeaderBlock()->EventNumber();
   int run_number   = GetHeaderBlock()->RunNumber();
 
@@ -262,11 +323,150 @@ void TTriggerAnaModule::FillEventHistograms(HistBase_t* Hist, double Weight) {
   hist->fNTracks->Fill(fNTracks,Weight);
   hist->fMcMom->Fill(fMcMom,Weight);
   hist->fMcCosTh->Fill(fMcCosTh,Weight);
+
+  // Loop over number of helices of multihelix events
+  for (int i=0; i<fNHelices-1; i++) {
+    TStnHelix* helix = fHelixBlock->Helix(i);
+    
+    for (int j = i+1; j<fNHelices; j++){
+      TStnHelix* helixN = fHelixBlock->Helix(j);
+      
+      // Calculate differences between each pair of helices
+      float hDeltaT = std::abs(helixN->fT0 - helix->fT0);
+      float deltaP = helixN->P() - helix->P();
+      float deltaPt = helixN->Pt() - helix->Pt();
+      float deltaRadius = helixN->fRadius - helix->fRadius;
+      float deltaD0 = std::abs(helixN->fD0) - std::abs(helix->fD0);
+      float deltaRCenter = helixN->fRCent - helix->fRCent;
+      
+      // Fill event histograms
+      hist->fDtHelix->Fill(hDeltaT,Weight);
+      hist->fDpHelix->Fill(deltaP,Weight);
+      hist->fDptHelix->Fill(deltaPt,Weight);
+      hist->fDradiusHelix->Fill(deltaRadius,Weight);
+      hist->fDd0Helix->Fill(deltaD0,Weight);
+      hist->fDrcenterHelix->Fill(deltaRCenter,Weight);
+
+      // Saves index of helices with deltaT0 less than 10 ns
+      if (hDeltaT < 10.){
+	fHelixIndexGood.push_back(i);
+	fHelixIndexGood.push_back(j);
+      }
+
+      // Saves index of helices with deltaT0 less than 100 ns 
+      else if (hDeltaT < 100.){
+	fHelixIndexBad.push_back(i);
+	fHelixIndexBad.push_back(j);
+      }
+
+      // Saves index of helices with deltaT0 greater than 100 ns
+      else {
+	fHelixIndexTail.push_back(i);
+	fHelixIndexTail.push_back(j);
+      }
+
+      // Flags on DeltaT0
+      /* if (GetDebugBit(4) == 1) {
+	if (deltaT >= 500) {
+	  GetHeaderBlock()->Print(Form("deltaT = %10.3f", deltaT));
+	}
+      }
+      if (GetDebugBit(5) == 1) {
+	if (deltaT < 10) {
+	  GetHeaderBlock()->Print(Form("deltaT = %10.3f", deltaT));
+	}
+      }
+       if (GetDebugBit(6) == 1) {
+	 if ((deltaT > 10) && (deltaT < 100)) {
+	  GetHeaderBlock()->Print(Form("deltaT = %10.3f", deltaT));
+	}
+	}*/
+    }
+  }
+
+  // Loop of number of track seeds for multitrack events
+  for (int i=0; i<fNTrackSeeds[0]-1; i++) {
+    TStnTrackSeed* seed = fTrackSeedBlock->TrackSeed(i);
+    
+    for (int j = i+1; j<fNTrackSeeds[0]; j++){
+      TStnTrackSeed* seedN = fTrackSeedBlock->TrackSeed(j);
+
+      // Compute differences between pairs of track seeds
+      float tDeltaT = std::abs(seed->fT0 - seedN->fT0);
+      float tDeltaP = seed->fP - seedN->fP;
+      float tDeltaPt = seed->fPt - seedN->fPt;
+      float tDeltaZ0 = seed->fZ0 - seedN->fZ0;
+      float tDeltaD0 = std::abs(seed->fD0) - std::abs(seedN->fD0);
+
+      // Fill event histograms
+      hist->fDtTrack->Fill(tDeltaT,Weight);
+      hist->fDpTrack->Fill(tDeltaP,Weight);
+      hist->fDptTrack->Fill(tDeltaPt,Weight);
+      hist->fDz0Track->Fill(tDeltaZ0,Weight);
+      hist->fDd0Track->Fill(tDeltaD0,Weight);
+    }
+  }
+
+  // Fill helix moment efficiency plot
+  int passed = fTriggerBlock->PathPassed(1);
+  if (passed){//this requires the events to have 2 MC particles in the tracker with N-hits>15 and P>60 MeV/c
+    std::array<int,4> helixMomCut={80, 85, 90, 95};
+    //std::array<int,3> helixDeltaTCut={100, 90, 80};
+    //std::array<int,3> helixD0Cut={600, 500, 400};
+    for (int i = 0; i<fNHelices; i++){
+      TStnHelix* helix = fHelixBlock->Helix(i);
+      hist->fHelixPEff->Fill(0);
+      for (int j = 0; j < 4; j++){
+        if (helix->P() > helixMomCut[j]) hist->fHelixPEff->Fill(j+1);
+      } 
+    }
+  }
+  
+  // Fill helix DeltaT and DeltaD0 plots
+  /*for (int i = 0; i<fNHelices-1; i++){
+    TStnHelix* helix = fHelixBlock->Helix(i);
+    for (int j = i+1; j<fNHelices; j++){
+      TStnHelix* helixN = fHelixBlock->Helix(j);
+      float DeltaT = std::abs(helix->fT0 - helixN->fT0);
+      float DeltaD0 = std::abs(helix->fD0) - std::abs(helixN->fD0);
+      hist->fHelixDeltaTEff->Fill(0);
+      hist->fHelixD0Eff->Fill(0);
+      for (int k = 0; k<3; k++){
+	if (DeltaT < helixDeltaTCut[k]) hist->fHelixDeltaTEff->Fill(k+1);
+	if (DeltaD0 < helixD0Cut[k]) hist->fHelixD0Eff->Fill(k+1);
+      }
+    }
+    }*/
 }
 
 //-----------------------------------------------------------------------------
-void TTriggerAnaModule::FillHelixHistograms(HistBase_t* Hist, TStnHelix* TPeak) {
-  //  HelixHist_t* hist = (HelixHist_t*) Hist;
+void TTriggerAnaModule::FillHelixHistograms(HistBase_t* Hist, TStnHelix* Helix) {
+  HelixHist_t* hist = (HelixHist_t*) Hist;
+
+  hist->fNHits->Fill(Helix->fNHits);
+  hist->fNComboHits->Fill(Helix->fNComboHits);
+  hist->fLambda ->Fill(Helix->fLambda);
+  hist->fD0->Fill(Helix->fD0);
+  hist->fNLoops->Fill(std::abs(Helix->fNLoops));
+  hist->fP->Fill(Helix->P());
+  hist->fPt->Fill(Helix->Pt());
+  hist->fT0->Fill(Helix->fT0);
+  hist->fTZSlope->Fill(Helix->TZSlope());
+  hist->fTZSlopeSig->Fill(Helix->TZSlopeSig());
+  hist->fHitRatio->Fill(Helix->HitRatio());
+
+  //Chi2s
+  hist->fChi2XYNDof->Fill(Helix->fChi2XYNDof);
+  hist->fChi2PhiZNDof->Fill(Helix->fChi2PhiZNDof);
+  hist->fChi2TZNDof->Fill(Helix->fChi2TZNDof);
+
+  //MC info
+  hist->fSimpPDG1->Fill(Helix->fSimpPDG1);
+  float deltaP = Helix->P() - Helix->Mom1().P();
+  hist->fDp->Fill(deltaP);
+  float deltaPt = Helix->Pt() - Helix->Mom1().Pt();
+  hist->fDpt->Fill(deltaPt);  
+  
 }
 
 //-----------------------------------------------------------------------------
@@ -290,6 +490,15 @@ void TTriggerAnaModule::FillTrackSeedHistograms(HistBase_t* Hist, TStnTrackSeed*
   hist->fNHits->Fill(Seed->fNHits,Weight);
   hist->fChi2Dof->Fill(Seed->fChi2/(Seed->fNHits-5.),Weight);
   hist->fD0->Fill(Seed->fD0,Weight);
+  hist->fPt->Fill(Seed->fPt,Weight);
+  hist->fT0->Fill(Seed->fT0,Weight);
+  hist->fZ0->Fill(Seed->fZ0,Weight);
+  hist->fNLoops->Fill(std::abs(Seed->fNLoops),Weight);
+  hist->fSimpPDG1->Fill(Seed->fSimpPDG1,Weight);
+  float deltaP = Seed->fP - Seed->Mom1().P();
+  hist->fDp->Fill(deltaP,Weight);
+  float deltaPt = Seed->fPt - Seed->Mom1().Pt();
+  hist->fDpt->Fill(deltaPt,Weight);
 }
 
 //-----------------------------------------------------------------------------
@@ -344,6 +553,23 @@ void TTriggerAnaModule::FillHistograms() {
   for (int i=0; i<fNTimeClusters; i++) {
     TStnTimeCluster* tpeak = fTimeClusterBlock->TimeCluster(i);
     FillTimeClusterHistograms(fHist.fTimeCluster[0],tpeak);
+    if (tpeak->NHits() > 20) {
+      FillTimeClusterHistograms(fHist.fTimeCluster[1],tpeak);
+    }
+  }
+//-----------------------------------------------------------------------------
+// helix histograms
+//-----------------------------------------------------------------------------
+  for (int i=0; i<fNHelices; i++) {
+    TStnHelix* helix = fHelixBlock->Helix(i);
+    FillHelixHistograms(fHist.fHelix[0],helix);
+    if (helix->fChi2XYNDof > 5.)
+      FillHelixHistograms(fHist.fHelix[4],helix);
+    if (helix->fChi2PhiZNDof > 5.)
+      FillHelixHistograms(fHist.fHelix[5],helix);
+    if (helix->P()>=80.)
+      FillHelixHistograms(fHist.fHelix[6],helix);
+    
   }
 //-----------------------------------------------------------------------------
 // track seed histograms
@@ -396,10 +622,30 @@ void TTriggerAnaModule::FillHistograms() {
 //
 // EVT_0: all events
 //-----------------------------------------------------------------------------
+//Clear the content of fHelixIndexGood/Bad/Tail
+  fHelixIndexGood.clear();
+  fHelixIndexBad.clear();
+  fHelixIndexTail.clear();
+
   FillEventHistograms(fHist.fEvent[0]);
+
+  for (size_t i=0; i<fHelixIndexGood.size(); i++) {
+    TStnHelix* helix = fHelixBlock->Helix(fHelixIndexGood[i]);
+    FillHelixHistograms(fHist.fHelix[1],helix);
+  }
+
+  for (size_t i=0; i<fHelixIndexBad.size(); i++) {
+    TStnHelix* helix = fHelixBlock->Helix(fHelixIndexBad[i]);
+    FillHelixHistograms(fHist.fHelix[2],helix);
+  }
+
+  for (size_t i=0; i<fHelixIndexTail.size(); i++) {
+    TStnHelix* helix = fHelixBlock->Helix(fHelixIndexTail[i]);
+    FillHelixHistograms(fHist.fHelix[3],helix);
+  }
+  
   if (fNTrackSeeds[0] > 0) FillEventHistograms(fHist.fEvent[1]);
   if (fNGoodSeeds     > 0) FillEventHistograms(fHist.fEvent[2]);
-
   if (fNTrackSeeds[0] > 0) FillEventHistograms(fHist.fEvent[11],fWeight);
 //-----------------------------------------------------------------------------
 // trigger histograms
@@ -417,11 +663,11 @@ int TTriggerAnaModule::BeginJob() {
 // register data blocks
 //-----------------------------------------------------------------------------
   RegisterDataBlock("GenpBlock"       , "TGenpBlock"          , &fGenpBlock       );
-  RegisterDataBlock("TimeClusterBlock", "TStnTimeClusterBlock", &fTimeClusterBlock);
-  RegisterDataBlock("HelixBlock"      , "TStnHelixBlock"      , &fHelixBlock      );
-  RegisterDataBlock("TrackBlock"      , "TStnTrackBlock"      , &fTrackBlock      );
-  RegisterDataBlock("TrackSeedBlock"  , "TStnTrackSeedBlock"  , &fTrackSeedBlock  );
-  RegisterDataBlock("ClusterBlock"    , "TStnClusterBlock"    , &fClusterBlock    );
+  RegisterDataBlock("TimeClusterBlockDemTpr", "TStnTimeClusterBlock", &fTimeClusterBlock);
+  RegisterDataBlock("HelixBlockDemTpr"      , "TStnHelixBlock"      , &fHelixBlock      );
+  //RegisterDataBlock("TrackBlock"      , "TStnTrackBlock"      , &fTrackBlock      );
+  RegisterDataBlock("TrackSeedBlockDemTpr"  , "TStnTrackSeedBlock"  , &fTrackSeedBlock  );
+  //RegisterDataBlock("ClusterBlock"    , "TStnClusterBlock"    , &fClusterBlock    );
   RegisterDataBlock("TriggerBlock"    , "TStnTriggerBlock"    , &fTriggerBlock    );
 //-----------------------------------------------------------------------------
 // book histograms
@@ -457,9 +703,9 @@ int TTriggerAnaModule::Event(int ientry) {
   fGenpBlock->GetEntry(ientry);
   fTimeClusterBlock->GetEntry(ientry);
   fHelixBlock->GetEntry(ientry);
-  fTrackBlock->GetEntry(ientry);
+  //fTrackBlock->GetEntry(ientry);
   fTrackSeedBlock->GetEntry(ientry);
-  fClusterBlock->GetEntry(ientry);
+  //fClusterBlock->GetEntry(ientry);
   fTriggerBlock->GetEntry(ientry);
 //-----------------------------------------------------------------------------
 // MC generator info
@@ -508,7 +754,7 @@ int TTriggerAnaModule::Event(int ientry) {
   fPassed        = 0;
   fNTimeClusters = fTimeClusterBlock->NTimeClusters(); // all
   fNHelices      = fHelixBlock->NHelices(); // all
-  fNTracks       = fTrackBlock->NTracks();
+  fNTracks       = 0; //fTrackBlock->NTracks();
   fNGoodSeeds    = 0;
 
   fNTrackSeeds[0] = fTrackSeedBlock->NTrackSeeds(); // all

@@ -39,6 +39,22 @@ public:
 
   struct HelixHist_t : public stntuple::HistBase_t {
     TH1F* fNHits;
+    TH1F* fNComboHits; 
+    TH1F* fLambda;
+    TH1F* fD0;
+    TH1F* fNLoops;
+    TH1F* fP;
+    TH1F* fPt;
+    TH1F* fT0;
+    TH1F* fChi2XYNDof;
+    TH1F* fChi2PhiZNDof;
+    TH1F* fChi2TZNDof;
+    TH1F* fSimpPDG1;
+    TH1F* fDp;
+    TH1F* fDpt;
+    TH1F* fTZSlope;
+    TH1F* fTZSlopeSig;
+    TH1F* fHitRatio;
   };
 
   struct TrackSeedHist_t : public stntuple::HistBase_t {
@@ -46,6 +62,13 @@ public:
     TH1F* fNHits;
     TH1F* fChi2Dof;
     TH1F* fD0;
+    TH1F* fPt;
+    TH1F* fT0;
+    TH1F* fZ0;
+    TH1F* fNLoops;
+    TH1F* fSimpPDG1;
+    TH1F* fDp;
+    TH1F* fDpt;
   };
 
   struct TrackHist_t : public stntuple::HistBase_t {
@@ -76,6 +99,20 @@ public:
     TH1F* fMcMom      ;
     TH1F* fMcCosTh    ;
     TH1F* fTriggerBits;
+    TH1F* fDtHelix;
+    TH1F* fDpHelix;
+    TH1F* fDptHelix;
+    TH1F* fDradiusHelix;
+    TH1F* fDd0Helix;
+    TH1F* fDrcenterHelix;
+    TH1F* fDtTrack;
+    TH1F* fDpTrack;
+    TH1F* fDptTrack;
+    TH1F* fDz0Track;
+    TH1F* fDd0Track;
+    TH1F* fHelixPEff;
+    TH1F* fHelixDeltaTEff;
+    TH1F* fHelixD0Eff;
   };
 
 //-----------------------------------------------------------------------------
@@ -127,6 +164,10 @@ public:
   double                   fMcMom;
   double                   fMcCosTh;
   double                   fWeight;
+
+  std::vector<int>         fHelixIndexGood;
+  std::vector<int>         fHelixIndexBad;
+  std::vector<int>         fHelixIndexTail;
 //-----------------------------------------------------------------------------
 //  functions
 //-----------------------------------------------------------------------------

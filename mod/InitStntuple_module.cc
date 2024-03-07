@@ -167,19 +167,38 @@ int InitStntuple::InitTriggerTable(int RunNumber) {
 // just an example
 //-----------------------------------------------------------------------------
     trigger_table->AddTrigger(new TStnTrigger(   0,   0,"MixPath"                          ,1));
-    trigger_table->AddTrigger(new TStnTrigger( 100, 100,"tprDeM_highP_stopTarg_trigger"    ,1));
-    trigger_table->AddTrigger(new TStnTrigger( 101, 101,"tprDeP_highP_stopTarg_trigger"    ,1));
-    trigger_table->AddTrigger(new TStnTrigger( 110, 110,"tprDeM_lowP_stopTarg_trigger"     ,1));
-    trigger_table->AddTrigger(new TStnTrigger( 111, 111,"tprDeP_lowP_stopTarg_trigger"     ,1));
-    trigger_table->AddTrigger(new TStnTrigger( 120, 120,"tprHelixDeM_ipa_trigger"          ,1));
-    trigger_table->AddTrigger(new TStnTrigger( 121, 121,"tprHelixDeM_ipa_phiScaled_trigger",1));
-    
-    trigger_table->AddTrigger(new TStnTrigger( 150, 150,"cprDeM_highP_stopTarg_trigger"    ,1));
-    trigger_table->AddTrigger(new TStnTrigger( 151, 151,"cprDeP_highP_stopTarg_trigger"    ,1));
-    trigger_table->AddTrigger(new TStnTrigger( 160, 160,"cprDeM_lowP_stopTarg_trigger"     ,1));
-    trigger_table->AddTrigger(new TStnTrigger( 161, 161,"cprDeP_lowP_stopTarg_trigger"     ,1));
+    trigger_table->AddTrigger(new TStnTrigger(   1,   1,"p1"                               ,1));
 
-    trigger_table->AddTrigger(new TStnTrigger( 220, 220,"caloFast_rmc_trigger"             ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 100, 100,"tprDeM_highP_stopTarg"       ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 101, 101,"tprDeP_highP_stopTarg"       ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 110, 110,"tprDeM_lowP_stopTarg"        ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 111, 111,"tprDeP_lowP_stopTarg"        ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 120, 120,"tprHelixDeM_ipa"             ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 121, 121,"tprHelixDeM_ipa_phiScaled"   ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 130, 130,"tprHelixDeM"                 ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 131, 131,"tprHelixDeP"                 ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 132, 132,"tprHelixUeM"                 ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 133, 133,"tprHelixUeP"                 ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 150, 150,"cprDeM_highP_stopTarg"       ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 151, 151,"cprDeP_highP_stopTarg"       ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 160, 160,"cprDeM_lowP_stopTarg"        ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 161, 161,"cprDeP_lowP_stopTarg"        ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 170, 170,"cprHelixDeM"                 ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 171, 171,"cprHelixDeP"                 ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 172, 172,"cprHelixUeM"                 ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 173, 173,"cprHelixUeP"                 ,1));
+
+    trigger_table->AddTrigger(new TStnTrigger( 200, 200,"caloFast_photon"             ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 201, 201,"caloFast_MVANNCE"            ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 202, 202,"caloFast_cosmic"             ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 220, 220,"caloFast_RMC"                ,1));
+
+    trigger_table->AddTrigger(new TStnTrigger( 300, 300,"cst"                         ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 310, 310,"cstTimeCluster"              ,1));
+
+    trigger_table->AddTrigger(new TStnTrigger( 400, 400,"minBias_SDCount"             ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 410, 410,"minBias_CDCount"             ,1));
+
   }
   else {
     printf("ERROR: Run Number = %8i, no trigger table defined\n",RunNumber);
