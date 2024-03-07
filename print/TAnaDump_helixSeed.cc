@@ -314,7 +314,7 @@ void TAnaDump::printHelixSeedCollection(const char* HelixSeedCollTag,
   if (PrintHits > 0) strcat(popt,"+hits");
 
   art::InputTag sdmc_coll_tag = StrawDigiMCCollTag;
-  if (sdmc_coll_tag == nullptr) sdmc_coll_tag = fSdmcCollTag;
+  if (sdmc_coll_tag == "") sdmc_coll_tag = fSdmcCollTag;
 
   for (int i=0; i<nhelices; i++) {
     helix = &list_of_helixSeeds->at(i);

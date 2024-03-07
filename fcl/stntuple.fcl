@@ -58,10 +58,10 @@ END_PROLOG
 # trigger prologs
 #------------------------------------------------------------------------------
 ##  #include "Offline/Trigger/fcl/prolog_trigger.fcl"
-#include "mu2e_trig_config/core/trigProducers.fcl"
-#include "mu2e_trig_config/core/trigFilters.fcl"
-#include "mu2e_trig_config/core/trigMCProductionSequences.fcl"
-#include "mu2e_trig_config/core/trigSequences.fcl"
+# #include "mu2e_trig_config/core/trigProducers.fcl"
+# #include "mu2e_trig_config/core/trigFilters.fcl"
+# #include "mu2e_trig_config/core/trigMCProductionSequences.fcl"
+# #include "mu2e_trig_config/core/trigSequences.fcl"
 
 #include "Stntuple/fcl/prolog.fcl"
 #include "pbar2m/fcl/prolog.fcl"

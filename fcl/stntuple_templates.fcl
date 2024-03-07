@@ -46,4 +46,8 @@ Stntuple.paths : {
 	   @sequence::TrackerMC.DigiSim,         # makeSD
 	   @sequence::Digitize.DigitizeSequence  # PBISim, DigiSim, compressDigiMCs
           ]
+#------------------------------------------------------------------------------
+    p3  : [ @sequence::Stntuple.stnmaker_trig ]
+#------------------------------------------------------------------------------
+
 }
