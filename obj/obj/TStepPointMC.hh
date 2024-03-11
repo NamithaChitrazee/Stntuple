@@ -65,7 +65,8 @@ public:
   float  EDepNio       () const { return fEDepNio;       }
   float  Time          () const { return fTime;          }
   float  ProperTime    () const { return fProperTime;    }
-  float  StepLength    () const { return fStepLength;    }
+  float  SurvivalProb  () const { return exp(-fProperTime); }
+  float  StepLength    () const { return fStepLength;       }
 
   const TVector3*  Pos       () const { return &fPos; }
   const TVector3*  Mom       () const { return &fMom; }
