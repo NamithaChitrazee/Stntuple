@@ -127,9 +127,18 @@ void TTriggerAnaModule::BookTriggerHistograms(HistBase_t* Hist, const char* Fold
   //  char name [200];
   //  char title[200];
   TriggerHist_t* hist = (TriggerHist_t*) Hist;
-
+  float  npot[43] = {0,2333333.333,3333333.333,4000000.000,4666666.667,5333333.333,6000000.000,6666666.667,7333333.333,8000000.000,8666666.667,9333333.333,10000000.000,10666666.667,
+  11333333.333,12000000.000,12666666.667,13333333.333,14000000.000,14666666.667,15333333.333,16000000.000,16666666.667,17666666.667,18666666.667,19666666.667,
+                     20666666.667,21666666.667,22666666.667,23666666.667,25000000.000,26333333.333,27666666.667,29333333.333,31000000.000,33000000.000,35333333.333,38000000.000,41333333.333,45666666.667,52000000.000,63000000.000, 1e8};
   HBook1F(hist->fBits        ,"bits"    ,Form("%s: fired trigger bits" ,Folder), 300,    0,  300,Folder);
   HBook1F(hist->fNPassedPaths,"npassed" ,Form("%s: N(passed paths)"    ,Folder), 100,    0,  100,Folder);
+  HBook1F(hist->fInstLum,"instLum",Form("%s: nPOT/#mu bunch"  ,Folder), 42, npot,Folder);
+  
+  TString trigNames[5] = {"tprDeMHighPStopTarg", "tprDePHighPStopTarg", "cprDeMHighPStopTarg", "cprDePHighPStopTarg", "allHighPStopTarg"}; 
+
+  for (int i=0; i<5; i++){
+    HBook1F(hist->fNPassedPathInstLum[i],Form("nPathLumi%d",i),Form("%s: nPOT/#mu bunch %s"  ,Folder, trigNames[i].Data()), 42, npot,Folder);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -138,6 +147,11 @@ void TTriggerAnaModule::BookEventHistograms(stntuple::HistBase_t* Hist, const ch
   //  char title[200];
   EventHist_t* hist = (EventHist_t*) Hist;
 
+  float  npot[43] = {0,2333333.333,3333333.333,4000000.000,4666666.667,5333333.333,6000000.000,6666666.667,7333333.333,8000000.000,8666666.667,9333333.333,10000000.000,10666666.667,
+  11333333.333,12000000.000,12666666.667,13333333.333,14000000.000,14666666.667,15333333.333,16000000.000,16666666.667,17666666.667,18666666.667,19666666.667,
+                     20666666.667,21666666.667,22666666.667,23666666.667,25000000.000,26333333.333,27666666.667,29333333.333,31000000.000,33000000.000,35333333.333,38000000.000,41333333.333,45666666.667,52000000.000,63000000.000, 1e8};;
+  HBook1F(hist->fInstLum[0],"instLum0",Form("%s: nPOT/#mu bunch"  ,Folder), 300, 0,  1.e8,Folder);
+  HBook1F(hist->fInstLum[1],"instLum1",Form("%s: nPOT/#mu bunch"  ,Folder), 42, npot,Folder);
   HBook1F(hist->fEventNumber,"evtnum",Form("%s: Event Number"  ,Folder), 1000, 0,  1.e4,Folder);
   HBook1F(hist->fRunNumber  ,"runnum",Form("%s: Run   Number"  ,Folder), 1000, 0,  1.e6,Folder);
   HBook1F(hist->fPassed     ,"passed",Form("%s: event passed"  ,Folder),   10, 0,    10,Folder);
@@ -312,6 +326,8 @@ void TTriggerAnaModule::FillEventHistograms(HistBase_t* Hist, double Weight) {
   int event_number = GetHeaderBlock()->EventNumber();
   int run_number   = GetHeaderBlock()->RunNumber();
 
+  hist->fInstLum[0]->Fill(GetHeaderBlock()->InstLum());
+  hist->fInstLum[1]->Fill(GetHeaderBlock()->InstLum());
   hist->fEventNumber->Fill(event_number,Weight);
   hist->fRunNumber->Fill(run_number,Weight);
   hist->fPassed->Fill(fPassed,Weight);
@@ -540,6 +556,18 @@ void TTriggerAnaModule::FillTriggerHistograms(HistBase_t* Hist) {
 
   int n_passed_paths = fTriggerBlock->NPassedPaths();
   hist->fNPassedPaths->Fill(n_passed_paths);
+
+  hist->fInstLum->Fill(GetHeaderBlock()->InstLum());
+  int  trgiBitsHitghPStopTarg[4] = {100, 101, 150, 151};
+  bool passedHighPStopTarg(false);
+  for (int i=0; i<4; ++i){
+    if (fTriggerBlock->PathPassed(trgiBitsHitghPStopTarg[i])){
+      hist->fNPassedPathInstLum[i]->Fill(GetHeaderBlock()->InstLum());
+      passedHighPStopTarg = true;
+    }
+  }
+  if (passedHighPStopTarg) hist->fNPassedPathInstLum[4]->Fill(GetHeaderBlock()->InstLum());
+  //  InstLum
 }
 
 //_____________________________________________________________________________

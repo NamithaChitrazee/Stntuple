@@ -85,9 +85,12 @@ public:
   struct TriggerHist_t : public stntuple::HistBase_t {
     TH1F* fBits;
     TH1F* fNPassedPaths;
+    TH1F* fInstLum;
+    TH1F* fNPassedPathInstLum[5];
   };
 
   struct EventHist_t : public stntuple::HistBase_t {
+    TH1F* fInstLum[2];
     TH1F* fRunNumber;
     TH1F* fEventNumber;
     TH1F* fNTimeClusters;
