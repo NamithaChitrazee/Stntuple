@@ -46,7 +46,7 @@ int StntupleInitTriggerBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Even
     TStnDBManager*    dbm  = TStnDBManager::Instance();
     TStnTriggerTable* ttbl = (TStnTriggerTable*) dbm->GetTable("TriggerTable");
 
-    TObjArray list(200);
+    TObjArray list(500);
 
     block->fNPaths = trn.getTrigPaths().size();
     // block->fPaths.Init(nbits);
