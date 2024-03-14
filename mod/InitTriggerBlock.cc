@@ -62,16 +62,16 @@ int StntupleInitTriggerBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Even
 
 	ttbl->GetListOfTriggers(name.data(),&list);
 	int nt = list.GetEntriesFast();
-	if (nt == 1) {
-	  TStnTrigger* tr = (TStnTrigger*) list.At(0);
-	  int bit = tr->Bit();
-	  block->fPaths.SetBit(bit);
-	}
-	else if (nt == 0) {
+        for (int k=0; k<nt; k++){
+          TStnTrigger* tr = (TStnTrigger*) list.At(k);
+          if (tr->Name().Data() == name){
+            int bit = tr->Bit();
+            block->fPaths.SetBit(bit);
+            break;
+          }
+        }
+	if (nt == 0) {
 	  printf("%s ERROR: path %s is not in the trigger table for this run. The bit is NOT SET\n",oname,name.data());
-	}
-	else {
-	  printf("%s ERROR: path %s defined more than once. The bit is NOT SET\n",oname,name.data());
 	}
       }
     }

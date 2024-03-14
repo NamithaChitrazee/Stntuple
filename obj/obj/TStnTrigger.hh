@@ -34,6 +34,7 @@ public:
   Int_t           Id   () const { return fId;    }
   Int_t           Tag  () const { return fTag;   }
   const TString&  Name () const { return *((const TString*) &fName);  }
+  //TString         Name () const { return fName;  }
 
   // ****** modifiers
 
