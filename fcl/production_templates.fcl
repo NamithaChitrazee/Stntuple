@@ -508,8 +508,26 @@ production.paths : {
             CalHelixFinderDe
             , MHDeM , MHDeP                         # 1st step: RobustHelixFinder(M/P)+CalHelixFinder(M/P)
             , MHFinderDe                            # 2nd step: MHDeM + MHDeP
-            , KSFDe                                 # Seed fit (chisquared, no drift)
-            , KFFDe                                 # final Kalman filter fit
+            , KSFDeMH                               # Seed fit (chisquared, no drift)
+            , KFFDeMHPar                            # final Kalman filter fit
+           ]
+#------------------------------------------------------------------------------
+# p34: reco path for pi+ --> e+ nu : KinKal fits
+#------------------------------------------------------------------------------
+    p34 : [ @sequence::Reconstruction.CaloReco, 
+            # @sequence::Reconstruction.TrkReco ,     # PBTFSD, makeSH, makePH, FlagBkgHits
+            @sequence::TrkHitReco.PrepareHits ,     # PBTFSD, makeSH, makePH, FlagBkgHits
+            # ------------ @sequence::Reconstruction.DmuReco  
+            # TimeClusterFinderDmu, 
+            TZClusterFinder, 
+            # PhiClusterFinder,
+            CalTimePeakFinder,
+            HelixFinderDe,                         		 
+            CalHelixFinderDe
+            , MHDeM , MHDeP                         # 1st step: RobustHelixFinder(M/P)+CalHelixFinder(M/P)
+            , MHFinderDe                            # 2nd step: MHDeM + MHDeP
+            # , KSFDeMH                               # Seed fit (chisquared, no drift)
+            , KKDeMHPar                             # final Kalman filter fit
            ]
 #------------------------------------------------------------------------------
 # p100: concatenation job, trigger path is empty

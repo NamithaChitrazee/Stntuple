@@ -273,9 +273,8 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
 //-----------------------------------------------------------------------------
       const CLHEP::Hep3Vector sp = sim->startPosition();
 
-      if (fMinSimpMomentum >= 0) {
-	if ((nhits == 0) or  (ptot < fMinSimpMomentum))     continue;
-      }
+      if ((fMinSimpMomentum >= 0) and (ptot < fMinSimpMomentum)) continue;
+      if ((fMinNStrawHits   >= 0) and (nhits < fMinNStrawHits )) continue;
 
       simp   = simp_block->NewParticle(id, parent_id, pdg_code        , 
 				       creation_code, termination_code,

@@ -23,6 +23,7 @@ public:
   float           fMaxZ;
   int             fGenProcessID;
   int             fPdgID;
+  int             fMinNStrawHits;
 //-----------------------------------------------------------------------------
 // functions
 //-----------------------------------------------------------------------------
@@ -38,6 +39,7 @@ public:
   void   SetMaxZ              (double         MaxZ) { fMaxZ               = MaxZ; }
   void   SetGenProcessID      (int            ID  ) { fGenProcessID       = ID  ; }
   void   SetPdgID             (int            ID  ) { fPdgID              = ID  ; }
+  void   SetMinNStrawHits     (int            N   ) { fMinNStrawHits      = N   ; }
 
   virtual int InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mode);
   //  virtual int ResolveLinks (TStnDataBlock* Block, AbsEvent* Evt, int Mode);

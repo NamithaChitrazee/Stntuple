@@ -96,6 +96,7 @@ StntupleMakerTemplate : { module_type:StntupleMaker
     vdHitsCollTag        : @local::STN_VDHITS_COLL_TAG           # was "g4run" before
     minSimpMomentum      : 40.0                                  # MeV , minSimpMomentum < 0: store all with straw hits
     simpMaxZ             : 1800.0                                # not used
+    minNStrawHits        : -1                                    # min number of straw hits for a SimParticle to be stored
 
     genpCollTag          : @local::STN_COMPRESS_MCS              # save signal-only: "generate" 
 #------------------------------------------------------------------------------

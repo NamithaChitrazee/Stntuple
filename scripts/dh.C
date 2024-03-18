@@ -126,7 +126,7 @@ void catalog_dataset(const char* Book,
 }
 
 //_____________________________________________________________________________
-void catalog_list_of_files(const char* RequestFile, Int_t Mode=11) {
+int catalog_list_of_files(const char* RequestFile, Int_t Mode=11) {
   // catalog list of files returned by the shell command
 
   char  data_server[200], book     [100], dataset_id[100];
@@ -206,6 +206,7 @@ void catalog_list_of_files(const char* RequestFile, Int_t Mode=11) {
       fgets(c,1000,f);
     }
   }
+  return 0;
 }
 
 

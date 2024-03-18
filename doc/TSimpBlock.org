@@ -16,6 +16,8 @@
 |--------------------+------------------+----------------------------------------------------------------------------------------------|
 | minSimpMomentum    | fMinSimpMomentum | if > 0, the momentum threshold for particles to be stored                                    |
 |--------------------+------------------+----------------------------------------------------------------------------------------------|
+| minNStrawHits      | fMinNStrawHits   | if > 0, the minimum number of straw hits produced by a particle for a particle to be stored  |
+|--------------------+------------------+----------------------------------------------------------------------------------------------|
 | simpUseTimeOffsets | fUseTimeOffsets  | if != 0, stored TSimParticle times are corrected by the time offsetts                        |
 |                    |                  | note, that the times are not wrapped around the microbunch period                            |
 |                    |                  | comment: requires branch=su2020 of the Mu2e Offline                                          |
