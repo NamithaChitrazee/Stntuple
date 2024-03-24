@@ -77,8 +77,9 @@ public:
   int    StartVolumeIndex () const { return fStartVolumeIndex; }
   int    EndVolumeIndex   () const { return fEndVolumeIndex  ; }
 
-  float  StartProperTime  () const { return fStartProperTime; }
-  float  EndProperTime    () const { return fEndProperTime  ; }
+  float  StartProperTime  () const { return fStartProperTime    ; }
+  float  EndProperTime    () const { return fEndProperTime      ; }
+  float  SurvivalProb     () const { return exp(-fEndProperTime); }
 
   const TLorentzVector* StartPos() const { return &fStartPos; }
   const TLorentzVector* StartMom() const { return &fStartMom; }
