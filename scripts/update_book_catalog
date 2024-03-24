@@ -92,11 +92,11 @@ for book in $books ; do
         if [ -f $dir/$f/AAA_DESCRIPTION.html ] ; then
     	    text=" see <a href=$f/AAA_DESCRIPTION.html> detailed description of the dataset </a>"
         else
-    	    text=" see more details in the fileset catalog ........."
+    	    text=" see more in the fileset catalog ........."
         fi
         dsname=$f" ..................."
         ov=`printf "%6s" $offline_ver`
-        echo "<li> <a href=$f/AAA_CATALOG.html width=200px>${dsname:0:12}</a> | <a href=$f/AAA_FILES.txt> files </a> | $ov | ${description:0:$ldesc} | $text" >> $HTML_CATALOG ; 
+        echo "<li> <a href=$f/AAA_CATALOG.html width=200px>${dsname:0:15}</a> | <a href=$f/AAA_FILES.txt> files </a> | $ov | ${description:0:$ldesc} | $text" >> $HTML_CATALOG ; 
     done
  #    done
 #------------------------------------------------------------------------------
