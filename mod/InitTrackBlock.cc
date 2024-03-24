@@ -377,13 +377,20 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 //-----------------------------------------------------------------------------
 // helical parameters at Z(TT_FrontPA)
 //-----------------------------------------------------------------------------
-    KinKal::CentralHelix helx  = kseg->centralHelix();
-    track->fC0        = helx.omega(); // old
-    track->fD0        = helx.d0();
-    track->fZ0        = helx.z0();
-    track->fPhi0      = helx.phi0();
-    track->fTanDip    = helx.tanDip(); // old
-    track->fCharge    = helx.charge();
+    try {
+      KinKal::CentralHelix helx = kseg->centralHelix();
+      track->fC0        = helx.omega(); // old
+      track->fD0        = helx.d0();
+      track->fZ0        = helx.z0();
+      track->fPhi0      = helx.phi0();
+      track->fTanDip    = helx.tanDip(); // old
+      track->fCharge    = helx.charge();
+    }
+    catch (...) {
+      mf::LogWarning(oname) << " ERROR line " << __LINE__ << ": KinKal::CentralHelix trouble" ;
+      continue;
+    }
+
 //-----------------------------------------------------------------------------
 // virtual detector at the tracker exit: Time at Z(TT_Back)
 //-----------------------------------------------------------------------------
@@ -665,7 +672,7 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
 
     track->fPdgCode     = part_pdg_code[ipart];
     track->fPartID      = part_id      [ipart];
-    track->fNGoodMcHits = nh0;
+    track->fNGoodMcHits = (kffs->nDOF() << 16) + nh0;
 //-----------------------------------------------------------------------------
 // particle parameters at virtual detectors
 //-----------------------------------------------------------------------------

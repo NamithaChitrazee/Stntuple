@@ -1625,7 +1625,7 @@ void TStnTrack::Streamer(TBuffer& R__b) {
     else if (R__v == 10) ReadV10 (R__b);
     else if ( (R__v == 11) || (R__v == 12)){
 //-----------------------------------------------------------------------------
-// current version: V12, is different from V11 only by renaming Chi2C -> TBack
+// V12, is different from V11 only by renaming Chi2C -> TBack
 // the memory layout is the same
 //-----------------------------------------------------------------------------
       fMomentum.Streamer(R__b);
@@ -1651,6 +1651,10 @@ void TStnTrack::Streamer(TBuffer& R__b) {
       else             fVMaxEp = NULL;
     }
     else {
+//-----------------------------------------------------------------------------
+// current version - v14
+// V13 and V14 are different only by NDoF being packed into fNGoodMCHits
+//-----------------------------------------------------------------------------
       fMomentum.Streamer(R__b);
       fHitMask.Streamer(R__b);
       fExpectedHitMask.Streamer(R__b);

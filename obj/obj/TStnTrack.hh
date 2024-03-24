@@ -133,7 +133,7 @@ public:
   int                       fNMatSites;	      // (Nmat ) + (nmatactive << 16) 
   int                       fDiskID;	      // 
   int                       fPdgCode;         // PDG code of the particle produced most hits
-  int                       fNGoodMcHits;     // Nhits on the track produced by the associated MC particle
+  int                       fNGoodMcHits;     // (NDOF << 16) + (Nhits on the track produced by the associated MC particle)
   int                       fPartID;          // MC particle ID (number in the list)
   int                       fNMcStrawHits;    // Nhits by associated particle in the straw tracker
   int                       fAlgorithmID;     // bit-packed : (alg_mask << 16 ) | best
@@ -189,7 +189,7 @@ public:
   InterData_t               fDisk [kNDisks];      // track intersections with disks
   InterData_t               fTrkCaloHit;          // TrkCaloHit info
 //-----------------------------------------------------------------------------
-//  transient data members, all the persistent ones should go above
+//  transient data members, all persistent ones should go above
 //-----------------------------------------------------------------------------
   const mu2e::TrkToCaloExtrapol* fExtrk;              //!
   const mu2e::CaloCluster*       fClosestCaloCluster; //!
@@ -232,10 +232,15 @@ public:
   
   int    NClusters();
   int    NMcStrawHits() const { return fNMcStrawHits; }
-  int    NGoodMcHits () const { return fNGoodMcHits; }
+
+                                        // P.M. pack the number of degrees of freedom into the same word with
+                                        // the number of good MC hits, not sure if the latter is still used
+
+  int    NGoodMcHits () const { return (fNGoodMcHits      ) & 0xffff; }
+  int    NDoF        () const { return (fNGoodMcHits >> 16) & 0xffff; }
 
   int    AlgorithmID() const { return fAlgorithmID; }
-  int    BestAlg    () const { return fAlgorithmID & 0xffff; }
+  int    BestAlg    () const { return (fAlgorithmID      ) & 0xffff; }
   int    AlgMask    () const { return (fAlgorithmID >> 16) & 0xffff; }
 
   int    HelixIndex     () const { return fHelixIndex; }
@@ -254,7 +259,8 @@ public:
   float  Ep       () const { return fEp; }
   float  Dy       () const { return fDy; }
   float  Dz       () const { return fDz; }
-  float  Chi2Dof  () const { return fChi2/(NActive()-5+1.e-12) ; }
+                                                          // for KK fit, NDoF is a tricky thing, rely on Dave
+  float  Chi2Dof  () const { return fChi2/NDoF(); }
   float  ClusterE () const { return fClusterE;    }
 
   int    TCH_diskId () const { if (fVTCH) { return fTrkCaloHit.fID;} else {return -1e6;} }
@@ -326,7 +332,7 @@ public:
   void ReadV9 (TBuffer& R__b);
   void ReadV10(TBuffer& R__b);
 
-  ClassDef(TStnTrack,13)
+  ClassDef(TStnTrack,14)
 
 };
 
