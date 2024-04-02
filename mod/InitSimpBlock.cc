@@ -148,7 +148,7 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
 //------------------------------------------------------------------------------
 // looking at the ppbar annihilation events - 
 // searching for the mother works for delta-electrons, but not otherwise, do we really need 
-// that? - it worked before, though... comment outp for teh time being
+// that? - it worked before, though... comment out for the time being
 //-----------------------------------------------------------------------------
 	art::Ptr<mu2e::SimParticle> const& simptr = step->simParticle(); 
 	art::Ptr<mu2e::SimParticle> mother        = simptr;
@@ -170,8 +170,8 @@ int StntupleInitSimpBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEvent
 	if (found == 0) {
 	  vshid[np_with_straw_hits]      = new std::vector<int>;
 	  vshid[np_with_straw_hits]->push_back(i);
-	  vid[np_with_straw_hits]        = sim_id;
-	  vin[np_with_straw_hits]        = 1;
+	  vid  [np_with_straw_hits]      = sim_id;
+	  vin  [np_with_straw_hits]      = 1;
 	  np_with_straw_hits             = np_with_straw_hits+1;
 	}
       }
