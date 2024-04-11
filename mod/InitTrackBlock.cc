@@ -915,6 +915,9 @@ int StntupleInitTrackBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* AnEven
     track->fDy       = -1.e12;
     track->fDz       = -1.e12;
 
+    const mu2e::CaloCluster* calo_cluster = kffs->caloHit().caloCluster().get();
+    if (calo_cluster) track->fClusterE = calo_cluster->energyDep();
+
     if (track->fVMinS != 0) {
       if (track->fVMinS->fCluster) {
 	track->fClusterE = track->fVMinS->fCluster->energyDep();
