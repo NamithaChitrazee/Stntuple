@@ -22,19 +22,16 @@ physics : {
     p1 : [ @sequence::CaloReco.Reco,
 	   @sequence::CaloCluster.Reco,
 	   @sequence::TrkHitReco.PrepareHits   ## [ PBTFSD, makeSH, makePH, FlagBkgHits ] 
-                                               #  see Offline/TrkHitReco/prolog.fcl
+                                               ##  see Offline/TrkHitReco/prolog.fcl
            , TZClusterFinder
 	  ]
 
     e1 : [ MuHitDisplay ]
 
     trigger_paths : [ p1 ]
-    #    out : [detectorOutput]  # detectorOutput is defined in Stntuple/fcl/templates.fcl
-    out           : [         ]
-    end_paths     : [ e1      ]  # , out ]
+    out           : [    ]  ## [detectorOutput] # defined in Stntuple/fcl/stntuple.fcl]
+    end_paths     : [ e1 ]  # , out ]
 }
-
-services.TFileService.fileName            : "nts.user.display.xxx.000001.root"
 #------------------------------------------------------------------------------
 # uncomment the next 2 lines if you want the DST file to be written out
 #-----------------------------------------------------------------------------
