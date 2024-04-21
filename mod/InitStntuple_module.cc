@@ -188,6 +188,10 @@ int InitStntuple::InitTriggerTable(int RunNumber) {
     trigger_table->AddTrigger(new TStnTrigger( 172, 172,"cprHelixUeM"                 ,1));
     trigger_table->AddTrigger(new TStnTrigger( 173, 173,"cprHelixUeP"                 ,1));
 
+    trigger_table->AddTrigger(new TStnTrigger( 180, 180,"apr_highP_stopTarg"          ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 190, 190,"apr_lowP_stopTarg"           ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 195, 190,"aprHelix"                    ,1));
+
     trigger_table->AddTrigger(new TStnTrigger( 200, 200,"caloFast_photon"             ,1));
     trigger_table->AddTrigger(new TStnTrigger( 201, 201,"caloFast_MVANNCE"            ,1));
     trigger_table->AddTrigger(new TStnTrigger( 202, 202,"caloFast_cosmic"             ,1));
