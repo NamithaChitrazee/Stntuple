@@ -94,7 +94,8 @@ int  StntupleInitTrackSeedBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* E
       trackSeed->fClusterZ       = -1.e6; 
     }
     
-    mu2e::KalSegment kalSeg  = trkSeed->segments().at(0);//take the KalSegment closer to the entrance of the tracker
+    mu2e::KalSegment     kalSeg  = trkSeed->segments().at(0);//take the KalSegment closer to the entrance of the tracker
+    KinKal::CentralHelix helx    = kalSeg.centralHelix();
     trackSeed->fTrackSeed    = trkSeed;
     trackSeed->fNHits        = trkSeed->hits().size();
     trackSeed->fT0           = trkSeed->t0()._t0;
@@ -108,6 +109,7 @@ int  StntupleInitTrackSeedBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* E
 
     trackSeed->fChi2         = trkSeed->chisquared();
     trackSeed->fFitCons      = trkSeed->fitConsistency();
+    trackSeed->fCharge       = helx.charge();
 
     // now loop over the hits to search the particle that generated the track
 
