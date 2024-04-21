@@ -35,8 +35,11 @@ class TStnTrackSeed : public TObject {
     kNFreeIntsV2     = 10,		// V2
     kNFreeFloatsV2   = 10,         	// V2
 
-    kNFreeInts     = 10,		// V3
-    kNFreeFloats   = 9			// V3
+    kNFreeIntsV3     = 10,		// V3
+    kNFreeFloatsV3   = 9,         	// V3
+
+    kNFreeInts     = 10,		// V4
+    kNFreeFloats   = 8			// V4
   };
 
 public:
@@ -77,6 +80,7 @@ public:
   float			    fClusterY;      
   float			    fClusterZ;    
   float                     fNLoops;              // added in V3
+  float                     fCharge;              // added in V4
   float                     fFloat[kNFreeFloats]; // provision for future I/O expansion
 //-----------------------------------------------------------------------------
 // transients
@@ -143,8 +147,9 @@ public:
 //-----------------------------------------------------------------------------
   void ReadV1(TBuffer& R__b);
   void ReadV2(TBuffer& R__b);
+  void ReadV3(TBuffer& R__b);
 
-  ClassDef(TStnTrackSeed,3);
+  ClassDef(TStnTrackSeed,4);
 };
 
 #endif
