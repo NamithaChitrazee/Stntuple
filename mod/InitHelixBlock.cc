@@ -168,6 +168,8 @@ int  StntupleInitHelixBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt, 
 
       std::vector<StrawDigiIndex> shids;
       tmpHel->hits().fillStrawDigiIndices(j,shids);
+      
+      float minP(30.);//MeV/c
 
       for (size_t k=0; k<shids.size(); ++k) {
         const mu2e::StrawDigiMC* sdmc = &sdmcColl->at(shids[k]);
@@ -175,6 +177,8 @@ int  StntupleInitHelixBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt, 
         art::Ptr<mu2e::SimParticle> const& simptr = spmcp->simParticle();
         int sim_id        = simptr->id().asInt();
         float   dz        = spmcp->position().z();// - trackerZ0;
+        float   pMC       = std::sqrt(spmcp->momentum().mag2());
+        if (pMC<minP)     continue;
         hits_simp_id.push_back   (sim_id);
         hits_simp_index.push_back(shids[k]);
         hits_simp_z.push_back(dz);
@@ -234,8 +238,12 @@ int  StntupleInitHelixBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt, 
     }
     
     if ( (mostvalueindex<0) || (mostvalueindex >= (int) sdmcColl->size()))        {
-      printf(">>> ERROR: event %i helix %i no MC found. MostValueindex = %i hits_simp_index[id_max] = %i mcdigis_size =%li \n", 
-	     Evt->event(), i, mostvalueindex, hits_simp_index[id_max], sdmcColl->size());
+      printf(">>> ERROR: event %i helix %i no MC found. MostValueindex = %i mcdigis_size =%li size(hits_simp_index) = %lu\n", 
+	     Evt->event(), i, mostvalueindex, sdmcColl->size(), hits_simp_index.size());
+      if (hits_simp_index.size()>0) {
+        printf(">>> ERROR:  hits_simp_index[id_max] = %i  \n", 
+               hits_simp_index[id_max]);
+      }
       continue;
     }
     

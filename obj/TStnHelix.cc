@@ -540,10 +540,10 @@ void TStnHelix::Streamer(TBuffer& R__b) {
 //-----------------------------------------------------------------------------
 TStnHelix::TStnHelix(int Number) {
 
-  fMom1.SetPxPyPzE(0.,0.,0.,0.);
+  fMom1.SetPxPyPzE(1e6,1e6,1e6,1e6);
   fOrigin1.SetXYZT(0.,0.,0.,0.);
   
-  fMom2.SetPxPyPzE(0.,0.,0.,0.);
+  fMom2.SetPxPyPzE(1e6,1e6,1e6,1e6);
   fOrigin2.SetXYZT(0.,0.,0.,0.);
   
   fNumber           = Number;
