@@ -15,30 +15,30 @@
 
 //-----------------------------------------------------------------------------
 hist_data_t::hist_data_t(const char* DsID, const char* JobName, const char* Module, const char* HistName) {
-    fHist        = nullptr;
-    if (DsID && (DsID[0] != 0)) fFile = get_hist_file(DsID,JobName);
-    else                        fFile = nullptr;
-    fBook        = nullptr;
-    fName        = HistName;
-    fModule      = Module;
-    if (fFile != nullptr) {
-      fHist        = (TH1*) gh1(fFile->GetName(),fModule,HistName);
-      if (fHist != nullptr) init();
-    }
+  fHist        = nullptr;
+  if (DsID && (DsID[0] != 0)) fFile = get_hist_file(DsID,JobName);
+  else                        fFile = nullptr;
+  fBook        = nullptr;
+  fName        = HistName;
+  fModule      = Module;
+  if (fFile != nullptr) {
+    fHist        = (TH1*) gh1(fFile->GetName(),fModule,HistName)->Clone();
+    if (fHist != nullptr) init();
   }
+}
 
 //-----------------------------------------------------------------------------
 hist_data_t::hist_data_t(stn_book* Book, const char* DsID, const char* JobName, const char* Module, const char* HistName) {
-    fHist        = nullptr;
-    fBook        = Book;
-    fName        = HistName;
-    fModule      = Module;
-    fFile        = Book->FindHistFile(DsID,"",JobName);
-    if (fFile != nullptr) {
-      fHist        = (TH1*) gh1(fFile->GetName(),fModule,HistName);
-      if (fHist != nullptr) init();
-    }
+  fHist        = nullptr;
+  fBook        = Book;
+  fName        = HistName;
+  fModule      = Module;
+  fFile        = Book->FindHistFile(DsID,"",JobName);
+  if (fFile != nullptr) {
+    fHist        = (TH1*) gh1(fFile->GetName(),fModule,HistName)->Clone();
+    if (fHist != nullptr) init();
   }
+}
 
 //-----------------------------------------------------------------------------
 // histogram file created by production job (analysis job name = "")
@@ -57,7 +57,7 @@ hist_data_t::hist_data_t(stn_book* Book, const char* DsID, const char* Productio
       printf("ERROR in hist_data_t: file %s doesn't exist, bail out\n",fFile->GetName());
     }
     else {
-      fHist    = (TH1*) f->Get(FullHistName);
+      fHist    = (TH1*) f->Get(FullHistName)->Clone();
       if (fHist != nullptr) init();
     }
   }
@@ -65,31 +65,36 @@ hist_data_t::hist_data_t(stn_book* Book, const char* DsID, const char* Productio
 
 //-----------------------------------------------------------------------------
 hist_data_t::hist_data_t(stn_catalog* Catalog, const char* BookName, const char* DsID,
-	      const char* JobName,   const char* Module, const char* HistName) {
-    fHist        = nullptr;
-    fBook        = Catalog->FindBook(BookName);
-    fFile        = fBook->FindHistFile(DsID,"",JobName);
-    fName        = HistName;
-    fModule      = Module;
-    if (fFile != nullptr) {
-      fHist        = gh1(fFile->GetName(),fModule,HistName);
-      if (fHist != nullptr) init();
+                         const char* JobName,   const char* Module, const char* HistName) {
+  fHist        = nullptr;
+  fBook        = Catalog->FindBook(BookName);
+  fFile        = fBook->FindHistFile(DsID,"",JobName);
+  fName        = HistName;
+  fModule      = Module;
+  if (fFile != nullptr) {
+    try {
+      fHist        = (TH1*) gh1(fFile->GetName(),fModule,HistName)->Clone();
     }
+    catch (...) {
+      printf("hist_data_t::hist_data_t: cant find hist for file=%s module=%s histname=%s",fFile->GetName(),Module,HistName);
+    }
+    if (fHist != nullptr) init();
   }
+}
 
 //-----------------------------------------------------------------------------
 hist_data_t::hist_data_t(TH1* Hist, const char* JobName, const char* Module) {
-    // Hist is supposed not to be a null pointer, still check
-    fHist        = Hist;
-    fFile        = nullptr;            // don't need it, fHist is already defined
-    fBook        = nullptr;            // same reason
-    fModule      = Module;
-    fName        = "";
-    if (Hist != nullptr) {
-      fName        = Hist->GetName();
-      init();
-    }
+  // Hist is supposed not to be a null pointer, still check
+  fHist        = (TH1*) Hist->Clone();
+  fFile        = nullptr;            // don't need it, fHist is already defined
+  fBook        = nullptr;            // same reason
+  fModule      = Module;
+  fName        = "";
+  if (Hist != nullptr) {
+    fName        = Hist->GetName();
+    init();
   }
+}
 
 //-----------------------------------------------------------------------------
 void  hist_data_t::init() {

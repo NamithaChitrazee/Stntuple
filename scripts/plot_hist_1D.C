@@ -567,6 +567,10 @@ int plot_hist_1d(plot_data_t* Plot, int Print = 0, const char* Format = "eps") {
   
   TH1F* hpx1 = (TH1F*) Hist1->fHist->Clone(h1name);
 //-----------------------------------------------------------------------------
+// take care of the title
+//-----------------------------------------------------------------------------
+  if (Plot->fTitle != "") hpx1->SetTitle(Plot->fTitle.Data());
+//-----------------------------------------------------------------------------
 // rebinning: first check the histogram, then - default for the plot
 //-----------------------------------------------------------------------------
   int rebin = Hist1->fRebin;
@@ -808,7 +812,7 @@ int plot_hist_1d(plot_data_t* Plot, int Print = 0, const char* Format = "eps") {
   c->Modified(); c->Update();
 //-----------------------------------------------------------------------------
 // do we need to add something else? Print = -1 serves that purpose
-// how to name the output file in case f multiple histograms ?
+// how to name the output file in case of multiple histograms ?
 //-----------------------------------------------------------------------------
   // printf (" debug 001\n");
   if (Plot->fName == "") {
