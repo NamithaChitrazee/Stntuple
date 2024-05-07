@@ -3,8 +3,9 @@
 #  usage: 
 #  ------
 #  Stntuple/scripts/catalog_stntuples -b book -d dataset -m mode -v verbose   \
-#                                   [-i install_directory]
-#                                   -u user -h host -D directory -p pattern 
+#                                   [-i install_directory]                    \
+#                                   -u user -h host -D directory -p pattern   \
+#                                   [-n nev_fileset]                          \
 #                                   [-o offline_version]     
 # 
 # starts from already created file-level catalog file and assigns fileset 
