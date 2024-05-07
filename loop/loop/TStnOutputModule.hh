@@ -31,6 +31,12 @@ protected:
   Int_t                 fMaxFileSize;	// max file size in MBytes
   TObjArray*            fDropList;	// list of data blocks (names) to drop
   TObjArray*            fKeepList;	// list of data blocks (names) to keep
+  int                   fLoRun;         // low and high run and subrun numbers
+  int                   fLoSubrun;      // %08i is OK for an int
+  int                   fHiRun;        
+  int                   fHiSubrun;        
+  TString               fDatasetID;     // dataset ID
+  TString               fProject;       // project (description)
 //-----------------------------------------------------------------------------
 //  functions
 //-----------------------------------------------------------------------------
@@ -47,19 +53,23 @@ public:
 //-----------------------------------------------------------------------------
 // accessors
 //-----------------------------------------------------------------------------
-  TTree*      GetOutputTree () { return fTree; }
-  Int_t       GetMaxFileSize() { return fMaxFileSize; }
-  TObjArray*  GetDropList   () { return fDropList; }
-  TObjArray*  GetKeepList   () { return fKeepList; }
+  TTree*         GetOutputTree () { return fTree; }
+  Int_t          GetMaxFileSize() { return fMaxFileSize; }
+  TObjArray*     GetDropList   () { return fDropList; }
+  TObjArray*     GetKeepList   () { return fKeepList; }
+  const TString& DatasetID     () const { return fDatasetID;  }
 //-----------------------------------------------------------------------------
 // modifiers
 //-----------------------------------------------------------------------------
-  void        SetMaxFileSize(int size) { fMaxFileSize = size; }
-  void        DropDataBlock (const char* Name);
-  void        KeepDataBlock (const char* Name);
+  void        SetMaxFileSize(int         size   ) { fMaxFileSize = size   ; }
+  void        SetDatasetID  (const char* DsID   ) { fDatasetID   = DsID   ; }
+  void        SetProject    (const char* Project) { fProject     = Project; }
 //-----------------------------------------------------------------------------
 // other methods
 //-----------------------------------------------------------------------------
+  void        DropDataBlock (const char* Name);
+  void        KeepDataBlock (const char* Name);
+
   Int_t       OpenNewFile   (const char* Filename );
 
   ClassDef(TStnOutputModule,0)

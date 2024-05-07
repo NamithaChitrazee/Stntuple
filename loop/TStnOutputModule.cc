@@ -1,6 +1,9 @@
 //-----------------------------------------------------------------------------
-//  Feb 25 2001 P.Murat: base class for STNTUPLE output module, 
-//  provides the basic implementation
+// Feb 25 2001 P.Murat: base class for STNTUPLE output module, 
+// provides the basic implementation
+//
+// 2024-04-28 P.Murat: keep track only of runs and subruns: for Mu2e, 
+//                     the event number-level is a too fine granularity level
 //-----------------------------------------------------------------------------
 #include "TSystem.h"
 #include "TObjString.h"
@@ -23,6 +26,8 @@ TStnOutputModule::TStnOutputModule(const char* FileName):
   TStnModule("Output", "STNTUPLE Output Module")
 {
   fFileName     = FileName;
+  fDatasetID    = "dsid";
+  fProject      = "project";
   fFileNumber   = 0;
   fMaxFileSize  = 8000;
   fDropList     = new TObjArray(10);
@@ -55,7 +60,9 @@ int TStnOutputModule::OpenNewFile(const char* Filename)
   Int_t rc, split_level;
 
   TDirectory* dir = gDirectory;
-  fFile = new TFile(Filename,"recreate");
+  fFileName = Form("%s.%i",fFileName.Data(),gSystem->GetPid());
+
+  fFile = new TFile(fFileName,"recreate");
 
   if (fFile->IsOpen()) {
 				// clone input tree
@@ -112,7 +119,13 @@ int TStnOutputModule::OpenNewFile(const char* Filename)
     Error("OpenNewFile",Form("Can\'t open output file %s",Filename));
     rc = -1;
   }
-  gDirectory = dir;
+  gDirectory    = dir;
+
+  fLoRun        = 100000000;
+  fLoSubrun     = 100000000;
+  fHiRun        = -1;
+  fHiSubrun     = -1;
+
   return rc;
 }
 
@@ -182,6 +195,29 @@ int TStnOutputModule::Event(Int_t I) {
 // TStnEvent::fCurentEntry is set correctly. make sure we read the whole event
 //-----------------------------------------------------------------------------
   fAna->GetEvent()->ReadTreeEntry(I);
+
+  TStnHeaderBlock* hb = GetHeaderBlock();
+  int rn  = hb->RunNumber();
+  int srn = hb->SubrunNumber();
+//-----------------------------------------------------------------------------
+// book-keeping - keep track of low and high run/subrun numbers
+//-----------------------------------------------------------------------------
+  if (rn < fLoRun) {
+    fLoRun    = rn;
+    fLoSubrun = srn;
+  }
+  else if (rn == fLoRun) {
+    if (srn < fLoSubrun) fLoSubrun = srn;
+  }
+
+  if (rn > fHiRun) {
+    fHiRun    = rn;
+    fHiSubrun = srn;
+  }
+  else if (rn == fHiRun) {
+    if (srn > fHiSubrun) fHiSubrun = srn;
+  }
+
 					// size in MBytes
   int mbytes_written = (int) (fFile->GetBytesWritten()/1000000);
   if (mbytes_written >= fMaxFileSize) {
@@ -191,9 +227,13 @@ int TStnOutputModule::Event(Int_t I) {
     fFile->Close();
     delete fFile;
 				// rename the old file into x.00
-    if (fFileNumber == 0) {
-      gSystem->Exec(Form("mv %s %s.00",fFileName.Data(),fFileName.Data()));
-    }
+    TString fn = Form("nts.mu2e.%s.%s.%06i_%08i.stn",fDatasetID.Data(),fProject.Data(),
+                      fLoRun,fLoSubrun);
+
+    TString cmd = Form("mv %s %s",fFileName.Data(),fn.Data());
+    printf("TStnOutputModule::Event: executing : %s\n",cmd.Data());
+
+    gSystem->Exec(cmd.Data());
 
     fFileNumber++;
 					// now open the new file
@@ -215,11 +255,22 @@ int TStnOutputModule::EndRun()
   return 0;
 }
 
-//_____________________________________________________________________________
+//-----------------------------------------------------------------------------
+// in the end, rename the output file properly 
+//-----------------------------------------------------------------------------
 int TStnOutputModule::EndJob()
 {
   fFile->Write();
   fFile->Close();
+
+  TString fn = Form("nts.mu2e.%s.%s.%06i_%08i.stn",fDatasetID.Data(),fProject.Data(),
+                    fLoRun,fLoSubrun);
+
+  TString cmd = Form("mv %s %s",fFileName.Data(),fn.Data());
+  printf("TStnOutputModule::Event: executing : %s\n",cmd.Data());
+
+  gSystem->Exec(cmd.Data());
+
   return 0;
 }
 
