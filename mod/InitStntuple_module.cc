@@ -166,22 +166,23 @@ int InitStntuple::InitTriggerTable(int RunNumber) {
 // runs 1200-1210: this may or may not be correct, consider the following 
 // just an example
 //-----------------------------------------------------------------------------
-    trigger_table->AddTrigger(new TStnTrigger(   0,   0,"MixPath"                          ,1));
-    trigger_table->AddTrigger(new TStnTrigger(   1,   1,"p1"                               ,1));
+    trigger_table->AddTrigger(new TStnTrigger(   0,   0,"MixPath"                     ,1));
+    trigger_table->AddTrigger(new TStnTrigger(   1,   1,"p1"                          ,1));
 
-    trigger_table->AddTrigger(new TStnTrigger( 100, 100,"tprDe_highP_stopTarg"       ,1));
-    trigger_table->AddTrigger(new TStnTrigger( 110, 110,"tprDe_lowP_stopTarg"        ,1));
-    trigger_table->AddTrigger(new TStnTrigger( 120, 120,"tprHelixDe_ipa"             ,1));
-    trigger_table->AddTrigger(new TStnTrigger( 121, 121,"tprHelixDe_ipa_phiScaled"   ,1));
-    trigger_table->AddTrigger(new TStnTrigger( 130, 130,"tprHelixDe"                 ,1));
-    trigger_table->AddTrigger(new TStnTrigger( 131, 131,"tprHelixUe"                 ,1));
-    trigger_table->AddTrigger(new TStnTrigger( 150, 150,"cprDe_highP_stopTarg"       ,1));
-    trigger_table->AddTrigger(new TStnTrigger( 160, 160,"cprDe_lowP_stopTarg"        ,1));
-    trigger_table->AddTrigger(new TStnTrigger( 170, 170,"cprHelixDe"                 ,1));
-    trigger_table->AddTrigger(new TStnTrigger( 171, 171,"cprHelixUe"                 ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 100, 100,"tprDe_highP_stopTarg"        ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 110, 110,"tprDe_lowP_stopTarg"         ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 120, 120,"tprHelixDe_ipa"              ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 121, 121,"tprHelixDe_ipa_phiScaled"    ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 130, 130,"tprHelixDe"                  ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 131, 131,"tprHelixUe"                  ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 150, 150,"cprDe_highP_stopTarg"        ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 160, 160,"cprDe_lowP_stopTarg"         ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 170, 170,"cprHelixDe"                  ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 171, 171,"cprHelixUe"                  ,1));
 
     trigger_table->AddTrigger(new TStnTrigger( 180, 180,"apr_highP_stopTarg"          ,1));
     trigger_table->AddTrigger(new TStnTrigger( 190, 190,"apr_lowP_stopTarg"           ,1));
+    trigger_table->AddTrigger(new TStnTrigger( 191, 191,"apr_lowP_stopTarg_multiTrk"  ,1));
     trigger_table->AddTrigger(new TStnTrigger( 195, 190,"aprHelix"                    ,1));
 
     trigger_table->AddTrigger(new TStnTrigger( 200, 200,"caloFast_photon"             ,1));
