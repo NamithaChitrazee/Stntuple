@@ -677,7 +677,7 @@ Stntuple : {
 #------------------------------------------------------------------------------
 	StntupleMakerTrig : { @table::StntupleMakerTemplate 
 	    makePid                : 0
-	    makeTimeClusters       : 1
+	    makeTimeClusters       : 0 #temporary fix
 	    makeHelices            : 1
 	    makeTrackSeeds         : 1
 	    makeTracks             : 0
