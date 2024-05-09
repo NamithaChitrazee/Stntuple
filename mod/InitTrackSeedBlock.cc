@@ -286,8 +286,14 @@ int StntupleInitTrackSeedBlock::ResolveLinks(TStnDataBlock* Block, AbsEvent* AnE
   TStnEvent*          ev  = Block->GetEvent();
   TStnHelixBlock*     hb  = (TStnHelixBlock*) ev->GetDataBlock(fHsBlockName.encode().data());
   
-  int nts  = tsb->NTrackSeeds();
-  int nhel = hb->NHelices();
+  int nts(0);
+  if (tsb!=nullptr){
+    nts = tsb->NTrackSeeds();
+  }
+  int nhel(0);
+  if (hb!=nullptr){
+    nhel = hb->NHelices();
+  }
   
   for (int i=0; i<nts; i++) {
     TStnTrackSeed* tseed = tsb->TrackSeed(i);

@@ -244,105 +244,105 @@ int  StntupleInitHelixBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt, 
         printf(">>> ERROR:  hits_simp_index[id_max] = %i  \n", 
                hits_simp_index[id_max]);
       }
-      continue;
-    }
+    } else {
     
-    const mu2e::StrawDigiMC* sdmc = &sdmcColl->at(mostvalueindex);
+      const mu2e::StrawDigiMC* sdmc = &sdmcColl->at(mostvalueindex);
 
-    auto const& step = sdmc->earlyStrawGasStep();
-    // if (sdmc->wireEndTime(mu2e::StrawEnd::cal) < sdmc->wireEndTime(mu2e::StrawEnd::hv)) {
-    //   step = sdmc->strawGasStep(mu2e::StrawEnd::cal).get();
-    // }
-    // else {
-    //   step = sdmc->strawGasStep(mu2e::StrawEnd::hv ).get();
-    // }
+      auto const& step = sdmc->earlyStrawGasStep();
+      // if (sdmc->wireEndTime(mu2e::StrawEnd::cal) < sdmc->wireEndTime(mu2e::StrawEnd::hv)) {
+      //   step = sdmc->strawGasStep(mu2e::StrawEnd::cal).get();
+      // }
+      // else {
+      //   step = sdmc->strawGasStep(mu2e::StrawEnd::hv ).get();
+      // }
 
-    const mu2e::SimParticle* sim(nullptr);
+      const mu2e::SimParticle* sim(nullptr);
 
-    art::Ptr<mu2e::SimParticle> const& simptr = step->simParticle(); 
-    helix->fSimpPDG1    = simptr->pdgId();
-    art::Ptr<mu2e::SimParticle> mother = simptr;
-    part   = pdg_db->GetParticle(helix->fSimpPDG1);
+      art::Ptr<mu2e::SimParticle> const& simptr = step->simParticle(); 
+      helix->fSimpPDG1    = simptr->pdgId();
+      art::Ptr<mu2e::SimParticle> mother = simptr;
+      part   = pdg_db->GetParticle(helix->fSimpPDG1);
     
-    while(mother->hasParent()) mother = mother->parent();
-    sim = mother.operator ->();
+      while(mother->hasParent()) mother = mother->parent();
+      sim = mother.operator ->();
     
-    helix->fSimpPDGM1   = sim->pdgId();
+      helix->fSimpPDGM1   = sim->pdgId();
     
-    double   px = step->momentum().x();
-    double   py = step->momentum().y();
-    double   pz = step->momentum().z();
-    double   mass  (-1.);
-    double   energy(-1.);
-    if (part) {
-      mass   = part->Mass();
-      energy = sqrt(px*px+py*py+pz*pz+mass*mass);
-    }
-    helix->fMom1.SetPxPyPzE(px,py,pz,energy);
-    
-    CLHEP::Hep3Vector sp = simptr->startPosition();
-    helix->fOrigin1.SetXYZT(sp.x(),sp.y(),sp.z(),simptr->startGlobalTime());
-    
-    
-    //look for the second most frequent hit
-    if (max != int(hits_simp_id.size()) ){  //nhits){
-      int   secondmostvalueindex(-1);
-      max     = 0;//reset max
-      dz_most = 1e4;
-
-      for (int k=0; k<(int)hits_simp_id.size(); ++k){
-	int value = hits_simp_id[k];
-	int co = (int)std::count(hits_simp_id.begin(), hits_simp_id.end(), value);
-	if ( (co>0) && (co>=max) && (value != mostvalue)) {
-	  float  dz      = std::fabs(hits_simp_z[k]);
-	  if (dz < dz_most){
-	    max                  = co;
-	    dz_most              = dz;
-	    secondmostvalueindex = hits_simp_index[k];
-	  }
-	}
+      double   px = step->momentum().x();
+      double   py = step->momentum().y();
+      double   pz = step->momentum().z();
+      double   mass  (-1.);
+      double   energy(-1.);
+      if (part) {
+        mass   = part->Mass();
+        energy = sqrt(px*px+py*py+pz*pz+mass*mass);
       }
-      helix->fSimpId2Hits = max;
+      helix->fMom1.SetPxPyPzE(px,py,pz,energy);
+    
+      CLHEP::Hep3Vector sp = simptr->startPosition();
+      helix->fOrigin1.SetXYZT(sp.x(),sp.y(),sp.z(),simptr->startGlobalTime());
+    
+    
+      //look for the second most frequent hit
+      if (max != int(hits_simp_id.size()) ){  //nhits){
+        int   secondmostvalueindex(-1);
+        max     = 0;//reset max
+        dz_most = 1e4;
 
-      if (secondmostvalueindex >= 0) {
+        for (int k=0; k<(int)hits_simp_id.size(); ++k){
+          int value = hits_simp_id[k];
+          int co = (int)std::count(hits_simp_id.begin(), hits_simp_id.end(), value);
+          if ( (co>0) && (co>=max) && (value != mostvalue)) {
+            float  dz      = std::fabs(hits_simp_z[k]);
+            if (dz < dz_most){
+              max                  = co;
+              dz_most              = dz;
+              secondmostvalueindex = hits_simp_index[k];
+            }
+          }
+        }
+        helix->fSimpId2Hits = max;
 
-       	const mu2e::StrawGasStep* step(nullptr);
+        if (secondmostvalueindex >= 0) {
 
-      	const mu2e::StrawDigiMC*  sdmc = &sdmcColl->at(secondmostvalueindex);
-	if (sdmc->wireEndTime(mu2e::StrawEnd::cal) < sdmc->wireEndTime(mu2e::StrawEnd::hv)) {
-	  step = sdmc->strawGasStep(mu2e::StrawEnd::cal).get();
-	}
-	else {
-	  step = sdmc->strawGasStep(mu2e::StrawEnd::hv ).get();
-	}
+          const mu2e::StrawGasStep* step(nullptr);
 
-	const mu2e::SimParticle* sim (nullptr);
+          const mu2e::StrawDigiMC*  sdmc = &sdmcColl->at(secondmostvalueindex);
+          if (sdmc->wireEndTime(mu2e::StrawEnd::cal) < sdmc->wireEndTime(mu2e::StrawEnd::hv)) {
+            step = sdmc->strawGasStep(mu2e::StrawEnd::cal).get();
+          }
+          else {
+            step = sdmc->strawGasStep(mu2e::StrawEnd::hv ).get();
+          }
 
-       	if (step) {
-	  art::Ptr<mu2e::SimParticle> const& simptr = step->simParticle(); 
-	  helix->fSimpPDG2    = simptr->pdgId();
-	  art::Ptr<mu2e::SimParticle> mother = simptr;
-	  part   = pdg_db->GetParticle(helix->fSimpPDG2);
+          const mu2e::SimParticle* sim (nullptr);
 
-	  while(mother->hasParent()) mother = mother->parent();
-	  sim = mother.operator ->();
+          if (step) {
+            art::Ptr<mu2e::SimParticle> const& simptr = step->simParticle(); 
+            helix->fSimpPDG2    = simptr->pdgId();
+            art::Ptr<mu2e::SimParticle> mother = simptr;
+            part   = pdg_db->GetParticle(helix->fSimpPDG2);
 
-	  helix->fSimpPDGM2   = sim->pdgId();
+            while(mother->hasParent()) mother = mother->parent();
+            sim = mother.operator ->();
+
+            helix->fSimpPDGM2   = sim->pdgId();
       
-	  double   px = simptr->startMomentum().x();
-	  double   py = simptr->startMomentum().y();
-	  double   pz = simptr->startMomentum().z();
+            double   px = simptr->startMomentum().x();
+            double   py = simptr->startMomentum().y();
+            double   pz = simptr->startMomentum().z();
 
-	  double   mass  (-1.), energy(-1.);
-	  if (part) {
-	    mass   = part->Mass();
-	    energy = sqrt(px*px+py*py+pz*pz+mass*mass);
-	  }
-	  helix->fMom2.SetPxPyPzE(px,py,pz,energy);
+            double   mass  (-1.), energy(-1.);
+            if (part) {
+              mass   = part->Mass();
+              energy = sqrt(px*px+py*py+pz*pz+mass*mass);
+            }
+            helix->fMom2.SetPxPyPzE(px,py,pz,energy);
 
-	  const CLHEP::Hep3Vector sp = simptr->startPosition();
-	  helix->fOrigin2.SetXYZT(sp.x(),sp.y(),sp.z(),simptr->startGlobalTime());
-	}      
+            const CLHEP::Hep3Vector sp = simptr->startPosition();
+            helix->fOrigin2.SetXYZT(sp.x(),sp.y(),sp.z(),simptr->startGlobalTime());
+          }      
+        }
       }
     }
     

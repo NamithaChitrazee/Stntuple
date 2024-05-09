@@ -243,8 +243,14 @@ Int_t StntupleInitTimeClusterBlock::ResolveLinks(TStnDataBlock* Block, AbsEvent*
 
   tsb    = (TStnHelixBlock*) ev->GetDataBlock(short_tcluster_block_name);
   
-  int    ntc   = hb ->NTimeClusters();
-  int    nhelixseed    = tsb->NHelices();
+  int    ntc(0);
+  if (hb!=nullptr){
+    ntc = hb ->NTimeClusters();
+  }
+  int    nhelixseed(0);
+  if (tsb !=nullptr){
+    nhelixseed = tsb->NHelices();
+  }
 
   for (int i=0; i<ntc; ++i){
     TStnTimeCluster* tc = hb->TimeCluster(i);
