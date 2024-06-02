@@ -44,26 +44,33 @@ def stntuple_gen_rootcint(source, target, env, for_signature):
     if (os.getenv('MUSE_BACKING') and (os.getenv('MUSE_BACKING') != '')) : 
         includes = includes + ' -I'+os.environ['MUSE_BACKING' ];
 
-    includes = includes + ' -I'+os.environ['KINKAL_INC'  ];
-    includes = includes + ' -I'+os.environ['ART_INC'     ];
-    includes = includes + ' -I'+os.environ['ART_ROOT_IO_INC'];
-    includes = includes + ' -I'+os.environ['BTRK_INC'    ];
-    includes = includes + ' -I'+os.environ['CETLIB_INC'  ];
-    includes = includes + ' -I'+os.environ['CETLIB_EXCEPT_INC'];
-    includes = includes + ' -I'+os.environ['CANVAS_INC'  ];
-    includes = includes + ' -I'+os.environ['FHICLCPP_INC'];
-    includes = includes + ' -I'+os.environ.get('HEP_CONCURRENCY_INC');
-    includes = includes + ' -I'+os.environ['CLHEP_INC'   ];
-    includes = includes + ' -I'+os.environ['BOOST_INC'   ];
-    includes = includes + ' -I'+os.environ.get('TBB_INC');
-    includes = includes + ' -I'+os.environ.get('MESSAGEFACILITY_INC');
-    includes = includes + ' -I'+os.environ.get('ARTDAQ_CORE_INC');
-    includes = includes + ' -I'+os.environ.get('ARTDAQ_CORE_MU2E_INC');
+    muse_flavor = os.environ.get("MUSE_FLAVOR")
 
-    dict     = str(target[0]);
+    if (muse_flavor == 'sl7'):
+        includes = includes + ' -I'+os.environ['KINKAL_INC'  ];
+        includes = includes + ' -I'+os.environ['ART_INC'     ];
+        includes = includes + ' -I'+os.environ['ART_ROOT_IO_INC'];
+        includes = includes + ' -I'+os.environ['BTRK_INC'    ];
+        includes = includes + ' -I'+os.environ['CETLIB_INC'  ];
+        includes = includes + ' -I'+os.environ['CETLIB_EXCEPT_INC'];
+        includes = includes + ' -I'+os.environ['CANVAS_INC'  ];
+        includes = includes + ' -I'+os.environ['FHICLCPP_INC'];
+        includes = includes + ' -I'+os.environ.get('HEP_CONCURRENCY_INC');
+        includes = includes + ' -I'+os.environ['CLHEP_INC'   ];
+        includes = includes + ' -I'+os.environ['BOOST_INC'   ];
+        includes = includes + ' -I'+os.environ.get('TBB_INC');
+        includes = includes + ' -I'+os.environ.get('MESSAGEFACILITY_INC');
+        includes = includes + ' -I'+os.environ.get('ARTDAQ_CORE_INC');
+        includes = includes + ' -I'+os.environ.get('ARTDAQ_CORE_MU2E_INC');
+    elif (muse_flavor == 'al9'):
+        for p in os.environ.get("MUSE_VIEW_INC").split(':'):
+            includes = includes +' -I'+p
+    else:
+        raise Exception("Unknown OS flavor: %s"%muse_flavor)
+
+    dict        = str(target[0]);
     tmp_lib_dir = os.path.dirname(dict);
-    
-    pcm_file = dict.replace(".cxx","_rdict.pcm");
+    pcm_file    = dict.replace(".cxx","_rdict.pcm");
 
     # print( "[stntuple_gen_rootcint] dict:"+dict + "   pcm_file:"+pcm_file)
     #------------------------------------------------------------------------------

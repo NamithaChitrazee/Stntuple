@@ -16,8 +16,8 @@ def local_build():
     if ( not ("EG" in rootlibs)): rootlibs.insert(rootlibs.index("Physics")+1,"EG");
 
     debug  = False
-    # env.Append(FORTRANFLAGS = ['-Iinclude','-g']);
-    # local_env.Append(FORTRANFLAGS = ['-I'+include']);
+    local_env.Append(FORTRANFLAGS = ['-fPIC']);
+    # local_env.Append(FORTRANFLAGS = ['-I'+include'],'-g');
     helper = stntuple_helper(local_env,debug);
 
     helper.handle_dictionaries();

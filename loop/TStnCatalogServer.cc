@@ -239,7 +239,7 @@ int TStnCatalogServer::InitChain(TChain*     Chain,
 	       Book,Dataset,Run1,Run2);
 
     FILE* pipe = gSystem->OpenPipe(cmd,"r");
-    while (fgets(buf,10000,pipe)) { files.Add(new TObjString(buf)); }
+    while (fgets(buf,1000,pipe)) { files.Add(new TObjString(buf)); }
     gSystem->ClosePipe(pipe);
 
     TString prefix;
