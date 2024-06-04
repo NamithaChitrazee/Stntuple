@@ -19,12 +19,12 @@ f_build_config_muse() {
             pkg_dir=$MUSE_WORK_DIR/$pkg
     pkg_include_dir=$base/include/$pkg
 
-    if [ $debug_level != 0 ] ; then echo ${pkg}::build_config_muse: package=$pkg \$pwd=`pwd`  :: pkg_dir=$pkg_dir ; fi
+    if [ $debug_level != 0 ] ; then echo ${pkg}::build_config_muse:$LINENO: package=$pkg \$pwd=`pwd`  :: pkg_dir=$pkg_dir ; fi
 
     x1=`find $pkg_dir -name SConscript -print`
     list_of_subpackages=`for nm in $x1 ; do echo $nm | grep -v $pkg/SConscript | awk -F / '{print $(NF-1)}' ; done`
 
-    if [ $debug_level != 0 ] ; then echo $pkg::build_config_muse: list_of_subpackages=$list_of_subpackages ; fi
+    if [ $debug_level != 0 ] ; then echo $pkg::build_config_muse:$LINENO: list_of_subpackages=$list_of_subpackages ; fi
 #------------------------------------------------------------------------------
 # package and its subpackages
 #------------------------------------------------------------------------------
@@ -33,12 +33,12 @@ f_build_config_muse() {
 	mkdir -p $pkg_include_dir
     fi
 #------------------------------------------------------------------------------
-# make symbolic links local, as they are 
+# make symbolic links local, as they are , do not create already existing symlinks
 #------------------------------------------------------------------------------
     for d in $list_of_subpackages ; do
-	if [[ -e $base/include/$pkg ]] && [[ ! -e $base/include/$pkg/$d ]] ; then 
+	if [[ -e $pkg_include_dir ]] && [[ ! -L $pkg_include_dir/$d ]] ; then 
 	    cmd="ln -s ../../$pkg/$d/$d $pkg_include_dir/$d"
-	    if [ $debug_level != 0 ] ; then echo `pwd`$0 : executing: $cmd ; fi
+	    if [ $debug_level != 0 ] ; then echo `pwd`$0:$LINENO : executing: $cmd ; fi
 	    $cmd
 	fi
     done
@@ -66,5 +66,5 @@ f_build_config_muse() {
 #------------------------------------------------------------------------------
 # do what is needed
 #------------------------------------------------------------------------------
-if [ $debug_level != 0 ] ; then echo Stntuple::build_config_muse: package=$package debug_level=$debug_level ; fi
+if [ $debug_level != 0 ] ; then echo Stntuple::build_config_muse:$LINENO: package=$package debug_level=$debug_level ; fi
 f_build_config_muse $package $debug_level
