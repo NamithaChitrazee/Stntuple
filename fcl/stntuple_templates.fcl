@@ -1,53 +1,14 @@
 # -*- mode: tcl -*-
 #------------------------------------------------------------------------------
-# defines templates, assume that all prologs have been included 
-# a 'templates' file should include everything needed
-# package 'prolog' files shouldn't be including anything
-#
-# reconstruction and analysis modules
+# templates are also structured
+# additional non-IO tables and other templates
 #------------------------------------------------------------------------------
-Stntuple : { @table::Stntuple }                           # defined in Stntuple/fcl/prolog.fcl
-#------------------------------------------------------------------------------
-# paths
-#------------------------------------------------------------------------------
-Stntuple.paths : {
-#------------------------------------------------------------------------------
-# just ntuple making, goes to end_paths, may need hit making in trigger_paths
-#------------------------------------------------------------------------------
-    p0  : [ @sequence::Stntuple.stnmaker ]
-#------------------------------------------------------------------------------
-# MC generation, G4, reconstruction 
-# stntuple_p1: generation starts from an ntuple    (pre-MDC2020 way)
-# stntuple_p2: generation starts from an .art file (    MDC2020 way)
-#-----------------------------------------------------------------------------------------
-    p1 : [ @sequence::Common.generateSequence,   # generate, genCounter, 
-	   @sequence::Common.g4Sequence,         # g4run   , g4consistent,
-	   EWMProducer,                          # 
-	   @sequence::TrackerMC.StepSim,         # StrawGasStepMaker, 
-	   @sequence::CaloMC.StepSim,            # CaloShowerStepMaker,
-	   CrvSteps,                             # 
-	   DetectorStepFilter ,                  # want something in the tracker
-	   # protonBunchIntensity,               # don't need - it is hiding somewhere
-	   FindMCPrimary,                        # 
-	   @sequence::TrackerMC.DigiSim,         # makeSD
-	   @sequence::Digitize.DigitizeSequence  # PBISim, DigiSim, compressDigiMCs
-	  ]
+#include "Stntuple/fcl/stntuple_services.fcl"
 
-    p2 : [ TargetStopResampler,                  # generatiion starts from an .art file
-	   @sequence::Common.generateSequence,   # generate, genCounter, 
-	   @sequence::Common.g4Sequence,         # g4run   , g4consistent,
-	   EWMProducer,                          # 
-	   @sequence::TrackerMC.StepSim,         # StrawGasStepMaker, 
-	   @sequence::CaloMC.StepSim,            # CaloShowerStepMaker,
-	   CrvSteps,                             # 
-	   DetectorStepFilter ,                  # want something in the tracker
-	   # protonBunchIntensity,               # don't need - it is hiding somewhere
-	   FindMCPrimary,                        # 
-	   @sequence::TrackerMC.DigiSim,         # makeSD
-	   @sequence::Digitize.DigitizeSequence  # PBISim, DigiSim, compressDigiMCs
-          ]
-#------------------------------------------------------------------------------
-    p3  : [ @sequence::Stntuple.stnmaker_trig ]
-#------------------------------------------------------------------------------
+#include "Stntuple/fcl/production_tables.fcl"
+#include "Stntuple/fcl/stntuple_tables.fcl"
 
-}
+#include "Stntuple/fcl/stntuple_io.fcl"
+#------------------------------------------------------------------------------
+# end templates
+#------------------------------------------------------------------------------
