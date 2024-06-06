@@ -41,7 +41,8 @@ Stntuple : { @table::Stntuple
               ]
 
         p3  : [ @sequence::Stntuple.stnmaker_trig ]
-}                           # defined in Stntuple/fcl/prolog.fcl
+    }
+}
 #------------------------------------------------------------------------------
 # lower case 'stntuple' is for inclusion
 #------------------------------------------------------------------------------
