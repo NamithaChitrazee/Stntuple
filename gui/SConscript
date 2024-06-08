@@ -62,8 +62,9 @@ def local_build():
                          'xerces-c',
                          rootlibs ,
                          'MF_MessageLogger',
-                         'CLHEP',
-                         'boost_system',
+                         'CLHEP'           ,
+                         'tracelib'        ,
+                         'boost_system'    ,
                          'boost_filesystem',
                          'boost_system'
                      ];

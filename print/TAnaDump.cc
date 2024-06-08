@@ -61,7 +61,6 @@
 
 #include "Offline/TrkDiag/inc/TrkMCTools.hh"
 
-
 // BTRK (BaBar) includes
 #include "BTrk/BbrGeom/TrkLineTraj.hh"
 #include "BTrk/TrkBase/TrkPoca.hh"
@@ -69,6 +68,9 @@
 #include "BTrk/KalmanTrack/KalRep.hh"
 #include "BTrk/TrkBase/HelixParams.hh"
 #include "BTrk/ProbTools/ChisqConsistency.hh"
+
+#include "Offline/TrkReco/inc/TrkPrintUtils.hh"
+
 
 using namespace std;
 
@@ -1556,11 +1558,12 @@ void TAnaDump::printStrawHit(const mu2e::StrawHit* Hit, const mu2e::StrawGasStep
   opt.ToLower();
 
   if ((opt == "") || (opt.Index("banner") >= 0)) {
-    printf("#--------------------------------------------------------------------------");
+    printf("\n");
+    printf("#-------------------------------------------------------------------");
     printf("------------------------------------------------------------\n");
-    printf("#   I   SID    Flags  Pln   Pnl  Lay   Str     Time          dt       eDep ");
+    printf("#   I   SID    Flags  Pln:Pnl:Lay:Str   Time    TOT     dt     eDep ");
     printf("           PDG       PDG(M)   Generator      SimpID      p  \n");
-    printf("#--------------------------------------------------------------------------");
+    printf("#-------------------------------------------------------------------");
     printf("------------------------------------------------------------\n");
   }
 
@@ -1827,117 +1830,6 @@ void TAnaDump::printStrawGasStepCollection(const char* CollTag,
     }
   }
  
-}
-
-
-//-----------------------------------------------------------------------------------------------------
-// if PrintData non-null, it is a pointer to the index ..
-//-----------------------------------------------------------------------------------------------------
-void TAnaDump::printSimParticle(const mu2e::SimParticle* P, const char* Opt, const void* PrintData) {
-
-    TString opt = Opt;
-
-    if ((opt == "") || (opt.Index("banner") >= 0)) {
-      printf("-----------------------------------------------------------------------------------------");
-      printf("-----------------------------------------");
-      printf("---------------------------------------------------------------------------------------\n");
-      printf("Index Primary     ID Parent     GenpID        PDG      X0          Y0         Z0         ");
-      printf("T0       Px0       Py0      Pz0        E0 ");
-      printf("        X1         Y1           Z1        T1         Px1       Py1      Pz1        E1  \n");
-      printf("-----------------------------------------------------------------------------------------");
-      printf("------------------------------------------");
-      printf("---------------------------------------------------------------------------------------\n");
-    }
- 
-    if ((opt == "") || (opt.Index("data") >= 0)) {
-      int  id        = P->id().asInt();
-      
-      int  parent_id (-1);
-
-      if (P->parent()) {
-	parent_id = P->parent()->id().asInt();
-      }
-      int  pdg_id    = P->pdgId();
-      int  primary   = P->isPrimary();
-
-      int index (-1.);
-      if (PrintData) index = *((int*) PrintData);
-
-      printf("%5i %7i %6i %6i %10i %10i",
-	     index, primary, id, parent_id, 
-	     P->generatorIndex(), pdg_id);
-
-      printf(" %10.3f %10.3f %10.3f %9.3f %9.3f %9.3f %9.3f %9.3f",
-	     P->startPosition().x(),
-	     P->startPosition().y(),
-	     P->startPosition().z(),
-	     P->startGlobalTime(),
-	     P->startMomentum().x(),
-	     P->startMomentum().y(),
-	     P->startMomentum().z(),
-	     P->startMomentum().e());
-
-      printf(" %10.3f %10.3f %10.3f %10.3f %9.3f %9.3f %9.3f %9.3f\n",
-	     P->endPosition().x(),
-	     P->endPosition().y(),
-	     P->endPosition().z(),
-	     P->endGlobalTime(),
-	     P->endMomentum().x(),
-	     P->endMomentum().y(),
-	     P->endMomentum().z(),
-	     P->endMomentum().e());
-    }
-  }
-
-
-
-//-----------------------------------------------------------------------------
-void TAnaDump::printSimParticleCollection(const char* ModuleLabel, 
-					  const char* ProductName, 
-					  const char* ProcessName) {
-
-  art::Handle<mu2e::SimParticleCollection> handle;
-  const mu2e::SimParticleCollection*       coll(0);
-  const mu2e::SimParticle*                 simp(0);
-
-  if (ProductName[0] != 0) {
-    art::Selector  selector(art::ProductInstanceNameSelector(ProductName) &&
-			    art::ProcessNameSelector        (ProcessName) && 
-			    art::ModuleLabelSelector        (ModuleLabel)    );
-    fEvent->get(selector, handle);
-  }
-  else {
-    art::Selector  selector(art::ProcessNameSelector(ProcessName)         && 
-			    art::ModuleLabelSelector(ModuleLabel)            );
-    fEvent->get(selector, handle);
-  }
-
-  if (handle.isValid()) coll = handle.product();
-  else {
-    printf(">>> ERROR in TAnaDump::printSimParticleCollection: failed to locate collection");
-    printf(". BAIL OUT. \n");
-    return;
-  }
-
-  int banner_printed(0);
-
-  int np = coll->size();
-
-  int i = 0;
-  for ( mu2e::SimParticleCollection::const_iterator j=coll->begin(); j != coll->end(); ++j) {
-    simp = &j->second;
-
-    if (banner_printed == 0) {
-      printSimParticle(simp,"banner",&i);
-      banner_printed = 1;
-    }
-    printSimParticle(simp,"data",&i);
-    i++;
-  }
-
-  if (i != np) {
-    printf(" inconsistency in TAnaDump::printSimParticleCollection\n");
-  }
 }
 
 

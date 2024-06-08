@@ -45,10 +45,7 @@ def local_build():
                         'mu2e_DataProducts',
                         'mu2e_CaloMC',
                         'mu2e_BTrkData',
-                        
-#                            'HepPDT',
-#                        'HepPID',
-                        
+                                                
                         babarlibs,
                         
                         'art_Framework_Core',
@@ -71,6 +68,7 @@ def local_build():
                         'KinKal_Trajectory',
                         'KinKal_General',
                         'xerces-c',
+                        'tracelib'        ,
                         'boost_filesystem',
                         'boost_system'
     ];

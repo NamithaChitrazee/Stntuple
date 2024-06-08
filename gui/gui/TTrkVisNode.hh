@@ -48,15 +48,9 @@ protected:
   const mu2e::ComboHitCollection*              fChColl;     // several SH per CH
   std::string                                  fChCollTag;
   
-  // const mu2e::StrawHitFlagCollection*          fChfColl;     // CH flags
-  // std::string                                  fChfCollTag;
-  
   const mu2e::ComboHitCollection*              fSchColl;     // one     SH per CH
   const mu2e::StrawHitCollection*              fShColl;      // straw hit coll
   art::InputTag                                fShCollTag;
-
-  // const mu2e::StrawHitFlagCollection*          fShfColl;     // SH flags, for printing, mostly
-  // std::string                                  fShfCollTag;
 
   const mu2e::StrawDigiCollection**            fSdColl;		   // straw digi coll
 
@@ -69,6 +63,8 @@ protected:
   std::string                                  fKsCollTag;         // straw digi collection
 
   const mu2e::SimParticleCollection**          fSimpColl;
+  art::InputTag                                fSimpCollTag;       // sim particle coll
+
   const mu2e::StepPointMCCollection**          fSpmcColl;
 
   TStnTrackBlock*           fTrackBlock;
@@ -134,14 +130,12 @@ public:
 //-----------------------------------------------------------------------------
 // modifiers
 //-----------------------------------------------------------------------------
-  //  void  SetInitSimpBlock(StntupleInitSimpBlock* InitBlock) { fInitSimpBlock = InitBlock; }
 
-  void SetKsCollTag     (std::string& CollTag) { fKsCollTag   = CollTag; }
-  void SetChCollTag     (std::string& CollTag) { fChCollTag   = CollTag; }
-  // void SetChfCollTag    (std::string& CollTag) { fChfCollTag  = CollTag; }
+  void SetKsCollTag     (std::string&   CollTag) { fKsCollTag   = CollTag; }
+  void SetChCollTag     (std::string&   CollTag) { fChCollTag   = CollTag; }
   void SetShCollTag     (art::InputTag& CollTag) { fShCollTag   = CollTag; }
-  // void SetShfCollTag    (std::string& CollTag) { fShfCollTag  = CollTag; }
   void SetSdmcCollTag   (art::InputTag& CollTag) { fSdmcCollTag = CollTag; }
+  void SetSimpCollTag   (art::InputTag& CollTag) { fSimpCollTag = CollTag; }
 
   void  SetSimpBlock   (TSimpBlock* Block) { fSimpBlock    = Block; }
   void  SetListOfTracks(TObjArray*  List ) { fListOfTracks = List ; }
@@ -150,10 +144,6 @@ public:
   void SetSwColl(const mu2e::StrawDigiADCWaveformCollection** Coll) { 
     fSwColl = Coll;
   }
-
-  // void SetStrawHitFlagColl(const mu2e::StrawHitFlagCollection** Coll) { 
-  //   fStrawHitFlagColl = Coll;
-  // }
 
   void SetSimpColl(const mu2e::SimParticleCollection** Coll) { 
     fSimpColl = Coll;

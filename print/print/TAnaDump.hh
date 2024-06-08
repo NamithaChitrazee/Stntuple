@@ -27,8 +27,6 @@
 #include "Offline/RecoDataProducts/inc/HelixHit.hh"
 // #include "Offline/DataProducts/inc/XYZVec.hh"
 
-#include "Offline/TrkReco/inc/TrkPrintUtils.hh"
-
 #else
 
 namespace art {
@@ -280,6 +278,8 @@ public:
   void printSimParticleCollection(const char* ModuleLabel     , 
 				  const char* ProductName = "", 
 				  const char* ProcessName = "");
+  
+  void printSimParticleCollection(const art::InputTag& SimpCollTag);
 //-----------------------------------------------------------------------------
 // pass the detector name to know what to print for different detectors
 // tested for Detector = 'tracker', 'calorimeter'
@@ -295,12 +295,10 @@ public:
   void printTimeCluster   (const mu2e::TimeCluster*            TimePeak        , 
                            const char*                         Opt         = "", 
 			   const mu2e::ComboHitCollection*     ChColl      = nullptr,
-                           const mu2e::StrawHitFlagCollection* ChfColl     = nullptr,
 			   const char*                         SdmcCollTag = "makeSD");
 
   void printTimeClusterCollection(const char* TcCollTag             ,    // time cluster collection tag
 				  const char* ChCollTag             ,    // combo hit coll tag
-				  const char* ChfCollTag            ,    // combo hit flag coll tag
 				  int         PrintHits   = 0       ,
 				  const char* SdmcCollTag = nullptr);   // straw digi mc coll tag
 //-----------------------------------------------------------------------------

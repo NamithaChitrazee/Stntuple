@@ -42,7 +42,7 @@ MuHitDisplay::MuHitDisplay(fhicl::ParameterSet const& pset) :
   _shCollTag                   (pset.get<art::InputTag>("strawHitCollTag")),
   //  _shfCollTag                  (pset.get<string>("shfCollTag")),
   _comboHitCollTag             (pset.get<string>("comboHitCollTag")),
-  _chfCollTag                  (pset.get<string>("chfCollTag")),
+  //  _chfCollTag                  (pset.get<string>("chfCollTag")),
   _sdCollTag                   (pset.get<string>("sdCollTag")),            // straw digi
   _sdmcCollTag                 (pset.get<art::InputTag>("sdmcCollTag")),
   _swCollTag                   (pset.get<string>("swCollTag")),           // straw waveformws
@@ -280,13 +280,14 @@ void MuHitDisplay::InitVisManager() {
 //-----------------------------------------------------------------------------
   TTrkVisNode* tnode = new TTrkVisNode ("TrkVisNode", fTracker, NULL);
 
-  tnode->SetShCollTag       (_shCollTag);
-  //  tnode->SetShfCollTag      (_shfCollTag     );
+  tnode->SetShCollTag       (_shCollTag      );
   tnode->SetChCollTag       (_comboHitCollTag);
-  //  tnode->SetChfCollTag      (_chfCollTag     );
   tnode->SetKsCollTag       (_kffCollTag     );
   tnode->SetSdmcCollTag     (_sdmcCollTag    );
+
   tnode->SetSimpColl        (&_simpColl      );
+  tnode->SetSimpCollTag     (_simpCollTag    );
+
   tnode->SetSpmcColl        (&_spmcColl      );
   tnode->SetSwColl          (&_swColl        );
 //-----------------------------------------------------------------------------
@@ -309,7 +310,7 @@ void MuHitDisplay::InitVisManager() {
   tc_node->SetTcCollTag  (_timeClusterCollTag);
   tc_node->SetPcCollTag  (_phiClusterCollTag );
   tc_node->SetChCollTag  (_comboHitCollTag   );
-  tc_node->SetChfCollTag (_chfCollTag        );
+  //  tc_node->SetChfCollTag (_chfCollTag        );
   tc_node->SetSdmcCollTag(_sdmcCollTag       );
 //-----------------------------------------------------------------------------
 // nodes are defined, now come views

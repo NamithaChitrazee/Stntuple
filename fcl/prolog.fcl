@@ -176,8 +176,7 @@ MuHitDisplay: { module_type:MuHitDisplay                 # class name;
     showTracks                   : true
     
     genpCollTag                  : "generate"
-    comboHitCollTag              : "FlagBkgHits"                     ## (was "makePH") flagged comboHits
-    chfCollTag                   : "FlagBkgHits:ComboHits"           # combo hit flags
+    comboHitCollTag              : "makePH"                          ## "FlagBkgHits" ## (was "makePH") flagged comboHits
     helixSeedCollTag             : "MHFinderDe"                      # helices
     strawHitCollTag              : "makeSH"
     sdCollTag                    : "compressDigiMCs"                 # standard MC choice

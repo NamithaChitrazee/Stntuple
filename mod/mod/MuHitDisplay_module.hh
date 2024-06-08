@@ -92,9 +92,9 @@ private:
   string        _crvRecoPulseCollTag;
 
   art::InputTag _shCollTag;
-  string        _shfCollTag;            // straw hit flags
+  //string        _shfCollTag;            // straw hit flags
   string        _comboHitCollTag;
-  string        _chfCollTag;            // straw hit flags
+  //  string        _chfCollTag;            // straw hit flags
   string        _sdCollTag;		// strawDigiCollTag
   art::InputTag _sdmcCollTag;
   string        _swCollTag;
