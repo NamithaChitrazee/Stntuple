@@ -637,7 +637,7 @@ void TTrkVisNode::PaintXY(Option_t* Option) {
       }
 
       float mom          = simp->StartMom()->P();
-      if ((mom >= vm->MinMcMomentum()) and (mom <= vm->MaxMcMomentum())) {
+      if ((mom >= vm->MinSimpMomentum()) and (mom <= vm->MaxSimpMomentum())) {
         esp->PaintXY(Option);
       }
     }
@@ -746,7 +746,7 @@ void TTrkVisNode::PaintRZ(Option_t* Option) {
       }
 
       float mom          = simp->StartMom()->P();
-      if ((mom >= vm->MinMcMomentum()) and (mom <= vm->MaxMcMomentum())) {
+      if ((mom >= vm->MinSimpMomentum()) and (mom <= vm->MaxSimpMomentum())) {
         esim->PaintRZ(Option);
       }
     }

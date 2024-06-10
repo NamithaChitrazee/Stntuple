@@ -70,8 +70,8 @@ TStnVisManager::TStnVisManager(const char* Name, const char* Title): TVisManager
   fIgnoreProtonHits    = 0;
   fIgnoreProtons       = 0;
 
-  fMinMcMomentum       = 60;
-  fMaxMcMomentum       = 1.e10;                // in MeV/c
+  fMinSimpMomentum     = 60;
+  fMaxSimpMomentum     = 1.e10;                // in MeV/c
 }
 
 //_____________________________________________________________________________

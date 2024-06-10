@@ -65,6 +65,7 @@ MuHitDisplay::MuHitDisplay(fhicl::ParameterSet const& pset) :
   _minEnergyDep                (pset.get<double>        ("minEnergyDep", 0)),
   _timeWindow                  (pset.get<double>        ("timeWindow", 1.e6)),
   _minSimpMomentum             (pset.get<double>        ("minSimpMomentum")),
+  _maxSimpMomentum             (pset.get<double>        ("maxSimpMomentum")),
 
   _showCRVOnly                 (pset.get<bool>("showCRVOnly", false)),
   _showTracks                  (pset.get<bool>("showTracks")),
@@ -159,6 +160,8 @@ void MuHitDisplay::beginRun(const art::Run& Run) {
 
   TStnVisManager* vm = TStnVisManager::Instance();
   vm->SetMbTime(mbtime);
+  vm->SetMinSimpMomentum(_minSimpMomentum);
+  vm->SetMaxSimpMomentum(_maxSimpMomentum);
 
   TModule::beginRun(Run);
 }

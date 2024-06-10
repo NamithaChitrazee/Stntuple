@@ -228,22 +228,6 @@ public:
 				const char* StrawHitCollTag    = "makeSH",  // usually, "makeSH"
 				const char* StrawDigiMCCollTag = "compressDigiMCs" ); // most often, "makeSD" or "compressDigiMCs"
 
-  void printStrawHit      (const mu2e::StrawHit*     Hit, 
-			   const mu2e::StrawGasStep* Step,
-			   const char*               Opt   = "", 
-			   int                       INit  = -1,
-			   int                       Flags = -1);
-  
-  void printStrawHitCollection (const char* StrawHitCollTag, 
-				const char* StrawDigiMCCollTag = "compressDigiMCs", 
-				double TMin = -1.e6, double TMax =  1.e6);
-
-  void printStrawGasStep   (const mu2e::StrawGasStep* Step     ,
-			    const char*               Opt  = "",
-			    int   IStep                    = -1);
-  
-  void printStrawGasStepCollection (const char* CollTag, double TMin = -1.e6, double TMax =  1.e6);
-
   void printHelixHit      (const mu2e::HelixHit*     HelHit,
 			   const mu2e::ComboHit*     Hit, 
 			   const mu2e::StrawGasStep* Step,
@@ -289,6 +273,23 @@ public:
   void printStepPointMCCollection (const char* ModuleLabel     , 
 				   const char* ProductName = "", 
 				   const char* ProcessName = "");
+
+  void printStrawHit      (const mu2e::StrawHit*     Hit, 
+			   const mu2e::StrawGasStep* Step,
+			   const char*               Opt   = "", 
+			   int                       INit  = -1,
+			   int                       Flags = -1);
+  
+  void printStrawHitCollection (const char* StrawHitCollTag, 
+				const char* StrawDigiMCCollTag = "compressDigiMCs", 
+				double TMin = -1.e6, double TMax =  1.e6);
+
+  void printStrawGasStep   (const mu2e::StrawGasStep* Step     ,
+			    const char*               Opt  = "",
+			    int   IStep                    = -1);
+  
+  void printStrawGasStepCollection (const char* CollTag, double TMin = -1.e6, double TMax =  1.e6);
+
 //-----------------------------------------------------------------------------
 // time clusters
 //-----------------------------------------------------------------------------

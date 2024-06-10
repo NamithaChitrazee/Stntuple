@@ -122,7 +122,8 @@ private:
   // StrawHitFlag  fGoodHitMask;           // unused
   // StrawHitFlag  fBadHitMask;            // unused
   // size_t        _minHits;               // unused
-  double        _minSimpMomentum;       // to initialize Simp Block
+  double        _minSimpMomentum;       // to initialize SimpBlock and TStnVisManager
+  double        _maxSimpMomentum;       // to initialize SimpBlock and TStnVisManager
 //-----------------------------------------------------------------------------
 // Control for CRV-specific viewing
 //-----------------------------------------------------------------------------

@@ -207,7 +207,8 @@ MuHitDisplay: { module_type:MuHitDisplay                 # class name;
     badHitMask                   : ["Background"] 
     
     minHits                      : 5
-    minSimpMomentum              : 40. # MeV
+    minSimpMomentum              : 40.      ## MeV
+    maxSimpMomentum              : 1.e12    ## MeV
     timeWindow                   : 100000.
 #------------------------------------------------------------------------------
 # kalDiag and Doublet Resolver
