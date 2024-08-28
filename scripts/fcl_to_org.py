@@ -223,7 +223,7 @@ class Tool:
 
         # at this point the table is parsed, we can print it in a form of .org file
 
-        fout.write('# -*- mode:org -*-\n')
+        fout.write('#+startup:fold -*- mode:org buffer-read-only:t -*-\n')
         fout.write('# printing output in org format:\n')
 
         self.print_table_to_org(self.fTable,'*',fout);
