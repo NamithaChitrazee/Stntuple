@@ -1,35 +1,19 @@
-#+startup:fold
+#+startup:fold -*- buffer-read-only:t -*- 
 * _Building Stntuple libraries under muse_                                   
-
 - assume $MUSE_WORK_DIR is the working directory
 - start from building in debug mode 
 - To save space on /mu2e/app, it might make sense to redirect $MUSE_WORK_DIR/build 
   to /mu2e/data/users/...)
-
-#+begin_src  
-# ... assuming you have your muse-based area setup 
-# other repos needed: Offline, Production, mu2e_trig_config
-git clone https://www.github.com/Mu2e/Stntuple.git 
-# .. redo the setups in a new shell - muse needs that after a new package was added
-muse build 
-#+end_src 
-
-* _Building Stntuple libraries in a full test release_                
-
-- in a fresh shell, create a new working area, say 'dev', and clone Offline and Stntuple 
-  to there:
-
-#+begin_src
-mkdir dev
-cd dev
-git clone https://www.github.com/Mu2e/Offline.git 
-git clone https://www.github.com/Mu2e/Stntuple.git 
-#+end_src
-
-- with *dev* being a current directory, setup Mu2e environment and build
-
+** first time                                                                
+- in a fresh shell, create a new working area, say 'dev', clone Offline, mu2e_trig_config,
+  and Stntuple to there, and build :
 #+begin_src
 source /cvmfs/mu2e.opensciencegrid.org/setupmu2e-art.sh
+mkdir dev
+cd dev
+git clone https://www.github.com/Mu2e/Offline
+git clone https://www.github.com/Mu2e/mu2e_trig_config
+git clone https://www.github.com/Mu2e/Stntuple
 muse setup -q debug
 muse build
 #+end_src
