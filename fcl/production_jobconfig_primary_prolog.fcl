@@ -192,12 +192,4 @@ Primary.EndPath : [ @sequence::Primary.EndSequence, PrimaryOutput ]
 #------------------------------------------------------------------------------
 # JobConfig/primary/epilog.fcl
 #------------------------------------------------------------------------------
-# use detailed physics list
-Primary.producers.g4run.physics.physicsListName:ShieldingM_EMZ
-# use 'coarse' stepping in the calorimeter to save time
-Primary.producers.g4run.physics.minRangeRegionCuts: { CalorimeterMother : 0.1}
-# save the MC Trajectories of primary particles
-Primary.producers.g4run.TrajectoryControl: @local::mu2eg4DefaultTrajectories
-# extend the sensitive volume list to include passive material (only for primaries)
-Primary.producers.g4run.SDConfig.enableSD: [@sequence::Primary.producers.g4run.SDConfig.enableSD, stoppingtarget , protonabsorber ]
 END_PROLOG

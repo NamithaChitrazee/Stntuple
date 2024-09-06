@@ -65,13 +65,13 @@ void stnana (TString     Book   ,
     if (dir) {
       sprintf(macro,"%s/Stntuple/scripts/%s",dir,script[i]);
       if (! cint->IsLoaded(macro)) {
-	printf("[stnana.C]: locating %s\n",macro);
+	printf("[stnana.C] locating %s\n",macro);
 	cint->LoadMacro(macro,&rc);
 	if (rc != 0) printf("stnana ERROR : failed to load %s\n",macro);
       }
     }
     else {
-      printf("[stnana.C]: WARNING: environment variable %s is not defined\n",script[i+1]);
+      printf("[stnana.C] WARNING: environment variable %s is not defined\n",script[i+1]);
     }
   }
 
@@ -80,6 +80,8 @@ void stnana (TString     Book   ,
   // }
 
   TString stnana_packages = gEnv->GetValue("Stnana.Package","");
+  
+  printf("[stnana.C] stnana packages: %s\n",stnana_packages.Data());
 
   TObjArray* list_of_packages = stnana_packages.Tokenize(" ");
   
@@ -106,7 +108,7 @@ void stnana (TString     Book   ,
 //-----------------------------------------------------------------------------
 // parse job options: /mc[=] /grl= /little /newcuts /output[=] /save[=] /debug= /pass=
 //-----------------------------------------------------------------------------
-  printf("[stnana.C]: parsing command line\n");
+  printf("[stnana.C] parsing command line\n");
   parse_job_parameters(JobName,g);
 
   if (g.dataset != 0) {
@@ -144,7 +146,7 @@ void stnana (TString     Book   ,
 //-----------------------------------------------------------------------------
 // generator-level MC study - use PHOTOS
 //-----------------------------------------------------------------------------
-      printf("[stnana.C]: PHOTOS initialization\n");
+      printf("[stnana.C] PHOTOS initialization\n");
       g.x = new TStnAna();
       gInterpreter->ProcessLine("init_photos()");
     }
@@ -169,7 +171,7 @@ void stnana (TString     Book   ,
 	return;
       }
 
-      /* DEBUG */     // printf("[stnana.C]: done with the dataset initialization\n");
+      /* DEBUG */     // printf("[stnana.C] done with the dataset initialization\n");
 //-----------------------------------------------------------------------------
 //  no matter what command line prevails
 //-----------------------------------------------------------------------------
@@ -180,7 +182,7 @@ void stnana (TString     Book   ,
 	g.dataset->SetMcFlag(0);
       }
       
-      printf("[stnana.C]: dataset MC_FLAG = %i\n",g.dataset->GetMcFlag());
+      printf("[stnana.C] dataset MC_FLAG = %i\n",g.dataset->GetMcFlag());
 
       g.x = new TStnAna(g.dataset);
       g.x->SetPrintLevel(0);
@@ -203,9 +205,9 @@ void stnana (TString     Book   ,
     const char* init_geometry = gEnv->GetValue("Stnana.InitGeometry",
 					       "stntuple_init_geometry");
     sprintf(line,"%s();",init_geometry);
-    printf("[stnana.C]: executing:  %s\n",line);
+    printf("[stnana.C] executing:  %s\n",line);
     gInterpreter->ProcessLine(line);
-    printf("[stnana.C]: done with executing:  %s\n",line);
+    printf("[stnana.C] done with executing:  %s\n",line);
   }
   //  /* DEBUG */      return;
 //-----------------------------------------------------------------------------
@@ -213,11 +215,11 @@ void stnana (TString     Book   ,
 // to specify '/mc' in either batch or interactive job to make trigger 
 // emulation to work
 //-----------------------------------------------------------------------------
-  printf("[stnana.C]: starting trigger setup\n");    
+  printf("[stnana.C] starting trigger setup\n");    
 
   setup_trigger_path(g.L3TrigPath.Data());
 
-  // /* DEBUG */     printf("[stnana.C]: after setup_trigger_path\n");    
+  // /* DEBUG */     printf("[stnana.C] after setup_trigger_path\n");    
 //-----------------------------------------------------------------------------
 //  analyse definition of the requested job, handle debug mode
 //-----------------------------------------------------------------------------
@@ -240,7 +242,7 @@ void stnana (TString     Book   ,
     }
   }
   else {
-    printf(" ****** unknown job : %s, bailing out ****** \n",task.Data());
+    printf("[stnana.C] ERROR: unknown job : %s, bailing out ****** \n",task.Data());
     g.ListOfTasks->Print();
     return;
   }

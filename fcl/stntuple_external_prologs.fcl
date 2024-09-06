@@ -65,6 +65,6 @@ END_PROLOG
 # include-less clones of Production fcls - does the sequence of inclusion matter ?
 #------------------------------------------------------------------------------
 #include "Stntuple/fcl/production_jobconfig_common_prolog.fcl" 
-#include "Stntuple/fcl/production_jobconfig_digitize_prolog.fcl" 
 #include "Stntuple/fcl/production_jobconfig_primary_prolog.fcl"
+#include "Stntuple/fcl/production_jobconfig_digitize_prolog.fcl" 
 #include "Stntuple/fcl/production_jobconfig_reco_prolog.fcl"   
