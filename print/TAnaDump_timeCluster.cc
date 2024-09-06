@@ -20,7 +20,6 @@ using namespace mu2e;
 void TAnaDump::printTimeCluster(const mu2e::TimeCluster*            TimeCluster, 
 				const char*                         Opt, 
 				const mu2e::ComboHitCollection*     ChColl, 
-				const mu2e::StrawHitFlagCollection* ChfColl, 
 				const char*                         SdmcCollTag) {
 //-----------------------------------------------------------------------------
 // MC collection could be absent, missing, or incorrectly specified - 
@@ -94,11 +93,6 @@ void TAnaDump::printTimeCluster(const mu2e::TimeCluster*            TimeCluster,
         int loc   = hit-ch_0;
         int flags = *((int*) &hit->flag());
 	if (opt.Index("debug") < 0) {
-//-----------------------------------------------------------------------------
-// if ChfColl is defined, use supplied StrawHitFlagCollection to print flags 
-//-----------------------------------------------------------------------------
-          if (ChfColl) flags = *((int*) &ChfColl->at(loc));
-
           const StrawGasStep* step(nullptr);
 	  if (mcdigis) {
 	    const StrawDigiMC* sdmc = &mcdigis->at(hit->index(0));
@@ -120,7 +114,6 @@ void TAnaDump::printTimeCluster(const mu2e::TimeCluster*            TimeCluster,
 //-----------------------------------------------------------------------------
 void TAnaDump::printTimeClusterCollection(const char* TcCollTag  , 
 					  const char* ChCollTag  ,
-					  const char* ChfCollTag ,
 					  int         hitOpt     ,
 					  const char* SdmcCollTag) {
 
@@ -131,8 +124,8 @@ void TAnaDump::printTimeClusterCollection(const char* TcCollTag  ,
   art::Handle<mu2e::ComboHitCollection>     chcH;
   const mu2e::ComboHitCollection*           chc(0);
 
-  art::Handle<mu2e::StrawHitFlagCollection>  chfcH;
-  const mu2e::StrawHitFlagCollection*        chfc(nullptr);
+  // art::Handle<mu2e::StrawHitFlagCollection>  chfcH;
+  // const mu2e::StrawHitFlagCollection*        chfc(nullptr);
 //-----------------------------------------------------------------------------
 // locate collections to be used
 //-----------------------------------------------------------------------------
@@ -150,14 +143,14 @@ void TAnaDump::printTimeClusterCollection(const char* TcCollTag  ,
     return;
   }
 
-  fEvent->getByLabel(ChfCollTag,chfcH);
-  if (chfcH.isValid()) chfc = (mu2e::StrawHitFlagCollection* )chcH.product();
-  else {
-    print_shf_colls();
-//-----------------------------------------------------------------------------
-// can do without flags, so don't bail out...
-//-----------------------------------------------------------------------------
-  }
+//   fEvent->getByLabel(ChfCollTag,chfcH);
+//   if (chfcH.isValid()) chfc = (mu2e::StrawHitFlagCollection* )chcH.product();
+//   else {
+//     print_shf_colls();
+// //-----------------------------------------------------------------------------
+// // can do without flags, so don't bail out...
+// //-----------------------------------------------------------------------------
+//   }
 
   int banner_printed(0);
 
@@ -169,19 +162,19 @@ void TAnaDump::printTimeClusterCollection(const char* TcCollTag  ,
       banner_printed = 1;
     }
 
-    if      (hitOpt == 0) printTimeCluster(tc,"data",chc,chfc,SdmcCollTag);
+    if      (hitOpt == 0) printTimeCluster(tc,"data",chc,SdmcCollTag);
     else if (hitOpt == 1) {
 //-----------------------------------------------------------------------------
 // if hit printout has been requested, print banner in front of each cluster
 //-----------------------------------------------------------------------------
-      printTimeCluster(tc,"data+hits",chc,chfc,SdmcCollTag);
+      printTimeCluster(tc,"data+hits",chc,SdmcCollTag);
       banner_printed = 0;
     }
     else if (hitOpt == 2) {
 //-----------------------------------------------------------------------------
 // debug mode
 //-----------------------------------------------------------------------------
-      printTimeCluster(tc,"data+hits+debug",chc,chfc,SdmcCollTag);
+      printTimeCluster(tc,"data+hits+debug",chc,SdmcCollTag);
       banner_printed = 0;
     }
   }

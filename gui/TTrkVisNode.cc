@@ -637,7 +637,7 @@ void TTrkVisNode::PaintXY(Option_t* Option) {
       }
 
       float mom          = simp->StartMom()->P();
-      if ((mom >= vm->MinMcMomentum()) and (mom <= vm->MaxMcMomentum())) {
+      if ((mom >= vm->MinSimpMomentum()) and (mom <= vm->MaxSimpMomentum())) {
         esp->PaintXY(Option);
       }
     }
@@ -746,7 +746,7 @@ void TTrkVisNode::PaintRZ(Option_t* Option) {
       }
 
       float mom          = simp->StartMom()->P();
-      if ((mom >= vm->MinMcMomentum()) and (mom <= vm->MaxMcMomentum())) {
+      if ((mom >= vm->MinSimpMomentum()) and (mom <= vm->MaxSimpMomentum())) {
         esim->PaintRZ(Option);
       }
     }
@@ -1185,18 +1185,26 @@ void TTrkVisNode::NodePrint(const void* Object, const char* ClassName) {
 
   TAnaDump* ad = TAnaDump::Instance();
 
-  if (class_name == "KalSeed") {
+  if (class_name == "ComboHit") {
+//-----------------------------------------------------------------------------
+// print a ComboHit or a collection of those
+//-----------------------------------------------------------------------------
+    if (Object) ad->printComboHit          ((const mu2e::ComboHit*) Object,nullptr);
+    else        ad->printComboHitCollection(fChCollTag.data(),fSdmcCollTag.encode().data());
+  }
+  else if (class_name == "KalSeed") {
 //-----------------------------------------------------------------------------
 // print a KalSeed or a KalSeed collection
 //-----------------------------------------------------------------------------
-    if (Object) {
-      const mu2e::KalSeed* ks = (const mu2e::KalSeed*) Object;
-      ad->printKalSeed(ks,"",fShCollTag.encode().data(),fSdmcCollTag.encode().data());
-    }
-    else {
-					// Object = nullptr: print collection, with hits 
-      ad->printKalSeedCollection(fKsCollTag.data(),1,fShCollTag.encode().data(),fSdmcCollTag.encode().data());
-    }
+    if (Object) ad->printKalSeed          ((const mu2e::KalSeed*) Object,"",fShCollTag.encode().data(),fSdmcCollTag.encode().data());
+    else        ad->printKalSeedCollection(fKsCollTag.data(),1,fShCollTag.encode().data(),fSdmcCollTag.encode().data());
+  }
+  else if (class_name == "SimParticle") {
+    ad->printSimParticleCollection(fSimpCollTag);
+  }
+  else if (class_name == "StrawHit") {
+    if (Object) ad->printStrawHit          ((const mu2e::StrawHit*) Object,nullptr);
+    else        ad->printStrawHitCollection(fShCollTag.encode().data(),fSdmcCollTag.encode().data());
   }
   else {
     printf("WARNING in TTrkVisNode::Print: print for %s not implemented yet\n",ClassName);

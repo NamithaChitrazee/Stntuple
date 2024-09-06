@@ -32,6 +32,9 @@
 
 #include <boost/lexical_cast/lexical_cast_old.hpp>
 
+#include "TRACE/tracemf.h"
+#define  TRACE_NAME         "TStnVisManager"
+
 // ClassImp(TStnVisManager)
 
 //-----------------------------------------------------------------------------
@@ -67,8 +70,8 @@ TStnVisManager::TStnVisManager(const char* Name, const char* Title): TVisManager
   fIgnoreProtonHits    = 0;
   fIgnoreProtons       = 0;
 
-  fMinMcMomentum       = 60;
-  fMaxMcMomentum       = 1.e10;                // in MeV/c
+  fMinSimpMomentum     = 60;
+  fMaxSimpMomentum     = 1.e10;                // in MeV/c
 }
 
 //_____________________________________________________________________________
@@ -1114,29 +1117,29 @@ void TStnVisManager::NextEvent() {
   gROOT->ProcessLine(".q");
 }
 
-//_____________________________________________________________________________
+//-----------------------------------------------------------------------------
+// note missing 's' : 'KalSeeds' vs 'KalSeed' - NodePrint takes the class name...
+//-----------------------------------------------------------------------------
 void TStnVisManager::PrintColls(const char* Tag) {
   TString tag = Tag;
-  tag.ToLower();
 
-  if      (tag == "sdmc_colls"   ) print_sdmc_colls   ();
-  else if (tag == "kalseed_colls") print_kalseed_colls();
-  else if (tag == "tc_colls"     ) print_tc_colls();
-  else if (tag == "time_clusters") {
-    TVisNode* vn = FindNode("TimeClusterVisNode");
-    vn->NodePrint(0,"TimeCluster");
+  try {
+    if      (tag == "ComboHits"   ) FindNode("TrkVisNode")->NodePrint(0,"ComboHit");
+    else if (tag == "Helices"     ) FindNode("HelixVisNode")->NodePrint(0,"HelixSeed");
+    else if (tag == "KalSeeds"    ) FindNode("TrkVisNode")->NodePrint(0,"KalSeed");
+    else if (tag == "KalSeedColls") print_kalseed_colls();
+    else if (tag == "SdmcColls"   ) print_sdmc_colls   ();
+    else if (tag == "SimParticles") FindNode("TrkVisNode")->NodePrint(0,"SimParticle");
+    else if (tag == "StrawDigis"  ) FindNode("TrkVisNode")->NodePrint(0,"StrawDigi"  );
+    else if (tag == "StrawHits"   ) FindNode("TrkVisNode")->NodePrint(0,"StrawHit"   );
+    else if (tag == "TcColls"     ) print_tc_colls();
+    else if (tag == "TimeClusters") FindNode("TimeClusterVisNode")->NodePrint(0,"TimeCluster");
+    else {
+      TLOG(TLVL_WARNING) << "undefined button " << Tag ;
+    }
   }
-  else if (tag == "kalseeds") {
-    TVisNode* vn = FindNode("TrkVisNode");
-    vn->NodePrint(0,"KalSeed");
-  }
-  else if (tag == "helices") {
-    TVisNode* vn = FindNode("HelixVisNode");
-    vn->NodePrint(0,"HelixSeed");
-  }
-  else if (tag == "combo_hits") {
-    TVisNode* vn = FindNode("TrkVisNode");
-    vn->Print("combo_hits");
+  catch(...) {
+    TLOG(TLVL_ERROR) << "failed to print " << Tag;
   }
 
 }

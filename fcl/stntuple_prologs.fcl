@@ -1,0 +1,15 @@
+# -*- mode:tcl -*-
+#------------------------------------------------------------------------------
+# this file should be followed by additional prologs and the definitions of
+# templates - Stntuple/fcl/stntuple_templates.fcl
+# an example is shown below (commented out)
+#------------------------------------------------------------------------------
+#include "Stntuple/fcl/stntuple_external_prologs.fcl"
+#include "Stntuple/fcl/prolog.fcl"
+
+# and here comes the example
+#------------------------------------------------------------------------------
+# \\                 #include "Stntuple/fcl/stntuple_prologs.fcl"
+# \\                 #include "pbar2m/fcl/prolog.fcl"
+# \\                 #include "Stntuple/fcl/stntuple_templates.fcl"
+#------------------------------------------------------------------------------

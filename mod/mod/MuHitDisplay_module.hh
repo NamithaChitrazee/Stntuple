@@ -92,9 +92,9 @@ private:
   string        _crvRecoPulseCollTag;
 
   art::InputTag _shCollTag;
-  string        _shfCollTag;            // straw hit flags
+  //string        _shfCollTag;            // straw hit flags
   string        _comboHitCollTag;
-  string        _chfCollTag;            // straw hit flags
+  //  string        _chfCollTag;            // straw hit flags
   string        _sdCollTag;		// strawDigiCollTag
   art::InputTag _sdmcCollTag;
   string        _swCollTag;
@@ -122,7 +122,8 @@ private:
   // StrawHitFlag  fGoodHitMask;           // unused
   // StrawHitFlag  fBadHitMask;            // unused
   // size_t        _minHits;               // unused
-  double        _minSimpMomentum;       // to initialize Simp Block
+  double        _minSimpMomentum;       // to initialize SimpBlock and TStnVisManager
+  double        _maxSimpMomentum;       // to initialize SimpBlock and TStnVisManager
 //-----------------------------------------------------------------------------
 // Control for CRV-specific viewing
 //-----------------------------------------------------------------------------

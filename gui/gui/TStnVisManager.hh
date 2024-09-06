@@ -109,8 +109,8 @@ protected:
   int                 fMinStation;
   int                 fMaxStation;
                                         // min and max momentum values for displayed MC particles
-  float               fMinMcMomentum;
-  float               fMaxMcMomentum;
+  float               fMinSimpMomentum;
+  float               fMaxSimpMomentum;
 
   float               fMbTime;
 
@@ -180,8 +180,8 @@ public:
   int            IgnoreProtonHits   () const { return fIgnoreProtonHits   ; }
   int            IgnoreProtons      () const { return fIgnoreProtons      ; }
 
-  float          MinMcMomentum      () const { return fMinMcMomentum; }
-  float          MaxMcMomentum      () const { return fMaxMcMomentum; }
+  float          MinSimpMomentum    () const { return fMinSimpMomentum; }
+  float          MaxSimpMomentum    () const { return fMaxSimpMomentum; }
 
   int            MinStation         () const { return fMinStation; }
   int            MaxStation         () const { return fMaxStation; }
@@ -205,8 +205,8 @@ public:
 
   void           SetStations(int IMin, int IMax) override;
 
-  void           SetMinMcMomentum(float Mom) { fMinMcMomentum = Mom; }
-  void           SetMaxMcMomentum(float Mom) { fMaxMcMomentum = Mom; }
+  void           SetMinSimpMomentum(float Mom) { fMinSimpMomentum = Mom; }
+  void           SetMaxSimpMomentum(float Mom) { fMaxSimpMomentum = Mom; }
 
   void           SetSelectedTimeCluster(stntuple::TEvdTimeCluster* Tc) { fSelectedTimeCluster = Tc; }
   void           SetSelectedPhiCluster (stntuple::TEvdTimeCluster* Pc) { fSelectedPhiCluster  = Pc; }

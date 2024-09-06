@@ -27,8 +27,6 @@
 #include "Offline/RecoDataProducts/inc/HelixHit.hh"
 // #include "Offline/DataProducts/inc/XYZVec.hh"
 
-#include "Offline/TrkReco/inc/TrkPrintUtils.hh"
-
 #else
 
 namespace art {
@@ -230,22 +228,6 @@ public:
 				const char* StrawHitCollTag    = "makeSH",  // usually, "makeSH"
 				const char* StrawDigiMCCollTag = "compressDigiMCs" ); // most often, "makeSD" or "compressDigiMCs"
 
-  void printStrawHit      (const mu2e::StrawHit*     Hit, 
-			   const mu2e::StrawGasStep* Step,
-			   const char*               Opt   = "", 
-			   int                       INit  = -1,
-			   int                       Flags = -1);
-  
-  void printStrawHitCollection (const char* StrawHitCollTag, 
-				const char* StrawDigiMCCollTag = "compressDigiMCs", 
-				double TMin = -1.e6, double TMax =  1.e6);
-
-  void printStrawGasStep   (const mu2e::StrawGasStep* Step     ,
-			    const char*               Opt  = "",
-			    int   IStep                    = -1);
-  
-  void printStrawGasStepCollection (const char* CollTag, double TMin = -1.e6, double TMax =  1.e6);
-
   void printHelixHit      (const mu2e::HelixHit*     HelHit,
 			   const mu2e::ComboHit*     Hit, 
 			   const mu2e::StrawGasStep* Step,
@@ -280,6 +262,8 @@ public:
   void printSimParticleCollection(const char* ModuleLabel     , 
 				  const char* ProductName = "", 
 				  const char* ProcessName = "");
+  
+  void printSimParticleCollection(const art::InputTag& SimpCollTag);
 //-----------------------------------------------------------------------------
 // pass the detector name to know what to print for different detectors
 // tested for Detector = 'tracker', 'calorimeter'
@@ -289,18 +273,33 @@ public:
   void printStepPointMCCollection (const char* ModuleLabel     , 
 				   const char* ProductName = "", 
 				   const char* ProcessName = "");
+
+  void printStrawHit      (const mu2e::StrawHit*     Hit, 
+			   const mu2e::StrawGasStep* Step,
+			   const char*               Opt   = "", 
+			   int                       INit  = -1,
+			   int                       Flags = -1);
+  
+  void printStrawHitCollection (const char* StrawHitCollTag, 
+				const char* StrawDigiMCCollTag = "compressDigiMCs", 
+				double TMin = -1.e6, double TMax =  1.e6);
+
+  void printStrawGasStep   (const mu2e::StrawGasStep* Step     ,
+			    const char*               Opt  = "",
+			    int   IStep                    = -1);
+  
+  void printStrawGasStepCollection (const char* CollTag, double TMin = -1.e6, double TMax =  1.e6);
+
 //-----------------------------------------------------------------------------
 // time clusters
 //-----------------------------------------------------------------------------
   void printTimeCluster   (const mu2e::TimeCluster*            TimePeak        , 
                            const char*                         Opt         = "", 
 			   const mu2e::ComboHitCollection*     ChColl      = nullptr,
-                           const mu2e::StrawHitFlagCollection* ChfColl     = nullptr,
 			   const char*                         SdmcCollTag = "makeSD");
 
   void printTimeClusterCollection(const char* TcCollTag             ,    // time cluster collection tag
 				  const char* ChCollTag             ,    // combo hit coll tag
-				  const char* ChfCollTag            ,    // combo hit flag coll tag
 				  int         PrintHits   = 0       ,
 				  const char* SdmcCollTag = nullptr);   // straw digi mc coll tag
 //-----------------------------------------------------------------------------

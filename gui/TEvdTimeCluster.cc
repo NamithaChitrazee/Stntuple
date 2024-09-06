@@ -162,7 +162,7 @@ void TEvdTimeCluster::Print(Option_t* Option) const {
 
   TEvdTimeClusterVisNode* vn = (TEvdTimeClusterVisNode*) fVisNode;
 
-  ad->printTimeCluster(fTimeCluster,"data+banner+hits",vn->ChColl(), vn->ChfColl(), vn->SdmcCollTag().encode().data());
+  ad->printTimeCluster(fTimeCluster,"data+banner+hits",vn->ChColl(), vn->SdmcCollTag().encode().data());
 }
 
 //-----------------------------------------------------------------------------

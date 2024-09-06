@@ -1,0 +1,86 @@
+# -*- mode: tcl -*-
+#------------------------------------------------------------------------------
+# current version: just adds paths to @table::Stntuple
+#------------------------------------------------------------------------------
+Stntuple : { @table::Stntuple
+    paths : {
+#------------------------------------------------------------------------------
+# just ntuple making, goes to end_paths, may need hit making in trigger_paths
+#------------------------------------------------------------------------------
+        p0  : [ @sequence::Stntuple.stnmaker ]
+#------------------------------------------------------------------------------
+# MC generation, G4, reconstruction 
+# stntuple_p1: generation starts from an ntuple    (pre-MDC2020 way)
+# stntuple_p2: generation starts from an .art file (    MDC2020 way)
+#-----------------------------------------------------------------------------------------
+        p1 : [ @sequence::Common.generateSequence,   # generate, genCounter, 
+               @sequence::Common.g4Sequence,         # g4run   , g4consistent,
+               EWMProducer,                          # 
+               @sequence::TrackerMC.StepSim,         # StrawGasStepMaker, 
+               @sequence::CaloMC.StepSim,            # CaloShowerStepMaker,
+               CrvSteps,                             # 
+               DetectorStepFilter ,                  # want something in the tracker
+               # protonBunchIntensity,               # don't need - it is hiding somewhere
+               FindMCPrimary,                        # 
+               @sequence::TrackerMC.DigiSim,         # makeSD
+               @sequence::Digitize.DigitizeSequence  # PBISim, DigiSim, compressDigiMCs
+              ]
+
+        p2 : [ TargetStopResampler,                  # generatiion starts from an .art file
+               @sequence::Common.generateSequence,   # generate, genCounter, 
+               @sequence::Common.g4Sequence,         # g4run   , g4consistent,
+               EWMProducer,                          # 
+               @sequence::TrackerMC.StepSim,         # StrawGasStepMaker, 
+               @sequence::CaloMC.StepSim,            # CaloShowerStepMaker,
+               CrvSteps,                             # 
+               DetectorStepFilter ,                  # want something in the tracker
+               # protonBunchIntensity,               # don't need - it is hiding somewhere
+               FindMCPrimary,                        # 
+               @sequence::TrackerMC.DigiSim,         # makeSD
+               @sequence::Digitize.DigitizeSequence  # PBISim, DigiSim, compressDigiMCs
+              ]
+
+        p3  : [ @sequence::Stntuple.stnmaker_trig ]
+    }
+}
+#------------------------------------------------------------------------------
+# lower case 'stntuple' is for inclusion
+#------------------------------------------------------------------------------
+stntuple : {
+    producers: { 
+	@table::EventGenerator.producers
+	@table::Common.producers
+	@table::Primary.producers
+	@table::Digitize.producers
+	@table::Reconstruction.producers
+	@table::Stntuple.producers 
+	# 
+	compressDigiMCs : { @table::Digitize.producers.compressDigiMCs       # defined in Filters/fcl/
+	    crvDigiMCTag         : ""
+	}
+    }
+
+    filters  : { 
+	@table::Common.filters
+	@table::Primary.filters
+        @table::Digitize.filters
+	@table::Reconstruction.filters
+	@table::Stntuple.filters   
+    }
+
+    analyzers: { 
+	@table::Common.analyzers
+	@table::Digitize.analyzers
+	@table::Reconstruction.analyzers
+	@table::Stntuple.analyzers 
+    }
+#------------------------------------------------------------------------------
+# add trigger paths 
+#------------------------------------------------------------------------------
+    paths : { @table::Stntuple.paths }
+#------------------------------------------------------------------------------
+# final part - make sure 'trigger_paths' is aleways defined
+# 'end_paths' defined in the top-level job configuration FCL's 
+#------------------------------------------------------------------------------
+    trigger_paths : [ @sequence::TRIGGER_PATHS ]
+}

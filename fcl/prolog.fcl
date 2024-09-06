@@ -176,8 +176,7 @@ MuHitDisplay: { module_type:MuHitDisplay                 # class name;
     showTracks                   : true
     
     genpCollTag                  : "generate"
-    comboHitCollTag              : "FlagBkgHits"                     ## (was "makePH") flagged comboHits
-    chfCollTag                   : "FlagBkgHits:ComboHits"           # combo hit flags
+    comboHitCollTag              : "makePH"                          ## "FlagBkgHits" ## (was "makePH") flagged comboHits
     helixSeedCollTag             : "MHFinderDe"                      # helices
     strawHitCollTag              : "makeSH"
     sdCollTag                    : "compressDigiMCs"                 # standard MC choice
@@ -208,7 +207,8 @@ MuHitDisplay: { module_type:MuHitDisplay                 # class name;
     badHitMask                   : ["Background"] 
     
     minHits                      : 5
-    minSimpMomentum              : 40. # MeV
+    minSimpMomentum              : 40.      ## MeV
+    maxSimpMomentum              : 1.e12    ## MeV
     timeWindow                   : 100000.
 #------------------------------------------------------------------------------
 # kalDiag and Doublet Resolver

@@ -246,6 +246,10 @@ public:
   int    HelixIndex     () const { return fHelixIndex; }
   int    TrackSeedIndex () const { return fSeedIndex; }
 
+  int    PDGCode() const { return fPdgCode; }
+                                        // ID of the corresponding TSimParticle
+  int    SimID  () const { return fPartID;  }
+
   float  T0       () const { return fT0       ; }
   float  T0Err    () const { return fT0Err    ; }
   float  FitCons  () const { return fFitCons  ; }
