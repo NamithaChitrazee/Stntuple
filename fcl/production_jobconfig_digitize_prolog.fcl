@@ -5,11 +5,11 @@ BEGIN_PROLOG
 
 Digitize: {
   producers : {
-    @table::CommonMC.producers
+    @table::CommonMC.DigiProducers
     @table::TrackerMC.DigiProducers
-    @table::CaloMC.DigiProducers
+    @table::CaloMC.producers
     @table::CrvDAQPackage.producers
-
+    @table::TrigProducers.producers
     compressDigiMCs : {
       module_type : CompressDigiMCs
       strawDigiMCTag : @local::DigiCompressionTags.commonStrawDigiMCTag
@@ -17,10 +17,10 @@ Digitize: {
       simParticleTags : [ @local::DigiCompressionTags.primarySimParticleTag ]
       mcTrajectoryTag : @local::DigiCompressionTags.primarySimParticleTag
       extraStepPointMCTags : @local::DigiCompressionTags.commonExtraStepPointMCTags
-      timeMapTags : [ ]
       caloShowerStepTags : @local::DigiCompressionTags.primaryCaloShowerStepTags
       caloShowerSimTag : @local::DigiCompressionTags.commonCaloShowerSimTag
       caloShowerROTag : @local::DigiCompressionTags.commonCaloShowerROTag
+      surfaceStepTags : [ "compressDetStepMCs" ]
       primaryParticleTag : "FindMCPrimary"
       keepAllGenParticles : true
       rekeySimParticleCollection : true
@@ -31,6 +31,7 @@ Digitize: {
       crvDigiMCIndexMapTag : ""
       caloClusterMCTag : ""
       crvCoincClusterMCTags : [  ]
+      crvStepsToKeep : [ ]
     }
     PBISim : {
       module_type: ProtonBunchIntensityFlat
@@ -40,24 +41,25 @@ Digitize: {
   }
 
   filters : {
-    # filter for Untriggered stream.  These should be events that might have
+    # filter for Triggerable stream.  These should be events that might have
     # triggered.  The default setting is a particle with enough tracker digis
     # in the right momentum range to be reconstructable as a helix
     # This filter should be overriden as needed for other kinds of primaries (straight cosmics, calo signals, ...)
     Triggerable : {
       module_type : StrawDigiMCFilter
       MinNDigis : 15
-      MinParticleMom : 80.0
-      MaxParticleMom : 200.0
+      MinParticleMom : 75.0
+      MaxParticleMom : 300.0 # nominally particles that can form helices in the tracker
       StrawDigiMCCollection : compressDigiMCs
       particleTypes : [ 11,-11, 13, -13, 211, -211] # e+-, mu+-, pi+-
     }
-    # Untriggered stream prescaler; stream-dependent
-    UntriggeredPrescale : {
+    # Triggerable stream prescaler; stream-dependent
+    TriggerablePrescale : {
       module_type : Prescaler
-      prescaleFactor : @nil
+      prescaleFactor : 1 # by default, don't prescale
       prescaleOffset : 0
     }
+    @table::TrigFilters.filters
   }
 
   analyzers: {
@@ -72,157 +74,85 @@ Digitize: {
     @sequence::CrvDAQPackage.CrvDAQSequence,
     compressDigiMCs ]
 
-  UntriggeredSequence : [
-    UntriggeredPrescale, Triggerable ]
+  TriggerableSequence : [
+    TriggerablePrescale, Triggerable ]
 
   TriggerProducts : [
-    "keep mu2e::TriggerInfo_*_*_*",
     "keep art::TriggerResults_*_*_*",
     "keep mu2e::KalSeeds_TT*_*_*",
-    "keep mu2e::HelixSeeds_TT*_*_*",
-    "keep mu2e::TimeClusters_TT*_*_*",
-    "keep mu2e::CaloClusters_CaloClusterFast_*_*",
-    "keep mu2e::ProtonBunchIntensity*_*_*_*"
+    "keep mu2e::CaloClusters_*_*_*",
+    "keep mu2e::TriggerInfo_*_*_*"
   ]
-  #
+
+  GeneralProducts : [
+    "keep mu2e::EventWindowMarker_*_*_*",
+    "keep mu2e::ProtonBunchTime_*_*_*"
+  ]
   DigiProducts : [
     "keep mu2e::StrawDigis_*_*_*",
     "keep mu2e::StrawDigiADCWaveforms_*_*_*",
     "keep mu2e::CaloDigis_*_*_*",
-    "keep mu2e::CrvDigis_*_*_*",
-    "keep mu2e::StatusG4_*_*_*",
-    "keep *_genCounter_*_*",
-    "keep mu2e::EventWindowMarker_*_*_*",
-    "keep mu2e::ProtonBunchTimeMC_*_*_*",
-    "keep mu2e::ProtonBunchTime_*_*_*",
-    "keep mu2e::EventWeight_*_*_*",
-    "keep *_compressDigiMCs_*_*",
-    "keep mu2e::TriggerInfo_*_*_*",
-    "keep art::TriggerResults_*_*_*",
-    "keep mu2e::KalSeeds_TT*_*_*",
-    "keep mu2e::HelixSeeds_TT*_*_*",
-    "keep mu2e::TimeClusters_TT*_*_*",
-    "keep mu2e::CaloClusters_CaloClusterFast_*_*",
-    "keep mu2e::CosmicLivetime_*_*_*",
-    "keep mu2e::ProtonBunchIntensity*_*_*_*"
+    "keep mu2e::CrvDigis_*_*_*"
   ]
+  MCDigiProducts : [
+    "keep *_compressDigiMCs_*_*"
+  ]
+  GeneralMCProducts : [
+    "keep mu2e::ProtonBunchIntensity*_*_*_*",
+    "keep mu2e::ProtonBunchTimeMC_*_*_*",
+    @sequence::Primary.GeneralProducts
+  ]
+
   #
-  # different streams for different end uses:  Signal is for physics studies, background studies, and calibration and alignment
-  # Untriggered is for trigger algorithm improvement
-  # Trk and Calo are for calibration and alignment
+  # Output Stream for events passing relevant triggers
   #
-  # Stream for events passing any 'physics signal' trigger; at the moment, just high-momentum tracks
-  SignalOutput : {
+  TriggeredOutput : {
     module_type : RootOutput
-    SelectEvents : [ "*_highP_*_trigger" ]
     fileName    : @nil
   }
-  # Stream for diagnostic events; random and (prescaled) signal precursors
-  DiagOutput : {
+  #
+  # Output stream for MC-truth selected events
+  #
+  TriggerableOutput : {
     module_type : RootOutput
-    SelectEvents : [ "minBias_*_trigger" , "*Helix*M_trigger", "*Helix*P_trigger"]
+    SelectEvents : [ "TriggerablePath" ] # require events pass 'Triggerable' filter
     fileName    : @nil
   }
-  # Stream for events useful for tracker calibration and alignment
-  TrkOutput : {
-    module_type : RootOutput
-    SelectEvents : [ "*_lowP_*_trigger","*_ipa_*_trigger", "cst*_trigger" ]
-    fileName    : @nil
-  }
-  # Stream for events useful for calorimeter calibration
-  CaloOutput : {
-    module_type : RootOutput
-    SelectEvents : [ "calo*_trigger" ] # selects events passing calorimeter calibration trigger
-    fileName    : @nil
-  }
-  # Stream for MC only: Stream for events which 'should have' triggered, but didnt, useful for studying trigger efficiency
-  UntriggeredOutput : {
-    module_type : RootOutput
-    RejectEvents : [ "*_trigger" ] # reject events passing any trigger
-    SelectEvents : [ "UntriggeredPath" ] # require events pass 'Triggerable' filter
-    fileName    : @nil
-  }
+  #
+  # trigger selections that can be used to finalize the triggerOutput selection, depending on digitization mode and source
+  #
+  SignalTriggers : [ "tprDe_highP_stopTarg*", "cprDe_highP_stopTarg*" ]  # events with 'high' momentum tracks with good KinKal fits
+  TrkTriggers : [ "*_lowP_*","*_ipa_*", "cst*" ] # events useful only for tracker calibration
+  CaloTriggers : [ "calo*" ] # events useful only for calo calibration
+  DiagTriggers : [ "minBias_*" , "*Helix*M", "*Helix*P"] # events useful for trigger diagnostics
 
   EndSequence : [digiCompressionCheck]
 }
-#------------------------------------------------------------------------------
 # override the Trigger sequence to prepare digis
-# P.M. turns out this is needed... used by the Trigger... 
-# an attempt to comment this out leads to a problem when running with trigger
-#------------------------------------------------------------------------------
-Trigger.PrepareDigis: [ @sequence::CommonMC.DigiSim, @sequence::TrackerMC.DigiSim, @sequence::CaloMC.DigiSim ]
+TrigRecoSequences.artFragmentsGen : [ @sequence::CommonMC.DigiSim, @sequence::TrackerMC.DigiSim, @sequence::CaloMC.DigiSim ]
 
-Digitize.SignalOutput.outputCommands : [ "drop *_*_*_*",
-  @sequence::Digitize.DigiProducts]
+Digitize.TriggeredOutput.outputCommands : [ "drop *_*_*_*",
+  @sequence::Digitize.GeneralProducts,
+  @sequence::Digitize.GeneralMCProducts,
+  @sequence::Digitize.DigiProducts,
+  @sequence::Digitize.TriggerProducts,
+  @sequence::Digitize.MCDigiProducts
+]
 
-Digitize.DiagOutput.outputCommands : [ "drop *_*_*_*",
-  @sequence::Digitize.DigiProducts]
-
-Digitize.TrkOutput.outputCommands : [ "drop *_*_*_*",
-  @sequence::Digitize.DigiProducts]
-
-Digitize.CaloOutput.outputCommands : [ "drop *_*_*_*",
-  @sequence::Digitize.DigiProducts]
-
-Digitize.UntriggeredOutput.outputCommands : [ "drop *_*_*_*",
-  @sequence::Digitize.DigiProducts]
+Digitize.TriggerableOutput.outputCommands : [ "drop *_*_*_*",
+  @sequence::Digitize.GeneralProducts,
+  @sequence::Digitize.GeneralMCProducts,
+  @sequence::Digitize.DigiProducts,
+  @sequence::Digitize.TriggerProducts,
+  @sequence::Digitize.MCDigiProducts
+]
 
 Digitize.Outputs : {
-  SignalOutput      : @local::Digitize.SignalOutput
-  DiagOutput        : @local::Digitize.DiagOutput
-  TrkOutput         : @local::Digitize.TrkOutput
-  CaloOutput        : @local::Digitize.CaloOutput
-  UntriggeredOutput : @local::Digitize.UntriggeredOutput
+  TriggeredOutput : @local::Digitize.TriggeredOutput
+  TriggerableOutput : @local::Digitize.TriggerableOutput
 }
-#------------------------------------------------------------------------------
-# from digitize/epilog
-#------------------------------------------------------------------------------
-# optimization of the memory footprint ?
-# services.GeometryService.bFieldFile     : "Offline/Mu2eG4/geom/bfgeom_reco_v01.txt"
-# setup proditions; as new proditions are added to the database this file MUST be updated or reco won't see them
-#------------------------------------------------------------------------------
-Digitize.Proditions : { @table::Proditions
-    alignedTracker : { @table::Proditions.alignedTracker
-	useDb                 : true
-	verbose               : 0
-    }
-    trackerStatus  : { @table::Proditions.trackerStatus
-	useDb                 : true
-	verbose               : 0
-    }
-    strawElectronics : { @table::Proditions.strawElectronics 
-	useDb                 : true
-	verbose               : 0
-	overrideDbTimeOffsets : true        # don't use database time offsets in digitization
-    }
-}
-#------------------------------------------------------------------------------
-# redefinitions: from JobConfig/digitize/epilog.fcl, digitization jobs will use Digitize.producers
-#------------------------------------------------------------------------------
-# Module labels needed for compressed detector steps
-Digitize.producers.makeSD.StrawGasStepModule                  : "compressDetStepMCs"
-Digitize.producers.CaloShowerROMaker.caloShowerStepCollection : ["compressDetStepMCs"]
-Digitize.producers.compressDigiMCs.simParticleTags            : ["compressDetStepMCs"]
-Digitize.producers.compressDigiMCs.caloShowerStepTags         : ["compressDetStepMCs"]
-Digitize.producers.compressDigiMCs.extraStepPointMCTags       : ["compressDetStepMCs:virtualdetector", "compressDetStepMCs:stoppingtarget", "compressDetStepMCs:protonabsorber" ]
-Digitize.producers.compressDigiMCs.mcTrajectoryTag            : "compressDetStepMCs"
-Digitize.producers.CrvPhotons.crvStepModuleLabels             : [ "compressDetStepMCs" ]
-Digitize.producers.CrvPhotons.crvStepProcessNames             : [ "" ]
-#
-Digitize.producers.EWMProducer.SpillType                      : 1         # on-spill
-#------------------------------------------------------------------------------
-# redefinition of the services - digitization jobs will use Digitize.services
-#------------------------------------------------------------------------------
-Digitize.services :  { @table::Services.SimAndReco }
-Digitize.services.GeometryService.bFieldFile     : "Offline/Mu2eG4/geom/bfgeom_reco_v01.txt"
-# setup proditions; as new proditions are added to the database this file MUST be updated or reco won't see them
-Digitize.services.ProditionsService.alignedTracker.useDb: true
-Digitize.services.ProditionsService.alignedTracker.verbose: 0
-Digitize.services.ProditionsService.trackerStatus.Settings.useDb: true
-Digitize.services.ProditionsService.trackerStatus.Settings.verbose: 0
-Digitize.services.ProditionsService.strawElectronics.useDb: true
-Digitize.services.ProditionsService.strawElectronics.verbose: 0
-# don't use database time offsets in digitization
-Digitize.services.ProditionsService.strawElectronics.overrideDbTimeOffsets : true
+# give paths specific numbers outside trigger path range
+Digitize.trigger_paths : ["0:DigitizePath", "1:TriggerablePath" ]
+Digitize.EndPath : [ @sequence::Digitize.EndSequence, TriggeredOutput, TriggerableOutput ]
 
 END_PROLOG

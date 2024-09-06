@@ -33,11 +33,6 @@ physics : {
     end_paths     : [ e1 ]  # , out ]
 }
 #------------------------------------------------------------------------------
-# make straw hits out of all digis and use all straw hits to make combo hits
-#------------------------------------------------------------------------------
-physics.producers.makeSH.MinimumTime                      : 100
-physics.producers.makePH.MinimumTime                      : 100
-#------------------------------------------------------------------------------
 # uncomment the next 2 lines if you want the DST file to be written out
 #-----------------------------------------------------------------------------
 # physics.out                               : [ detectorOutput ]
@@ -51,5 +46,5 @@ outputs.detectorOutput.fileName           : "sim.user.display.xxx.000001.art"
 physics.analyzers.MuHitDisplay.primaryParticleTag : ""
 physics.analyzers.MuHitDisplay.timeClusterCollTag : "TZClusterFinder"
 physics.analyzers.MuHitDisplay.comboHitCollTag    : "FlagBkgHits"
-physics.analyzers.MuHitDisplay.minSimpMomentum    : 30
+# physics.analyzers.MuHitDisplay.minSimpMomentum    : 100
 # physics.analyzers.MuHitDisplay.rootMacro          : "Stntuple/mod/scripts/display_001.C"

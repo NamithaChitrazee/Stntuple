@@ -7,18 +7,24 @@ BEGIN_PROLOG
 
 Primary: {
   producers : {
-    @table::Common.producers
     @table::TrackerMC.StepProducers
-    @table::CaloMC.StepProducers
+    @table::CaloMC.producers
     CrvSteps :{
       @table::CrvSteps
       stepPointsModuleLabels : ["g4run"]
+    }
+    MakeSS : {
+      @table::CommonMC.MakeSS
+      VDStepPointMCs : "g4run:virtualdetector"
+      IPAStepPointMCs : "g4run:protonabsorber"
+      TargetStepPointMCs : "g4run:stoppingtarget"
     }
     compressDetStepMCs : {
       module_type : CompressDetStepMCs
       strawGasStepTag : "StrawGasStepMaker"
       caloShowerStepTag : "CaloShowerStepMaker"
       crvStepTag : "CrvSteps"
+      surfaceStepTag : "MakeSS"
       simParticleTags : [ "g4run" ]
       mcTrajectoryTag : "g4run"
       debugLevel : 0
@@ -28,7 +34,7 @@ Primary: {
     }
     FindMCPrimary : {
       module_type : FindMCPrimary
-      SimParticles : "g4run"            ## "compressDetStepMCs"
+      SimParticles : "compressDetStepMCs"
     }
     # null MCPrimary, for NoPrimary events
     NullMCPrimary : {
@@ -119,31 +125,51 @@ Primary: {
         }
       }
     }
+
+    WireGammaStopResampler : {
+      module_type: ResamplingMixer
+      readMode            : sequential
+      wrapFiles           : true
+      fileNames: @nil
+      mu2e: {
+        writeEventIDs : true
+        MaxEventsToSkip: @nil
+        debugLevel : 0
+        products: {
+          genParticleMixer: { mixingMap: [ [ "TargetStopResampler", "" ] ] }
+          simParticleMixer: { mixingMap: [ [ "WireStopFilter", "" ] ] }
+          stepPointMCMixer: { mixingMap: [ [ "WireStopFilter:virtualdetector", ":" ] ] }
+          volumeInfoMixer: {
+            srInput: "compressPVWireStops"
+            evtOutInstanceName: "eventlevel"
+          }
+        }
+      }
+    }
   }
   # sequence to create DetectorSteps
   DetStepSequence : [
     @sequence::TrackerMC.StepSim,
     @sequence::CaloMC.StepSim,
-    CrvSteps ]
+    CrvSteps,
+    MakeSS ]
   # sequence to finalize the output
   FinalizeSequence : [  compressDetStepMCs, FindMCPrimary ]
 
-  KeptProducts : [
-    "keep mu2e::StrawGasSteps_compressDetStepMCs_*_*",
-    "keep mu2e::CaloShowerSteps_compressDetStepMCs_*_*",
-    "keep mu2e::CrvSteps_compressDetStepMCs_*_*",
-    "keep mu2e::StepPointMCs_compressDetStepMCs_virtualdetector_*",
-    "keep mu2e::StepPointMCs_compressDetStepMCs_protonabsorber_*",
-    "keep mu2e::StepPointMCs_compressDetStepMCs_stoppingtarget_*",
-    "keep mu2e::SimParticlemv_compressDetStepMCs_*_*",
-    "keep mu2e::SimParticleart::Ptrmu2e::MCTrajectorystd::map_compressDetStepMCs_*_*",
-    "keep mu2e::GenParticles_compressDetStepMCs_*_*",
-    "keep mu2e::PrimaryParticle_*_*_*",
-    "keep art::EventIDs_*_*_*",
-    "keep art::TriggerResults_*_*_*",
+  GeneralProducts: [
     "keep mu2e::StatusG4_*_*_*",
     "keep mu2e::GenEventCount_*_*_*" ,
-    "keep mu2e::EventWeight_*_*_*" ]
+    "keep art::EventIDs_*_*_*", # these are the original eventids prior to resampling
+    "keep mu2e::CosmicLivetime_*_*_*",
+    "keep mu2e::EventWeight_*_*_*",
+    "keep art::TriggerResults_*_*_*",
+    "keep mu2e::StepPointMCs_CosmicResampler_crvStage1_*", # this is needed to keep track of low/all CRV split
+    "keep mu2e::PrimaryParticle_*_*_*"
+  ]
+
+  StepProducts : [
+    "keep *_compressDetStepMCs_*_*"
+  ]
 
   analyzers: {
     genCountLogger: { module_type: GenEventCountReader makeHistograms: false }
@@ -158,7 +184,10 @@ Primary: {
 }
 # define the main sequence
 Primary.PrimarySequence : [ @sequence::Primary.DetStepSequence, PrimaryFilter, @sequence::Primary.FinalizeSequence ]
-Primary.PrimaryOutput.outputCommands : [ "drop *_*_*_*", @sequence::Primary.KeptProducts]
+Primary.PrimaryOutput.outputCommands : [ "drop *_*_*_*",
+  @sequence::Primary.GeneralProducts,
+  @sequence::Primary.StepProducts
+]
 Primary.EndPath : [ @sequence::Primary.EndSequence, PrimaryOutput ]
 #------------------------------------------------------------------------------
 # JobConfig/primary/epilog.fcl

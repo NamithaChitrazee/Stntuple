@@ -1,8 +1,46 @@
 # -*- mode:tcl -*- 
 #------------------------------------------------------------------------------
-# no more prologs beyond this point
+# su2020/common/templates.fcl 
+# all prolog files have to be included before the templates files
+# template file can include each other
 #------------------------------------------------------------------------------
+# global defaults 
+#------------------------------------------------------------------------------
+# BEGIN_PROLOG
+#   bgHitFiles   : @nil
+#   INPUT_MODULE : EmptyEvent             # EmptyEvent / RootInput
+#   TRIGGER_PATH : p1
+#   PROCESS_NAME : Stnmaker
+# END_PROLOG
+#------------------------------------------------------------------------------
+# no more prologs beyond this point
+# 
 production : {
+#     producers : { 
+# #------------------------------------------------------------------------------
+# # MC producers
+# #------------------------------------------------------------------------------
+# 	@table::EventGenerator.producers  # defined in EventGenerator
+# 	@table::CommonMC.producers        # FIXME
+# 	@table::Mu2eG4.producers          # defined in Mu2eG4/fcl
+# 	@table::CaloMC.producers          # defined in CaloMC
+# 	@table::CrvDAQPackage.producers   # 
+# 	@table::TrackerMC.producers       # defined in TrackerMC
+# 
+# 	generate  : { @table::EventGenerator.producers.egun }      # to avoid unnecessary diagnostics
+# 	genCounter: { module_type: GenEventCounter }
+# 
+# 	# dummy protonBunchIntensity objects for primary-only datasets
+# 	protonBunchIntensity : { module_type: ProtonBunchIntensityFlat
+# 	    mean      : 0.0 # No PBI possible for pure signal! 
+# 	    halfWidth : 1.0
+# 	}
+# #------------------------------------------------------------------------------
+# # reco producers, compressDigiMCs defined there 
+# #------------------------------------------------------------------------------
+# #   \\ @table::ParticleID.producers
+# #   \\ @table::CommonTrk.producers
+#     }
 #------------------------------------------------------------------------------
 #  filters
 #------------------------------------------------------------------------------
@@ -46,6 +84,7 @@ production : {
     }
 
     analyzers : {
+#\\\\	@table::Trigger.analyzers
         genCountLogger            : { module_type: GenEventCountReader } # defalt: 1 StepPointMC, 10 MeV
     }
 }
@@ -501,3 +540,6 @@ production.paths : {
 # production.producers.TimeClusterFinderUe.PrefilterCluster : false
 # production.producers.TimeClusterFinderUe.MinKeepHitMVA    : -100.
 #------------------------------------------------------------------------------
+# introduce blind time - start of the digitization
+#------------------------------------------------------------------------------
+services.DbService.verbose                                   : 0

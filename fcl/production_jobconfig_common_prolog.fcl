@@ -2,7 +2,7 @@
 #------------------------------------------------------------------------------
 # cloned Production/JobConfig/common/prolog.fcl minus includes
 # common prolog for all production jobs.
-# common epiloc.fcl is trivial and is absorbed by Stntuple/fcl/stntuple.fcl
+# common epilog.fcl is trivial and is absorbed by Stntuple/fcl/stntuple.fcl
 #------------------------------------------------------------------------------
 BEGIN_PROLOG
 Common: {

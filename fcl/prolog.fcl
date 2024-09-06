@@ -191,8 +191,8 @@ MuHitDisplay: { module_type:MuHitDisplay                 # class name;
 
     phiClusterCollTag            : "PhiClusterFinder"
     timeClusterCollTag           : "CalTimePeakFinder"
-    trackCollTag                 : "KFFDeMHDar"
-    kffCollTag                   : "KSFDeMHDar"
+    trackCollTag                 : "KKDeMHPar"                       ## need to recover : "KFFDeMHDar"
+    kffCollTag                   : "KKDeMHPar"                       ## "KSFDeMHDar"
     ksfCollTag                   : "KFFDeMHDar"
 
     trkExtrapol                  : "TrackCaloIntersection"
