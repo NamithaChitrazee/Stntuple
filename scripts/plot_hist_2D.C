@@ -155,6 +155,162 @@ void plot_hist_2D(hist_data_t* Hd, int Print = 0) {
   return;
 }
 
+//-----------------------------------------------------------------------------
+// plot one hist
+//-----------------------------------------------------------------------------
+void plot_hist_2d(plot_data_t* Plot, int Print = 0, const char* Format = "eps") {
+  
+  char figure_name[200];
+//-----------------------------------------------------------------------------
+// figure out clone histogram names
+//-----------------------------------------------------------------------------
+  hist_data_t* hd = &Plot->hd[0];
+  TString h1name(hd->fName);
+
+  if (hd->fNewName == "") h1name.ReplaceAll("/","_");
+  else                    h1name = hd->fNewName;
+
+  hist_file_t* hf1 = hd->fFile;
+
+  if (hf1 == nullptr) {
+    printf("plot_hist_2D in trouble, exit\n");
+    return ;
+  }
+  
+  TH2F* hpx1 = (TH2F*) gh2(hf1->GetName(),hd->fModule,hd->fName)->Clone(h1name);
+  hd->fHist  = hpx1;
+//-----------------------------------------------------------------------------
+// rebinning: first check the histogram, then - default for the plot
+//-----------------------------------------------------------------------------
+  int rebin = hd->fRebin;
+  if (rebin <= 0) rebin = Plot->fRebin;
+  if (rebin > 1) hd->fHist->Rebin(rebin);
+//-----------------------------------------------------------------------------
+// scale, if requested
+//-----------------------------------------------------------------------------
+  if (hd->fScale  > 0) hpx1->Scale(hd->fScale);
+  if (hd->fLumiSF > 0) hpx1->Scale(hd->fLumiSF);
+ 
+  stn_dataset_t* ds1(nullptr);
+  if (hf1) ds1 = hf1->fDataset;
+//-----------------------------------------------------------------------------
+// create a canvas
+//-----------------------------------------------------------------------------
+  TString canvas_name("c_plot_hist_2d");
+  
+  if (Plot->fCanvasName != "") canvas_name = Plot->fCanvasName;
+  else if (Plot->fName  != "") canvas_name = "c_"+Plot->fName;
+  else {
+    if (ds1) {
+      canvas_name += ds1->GetName();
+      canvas_name += "_";
+    }
+    canvas_name += hd->fModule;
+    canvas_name += "_";
+    canvas_name += h1name;
+  }
+
+  int cx = Plot->fCanvasSizeX;
+  int cy = Plot->fCanvasSizeY;
+//-----------------------------------------------------------------------------
+// initially, create canvas with an empty name, set scales
+//-----------------------------------------------------------------------------
+  TCanvas* c = new TCanvas(canvas_name,canvas_name,cx,cy);
+  c->SetLogx(Plot->fXLogScale);
+  c->SetLogy(Plot->fYLogScale);
+  
+  if(hd->fCanvasLeftMargin   >= 0.) c->SetLeftMargin  (hd->fCanvasLeftMargin);
+  if(hd->fCanvasRightMargin  >= 0.) c->SetRightMargin (hd->fCanvasRightMargin);
+  if(hd->fCanvasBottomMargin >= 0.) c->SetBottomMargin(hd->fCanvasBottomMargin);
+  if(hd->fCanvasTopMargin    >= 0.) c->SetTopMargin   (hd->fCanvasTopMargin);
+//-----------------------------------------------------------------------------
+// color
+//-----------------------------------------------------------------------------
+  hpx1->SetLineColor(kRed-3);
+  hpx1->SetLineWidth(2);
+  hpx1->SetTitle("");
+  if (Plot->fXMin < Plot->fXMax) hpx1->GetXaxis()->SetRangeUser(Plot->fXMin,Plot->fXMax);
+  if (Plot->fYMin < Plot->fYMax) hpx1->GetYaxis()->SetRangeUser(Plot->fYMin,Plot->fYMax);
+  
+  if (Plot->fXAxisTitle != ""   ) hpx1->GetXaxis()->SetTitle(Plot->fXAxisTitle.Data());
+  if (Plot->fYAxisTitle != ""   ) hpx1->GetYaxis()->SetTitle(Plot->fYAxisTitle.Data());
+  if (hd->fAxisFontSize >= 0. ) {
+    hpx1->GetXaxis()->SetTitleSize(hd->fAxisFontSize);
+    hpx1->GetXaxis()->SetLabelSize(hd->fAxisFontSize);
+    hpx1->GetYaxis()->SetTitleSize(hd->fAxisFontSize);
+    hpx1->GetYaxis()->SetLabelSize(hd->fAxisFontSize);
+  }
+
+  if (hd->fMarkerStyle >=0) hpx1->SetMarkerStyle(hd->fMarkerStyle);
+  if (hd->fMarkerColor >=0) hpx1->SetMarkerColor(hd->fMarkerColor);
+  if (hd->fMarkerSize  >=0) hpx1->SetMarkerSize (hd->fMarkerSize );
+
+  if (hd->fStats == 0) hpx1->SetStats(0);
+  hpx1->Draw();
+//-----------------------------------------------------------------------------
+// position statbox - need to update the canvas first
+//-----------------------------------------------------------------------------
+  c->Modified();
+  c->Update();
+  plot_stat_box(hpx1,hd->fOptStat,Plot->fStatBoxXMin,Plot->fStatBoxYMin,Plot->fStatBoxXMax,Plot->fStatBoxYMax);
+//-----------------------------------------------------------------------------
+// add legend - not sure what legend is needed
+//-----------------------------------------------------------------------------
+  float xmin{0.65}, ymin{0.25}, xmax{0.90}, ymax{0.35};
+  if (Plot->fLegendXMin > 0) {             // redefine the legend position, normalized coords
+    xmin = Plot->fLegendXMin;
+    ymin = Plot->fLegendYMin;
+    xmax = Plot->fLegendXMax;
+    ymax = Plot->fLegendYMax;
+  }
+  
+  TLegend* leg = new TLegend(xmin,ymin,xmax,ymax);
+  leg->AddEntry(hpx1,hd->fLabel.Data(),"pl");  // "pl"
+  leg->SetBorderSize(0);
+  leg->Draw();
+//-----------------------------------------------------------------------------
+// write DS names inside the plot
+//-----------------------------------------------------------------------------
+  TString label;
+
+  if (Plot->fLabel != "") label = hd->fLabel;
+  else                    label = hd->fName;
+
+  // lower left corner
+  draw_label_ndc(label.Data(),Plot->fLabelXMin,Plot->fLabelYMin,Plot->fLabelFontSize,Plot->fLabelFont); 
+
+  c->Modified(); c->Update();
+//-----------------------------------------------------------------------------
+// do we need to add something else? Print = -1 serves that purpose
+//-----------------------------------------------------------------------------
+  printf(" Hd->fPlotName = %s\n",Plot->fName.Data());
+  
+  if (Plot->fName == "") {
+    TString hn1(Plot->fName);
+
+    TString fol1 = hn1(0,hn1.Index('/'));
+    TString nam1 = hn1(hn1.Index('/')+1,hn1.Length());
+
+    printf("fol1=:%s  nam1:%s Hd->fName:%s\n",fol1.Data(),nam1.Data(),Plot->fName.Data());
+
+    if (Plot->fYLogScale == 1) Plot->fName = Form("%s_%s_log",fol1.Data(),nam1.Data());
+    else                       Plot->fName = Form("%s_%s_lin",fol1.Data(),nam1.Data());
+  }
+  
+//-----------------------------------------------------------------------------
+// determine the output file name. Extension defines the file format (default: ".eps")
+//-----------------------------------------------------------------------------
+  TString ext(Format);
+  ext.ToLower();
+  Plot->fOutputFn = Form("%s/%s/%s.%s",gEnv->GetValue("FiguresDir","./"),ext.Data(),Plot->fName.Data(),ext.Data());
+  if (Print == 1) {
+    c->Print(Form("%s",Plot->fOutputFn.Data())) ;
+  }
+  Plot->fCanvas   = c;
+
+  return;
+}
+
 
 //-----------------------------------------------------------------------------
 // compare two histograms with different ModuleName/HistName's from two different files

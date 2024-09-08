@@ -661,7 +661,7 @@ int plot_hist_1d(plot_data_t* Plot, int Print = 0, const char* Format = "eps") {
   if (Hist1->fStats != 0) {
     int opt_stat = Hist1->fOptStat;
     if (opt_stat <= 0) opt_stat = Plot->fOptStat;
-    plot_stat_box(hpx1,opt_stat,Hist1->fStatBoxXMin,sb_ymin,Hist1->fStatBoxXMax,sb_ymax);
+    plot_stat_box(hpx1,opt_stat,Plot->fStatBoxXMin,sb_ymin,Plot->fStatBoxXMax,sb_ymax);
   }
 //-----------------------------------------------------------------------------
 // start forming legend
@@ -772,7 +772,7 @@ int plot_hist_1d(plot_data_t* Plot, int Print = 0, const char* Format = "eps") {
       int opt_stat = Hist2->fOptStat;
       if (opt_stat == -1) opt_stat = Plot->fOptStat;
       
-      plot_stat_box(hpx2,opt_stat,Hist2->fStatBoxXMin,sb2_ymin,Hist2->fStatBoxXMax,sb2_ymax);
+      plot_stat_box(hpx2,opt_stat,Plot->fStatBoxXMin,sb2_ymin,Plot->fStatBoxXMax,sb2_ymax);
     }
 
     if (leg) {
