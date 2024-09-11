@@ -131,7 +131,7 @@ StntupleMakerTemplate : { module_type:StntupleMaker
 #------------------------------------------------------------------------------
     trackBlockName       : [ "TrackBlock"   ]
     trackCollTag         : [ "KFFDeM"       ]
-    trackFitType         : 1                         ## 1:BTRK(KFF) 2:KinKal(KK)
+    trackFitType         : 2                         ## 1:BTRK(KFF) 2:KinKal(KK)
 
     trackTsBlockName     : [ "KSFBlock"     ]
     trackTsCollTag       : [ "KSFDeM"       ]        ## has to be defined for BTRK   fits
@@ -679,23 +679,24 @@ Stntuple : {
 	    makePid                : 0
 	    makeTimeClusters       : 0 #temporary fix
 	    makeHelices            : 1
-	    makeTrackSeeds         : 1
-	    makeTracks             : 0
-            makeClusters           : 0
-	    timeClusterBlockName   : [ "TimeClusterBlockDeTpr"     , "TimeClusterBlockDeCpr"     , "TimeClusterBlockApr"  ]
-	    timeClusterCollTag     : [ "TTtimeClusterFinder"       , "TTCalTimePeakFinder"       , "TTTZClusterFinder"    ]
-	    helixBlockName         : [ "HelixBlockDeTpr"           , "HelixBlockDeCpr"           , "HelixBlockApr"        ]
-	    helixCollTag           : [ "TTHelixMergerDe"           , "TTCalHelixMergerDe"        , "TTAprHelixMerger"     ]
-	    trackSeedBlockName     : [ "TrackSeedBlockDeTpr"       , "TrackSeedBlockDeCpr"       , "TrackSeedBlockApr"    ]
-	    trackSeedCollTag       : [ "TTKSFDe"                   , "TTCalSeedFitDe"            , "TTAprKSF"             ]
-	    helixKsCollTag         : [ "TTKSFDe"                   , "TTCalSeedFitDe"            , "TTAprKSF"             ]
-	    trackBlockName         : []
-	    trackCollTag           : []
-	    tciCollTag             : []
-	    tcmCollTag             : []
-	    trackSHBlockName       : []
-	    pidBlockName           : []
-	    pidCollTag             : []
+	    makeTrackSeeds         : 0
+	    makeTracks             : 1
+	    timeClusterBlockName       : [ "TimeClusterBlockDeTpr"      , "TimeClusterBlockDeCpr"      , "TimeClusterBlockApr"  ]
+	    timeClusterCollTag         : [ "TTtimeClusterFinder"        , "TTCalTimePeakFinder"        , "TTTZClusterFinder"    ]
+	    helixBlockName             : [ "HelixBlockDeTpr"            , "HelixBlockDeCpr"            , "HelixBlockApr"        ]
+	    helixCollTag               : [ "TTHelixMergerDe"            , "TTCalHelixMergerDe"         , "TTAprHelixMerger"     ]
+            trackSeedBlockName         : []
+            trackSeedCollTag           : []
+	    trackBlockName             : [ "TrackBlockDeTpr"            , "TrackBlockDeCpr"            , "TrackBlockApr"        ]
+            trackCollTag               : [ "TTKSFDe"                    , "TTCalSeedFitDe"             , "TTAprKSF"             ]
+	    helixKsCollTag             : [ ""                           , ""                           , ""                     ]
+            trackHsBlockName           : [ "HelixBlockDeTpr"            , "HelixBlockDeCpr"            , "HelixBlockApr"        ]
+	    tciCollTag                 : [ ""                           ,  ""                          , ""                     ]
+	    tcmCollTag                 : [ ""                           ,  ""                          , ""                     ]
+	    trackSHBlockName           : []
+	    pidBlockName               : []
+	    pidCollTag                 : [ ""                           ,  ""                          , ""                     ]
+            trkQualCollTag             : [ ""                           ,  ""                          , ""                     ]
         }
 #------------------------------------------------------------------------------
 # make 4 track blocks: train PID

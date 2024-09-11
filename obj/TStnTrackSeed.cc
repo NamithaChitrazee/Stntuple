@@ -188,6 +188,101 @@ void TStnTrackSeed::ReadV2(TBuffer &R__b) {
 }
 
 //-----------------------------------------------------------------------------
+void TStnTrackSeed::ReadV3(TBuffer &R__b) {
+
+  struct TStnTrackSeedDataV3_t {
+    TLorentzVector            fMom1;  
+    TLorentzVector            fOrigin1;
+    TLorentzVector            fMom2;  
+    TLorentzVector            fOrigin2;
+//-----------------------------------------------------------------------------
+// int
+//-----------------------------------------------------------------------------
+    int                       fNHits;
+    int                       fHelixIndex;
+    int                       fTrackIndex;
+    int                       fSimpPDG1;          // added in v2
+    int                       fSimpPDGM1;         // added in v2
+    int                       fSimpId1Hits;       // added in v2
+    int                       fSimpPDG2;          // added in v2
+    int                       fSimpPDGM2;         // added in v2
+    int                       fSimpId2Hits;       // added in v2
+    int                       fInt[kNFreeIntsV3];
+//-----------------------------------------------------------------------------
+// floats
+//-----------------------------------------------------------------------------
+    float                     fT0;    
+    float                     fT0Err; 
+    float                     fD0;    
+    float                     fZ0;    
+    float                     fP;  
+    float                     fPt; 
+    float                     fTanDip;
+    float                     fFlt0;// flight distance where the track crosses the tracker midplane (z=0)
+    float                     fChi2;
+    float                     fFitCons;
+
+    float                     fClusterTime;   
+    float		      fClusterEnergy; 
+    float		      fClusterX;      
+    float		      fClusterY;      
+    float		      fClusterZ;      
+    float                     fNLoops;              
+    float                     fFloat[kNFreeFloatsV3]; // provision for future I/O expansion
+
+    const mu2e::KalSeed*      fTrackSeed;  //!
+    const mu2e::CaloCluster*  fCluster;    //!
+  };
+
+  TStnTrackSeedDataV3_t data;
+
+  int            nwi, nwf;
+  fMom1.Streamer(R__b);
+  fOrigin1.Streamer(R__b);
+  fMom2.Streamer(R__b);
+  fOrigin2.Streamer(R__b);
+
+  nwi      = ((int*  ) &data.fT0            ) - &data.fNHits;
+  nwf      = ((float*) &data.fTrackSeed     ) - &data.fT0;
+    
+  R__b.ReadFastArray(&data.fNHits ,nwi);
+  R__b.ReadFastArray(&data.fT0    ,nwf);
+
+  fNHits             = data.fNHits;	     
+  fHelixIndex        = data.fHelixIndex; 
+  fTrackIndex        = data.fTrackIndex; 
+  fSimpPDG1          = data.fSimpPDG1   ;         
+  fSimpPDGM1         = data.fSimpPDGM1  ;         
+  fSimpId1Hits       = data.fSimpId1Hits;         
+  fSimpPDG2          = data.fSimpPDG2   ;         
+  fSimpPDGM2         = data.fSimpPDGM2  ;         
+  fSimpId2Hits       = data.fSimpId2Hits;         
+  fNLoops            = data.fNLoops;
+  fCharge            = 0;
+
+  fT0                = data.fT0;    	  
+  fT0Err             = data.fT0Err; 	  
+                
+  fD0                = data.fD0;    
+  fZ0                = data.fZ0;   
+  fP                 = data.fP;
+  fPt                = data.fPt;
+  fTanDip            = data.fTanDip;
+  fFlt0              = data.fFlt0;
+  fChi2              = data.fChi2;
+  fFitCons           = data.fFitCons;
+
+  fClusterTime       = data.fClusterTime; 
+  fClusterEnergy     = data.fClusterEnergy; 
+  fClusterX          = data.fClusterX;      
+  fClusterY          = data.fClusterY;    
+  fClusterZ          = data.fClusterZ;    
+
+  fTrackSeed         = data.fTrackSeed;
+  fCluster           = data.fCluster;
+}
+
+//-----------------------------------------------------------------------------
 void TStnTrackSeed::Streamer(TBuffer& R__b) {
   int   nwi, nwf;
   
@@ -257,6 +352,7 @@ TStnTrackSeed::TStnTrackSeed(int Number) {
   fClusterZ      = 0;     
   
   fNLoops        = 0;
+  fCharge        = 0;
 
   fTrackSeed = NULL;
   fCluster   = NULL;

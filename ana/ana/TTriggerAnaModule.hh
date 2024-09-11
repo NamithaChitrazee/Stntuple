@@ -13,7 +13,6 @@
 #include "Stntuple/obj/TGenpBlock.hh"
 #include "Stntuple/obj/TStnTimeClusterBlock.hh"
 #include "Stntuple/obj/TStnHelixBlock.hh"
-#include "Stntuple/obj/TStnTrackSeedBlock.hh"
 #include "Stntuple/obj/TStnTrackBlock.hh"
 #include "Stntuple/obj/TStnClusterBlock.hh"
 #include "Stntuple/obj/TStnTriggerBlock.hh"
@@ -57,20 +56,6 @@ public:
     TH1F* fHitRatio;
   };
 
-  struct TrackSeedHist_t : public stntuple::HistBase_t {
-    TH1F* fP;
-    TH1F* fNHits;
-    TH1F* fChi2Dof;
-    TH1F* fD0;
-    TH1F* fPt;
-    TH1F* fT0;
-    TH1F* fZ0;
-    TH1F* fNLoops;
-    TH1F* fSimpPDG1;
-    TH1F* fDp;
-    TH1F* fDpt;
-  };
-
   struct TrackHist_t : public stntuple::HistBase_t {
     TH1F* fP;
     TH1F* fNActive;
@@ -87,6 +72,9 @@ public:
     TH1F* fNPassedPaths;
     TH1F* fInstLum;
     TH1F* fNPassedPathInstLum[5];
+    TH1F* fNPassedAprInstLum;
+    TH1F* fNPassedAprCprInstLum;
+    TH1F* fNPassedAprTprInstLum;
   };
 
   struct EventHist_t : public stntuple::HistBase_t {
@@ -95,10 +83,7 @@ public:
     TH1F* fEventNumber;
     TH1F* fNTimeClusters;
     TH1F* fNHelices   ;
-    TH1F* fNTrackSeeds[2];
-    TH1F* fNGoodSeeds ;
     TH1F* fNTracks    ;
-    TH1F* fPassed     ;
     TH1F* fMcMom      ;
     TH1F* fMcCosTh    ;
     TH1F* fTriggerBits;
@@ -121,7 +106,6 @@ public:
 //-----------------------------------------------------------------------------
   enum { kNTimeClusterHistSets = 100 };
   enum { kNHelixHistSets       = 100 };
-  enum { kNTrackSeedHistSets   = 100 };
   enum { kNTrackHistSets       = 200 };
   enum { kNTriggerHistSets     = 100 };
   enum { kNEventHistSets       = 100 };
@@ -129,7 +113,6 @@ public:
   struct Hist_t {
     TimeClusterHist_t*  fTimeCluster [kNTimeClusterHistSets ];
     HelixHist_t*        fHelix    [kNHelixHistSets    ];
-    TrackSeedHist_t*    fTrackSeed[kNTrackSeedHistSets];
     TrackHist_t*        fTrack    [kNTrackHistSets    ];
     TriggerHist_t*      fTrigger  [kNTriggerHistSets  ];
     EventHist_t*        fEvent    [kNEventHistSets    ];
@@ -142,7 +125,6 @@ public:
   TGenpBlock*              fGenpBlock;
   TStnTimeClusterBlock*    fTimeClusterBlock;
   TStnHelixBlock*          fHelixBlock;
-  TStnTrackSeedBlock*      fTrackSeedBlock;
   TStnTrackBlock*          fTrackBlock;
   TStnClusterBlock*        fClusterBlock;
   TStnTriggerBlock*        fTriggerBlock;
@@ -150,13 +132,10 @@ public:
 					// histograms filled
   Hist_t                   fHist;
 
-  int                      fPassed;
   int                      fNGenp;
   int                      fNTracks;
   int                      fNTimeClusters;
   int                      fNHelices;
-  int                      fNTrackSeeds[10];
-  int                      fNGoodSeeds;
   int                      fNGoodTracks;
   stntuple::TrackPar_t     fTrackPar   [10];
 
@@ -198,7 +177,6 @@ public:
 //-----------------------------------------------------------------------------
   void    BookTimeClusterHistograms(stntuple::HistBase_t* Hist, const char* Folder);
   void    BookHelixHistograms      (stntuple::HistBase_t* Hist, const char* Folder);
-  void    BookTrackSeedHistograms  (stntuple::HistBase_t* Hist, const char* Folder);
   void    BookTrackHistograms      (stntuple::HistBase_t* Hist, const char* Folder);
   void    BookTriggerHistograms    (stntuple::HistBase_t* Hist, const char* Folder);
   void    BookEventHistograms      (stntuple::HistBase_t* Hist, const char* Folder);
@@ -206,7 +184,6 @@ public:
 
   void    FillTimeClusterHistograms(stntuple::HistBase_t* Hist, TStnTimeCluster*  TPeak);
   void    FillHelixHistograms      (stntuple::HistBase_t* Hist, TStnHelix*     Helix);
-  void    FillTrackSeedHistograms  (stntuple::HistBase_t* Hist, TStnTrackSeed* Seed , double Weight = 1);
   void    FillTrackHistograms      (stntuple::HistBase_t* Hist, TStnTrack*     Trk);
   void    FillTriggerHistograms    (stntuple::HistBase_t* Hist);
   void    FillEventHistograms      (stntuple::HistBase_t* Hist, double Weight = 1);

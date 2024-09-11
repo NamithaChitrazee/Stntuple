@@ -82,7 +82,8 @@ Int_t StntupleInitTrackBlock_KK::ResolveLinks(TStnDataBlock* Block, AbsEvent* An
   art::Handle<mu2e::KalHelixAssns> ksfhaH;
   const mu2e::KalHelixAssns* ksfha;
   AnEvent->getByLabel(fKFFCollTag, ksfhaH);
-  ksfha = ksfhaH.product();
+  if (ksfhaH.isValid()) {ksfha = ksfhaH.product();}
+  else {ksfha = NULL;}
 
   TStnTrackBlock* tb = (TStnTrackBlock*) Block;
   TStnEvent*      ev = Block->GetEvent();
@@ -101,11 +102,13 @@ Int_t StntupleInitTrackBlock_KK::ResolveLinks(TStnDataBlock* Block, AbsEvent* An
 // looking for the seed in associations
 //-----------------------------------------------------------------------------
     const mu2e::HelixSeed* hs(nullptr);
-    for (auto ass: *ksfha) {
-      const mu2e::KalSeed* qsf = ass.first.get();
-      if (qsf == ksf) {
-        hs = ass.second.get();
-        break;
+    if (ksfha != NULL) {
+      for (auto ass: *ksfha) {
+        const mu2e::KalSeed* qsf = ass.first.get();
+        if (qsf == ksf) {
+          hs = ass.second.get();
+          break;
+        }
       }
     }
 

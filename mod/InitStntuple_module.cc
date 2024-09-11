@@ -188,12 +188,24 @@ int InitStntuple::InitTriggerTable(int RunNumber) {
     trigger_table->AddTrigger(new TStnTrigger( 200, 200,"caloFast_photon"             ,1));
     trigger_table->AddTrigger(new TStnTrigger( 201, 201,"caloFast_MVANNCE"            ,1));
     trigger_table->AddTrigger(new TStnTrigger( 202, 202,"caloFast_cosmic"             ,1));
+    for (int i=203; i<220; ++i){
+      trigger_table->AddTrigger(new TStnTrigger(   i,   i,Form("NOT_USED_%d", i), 1));      
+    }    
     trigger_table->AddTrigger(new TStnTrigger( 220, 220,"caloFast_RMC"                ,1));
+    for (int i=221; i<300; ++i){
+      trigger_table->AddTrigger(new TStnTrigger(   i,   i,Form("NOT_USED_%d", i), 1));      
+    }    
 
     trigger_table->AddTrigger(new TStnTrigger( 300, 300,"cst"                         ,1));
     trigger_table->AddTrigger(new TStnTrigger( 310, 310,"cstTimeCluster"              ,1));
+    for (int i=311; i<400; ++i){
+      trigger_table->AddTrigger(new TStnTrigger(   i,   i,Form("NOT_USED_%d", i), 1));      
+    }    
 
     trigger_table->AddTrigger(new TStnTrigger( 400, 400,"minBias_SDCount"             ,1));
+    for (int i=401; i<410; ++i){
+      trigger_table->AddTrigger(new TStnTrigger(   i,   i,Form("NOT_USED_%d", i), 1));      
+    }    
     trigger_table->AddTrigger(new TStnTrigger( 410, 410,"minBias_CDCount"             ,1));
 
   }
