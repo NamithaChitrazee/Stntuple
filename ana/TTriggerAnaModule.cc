@@ -79,7 +79,8 @@ void TTriggerAnaModule::BookHelixHistograms(HistBase_t* Hist, const char* Folder
   HBook1F(hist->fChi2XYNDof  ,"Chi2XY"    ,Form("%s: Chi2XY/NDof"   ,Folder),  100,    0,    20,Folder);
   HBook1F(hist->fChi2PhiZNDof,"Chi2PhiZ"  ,Form("%s: Chi2PhiZ/NDof",Folder),   100,    0,    20,Folder);
   HBook1F(hist->fChi2TZNDof ,"Chi2TZ"     ,Form("%s: Chi2TZ/NDof"   ,Folder),  100,    0,    20,Folder);
-  HBook1F(hist->fSimpPDG1   ,"PDG"        ,Form("%s: PDG"     ,Folder), 500,    -500,  500,Folder);
+  HBook1F(hist->fSimpPDG1   ,"PDG"        ,Form("%s: PDG"     ,Folder), 1000,    -500,  500,Folder);
+  HBook1F(hist->fMCP        ,"pMC"        ,Form("%s: MC momentum"   ,Folder), 500,    0,  500,Folder);
   HBook1F(hist->fDp         ,"deltaP"     ,Form("%s: Delta P (Reconstructed - MC)"     ,Folder), 500,    -500,  500,Folder);
   HBook1F(hist->fDpt        ,"deltaPt"    ,Form("%s: Delta Pt (Reconstructed - MC)"     ,Folder), 500,    -500,  500,Folder);
   HBook1F(hist->fTZSlope    ,"tzSlope"    ,Form("%s: TZ slope"      ,Folder), 2000,    -1,  1,Folder);
@@ -126,9 +127,11 @@ void TTriggerAnaModule::BookTriggerHistograms(HistBase_t* Hist, const char* Fold
     HBook1F(hist->fNPassedPathInstLum[i],Form("nPathLumi%d",i),Form("%s: nPOT/#mu bunch %s"  ,Folder, trigNames[i].Data()), 19, npot,Folder);
   }
   
-  HBook1F(hist->fNPassedAprInstLum,"AprPassedLumi",Form("%s: nPOT/#mu bunch "  ,Folder), 19, npot,Folder);
-  HBook1F(hist->fNPassedAprCprInstLum,"AprCprPassedLumi",Form("%s: nPOT/#mu bunch "  ,Folder), 19, npot,Folder);
-  HBook1F(hist->fNPassedAprTprInstLum,"AprTprPassedLumi",Form("%s: nPOT/#mu bunch "  ,Folder), 19, npot,Folder);
+  HBook1F(hist->fNPassedAprInstLum[0],"AprPassedLumi0",Form("%s APR highP: nPOT/#mu bunch "  ,Folder), 19, npot,Folder);
+  HBook1F(hist->fNPassedAprInstLum[1],"AprPassedLumi1",Form("%s APR lowP: nPOT/#mu bunch "  ,Folder), 19, npot,Folder);
+  HBook1F(hist->fNPassedAprInstLum[2],"AprPassedLumi2",Form("%s APR helix: nPOT/#mu bunch "  ,Folder), 19, npot,Folder);
+  HBook1F(hist->fNPassedCprInstLum,"AprCprPassedLumi",Form("%s: nPOT/#mu bunch "  ,Folder), 19, npot,Folder);
+  HBook1F(hist->fNPassedTprInstLum,"AprTprPassedLumi",Form("%s: nPOT/#mu bunch "  ,Folder), 19, npot,Folder);
 
 }
 
@@ -231,6 +234,12 @@ void TTriggerAnaModule::BookHistograms() {
   book_helix_histset[ 5] = 1;           //helix with bad Chi2PhiZ
   book_helix_histset[ 6] = 1;           //helix with p>=80 MeV/c
 
+  book_helix_histset[ 10] = 1;		// all Apr helices
+  book_helix_histset[ 11] = 1;		// all Apr helices
+  book_helix_histset[ 12] = 1;		// all Apr helices
+  book_helix_histset[ 13] = 1;		// all Apr helices
+
+
   for (int i=0; i<kNHelixHistSets; i++) {
     if (book_helix_histset[i] != 0) {
       sprintf(folder_name,"helix_%i",i);
@@ -294,17 +303,17 @@ void TTriggerAnaModule::FillEventHistograms(HistBase_t* Hist, double Weight) {
   hist->fEventNumber->Fill(event_number,Weight);
   hist->fRunNumber->Fill(run_number,Weight);
   hist->fNTimeClusters->Fill(fNTimeClusters,Weight);
-  hist->fNHelices->Fill(fNHelices,Weight);
+  hist->fNHelices->Fill(fNHelices[0]+fNHelices[1],Weight);
   hist->fNTracks->Fill(fNTracks,Weight);
   hist->fMcMom->Fill(fMcMom,Weight);
   hist->fMcCosTh->Fill(fMcCosTh,Weight);
 
   // Loop over number of helices of multihelix events
-  for (int i=0; i<fNHelices-1; i++) {
-    TStnHelix* helix = fHelixBlock->Helix(i);
+  for (int i=0; i<fNHelices[1]-1; i++) {
+    TStnHelix* helix = fAprHelixBlock->Helix(i);
     
-    for (int j = i+1; j<fNHelices; j++){
-      TStnHelix* helixN = fHelixBlock->Helix(j);
+    for (int j = i+1; j<fNHelices[1]; j++){
+      TStnHelix* helixN = fAprHelixBlock->Helix(j);
       
       // Calculate differences between each pair of helices
       float hDeltaT = std::abs(helixN->fT0 - helix->fT0);
@@ -365,8 +374,8 @@ void TTriggerAnaModule::FillEventHistograms(HistBase_t* Hist, double Weight) {
     std::array<int,4> helixMomCut={80, 85, 90, 95};
     //std::array<int,3> helixDeltaTCut={100, 90, 80};
     //std::array<int,3> helixD0Cut={600, 500, 400};
-    for (int i = 0; i<fNHelices; i++){
-      TStnHelix* helix = fHelixBlock->Helix(i);
+    for (int i = 0; i<fNHelices[1]; i++){
+      TStnHelix* helix = fAprHelixBlock->Helix(i);
       hist->fHelixPEff->Fill(0);
       for (int j = 0; j < 4; j++){
         if (helix->P() > helixMomCut[j]) hist->fHelixPEff->Fill(j+1);
@@ -414,6 +423,7 @@ void TTriggerAnaModule::FillHelixHistograms(HistBase_t* Hist, TStnHelix* Helix) 
 
   //MC info
   hist->fSimpPDG1->Fill(Helix->fSimpPDG1);
+  hist->fMCP->Fill(Helix->Mom1().P());
   float deltaP = Helix->P() - Helix->Mom1().P();
   hist->fDp->Fill(deltaP);
   float deltaPt = Helix->Pt() - Helix->Mom1().Pt();
@@ -487,15 +497,15 @@ void TTriggerAnaModule::FillTriggerHistograms(HistBase_t* Hist) {
   if (passedHighPStopTarg) hist->fNPassedPathInstLum[4]->Fill(GetHeaderBlock()->InstLum());
   
   if (fTriggerBlock->PathPassed(180)){
-      hist->fNPassedAprInstLum->Fill(GetHeaderBlock()->InstLum());
+      hist->fNPassedAprInstLum[0]->Fill(GetHeaderBlock()->InstLum());
   }
 
-  if (fTriggerBlock->PathPassed(180) || fTriggerBlock->PathPassed(150) || fTriggerBlock->PathPassed(151) ){
-    hist->fNPassedAprCprInstLum->Fill(GetHeaderBlock()->InstLum());
+  if (fTriggerBlock->PathPassed(190)){
+      hist->fNPassedAprInstLum[1]->Fill(GetHeaderBlock()->InstLum());
   }
 
-  if (fTriggerBlock->PathPassed(180) || fTriggerBlock->PathPassed(100) || fTriggerBlock->PathPassed(101) ){
-    hist->fNPassedAprTprInstLum->Fill(GetHeaderBlock()->InstLum());
+  if (fTriggerBlock->PathPassed(195)){
+      hist->fNPassedAprInstLum[2]->Fill(GetHeaderBlock()->InstLum());
   }
   //  InstLum
 }
@@ -519,7 +529,7 @@ void TTriggerAnaModule::FillHistograms() {
 // helix histograms
 //-----------------------------------------------------------------------------
   int  trgiBitsHitghPStopTarg[4] = {100, 101, 150, 151};
-  for (int i=0; i<fNHelices; i++) {
+  for (int i=0; i<fNHelices[0]; i++) {
     TStnHelix* helix = fHelixBlock->Helix(i);
     FillHelixHistograms(fHist.fHelix[0],helix);
     if (helix->fChi2XYNDof > 5.)
@@ -533,10 +543,19 @@ void TTriggerAnaModule::FillHistograms() {
     for (int i=0; i<4; ++i){
       if (fTriggerBlock->PathPassed(trgiBitsHitghPStopTarg[i])){
         FillHelixHistograms(fHist.fHelix[6],helix);        
-
       }
     }
+    // if (fTriggerBlock->PathPassed(100)) FillTrackSeedHistograms(fHist.fTrackSeed[30],tseed,fWeight);
+    // if (fTriggerBlock->PathPassed(101)) FillTrackSeedHistograms(fHist.fTrackSeed[31],tseed,fWeight);
   }
+
+  // for (int i=0; i<fNTrackSeeds[1]; i++) {
+  //   TStnTrackSeed* tseed = fAprTrackSeedBlock->TrackSeed(i);
+  //   FillTrackSeedHistograms(fHist.fTrackSeed[20],tseed,fWeight);
+  //   if (fTriggerBlock->PathPassed(180)) FillTrackSeedHistograms(fHist.fTrackSeed[21],tseed,fWeight);
+  //   if (fTriggerBlock->PathPassed(190)) FillTrackSeedHistograms(fHist.fTrackSeed[21],tseed,fWeight);
+  // }
+
 //-----------------------------------------------------------------------------
 // track histograms
 //
@@ -563,17 +582,17 @@ void TTriggerAnaModule::FillHistograms() {
   FillEventHistograms(fHist.fEvent[0]);
 
   for (size_t i=0; i<fHelixIndexGood.size(); i++) {
-    TStnHelix* helix = fHelixBlock->Helix(fHelixIndexGood[i]);
+    TStnHelix* helix = fAprHelixBlock->Helix(fHelixIndexGood[i]);
     FillHelixHistograms(fHist.fHelix[1],helix);
   }
 
   for (size_t i=0; i<fHelixIndexBad.size(); i++) {
-    TStnHelix* helix = fHelixBlock->Helix(fHelixIndexBad[i]);
+    TStnHelix* helix = fAprHelixBlock->Helix(fHelixIndexBad[i]);
     FillHelixHistograms(fHist.fHelix[2],helix);
   }
 
   for (size_t i=0; i<fHelixIndexTail.size(); i++) {
-    TStnHelix* helix = fHelixBlock->Helix(fHelixIndexTail[i]);
+    TStnHelix* helix = fAprHelixBlock->Helix(fHelixIndexTail[i]);
     FillHelixHistograms(fHist.fHelix[3],helix);
   }
   
@@ -592,12 +611,13 @@ int TTriggerAnaModule::BeginJob() {
 //-----------------------------------------------------------------------------
 // register data blocks
 //-----------------------------------------------------------------------------
-  RegisterDataBlock("GenpBlock"       , "TGenpBlock"          , &fGenpBlock       );
-  RegisterDataBlock("TimeClusterBlockDeTpr", "TStnTimeClusterBlock", &fTimeClusterBlock);
-  RegisterDataBlock("HelixBlockDeTpr"      , "TStnHelixBlock"      , &fHelixBlock      );
-  RegisterDataBlock("TrackBlockApr"      , "TStnTrackBlock"      , &fTrackBlock      );
-  //RegisterDataBlock("ClusterBlock"    , "TStnClusterBlock"    , &fClusterBlock    );
-  RegisterDataBlock("TriggerBlock"    , "TStnTriggerBlock"    , &fTriggerBlock    );
+  RegisterDataBlock("GenpBlock"            , "TGenpBlock"          , &fGenpBlock       );
+  RegisterDataBlock("TimeClusterBlockDeCpr", "TStnTimeClusterBlock", &fTimeClusterBlock);
+  RegisterDataBlock("HelixBlockDeCpr"      , "TStnHelixBlock"      , &fHelixBlock      );
+  RegisterDataBlock("HelixBlockApr"        , "TStnHelixBlock"      , &fAprHelixBlock      );
+  RegisterDataBlock("TrackBlockApr"        , "TStnTrackBlock"      , &fTrackBlock      );
+  //RegisterDataBlock("ClusterBlock"         , "TStnClusterBlock"    , &fClusterBlock    );
+  RegisterDataBlock("TriggerBlock"         , "TStnTriggerBlock"    , &fTriggerBlock    );
 //-----------------------------------------------------------------------------
 // book histograms
 //-----------------------------------------------------------------------------
@@ -632,6 +652,7 @@ int TTriggerAnaModule::Event(int ientry) {
   fGenpBlock->GetEntry(ientry);
   fTimeClusterBlock->GetEntry(ientry);
   fHelixBlock->GetEntry(ientry);
+  fAprHelixBlock->GetEntry(ientry);
   //fTrackBlock->GetEntry(ientry);
   //fClusterBlock->GetEntry(ientry);
   fTriggerBlock->GetEntry(ientry);
@@ -680,7 +701,8 @@ int TTriggerAnaModule::Event(int ientry) {
 // 
 //-----------------------------------------------------------------------------
   fNTimeClusters = fTimeClusterBlock->NTimeClusters(); // all
-  fNHelices      = fHelixBlock->NHelices(); // all
+  fNHelices[0]   = fHelixBlock->NHelices(); // all
+  fNHelices[1]   = fAprHelixBlock->NHelices(); // all
   fNTracks       = fTrackBlock->NTracks();
 
   InitTrackPar();

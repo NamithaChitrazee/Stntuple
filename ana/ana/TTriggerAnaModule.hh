@@ -49,6 +49,7 @@ public:
     TH1F* fChi2PhiZNDof;
     TH1F* fChi2TZNDof;
     TH1F* fSimpPDG1;
+    TH1F* fMCP;
     TH1F* fDp;
     TH1F* fDpt;
     TH1F* fTZSlope;
@@ -72,9 +73,9 @@ public:
     TH1F* fNPassedPaths;
     TH1F* fInstLum;
     TH1F* fNPassedPathInstLum[5];
-    TH1F* fNPassedAprInstLum;
-    TH1F* fNPassedAprCprInstLum;
-    TH1F* fNPassedAprTprInstLum;
+    TH1F* fNPassedAprInstLum[3];
+    TH1F* fNPassedCprInstLum;
+    TH1F* fNPassedTprInstLum;
   };
 
   struct EventHist_t : public stntuple::HistBase_t {
@@ -125,6 +126,7 @@ public:
   TGenpBlock*              fGenpBlock;
   TStnTimeClusterBlock*    fTimeClusterBlock;
   TStnHelixBlock*          fHelixBlock;
+  TStnHelixBlock*          fAprHelixBlock;
   TStnTrackBlock*          fTrackBlock;
   TStnClusterBlock*        fClusterBlock;
   TStnTriggerBlock*        fTriggerBlock;
@@ -135,7 +137,7 @@ public:
   int                      fNGenp;
   int                      fNTracks;
   int                      fNTimeClusters;
-  int                      fNHelices;
+  int                      fNHelices[2];
   int                      fNGoodTracks;
   stntuple::TrackPar_t     fTrackPar   [10];
 
