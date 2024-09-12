@@ -21,10 +21,10 @@
 //-----------------------------------------------------------------------------
 // load in ROOT physics vectors and event generator libraries
 //-----------------------------------------------------------------------------
-  gSystem->Load("$ROOTSYS/lib/libEG.so");
+  gSystem->Load("$ROOTSYS/lib/root/libEG.so");
   //  gSystem->Load("$ROOTSYS/lib/libPhysics.so");
-  gSystem->Load("$ROOTSYS/lib/libMinuit.so");
-  gSystem->Load("$ROOTSYS/lib/libFumili.so");
+  gSystem->Load("$ROOTSYS/lib/root/libMinuit.so");
+  gSystem->Load("$ROOTSYS/lib/root/libFumili.so");
   //  gSystem->Load("$ROOTSYS/lib/libTree.so");
   //  gSystem->Load("$ROOTSYS/lib/libRuby.so");
 //-----------------------------------------------------------------------------
@@ -57,7 +57,7 @@
 //-----------------------------------------------------------------------------
 // assume STNTUPLE  analysis job
 //-----------------------------------------------------------------------------
-      if (batch_mode == 1) gSystem->Load("$ROOTSYS/lib/libGui.so");
+      if (batch_mode == 1) gSystem->Load("$ROOTSYS/lib/root/libGui.so");
 //-----------------------------------------------------------------------------
 // Mu2e Offline libraries
 //-----------------------------------------------------------------------------
