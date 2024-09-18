@@ -11,7 +11,7 @@ BEGIN_PROLOG
 #------------------------------------------------------------------------------
 StntupleTModuleFclDefaults : {
     interactiveMode     : 0
-    maxFileSize         : 2000   # in MBytes
+    maxFileSize         : 4000   # in MBytes
 #------------------------------------------------------------------------------
 # if rootMacro is non-empty, it defines the name of a ROOT macro to be executed 
 # in interpreted mode in the art event loop
