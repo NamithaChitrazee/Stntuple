@@ -4,26 +4,29 @@
 
 it is assumed that the working area is that of the test release 
 
-1) Setup the Mu2e offline environment, buid STNTUPLE libraries 
-2) run a job to generate 100 events with single conversion electrons:
+1) Setup the Mu2e offline environment, buid STNTUPLE libraries
+   
+2) run jobs to generate, digitize, reconstruct, and stntuple 100 events
+    for dsid=cele0b0 (single conversion electrons,no pileup):
 
 #+begin_src
-mu2e -c Stntuple/fcl/gen_sim_digi_cele0.fcl -n 100
-#+end_src
-
-3) run a job to stntuple produced events :
-
-#+begin_src
-mu2e -c Stntuple/fcl/reco_stn_cele0.fcl -s dig._USER_.cele0s41b0.su2020.001000_00000000.art
+git clone https://github.com/mu2e/pbar2m
+mu2e -c pbar2m/datasets/cele0b0/s3_gen_sim_cele0bo.fcl   -n 100
+mu2e -c pbar2m/datasets/cele0b0/s4_digi_trig_cele0bo.fcl -s dts.user.cele0b0s31r0000.pbar2m.001210_00000000.art
+mu2e -c pbar2m/datasets/cele0b0/s5_reco_kk_cele0b0.fcl   -s dig.mu2e.cele0b0s41r0000.pbar2m.001210_00000000.art
+mu2e -c pbar2m/datasets/cele0b0/s5_stn_kk_cele0b0.fcl    -s mcs.user.cele0b0s51r0100.pbar2m.001210_00000000.art
 #+end_src
 
 4) check the job printout, make sure the ntuple (.stn file) has been produced:
 
 #+begin_src
->ls -altr | grep cele0s8
+>ls -altr | grep cele0b0
 .. snip.. 
--rw-r--r--   1 murat mu2e    29227 Jun 17 10:41 nts._USER_.cele0s81b2.su2020.001000_00000000.stn
--rw-r--r--   1 murat mu2e      519 Jun 17 10:41 nts._USER_.cele0s81b0.su2020.001000_00000000.root
+-rw-r--r--   1 murat mu2e  1518751 Sep 17 20:28 dts.user.cele0b0s31r0000.pbar2m.001210_00000000.art
+-rw-r--r--   1 murat mu2e  1711454 Sep 17 20:39 dig.user.cele0b0s41r0000.pbar2m.001210_00000000.art
+-rw-r--r--   1 murat mu2e  4531381 Sep 17 20:39 mcs.user.cele0b0s51r0100.pbar2m.001210_00000000.art
+drwxr-xr-x  13 murat mu2e       58 Sep 17 20:41 .
+-rw-r--r--   1 murat mu2e    71781 Sep 17 20:41 nts.mu2e.cele0b0s51r0100.pbar2m.001210_00000000.stn
 #+end_src
 
 * next: _how to run analyse produced stntuple_ : [[file:stnana.org][stnana.org]] 
