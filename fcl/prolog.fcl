@@ -176,20 +176,19 @@ MuHitDisplay: { module_type:MuHitDisplay                 # class name;
     showTracks                   : true
     
     genpCollTag                  : "generate"
-    comboHitCollTag              : "makePH"                          ## "FlagBkgHits" ## (was "makePH") flagged comboHits
+    comboHitCollTag              : "FlagBkgHits"                     ## "FlagBkgHits" ## (was "makePH") flagged comboHits
     helixSeedCollTag             : "MHFinderDe"                      # helices
     strawHitCollTag              : "makeSH"
     sdCollTag                    : "compressDigiMCs"                 # standard MC choice
     swCollTag                    : "compressDigiMCs"                 # standard MC choice
     sdmcCollTag                  : "compressDigiMCs"                 #  was "makeSD"
-##    shfCollTag                   : "FlagBkgHits:StrawHits"           # straw hit flags
     spmcCollTag                  : "compressDigiMCs:virtualdetector" # was g4run
     simpCollTag                  : "compressDigiMCs"                 # was g4run
 
     caloHitCollTag               : "CaloHitMaker"
     caloClusterCollTag           : "CaloClusterMaker"
 
-    phiClusterCollTag            : "PhiClusterFinder"
+    phiClusterCollTag            : "TZClusterFinder"                 ## "PhiClusterFinder"
     timeClusterCollTag           : "CalTimePeakFinder"
     trackCollTag                 : "KKDeMHPar"                       ## need to recover : "KFFDeMHDar"
     kffCollTag                   : "KKDeMHPar"                       ## "KSFDeMHDar"
@@ -730,17 +729,6 @@ Stntuple : {
 # sequences, all of them go to end_path
 #------------------------------------------------------------------------------
 Stntuple.stnmaker         : [ InitStntuple, StntupleMaker   ,                   FillStntuple ]
-# Stntuple.stnmaker_cpr     : [ InitStntuple, StntupleMakerCpr,                   FillStntuple ]
-# Stntuple.stnmaker_dmm     : [ InitStntuple, StntupleMakerDmm,                   FillStntuple ]
-# Stntuple.stnmaker_ump     : [ InitStntuple, StntupleMakerUmp,                   FillStntuple ]
-# Stntuple.stnmaker_dpp     : [ InitStntuple, StntupleMakerDpp,                   FillStntuple ]
-# Stntuple.stnmaker_dem_dep : [ InitStntuple, StntupleMakerDemDep,                FillStntuple ]
-# Stntuple.stnmaker_dem_dmm : [ InitStntuple, StntupleMakerDem, StntupleMakerDmm, FillStntuple ]
-# Stntuple.stnmaker_dem_umm : [ InitStntuple, StntupleMakerDem, StntupleMakerUmm, FillStntuple ]
-# Stntuple.stnmaker_dem_ump : [ InitStntuple, StntupleMakerDem, StntupleMakerUmp, FillStntuple ]
-# Stntuple.stnmaker_tcm     : [ InitStntuple, StntupleMakerTcm,                   FillStntuple ]
-# Stntuple.stnmaker_tcm_dem : [ InitStntuple, StntupleMakerTcmDem,                FillStntuple ]
-# Stntuple.stnmaker_tcm_dep : [ InitStntuple, StntupleMakerTcmDep,                FillStntuple ]
 Stntuple.stnmaker_trig    : [ InitStntuple, StntupleMakerTrig,                  FillStntuple ]
 #------------------------------------------------------------------------------
 # new sequences

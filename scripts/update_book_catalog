@@ -116,3 +116,5 @@ for book in $books ; do
       echo "<!--#set var=\"contact\" value=\"kutschke@fnal.gov\" -->"         >> $HTML_CATALOG
       echo "<!--#include virtual=\"/includes/mu2e_footer.shtml\" -->"         >> $HTML_CATALOG
 done
+
+echo directory /web/sites/mu2e.fnal.gov/htdocs/atwork/computing/Stntuple/cafdfc/$book updated
