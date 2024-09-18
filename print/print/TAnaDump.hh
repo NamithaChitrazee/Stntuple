@@ -213,7 +213,7 @@ public:
 			   int                       Flags = -1);
   
   void printComboHitCollection (const char* StrawHitCollTag, 
-				const char* StrawDigiMCCollTag = nullptr,  // "makeSD" or "compressDigiMCs"
+				const char* StrawDigiMCCollTag = "",  // "makeSD" or "compressDigiMCs"
 				double TMin = -1.e6,
 				double TMax =  1.e6);
  
