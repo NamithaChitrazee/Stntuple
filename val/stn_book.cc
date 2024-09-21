@@ -60,9 +60,10 @@ stn_dataset_t* stn_book::FindDataset(const char* DsID) const {
 hist_file_t*   stn_book::FindHistFile(const char* DsID, const char* ProductionJob, const char* AnalysisJob) const {
   hist_file_t* hf (nullptr);
     
+  printf("stn_book::%s dsid=%s ProductionJob=\'%s\' AnalysisJob=\'%s\'\n",__func__,DsID,ProductionJob,AnalysisJob);
   stn_dataset_t* ds = FindDataset(DsID);
   if (ds == nullptr) {
-    printf(" stn::book::FindHistFile ERROR: cant find dataset dsidid=\'%s\'\n",DsID);
+    printf(" stn_book::%s ERROR: cant find dataset dsidid=\'%s\'\n",__func__,DsID);
   }
   else {
     hf = ds->FindHistFile(ProductionJob,AnalysisJob);

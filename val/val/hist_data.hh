@@ -78,14 +78,16 @@ public:
                                         // stnana histogram file
   hist_data_t(stn_book* Book, const char* DsID, const char* JobName, const char* Module, const char* HistName);
 
-                                        // art histogram file - FullHistName is a full path, the rest parameters
-                                        // define the file name
-  hist_data_t(stn_book* Book, const char* DsID, const char* JobName, const char* FullHistName);
+  hist_data_t(stn_catalog* Catalog, const char* Book, const char* DsID,
+	      const char* Job,   const char* Module, const char* HistName);
+//-----------------------------------------------------------------------------
+// art histogram file - FullHistName is a full path, the rest parameters
+// define the file name
+//-----------------------------------------------------------------------------
+  hist_data_t(stn_catalog* Catalog, const char* Book, const char* DsID, const char* Job, const char* FullHistName);
+  hist_data_t(stn_book*    Book   , const char* DsID, const char* Job, const char* FullHistName);
   
-  hist_data_t(stn_catalog* Catalog, const char* BookName, const char* DsID,
-	      const char* JobName,   const char* Module, const char* HistName);
-
-  hist_data_t(TH1* Hist, const char* JobName = "", const char* Module = "");
+  hist_data_t(TH1* Hist, const char* Job = "", const char* Module = "");
 
   void  init();
 

@@ -41,29 +41,6 @@ hist_data_t::hist_data_t(stn_book* Book, const char* DsID, const char* JobName, 
 }
 
 //-----------------------------------------------------------------------------
-// histogram file created by production job (analysis job name = "")
-//-----------------------------------------------------------------------------
-hist_data_t::hist_data_t(stn_book* Book, const char* DsID, const char* ProductionJob, const char* FullHistName) {
-  const char* analysis_job = "";
-  
-  fHist        = nullptr;
-  fBook        = Book;
-  fName        = FullHistName;
-  fModule      = "";
-  fFile        = Book->FindHistFile(DsID,ProductionJob,analysis_job);
-  if (fFile != nullptr) {
-    TFile* f = TFile::Open(fFile->GetName());
-    if (f == nullptr) {
-      printf("ERROR in hist_data_t: file %s doesn't exist, bail out\n",fFile->GetName());
-    }
-    else {
-      fHist    = (TH1*) f->Get(FullHistName)->Clone();
-      if (fHist != nullptr) init();
-    }
-  }
-}
-
-//-----------------------------------------------------------------------------
 hist_data_t::hist_data_t(stn_catalog* Catalog, const char* BookName, const char* DsID,
                          const char* JobName,   const char* Module, const char* HistName) {
   fHist        = nullptr;
@@ -77,6 +54,53 @@ hist_data_t::hist_data_t(stn_catalog* Catalog, const char* BookName, const char*
     }
     catch (...) {
       printf("hist_data_t::hist_data_t: cant find hist for file=%s module=%s histname=%s",fFile->GetName(),Module,HistName);
+    }
+    if (fHist != nullptr) init();
+  }
+}
+//-----------------------------------------------------------------------------
+// histogram file created by production job (analysis job name = "")
+//-----------------------------------------------------------------------------
+hist_data_t::hist_data_t(stn_book* Book, const char* DsID, const char* ProductionJob, const char* FullHistName) {
+  const char* analysis_job = "";
+  
+  fHist        = nullptr;
+  fBook        = Book;
+  fName        = FullHistName;
+  fModule      = "";
+  
+  fFile        = Book->FindHistFile(DsID,ProductionJob,analysis_job);
+  if (fFile != nullptr) {
+    TFile* f = TFile::Open(fFile->GetName());
+    if (f == nullptr) {
+      printf("ERROR in hist_data_t: file %s doesn't exist, bail out\n",fFile->GetName());
+    }
+    else {
+      printf(" %s: -- getting histogram: %s\n",__func__,FullHistName);
+      fHist    = (TH1*) f->Get(FullHistName)->Clone();
+      if (fHist != nullptr) init();
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
+// production hist file
+//-----------------------------------------------------------------------------
+hist_data_t::hist_data_t(stn_catalog* Catalog, const char* Book, const char* DsID,
+                         const char* ProdJob,   const char* FullHistName) {
+  fHist        = nullptr;
+  fBook        = Catalog->FindBook(Book);
+  fFile        = fBook->FindHistFile(DsID,ProdJob,"");
+  fName        = FullHistName;
+  fModule      = "";
+  if (fFile != nullptr) {
+    try {
+      TFile* f = TFile::Open(fFile->GetName());
+      fHist        = (TH1*) f->Get(FullHistName)->Clone();
+    }
+    catch (...) {
+      printf("hist_data_t::hist_data_t: cant find hist for file=%s module=%s histname=%s",
+             fFile->GetName(),fModule.Data(),FullHistName);
     }
     if (fHist != nullptr) init();
   }
