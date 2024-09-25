@@ -68,15 +68,16 @@ for example, /publicweb/m/murat
 
 Use files in /web/sites/mu2e.fnal.gov/htdocs/atwork/computing/Stnuple/cafdfc/mdc2018 as templates
 
-** Notes on the catalog file format:                                         
+** catalog metadata:                                         
 
 #+begin_src
 Lines starting from '#' are comment lines. Exceptions ?? metadata lines (keys are 'NTOTAL:' and such, no space between 'NTOTAL' and ':')
  '# NTOTAL: xxxxx'       : defines total number of events on disk 
- '# NGENERATED: xxxx'    : defines total number of generated events (>= NTOTAL because of filtering) 
- '# SIGNAL_PARTICLE: xx' : PDG code of the 'signal' particle, i.e. 11  
- '# GENERATOR_CODE: xx'  : generator code 
- '# DESCRIPTION: ??..'    : one-line description of the dataset,  Stntuple/scripts/update_book_catalog includes the description line into the book catalog
+ '# NGENERATED: xxxx'    : defines total number of generated events (>= NTOTAL because of filtering)
+ '# MC_FLAG: x'          : 0 for data, 1 for MC
+ '# PROCESS_CODE: xx'    : MC process code
+ '# PDG_CODE:     xx'    : PDG code of the 'signal' particle
+ '# DESCRIPTION: ??..'   : one-line description of the dataset,  Stntuple/scripts/update_book_catalog includes the description line into the book catalog
 #+end_src
 
 If a AAA_DESCRIPTION.html file exists in the dataset catalog directory, a link to it will be included into the html directory 

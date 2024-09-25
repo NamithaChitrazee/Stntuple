@@ -41,7 +41,7 @@ on first 10000 events of the dataset defined by the book="detsim" and dsname="cn
       root[1] stnana("detsim","cnvs0202","","","track_ana()",10000)
 #+end_src
 
-WARNING: trk.C is not loaded by default, so don't try to call trk_ana() interactively.
+- WARNING#1: trk.C is not loaded by default, so don't try to call trk_ana() interactively.
 
 * *stnana* call format                                                       
 
@@ -55,6 +55,11 @@ First 4 parameters in a call to *stnana* describe the input dataset: (read more 
 
 - *Book* : the book name, used in cataloging. One can have several books and have datasets 
            with the same name defined in different books
+
+           for a cataloged dataset, its metadata parameters could be defined in the catalog AAA_CATALOG.html file,
+           see file:cataloging.org
+
+           analysis modules , for example, [[https://github.com/Mu2e/su2020/blob/master/ana/TAnaModule.cc#L220-L227][SU2020 analysis code]] , rely on that
 
   special values:
 
