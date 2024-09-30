@@ -48,6 +48,7 @@ public:
   float         fStatBoxYMin;
   float         fStatBoxXMax;
   float         fStatBoxYMax;
+  TString       fStatFormat;
   int           fRebin;
   int           fYLogScale;
   TString       fDrawOpt;

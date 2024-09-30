@@ -152,6 +152,7 @@ void  hist_data_t::init() {
   fStatBoxYMin =  0.72;
   fStatBoxXMax =  0.90;
   fStatBoxYMax =  0.90;
+  fStatFormat  = "";       // make the default explicit
   fRebin       = -1;
   fYLogScale   =  0;
   fDrawOpt     = "";

@@ -240,7 +240,7 @@ void plot_hist_1D(hist_data_t* Hist1,  hist_data_t*  Hist2, int Print = 0) {
 //-----------------------------------------------------------------------------
 int plot_hist_1d(hist_data_t* Hist, int NHist, int Print = 0) {
   
-  printf("WARNING: plot_hist_1D(hist_data_t*,...) is OBSOLETE, use plot_hist_1D(plot_data_t*, ...)\n");
+  printf("WARNING: plot_hist_1d(hist_data_t*,...) is OBSOLETE, use plot_hist_1d(plot_data_t*, ...)\n");
 
   char figure_name[200];
 //-----------------------------------------------------------------------------
@@ -662,6 +662,13 @@ int plot_hist_1d(plot_data_t* Plot, int Print = 0, const char* Format = "eps") {
     int opt_stat = Hist1->fOptStat;
     if (opt_stat <= 0) opt_stat = Plot->fOptStat;
     plot_stat_box(hpx1,opt_stat,Plot->fStatBoxXMin,sb_ymin,Plot->fStatBoxXMax,sb_ymax);
+    if (Hist1->fStatFormat != "") {
+//-----------------------------------------------------------------------------
+// stat box is only accessible after it has been plotted
+//-----------------------------------------------------------------------------
+      TPaveStats* s = (TPaveStats*) hpx1->GetListOfFunctions()->FindObject("stats");
+      s->SetStatFormat(Hist1->fStatFormat.Data());
+    }
   }
 //-----------------------------------------------------------------------------
 // start forming legend
@@ -773,6 +780,13 @@ int plot_hist_1d(plot_data_t* Plot, int Print = 0, const char* Format = "eps") {
       if (opt_stat == -1) opt_stat = Plot->fOptStat;
       
       plot_stat_box(hpx2,opt_stat,Plot->fStatBoxXMin,sb2_ymin,Plot->fStatBoxXMax,sb2_ymax);
+      if (Hist2->fStatFormat != "") {
+//-----------------------------------------------------------------------------
+// stat box is only accessible after it has been plotted
+//-----------------------------------------------------------------------------
+        TPaveStats* s = (TPaveStats*) hpx2->GetListOfFunctions()->FindObject("stats");
+        s->SetStatFormat(Hist2->fStatFormat.Data());
+      }
     }
 
     if (leg) {
