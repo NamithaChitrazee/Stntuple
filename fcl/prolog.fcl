@@ -1,6 +1,20 @@
 # -*- mode: tcl -*-
 BEGIN_PROLOG
 #------------------------------------------------------------------------------
+# 'global' FHICL variables
+# to redefine INPUT_MODULE in the top-level fcl :
+# INPUT_MODULE : @protect_ignore: "RootInput"
+#------------------------------------------------------------------------------
+bgHitFiles          : @nil
+INPUT_MODULE        : EmptyEvent
+TRIGGER_PATHS       : []
+END_PATHS: []
+PROCESS_NAME        : nil
+STN_COMPRESS_MCS    : "compressDigiMCs"                    # "compressRecoMCs" looks dangerous
+STN_VDHITS_COLL_TAG : "compressDigiMCs:virtualdetector"
+PDG_ID              : 0                                    # 0: ignore PDG_ID
+GEN_ID              : "particleGun"                        #    ignore GEN_ID check
+#------------------------------------------------------------------------------
 # all STNTUPLE modules inherit from the same base class, all of them are filters
 # the base class defaults need to be included into every STNTUPLE module FCL 
 # initialization template
