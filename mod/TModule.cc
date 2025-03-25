@@ -29,7 +29,7 @@ TModule::TModule(fhicl::ParameterSet const& PSet, const char* Name):
   TNamed(Name,Name)
 {
 
-  int    n, index;
+  int    n;
   static char* dummy[100];
 
   fFile   = 0;
@@ -52,9 +52,9 @@ TModule::TModule(fhicl::ParameterSet const& PSet, const char* Name):
                                         // a flag is an integer!
   n = fFclDebugBits.get_names().size();
   for (int i=0; i<n; i++) {
-    key                = fFclDebugBits.get_names().at(i).data();
-    sscanf(key,"bit%i" ,&index );
-
+    int index(0);
+    key               = fFclDebugBits.get_names().at(i).data();
+    sscanf(key,"bit%i",&index );
     fDebugBit[index]  = fFclDebugBits.get<int>(key);
 
     printf("... TModule: bit=%3i is set to %i \n",index,fDebugBit[index]);
