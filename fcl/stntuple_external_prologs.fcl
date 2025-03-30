@@ -1,4 +1,4 @@
- # -*- mode:tcl -*-
+# -*- mode:tcl -*-
 #------------------------------------------------------------------------------
 # STNTUPLE maker user FCL template - see read_reco.fcl
 # p1 : generate, simulate, reconstruct, stntuple
@@ -45,10 +45,13 @@
 #------------------------------------------------------------------------------
 # trigger prologs
 #------------------------------------------------------------------------------
-#include "mu2e_trig_config/core/trigProducers.fcl"
-#include "mu2e_trig_config/core/trigFilters.fcl"
-#include "mu2e_trig_config/core/trigMCProductionSequences.fcl"
-#include "mu2e_trig_config/core/trigSequences.fcl"
+#include "mu2e-trig-config/core/trigProducers.fcl"
+#include "mu2e-trig-config/core/trigFilters.fcl"
+#include "mu2e-trig-config/core/trigRecoSequences.fcl"
+#------------------------------------------------------------------------------
+# this one is claimed as must to go after the digi_prolog ???? really ??
+#------------------------------------------------------------------------------
+#include "mu2e-trig-config/core/trigSequences.fcl"
 #------------------------------------------------------------------------------
 # include-less clones of Production fcls - does the sequence of inclusion matter ?
 #------------------------------------------------------------------------------
