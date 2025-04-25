@@ -92,5 +92,4 @@ namespace mu2e {
 
 } // end namespace mu2e
 
-using mu2e::EventFilter;
-DEFINE_ART_MODULE(EventFilter)
+DEFINE_ART_MODULE(mu2e::EventFilter)

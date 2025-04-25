@@ -32,10 +32,9 @@ protected:
 
   TStnTimeClusterBlock*              fTcBlock;
 
-  std::string                        fTcCollTag;   // time cluster coll tag
-  std::string                        fPcCollTag;   // phi cluster coll tag (also time clusters)
-  std::string                        fChCollTag;   // combo hit collection
-  // std::string                        fChfCollTag;  // combo hit flag collection
+  art::InputTag                      fTcCollTag;   // time cluster coll tag
+  art::InputTag                      fPcCollTag;   // phi cluster coll tag (also time clusters)
+  art::InputTag                      fChCollTag;   // combo hit collection
   art::InputTag                      fSdmcCollTag; // straw digi collection
 
   Color_t                            fTcColor;
@@ -72,10 +71,9 @@ public:
     return (stntuple::TEvdTimeCluster*)    fListOfPhiClusters->At(I); 
   }
 
-  std::string& TcCollTag()   { return fTcCollTag   ; }
-  std::string& PcCollTag()   { return fPcCollTag   ; }
-  std::string& ChCollTag()   { return fChCollTag   ; }
-  //  std::string& ChfCollTag()  { return fChfCollTag  ; }
+  art::InputTag& TcCollTag()   { return fTcCollTag   ; }
+  art::InputTag& PcCollTag()   { return fPcCollTag   ; }
+  art::InputTag& ChCollTag()   { return fChCollTag   ; }
   art::InputTag& SdmcCollTag() { return fSdmcCollTag ; }
 
   const mu2e::TimeClusterCollection*  TcColl () { return fTcColl; }
@@ -85,11 +83,11 @@ public:
 //-----------------------------------------------------------------------------
 // modifiers
 //-----------------------------------------------------------------------------
-  void SetChCollTag  (std::string& CollTag) { fChCollTag   = CollTag; }
+  void SetChCollTag  (art::InputTag& CollTag) { fChCollTag   = CollTag; }
   //  void SetChfCollTag (std::string& CollTag) { fChfCollTag  = CollTag; }
   void SetSdmcCollTag(art::InputTag& CollTag) { fSdmcCollTag = CollTag; }
-  void SetTcCollTag  (std::string& CollTag) { fTcCollTag   = CollTag; }
-  void SetPcCollTag  (std::string& CollTag) { fPcCollTag   = CollTag; }
+  void SetTcCollTag  (art::InputTag& CollTag) { fTcCollTag   = CollTag; }
+  void SetPcCollTag  (art::InputTag& CollTag) { fPcCollTag   = CollTag; }
 
   void SetTcColor    (Color_t      Color   ) { fTcColor    = Color;   }
   void SetPcColor    (Color_t      Color   ) { fPcColor    = Color;   }

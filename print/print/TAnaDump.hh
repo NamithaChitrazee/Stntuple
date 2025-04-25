@@ -13,19 +13,15 @@
 #include "TH2F.h"
 #include "TF1.h"
 
-#ifndef __CINT__
+#ifndef __CLING__
 
+#include "fhiclcpp/types/Atom.h"
+#include "fhiclcpp/types/Table.h"
 #include "fhiclcpp/types/Name.h"
 #include "fhiclcpp/types/Comment.h"
+#include "fhiclcpp/ParameterSet.h"
 
 #include "art/Framework/Principal/Event.h"
-
-#include "Offline/MCDataProducts/inc/CaloMCTruthAssns.hh"
-#include "Offline/MCDataProducts/inc/StrawDigiMC.hh"
-
-#include "Offline/RecoDataProducts/inc/ComboHit.hh"
-#include "Offline/RecoDataProducts/inc/HelixHit.hh"
-// #include "Offline/DataProducts/inc/XYZVec.hh"
 
 #else
 
@@ -33,6 +29,12 @@ namespace art {
   class Event;
 }
 #endif
+
+#include "Offline/MCDataProducts/inc/CaloMCTruthAssns.hh"
+#include "Offline/MCDataProducts/inc/StrawDigiMC.hh"
+
+#include "Offline/RecoDataProducts/inc/ComboHit.hh"
+#include "Offline/RecoDataProducts/inc/HelixHit.hh"
 
 namespace mu2e {
 
@@ -67,14 +69,13 @@ class KalRep;
 
 class TAnaDump : public TObject {
 public:
-
-#ifndef __CINT__
+#ifndef __CLING__
   struct Config {
     using Name    = fhicl::Name;
     using Comment = fhicl::Comment;
-    // fhicl::Atom<int>                       interactiveMode{Name("interactiveMode"), Comment("1: interactive mode"  ) };
-    //    fhicl::Sequence<std::string>           rootMacro      {Name("rootMacro"      ), Comment("good hit mask"        ) };
-    // fhicl::Table<fhicl::ParameterSet>      debugBits      {Name("debugBits"      ), Comment("debug bits"           ) };
+    fhicl::Atom<int>                   interactiveMode{Name("interactiveMode"), Comment("1: interactive mode"  ) };
+    fhicl::Atom<std::string>           rootMacro      {Name("rootMacro"      ), Comment("good hit mask"        ) };
+    fhicl::Table<fhicl::ParameterSet>  debugBits      {Name("debugBits"      ), Comment("debug bits"           ) };
     // fhicl::Table<TrkReco>         printUtils    (Name("printUtils"       ), Comment("print Utils"   ) );
   };
 #endif

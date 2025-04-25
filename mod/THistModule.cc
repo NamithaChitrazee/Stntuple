@@ -23,11 +23,6 @@
 // ClassImp(THistModule)
 					// initialize static class members
 
-TObjArray* THistModule::fgModuleList   = 0;
-TFile*     THistModule::fgFile         = 0;
-TTree*     THistModule::fgTree         = 0;
-int        THistModule::fgMakeSubdirs  = 1;
-
 int        THistModule::fgBufferSize   = 64000;  // in bytes
 int        THistModule::fgMaxFileSize  =   350;  // in MBytes
 TString    THistModule::fgFileName     = "";
@@ -36,20 +31,25 @@ int        THistModule::fgCompressionLevel = 1;
 
 int        THistModule::fgFileNumber   = 0;
 int        THistModule::fgOpenNextFile = 0;
+TObjArray* THistModule::fgModuleList   = 0;
+TFile*     THistModule::fgFile         = 0;
+TTree*     THistModule::fgTree         = 0;
+int        THistModule::fgMakeSubdirs  = 1;
+
 
 
 //______________________________________________________________________________
-THistModule::THistModule(fhicl::ParameterSet const& PSet, const char* Name): 
-  TModule(PSet,Name)
+THistModule::THistModule(fhicl::ParameterSet const& PSet, fhicl::ParameterSet const& THistModulePSet, const char* Name): 
+  TModule(PSet,THistModulePSet.get<fhicl::ParameterSet>("TModule"),Name)
 {
   fOldDir        = NULL;
   fHistogramList = new TObjArray(10);
 
-  fgBufferSize       = PSet.get<int>        ("bufferSize"      ,fgBufferSize);
-  fgMaxFileSize      = PSet.get<int>        ("maxFileSize"     ,fgMaxFileSize);
-  fgFileName         = PSet.get<std::string>("histFileName"    ,fgFileName.Data()).data();
-  fgSplitLevel       = PSet.get<int>        ("splitLevel"      ,fgSplitLevel);
-  fgCompressionLevel = PSet.get<int>        ("compressionLevel",fgCompressionLevel);
+  fgBufferSize       = THistModulePSet.get<int>        ("bufferSize"      ,fgBufferSize);
+  fgMaxFileSize      = THistModulePSet.get<int>        ("maxFileSize"     ,fgMaxFileSize);
+  fgFileName         = THistModulePSet.get<std::string>("histFileName"    ,fgFileName.Data()).data();
+  fgSplitLevel       = THistModulePSet.get<int>        ("splitLevel"      ,fgSplitLevel);
+  fgCompressionLevel = THistModulePSet.get<int>        ("compressionLevel",fgCompressionLevel);
 
   fHistogramList->SetName("HistogramList");
   fFolder->Add(fHistogramList);
@@ -69,9 +69,9 @@ THistModule::THistModule(fhicl::ParameterSet const& PSet, const char* Name):
 }
 
 //-----------------------------------------------------------------------------
-THistModule::THistModule(const art::EDAnalyzer::Table<Config>& config, const char* Name) : 
-  //  TModule(config().tmodule,Name)
-  TModule(config.get_PSet(),Name)
+THistModule::THistModule(const fhicl::Table<THistModule::Config>& config, const char* Name) : 
+  TModule                  (config.get_PSet(), Name)
+  //  TModule(config.get_PSet(),Name)
 {
   fOldDir        = NULL;
   fHistogramList = new TObjArray(10);

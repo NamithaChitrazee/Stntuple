@@ -278,6 +278,4 @@ void FillStntuple::analyze(const AbsEvent& anEvent) {
 
 } // end namespace mu2e
 
-using mu2e::FillStntuple;
-
-DEFINE_ART_MODULE(FillStntuple)
+DEFINE_ART_MODULE(mu2e::FillStntuple)

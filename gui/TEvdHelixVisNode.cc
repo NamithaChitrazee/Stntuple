@@ -383,7 +383,7 @@ void TEvdHelixVisNode::NodePrint(const void* Object, const char* ClassName) {
     }
     else {
 					// Object = nullptr: print collection, with hits 
-      ad->printHelixSeedCollection(fHsCollTag.data(),1,fShCollTag.encode().data(),fSdmcCollTag.encode().data());
+      ad->printHelixSeedCollection(fHsCollTag.encode().data(),1,fShCollTag.encode().data(),fSdmcCollTag.encode().data());
     }
   }
   else {

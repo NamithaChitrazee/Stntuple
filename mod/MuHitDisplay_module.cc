@@ -9,6 +9,18 @@
 ///////////////////////////////////////////////////////////////////////////////
 #include <boost/algorithm/string.hpp>
 
+#include "TApplication.h"
+
+#include "art/Framework/Principal/Selector.h"
+#include "art/Framework/Principal/Handle.h"
+#include "art/Framework/Core/ModuleMacros.h"
+#include "art_root_io/TFileService.h"
+
+#include "Offline/GlobalConstantsService/inc/GlobalConstantsHandle.hh"
+#include "Offline/GlobalConstantsService/inc/PhysicsParams.hh"
+#include "Offline/GeometryService/inc/GeometryService.hh"
+#include "Offline/GeometryService/inc/GeomHandle.hh"
+
 #include "Stntuple/gui/THeaderVisNode.hh"
 #include "Stntuple/gui/TCalVisNode.hh"
 #include "Stntuple/gui/TCrvVisNode.hh"
@@ -20,6 +32,8 @@
 #include "Stntuple/gui/TCalView.hh"
 #include "Stntuple/gui/TCrvView.hh"
 
+#include "Stntuple/print/TAnaDump.hh"
+
 #include "Stntuple/mod/MuHitDisplay_module.hh"
 
 #include "Stntuple/obj/AbsEvent.hh"
@@ -29,59 +43,45 @@
 
 namespace mu2e {
 //-----------------------------------------------------------------------------
-MuHitDisplay::MuHitDisplay(fhicl::ParameterSet const& pset) :
-  THistModule                  (pset,            "MuHitDisplay"),
-
-  _moduleLabel                 (pset.get<string>("module_label")),
-  _processName                 (pset.get<string>("processName", "")),
-  _genpCollTag                 (pset.get<string>("genpCollTag")),
-  _spmcCollTag                 (pset.get<string>("spmcCollTag")),
-  _caloClusterCollTag          (pset.get<string>("caloClusterCollTag"  )),
-  _crvRecoPulseCollTag         (pset.get<string>("crvRecoPulsesCollTag")),
+MuHitDisplay::MuHitDisplay(const art::EDAnalyzer::Table<Config>& config) :
+  THistModule                  (config.get_PSet(), config().THistModule.get<fhicl::ParameterSet>(),"MuHitDisplay"),
+  _genpCollTag                 (config().genpCollTag()         ),
+  _spmcCollTag                 (config().spmcCollTag()         ),
+  _caloClusterCollTag          (config().caloClusterCollTag()  ),
+  _crvRecoPulseCollTag         (config().crvRecoPulsesCollTag()),
   			        
-  _shCollTag                   (pset.get<art::InputTag>("strawHitCollTag")),
-  //  _shfCollTag                  (pset.get<string>("shfCollTag")),
-  _comboHitCollTag             (pset.get<string>("comboHitCollTag")),
-  //  _chfCollTag                  (pset.get<string>("chfCollTag")),
-  _sdCollTag                   (pset.get<string>("sdCollTag")),            // straw digi
-  _sdmcCollTag                 (pset.get<art::InputTag>("sdmcCollTag")),
-  _swCollTag                   (pset.get<string>("swCollTag")),           // straw waveformws
+  _shCollTag                   (config().shCollTag()),
+  _comboHitCollTag             (config().chCollTag()),
+  _sdCollTag                   (config().sdCollTag()),            // straw digi
+  _sdmcCollTag                 (config().sdmcCollTag()),
+  _swCollTag                   (config().swCollTag()),           // straw waveformws
   
-  _helixSeedCollTag            (pset.get<string>("helixSeedCollTag")),
-  _ksfCollTag                  (pset.get<string>("ksfCollTag")),
-  _kffCollTag                  (pset.get<string>("kffCollTag")),
-  _trackCollTag                (pset.get<string>("trackCollTag")),
-  _simpCollTag                 (pset.get<art::InputTag>("simpCollTag")),
-  _timeClusterCollTag          (pset.get<string>("timeClusterCollTag")),
-  _phiClusterCollTag           (pset.get<string>("phiClusterCollTag")),
-  _caloHitCollTag              (pset.get<string>("caloHitCollTag")),
-  _trkExtrapol                 (pset.get<string>("trkExtrapol")),
-  _trkCalMatch                 (pset.get<string>("trkCalMatch")),
-  _pidCollTag                  (pset.get<string>("pidCollTag")),
-  _ppTag                       (pset.get<art::InputTag>("primaryParticleTag")),
-  _vdHitsCollTag               (pset.get<art::InputTag>("vdHitsCollTag")),
+  _helixSeedCollTag            (config().helixSeedCollTag()),
+  _ksfCollTag                  (config().ksfCollTag()),
+  _kffCollTag                  (config().kffCollTag()),
+  _trackCollTag                (config().trackCollTag()),
+  _simpCollTag                 (config().simpCollTag()),
+  _timeClusterCollTag          (config().timeClusterCollTag()),
+  _phiClusterCollTag           (config().phiClusterCollTag()),
+  _caloHitCollTag              (config().caloHitCollTag()),
+  _ppTag                       (config().primaryParticleTag()),
+  _vdHitsCollTag               (config().vdHitsCollTag()),
 
-  _generatorID                 (pset.get<mu2e::GenId>   ("generatorID", mu2e::GenId::CeEndpoint)),
-  _minEnergyDep                (pset.get<double>        ("minEnergyDep", 0)),
-  _timeWindow                  (pset.get<double>        ("timeWindow", 1.e6)),
-  _minSimpMomentum             (pset.get<double>        ("minSimpMomentum")),
-  _maxSimpMomentum             (pset.get<double>        ("maxSimpMomentum")),
+  _generatorID                 (config().generatorID()),
+  _minSimpMomentum             (config().minSimpMomentum()),
+  _maxSimpMomentum             (config().maxSimpMomentum()),
 
-  _showCRVOnly                 (pset.get<bool>("showCRVOnly", false)),
-  _showTracks                  (pset.get<bool>("showTracks")),
+  _showCRVOnly                 (config().showCRVOnly()),
+  _showTracks                  (config().showTracks ()),
 
-  _vmConfig                    (pset.get<fhicl::ParameterSet>("visManager", fhicl::ParameterSet()))
+  _vmConfig                    (config().visManager())
 {
 
   fApplication = 0;
-  
   fHeaderBlock = new TStnHeaderBlock();
-
-  fVisManager = TStnVisManager::Instance();
-
-  _mcUtils = std::make_unique<McUtilsToolBase>();
-    
-  fTrackID = new TStnTrackID();
+  fVisManager  = TStnVisManager::Instance();
+  _mcUtils     = std::make_unique<McUtilsToolBase>();
+  fTrackID     = new TStnTrackID();
   
   fCrvPulseColl_Right   = new CrvRecoPulseCollection();
   fCrvPulseColl_Left    = new CrvRecoPulseCollection();
@@ -90,10 +90,10 @@ MuHitDisplay::MuHitDisplay(fhicl::ParameterSet const& pset) :
   fCrvPulseColl_Dwnstrm = new CrvRecoPulseCollection();
   fCrvPulseColl_Upstrm  = new CrvRecoPulseCollection();
 
-  fDar                  = new DoubletAmbigResolver (pset.get<fhicl::ParameterSet>("DoubletAmbigResolver"),0.,0,0);
-  fDarHandle            = new TNamedHandle("DarHandle",fDar);
+  // fDar                  = new DoubletAmbigResolver (pset.get<fhicl::ParameterSet>("DoubletAmbigResolver"),0.,0,0);
+  // fDarHandle            = new TNamedHandle("DarHandle",fDar);
 
-  fFolder->Add(fDarHandle);
+  // fFolder->Add(fDarHandle);
 
   _firstCall            = 1;
 
@@ -113,7 +113,7 @@ MuHitDisplay::~MuHitDisplay() {
   delete fCrvPulseColl_Upstrm;
 
   //  delete fKalDiag;
-  delete fDar;
+  // delete fDar;
 
   delete fSimpBlock;
 }
@@ -231,22 +231,22 @@ void MuHitDisplay::InitVisManager() {
 //-----------------------------------------------------------------------------
 // parse the VM configuration parameters
 //-----------------------------------------------------------------------------
-  int debug_level = _vmConfig.get<int>("debugLevel");
+  int debug_level = _vmConfig.debugLevel();
   vm->SetDebugLevel(debug_level);
     
-  int display_straw_digi_mc = _vmConfig.get<int>("displayStrawDigiMC");
+  int display_straw_digi_mc = _vmConfig.displayStrawDigiMC();
   vm->SetDisplayStrawDigiMC(display_straw_digi_mc);
 
-  int display_straw_hits_xy = _vmConfig.get<int>("displayStrawHitsXY");
+  int display_straw_hits_xy = _vmConfig.displayStrawHitsXY();
   vm->SetDisplayStrawHitsXY(display_straw_hits_xy);
 
-  float bfield = _vmConfig.get<float>("bField");
+  float bfield = _vmConfig.bField();
   vm->SetBField(bfield);
 
-  _defaultView = _vmConfig.get<string>("defaultView");
+  _defaultView = _vmConfig.defaultView();
 
-  float tmin   = _vmConfig.get<float>("tMin");
-  float tmax   = _vmConfig.get<float>("tMax");
+  float tmin   = _vmConfig.tMin();
+  float tmax   = _vmConfig.tMax();
   vm->SetTimeWindow(tmin,tmax);
 //-----------------------------------------------------------------------------
 // do the geometry
@@ -296,7 +296,7 @@ void MuHitDisplay::InitVisManager() {
 //-----------------------------------------------------------------------------
 // SimpBlock is initialized in the module, a node references it via the pointer
 //-----------------------------------------------------------------------------
-  tnode->SetSimpBlock       (fSimpBlock       );
+  tnode->SetSimpBlock       (fSimpBlock      );
 //-----------------------------------------------------------------------------
 // HelixVisNode: one helix collection - lets see how it plays out
 // add helix node to only one view - XY
@@ -313,7 +313,6 @@ void MuHitDisplay::InitVisManager() {
   tc_node->SetTcCollTag  (_timeClusterCollTag);
   tc_node->SetPcCollTag  (_phiClusterCollTag );
   tc_node->SetChCollTag  (_comboHitCollTag   );
-  //  tc_node->SetChfCollTag (_chfCollTag        );
   tc_node->SetSdmcCollTag(_sdmcCollTag       );
 //-----------------------------------------------------------------------------
 // nodes are defined, now come views
@@ -406,7 +405,7 @@ int MuHitDisplay::getData(const art::Event* Evt) {
   }
   else {
     printf(">>> [MuHitDisplay::%s] WARNING: CrvRecoPulsesCollection by %s is missing. CONTINUE.\n",
-	   __func__, _crvRecoPulseCollTag.data());
+	   __func__, _crvRecoPulseCollTag.encode().data());
   }
     
   if (_showCRVOnly) { //If only displaying the CRV, skip everything else
@@ -424,7 +423,7 @@ int MuHitDisplay::getData(const art::Event* Evt) {
     else {
       _genpColl = 0;
       printf(">>> [%s] WARNING: GenParticleCollection by %s is missing. CONTINUE\n",
-	     oname, _genpCollTag.data());
+	     oname, _genpCollTag.encode().data());
     }
 //-----------------------------------------------------------------------------
 //  StepPointMCs - on virtual detectors
@@ -459,7 +458,7 @@ int MuHitDisplay::getData(const art::Event* Evt) {
     if (swcH.isValid()) _swColl = swcH.product();
     else {
       printf(">>> [%s] WARNING: StrawDigiADCWaveformCollection by %s is missing.\n",
-	     oname, _swCollTag.data());
+	     oname, _swCollTag.encode().data());
       _swColl = nullptr;
     }
     
@@ -477,17 +476,11 @@ int MuHitDisplay::getData(const art::Event* Evt) {
 	     oname, _sdmcCollTag.encode().data());
       _sdmcColl = nullptr;
     }
-    
-    // art::Handle<mu2e::StrawHitFlagCollection> shfcH;
-    // Evt->getByLabel(_shfCollTag, shfcH);
-    
-    // if (shfcH.isValid()) _shfColl = shfcH.product();
-    // else                 _shfColl = nullptr;
 //-----------------------------------------------------------------------------
 // calorimeter hit data
 //-----------------------------------------------------------------------------
     art::Handle<CaloHitCollection> calohit_ch;
-    Evt->getByLabel(_caloHitCollTag.data(), calohit_ch);
+    Evt->getByLabel(_caloHitCollTag,calohit_ch);
     
     if (calohit_ch.isValid()) {
       _caloHitColl = (CaloHitCollection*) calohit_ch.product();
@@ -495,13 +488,13 @@ int MuHitDisplay::getData(const art::Event* Evt) {
     else {
       _caloHitColl = NULL;
       printf(">>> [%s] WARNING: CaloHitCollection by %s is missing.\n",
-	     oname, _caloHitCollTag.data());
+	     oname, _caloHitCollTag.encode().data());
     }
 //-----------------------------------------------------------------------------
 // calorimeter cluster data
 //-----------------------------------------------------------------------------
     art::Handle<CaloClusterCollection> calocluster_ch;
-    Evt->getByLabel(_caloClusterCollTag, "", calocluster_ch);
+    Evt->getByLabel(_caloClusterCollTag,calocluster_ch);
     
     if (calocluster_ch.isValid()) {
       _caloClusterColl = calocluster_ch.product();
@@ -509,7 +502,7 @@ int MuHitDisplay::getData(const art::Event* Evt) {
     else {
       _caloClusterColl = NULL;
       printf(">>> [%s] WARNING: CaloClusterCollection by %s is missing.\n",
-	     oname, _caloClusterCollTag.data());
+	     oname, _caloClusterCollTag.encode().data());
     }
 //-----------------------------------------------------------------------------
 // finally, TSimpBlock. The second parameter, Mode, is not used

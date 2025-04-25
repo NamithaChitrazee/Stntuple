@@ -33,13 +33,12 @@ public:
       using Name    = fhicl::Name; 
       using Comment = fhicl::Comment;
 
-      fhicl::Atom<int>                  bufferSize      {Name("bufferSize"      ),Comment("buffer size"       ) };
-      fhicl::Atom<int>                  maxFileSize     {Name("maxFileSize"     ),Comment("max file size"     ) };
-      // fhicl::Sequence<TString>          histFileName    {Name("histFileName"    ),Comment("hist file name"    ) };
-      fhicl::Atom<TString>              histFileName    {Name("histFileName"    ),Comment("hist file name"    ) };
+      fhicl::Atom<int>                     bufferSize      {Name("bufferSize"      ),Comment("buffer size"       ) };
+      fhicl::Atom<int>                     maxFileSize     {Name("maxFileSize"     ),Comment("max file size"     ) };
+      // fhicl::Sequence<TString>       histFileName    {Name("histFileName"    ),Comment("hist file name"    ) };
+      fhicl::Atom<TString>                 histFileName    {Name("histFileName"    ),Comment("hist file name"    ) };
       fhicl::Atom<int>                      splitLevel      {Name("splitLevel"      ),Comment("split level"       ) };
       fhicl::Atom<int>                      compressionLevel{Name("compressionLevel"),Comment("compression level" ) };
-      //      art::EDAnalyzer::Table<TModule::Config> tmodule  {Name("TModule"         ),Comment("TModule parameters") };
     };
 protected:
 					// there are some initializations 
@@ -72,8 +71,11 @@ protected:
 public:
 					// ****** constructors and destructor
 
-  explicit THistModule(const fhicl::ParameterSet&    PSet, const char* Name);
-  explicit THistModule(const art::EDAnalyzer::Table<Config>& config, const char* Name);
+  explicit THistModule(const fhicl::ParameterSet&   PSet  ,
+                       const fhicl::ParameterSet&   THistModulePSet,
+                       const char*                  Name);
+  
+  explicit THistModule(const fhicl::Table<THistModule::Config>& Config, const char* Name);
 
   ~THistModule( );
 //-----------------------------------------------------------------------------

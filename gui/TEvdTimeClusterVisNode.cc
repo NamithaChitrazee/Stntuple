@@ -307,7 +307,7 @@ void TEvdTimeClusterVisNode::NodePrint(const void* Object, const char* ClassName
     }
     else {
 					// Object = nullptr: print collection, with hits 
-      ad->printTimeClusterCollection(fTcCollTag.data(),fChCollTag.data(),1,fSdmcCollTag.encode().data());
+      ad->printTimeClusterCollection(fTcCollTag.encode().data(),fChCollTag.encode().data(),1,fSdmcCollTag.encode().data());
     }
   }
   else {
@@ -320,6 +320,6 @@ void TEvdTimeClusterVisNode::Print(Option_t* Opt) const {
   // printf(" >>> name: %s TEvdTimeClusterVisNode::Print is not implemented yet\n",GetName());
 
   TAnaDump* ad = TAnaDump::Instance();
-  ad->printTimeClusterCollection(fTcCollTag.data(),fChCollTag.data(),1,fSdmcCollTag.encode().data());
+  ad->printTimeClusterCollection(fTcCollTag.encode().data(),fChCollTag.encode().data(),1,fSdmcCollTag.encode().data());
 }
 

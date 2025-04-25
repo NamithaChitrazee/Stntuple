@@ -1140,7 +1140,7 @@ void TTrkVisNode::Print(Option_t* Opt) const {
 
   if (opt == "combo_hits") {
     TAnaDump* ad = TAnaDump::Instance();
-    ad->printComboHitCollection(fChCollTag.data(),fSdmcCollTag.encode().data());
+    ad->printComboHitCollection(fChCollTag.encode().data(),fSdmcCollTag.encode().data());
     return;
   }
 //-----------------------------------------------------------------------------
@@ -1190,14 +1190,14 @@ void TTrkVisNode::NodePrint(const void* Object, const char* ClassName) {
 // print a ComboHit or a collection of those
 //-----------------------------------------------------------------------------
     if (Object) ad->printComboHit          ((const mu2e::ComboHit*) Object,nullptr);
-    else        ad->printComboHitCollection(fChCollTag.data(),fSdmcCollTag.encode().data());
+    else        ad->printComboHitCollection(fChCollTag.encode().data(),fSdmcCollTag.encode().data());
   }
   else if (class_name == "KalSeed") {
 //-----------------------------------------------------------------------------
 // print a KalSeed or a KalSeed collection
 //-----------------------------------------------------------------------------
     if (Object) ad->printKalSeed          ((const mu2e::KalSeed*) Object,"",fShCollTag.encode().data(),fSdmcCollTag.encode().data());
-    else        ad->printKalSeedCollection(fKsCollTag.data(),1,fShCollTag.encode().data(),fSdmcCollTag.encode().data());
+    else        ad->printKalSeedCollection(fKsCollTag.encode().data(),1,fShCollTag.encode().data(),fSdmcCollTag.encode().data());
   }
   else if (class_name == "SimParticle") {
     ad->printSimParticleCollection(fSimpCollTag);

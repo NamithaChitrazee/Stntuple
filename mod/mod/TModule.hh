@@ -4,6 +4,12 @@
 #ifndef __Stntuple_mod_TModule_hh__
 #define __Stntuple_mod_TModule_hh__
 
+#ifndef __CLING__
+#include "fhiclcpp/types/Atom.h"
+#include "fhiclcpp/types/DelegatedParameter.h"
+#include "fhiclcpp/ParameterSet.h"
+#endif
+
 #include "art/Framework/Core/EDAnalyzer.h"
 #include "art/Framework/Core/ModuleMacros.h"
 #include "art/Framework/Principal/Event.h"
@@ -21,7 +27,7 @@
 #include "TProfile.h"
 
 #include "Stntuple/obj/AbsEvent.hh"
-// #include "Stntuple/print/TAnaDump.hh"
+//#include "Stntuple/print/TAnaDump.hh"
 
 class TAnaRint;
 class TAnaDump;
@@ -31,16 +37,15 @@ class TModule : public art::EDAnalyzer, public TNamed {
   enum { kNDebugBits = 100 };
 
 public:
+  struct Config {
+    using Name    = fhicl::Name;
+    using Comment = fhicl::Comment;
+    fhicl::Atom<int>                   interactiveMode{Name("interactiveMode"), Comment("1: interactive mode"  ) };
+    fhicl::Atom<std::string>           rootMacro      {Name("rootMacro"      ), Comment("ROOT macro"           ) };
+    fhicl::Table<fhicl::ParameterSet>  debugBits      {Name("debugBits"      ), Comment("debug bits"           ) };
+    fhicl::DelegatedParameter          TAnaDump       {Name("TAnaDump"       ), Comment("TAnaDump parameters"  ) };
+  };
 
-    struct Config {
-      using Name    = fhicl::Name;
-      using Comment = fhicl::Comment;
-      fhicl::Atom<int>                       interactiveMode{Name("interactiveMode"), Comment("1: interactive mode"  ) };
-      // fhicl::Sequence<std::string>           rootMacro      {Name("rootMacro"      ), Comment("good hit mask"        ) };
-      fhicl::Atom<std::string>               rootMacro      {Name("rootMacro"      ), Comment("good hit mask"        ) };
-      fhicl::Table<fhicl::ParameterSet>      debugBits      {Name("debugBits"      ), Comment("debug bits"           ) };
-      //      fhicl::Table<TAnaDump::Config>         tanaDump       {Name("TAnaDump"       ), Comment("TAnaDumpParameters"   ) };
-    };
 					// there are some initializations which need 
 					// to be done just once
   static int          fgInitialized;
@@ -78,8 +83,11 @@ public:
 //-----------------------------------------------------------------------------
 // methods 
 //-----------------------------------------------------------------------------
-  TModule(const fhicl::ParameterSet&    pset, const char* Name);
-  //   explicit TModule(const art::EDAnalyzer::Table<TModule::Config>& config, const char* Name);
+  explicit TModule(const fhicl::ParameterSet&  PSet       ,
+                   const fhicl::ParameterSet&  TModulePSet,
+                   const char* Name                       );
+  
+  explicit TModule(const fhicl::Table<TModule::Config>& config, const char* Name);
 
   virtual      ~TModule();
 
