@@ -12,10 +12,10 @@ include_directories(
 # link_directories($ENV{ROOTSYS}/lib)
 
 set (include_files
-#  MuHitDisplay_module.hh
+# MuHitDisplay_module.hh
 # StntupleRecoAna_module.hh
-TAnaRint.hh
 # THistModule.hh TModule.hh
+TAnaRint.hh
 )
 
 ROOT_GENERATE_DICTIONARY(${dict} ${include_files} LINKDEF ${subpkg}/Linkdef.h)
@@ -182,5 +182,10 @@ target_link_libraries(${lib}
 cet_add_compiler_flags(-g -O0)
 
 install(TARGETS ${lib})
-install_headers()
-install_source()
+
+# install_headers()
+# install_source()
+
+message( " --Stntuple/${subpkg}: CMAKE_INSTALL_PREFIX: " ${CMAKE_INSTALL_PREFIX})
+
+install(DIRECTORY ${subpkg} DESTINATION include/Stntuple)

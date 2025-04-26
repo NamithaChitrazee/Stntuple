@@ -31,5 +31,6 @@ target_link_libraries(${lib} ROOT::Core ROOT::Matrix ROOT::Tree ROOT::Graf ROOT:
 cet_add_compiler_flags(-g -O0)
 
 install(TARGETS ${lib})
-install_headers()
-install_source()
+# install_headers()
+# install_source()
+install(DIRECTORY ${subpkg} DESTINATION include/Stntuple)

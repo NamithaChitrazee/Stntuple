@@ -7,7 +7,7 @@
 #pragma link C++ nestedtypedefs;
 
 #pragma link C++  class  mu2e::MuHitDisplay;
-#pragma link C++  class  mu2e::StntupleRecoAna;
+##   #pragma link C++  class  mu2e::StntupleRecoAna;
 #pragma link C++  class  TAnaRint;
 #pragma link C++  class  THistModule;
 #pragma link C++  class  TModule;

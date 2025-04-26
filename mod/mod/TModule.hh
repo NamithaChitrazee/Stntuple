@@ -4,13 +4,21 @@
 #ifndef __Stntuple_mod_TModule_hh__
 #define __Stntuple_mod_TModule_hh__
 
-#ifndef __CLING__
+#if !defined(__CLING__)
 #include "fhiclcpp/types/Atom.h"
 #include "fhiclcpp/types/DelegatedParameter.h"
 #include "fhiclcpp/ParameterSet.h"
+#include "art/Framework/Core/EDAnalyzer.h"
+#else
+namespace fhiclcpp {
+  class Atom;
+  class DelegatedParameter;
+};
+namespace art {
+  class EDAnalyzer;
+};
 #endif
 
-#include "art/Framework/Core/EDAnalyzer.h"
 #include "art/Framework/Core/ModuleMacros.h"
 #include "art/Framework/Principal/Event.h"
 #include "art/Framework/Principal/Run.h"
