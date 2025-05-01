@@ -35,7 +35,10 @@ if ($ENV{STNTUPLE_MC_GEN})
   append (source_files TStnGeneratorModule.cc StnGenInitGenpBlock.cc )
 endif()
 
-add_library(${lib} SHARED ${source_files} ${dict}.cxx)
+add_library(${lib} SHARED ${source_files}     ${dict}.cxx)
+add_library(${CMAKE_PROJECT_NAME}::${subpkg} ALIAS ${lib})
+
+message(" -- P.Murat CMAKE_PROJECT_NAME::subpkg ${CMAKE_PROJECT_NAME}::${subpkg}")
 
 target_link_libraries(${lib}
   Stntuple_obj

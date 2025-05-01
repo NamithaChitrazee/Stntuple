@@ -1,7 +1,9 @@
 # ======================================================================
 #  Stntuple
 # ======================================================================
+
 cmake_minimum_required (VERSION 3.19 FATAL_ERROR)
+
 find_package(cetmodules)
 
 project(Stntuple VERSION 25.04.21)
