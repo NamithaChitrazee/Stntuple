@@ -190,6 +190,34 @@ void MuHitDisplay::InitVisManager() {
 
   vm->SetTitleNode(new THeaderVisNode("HeaderVisNode", fHeaderBlock));
 //-----------------------------------------------------------------------------
+// parse the VM configuration parameters
+//-----------------------------------------------------------------------------
+  int debug_level = _vmConfig.debugLevel();
+  vm->SetDebugLevel(debug_level);
+    
+  int display_straw_digi_mc = _vmConfig.displayStrawDigiMC();
+  vm->SetDisplayStrawDigiMC(display_straw_digi_mc);
+
+  int display_straw_hits_xy = _vmConfig.displayStrawHitsXY();
+  vm->SetDisplayStrawHitsXY(display_straw_hits_xy);
+
+  float bfield = _vmConfig.bField();
+  vm->SetBField(bfield);
+
+  float ew_length = _vmConfig.ewLength();
+  vm->SetEWLength(ew_length);
+
+  _defaultView = _vmConfig.defaultView();
+
+  float tmin   = _vmConfig.tMin();
+  float tmax   = _vmConfig.tMax();
+  vm->SetTimeWindow(tmin,tmax);
+
+  float emin = _vmConfig.minEDep();
+  float emax = _vmConfig.maxEDep();
+  vm->SetMinEDep(emin);
+  vm->SetMaxEDep(emax);
+//-----------------------------------------------------------------------------
 // init CRV views - 6 of those
 //-----------------------------------------------------------------------------
   TCrvView*    view[6];
@@ -197,7 +225,7 @@ void MuHitDisplay::InitVisManager() {
 
   for (int i=0; i<6; i++) {
     view[i] = new TCrvView(i);
-    view[i]->SetTimeWindow(0, 1695);
+    view[i]->SetTimeWindow(0, ew_length);
   }
 
   node  = new TCrvVisNode("CrvVisNode#0", 0);
@@ -228,26 +256,6 @@ void MuHitDisplay::InitVisManager() {
   for (int i=0; i<6; i++) {
     vm->AddView(view[i]);
   }
-//-----------------------------------------------------------------------------
-// parse the VM configuration parameters
-//-----------------------------------------------------------------------------
-  int debug_level = _vmConfig.debugLevel();
-  vm->SetDebugLevel(debug_level);
-    
-  int display_straw_digi_mc = _vmConfig.displayStrawDigiMC();
-  vm->SetDisplayStrawDigiMC(display_straw_digi_mc);
-
-  int display_straw_hits_xy = _vmConfig.displayStrawHitsXY();
-  vm->SetDisplayStrawHitsXY(display_straw_hits_xy);
-
-  float bfield = _vmConfig.bField();
-  vm->SetBField(bfield);
-
-  _defaultView = _vmConfig.defaultView();
-
-  float tmin   = _vmConfig.tMin();
-  float tmax   = _vmConfig.tMax();
-  vm->SetTimeWindow(tmin,tmax);
 //-----------------------------------------------------------------------------
 // do the geometry
 //-----------------------------------------------------------------------------

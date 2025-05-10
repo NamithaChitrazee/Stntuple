@@ -328,7 +328,6 @@ int TTrkVisNode::InitEvent() {
 // the rest makes sense only if nhits > 0
 //-----------------------------------------------------------------------------
   if (nch > 0) { 
-    //    const mu2e::ComboHit* hit0 = &fChColl->at(0);
 
     float                     mc_mom(-1.), mc_mom_z(-1.);
     int                       mother_pdg_id(0);
@@ -490,8 +489,11 @@ void TTrkVisNode::PaintXY(Option_t* Option) {
 
   TStnVisManager* vm = TStnVisManager::Instance();
 
-  double tmin = vm->TMin(); 
-  double tmax = vm->TMax();
+  float tmin = vm->TMin(); 
+  float tmax = vm->TMax();
+
+  float min_edep = vm->MinEDep(); 
+  float max_edep = vm->MaxEDep();
 
   stntuple::TEvdTimeCluster* etcl = vm->SelectedTimeCluster();
   if (etcl) {
@@ -542,12 +544,13 @@ void TTrkVisNode::PaintXY(Option_t* Option) {
 	  if (! flag.hasAnyProperty(mu2e::StrawHitFlagDetail::energysel)) continue;
 	}
 
-	straw     = &tracker->getStraw(sch->strawId());
-	station   = straw->id().getStation();
-	time      = sch->correctedTime();
+	straw      = &tracker->getStraw(sch->strawId());
+	station    = straw->id().getStation();
+	time       = sch->correctedTime();
+	float edep = sch->energyDep();
 
 	if ((station >= vm->MinStation()) && (station <= vm->MaxStation())) { 
-	  if ((time >= tmin) && (time <= tmax)) {
+	  if ((time >= tmin) and (time <= tmax) and (edep >= min_edep) and (edep <= max_edep)) {
 //-----------------------------------------------------------------------------
 // check if the hit belongs to the time cluster
 //-----------------------------------------------------------------------------
@@ -587,12 +590,13 @@ void TTrkVisNode::PaintXY(Option_t* Option) {
         int index = ch->index(0);
         const mu2e::ComboHit* sh = &fSchColl->at(index);
 
-        straw     = &tracker->getStraw(sh->strawId());           // first straw hit
-        station   = straw->id().getStation();
-        time      = ch->correctedTime();
+        straw      = &tracker->getStraw(sh->strawId());           // first straw hit
+        station    = straw->id().getStation();
+        time       = ch->correctedTime();
+        float edep = ch->energyDep();
 
         if ((station >= vm->MinStation()) && (station <= vm->MaxStation())) { 
-          if ((time >= tmin) && (time <= tmax)) {
+          if ((time >= tmin) and (time <= tmax) and (edep >= min_edep) and (edep <= max_edep)) {
             // check if the hit belongs to the time cluster
             int ok = 1;
             if (etcl and vm->DisplayOnlyTCHits()) { 
@@ -642,16 +646,6 @@ void TTrkVisNode::PaintXY(Option_t* Option) {
       }
     }
   }
-//-----------------------------------------------------------------------------
-// seedfit, if requested - not implemented yet
-//-----------------------------------------------------------------------------
-//   TAnaDump::Instance()->printKalRep(0,"banner");
-
-//   ntrk = fListOfTracks->GetEntriesFast();
-//   for (int i=0; i<ntrk; i++ ) {
-//     evd_trk = (TEvdTrack*) fListOfTracks->At(i);
-//     evd_trk->Paint(Option);
-//   }
 
   gPad->Modified();
 }
@@ -666,6 +660,9 @@ void TTrkVisNode::PaintRZ(Option_t* Option) {
   TStnVisManager* vm = TStnVisManager::Instance();
 
   fTracker->PaintRZ(Option);
+
+  double min_edep = vm->MinEDep(); 
+  double max_edep = vm->MaxEDep();
 
   double tmin = vm->TMin(); 
   double tmax = vm->TMax();
@@ -696,18 +693,6 @@ void TTrkVisNode::PaintRZ(Option_t* Option) {
     }
   }
 //-----------------------------------------------------------------------------
-// do not draw all straw hits - just redraw straws in different color instead
-//-----------------------------------------------------------------------------
-//   int nhits = fListOfStrawHits->GetEntries();
-//   for (int i=0; i<nhits; i++) {
-//     hit       = (TEvdStrawHit*) fListOfStrawHits->At(i);
-
-//     if ((station >= vm->MinStation()) && (station <= vm->MaxStation())) continue;
-//     if ((time    <  vm->TMin()      ) || (time     > vm->TMax()      )) continue; 
-
-//     hit->Paint(Option);
-//   }
-//-----------------------------------------------------------------------------
 // display tracks and track hits
 //-----------------------------------------------------------------------------
   if (vm->DisplayTracks()) {
@@ -720,8 +705,9 @@ void TTrkVisNode::PaintRZ(Option_t* Option) {
       nhits = evd_trk->NHits();
       for (int ih=0; ih<nhits; ih++) {
 	stntuple::TEvdTrkStrawHit* hit = evd_trk->Hit(ih);
-	double time = hit->TrkStrawHitSeed()->hitTime();
-	if ((time >= tmin) && (time <= tmax)) {
+	float time = hit->TrkStrawHitSeed()->hitTime();
+        float edep = hit->TrkStrawHitSeed()->energyDep();
+	if ((time >= tmin) and (time <= tmax) and (edep >= min_edep) and (edep <= max_edep)) {
 	  hit->PaintRZ(Option);
 	}
       }
@@ -767,6 +753,9 @@ void TTrkVisNode::PaintTZ(Option_t* Option) {
   double tmin = vm->TMin(); 
   double tmax = vm->TMax();
 
+  double emin = vm->MinEDep(); 
+  double emax = vm->MaxEDep();
+
   stntuple::TEvdTimeCluster* etcl = vm->SelectedTimeCluster();
 
   if (etcl) {
@@ -776,7 +765,6 @@ void TTrkVisNode::PaintTZ(Option_t* Option) {
 
   int nhits = fListOfComboHits->GetEntries();
   if (nhits > 0) {
-    // const mu2e::ComboHit* ch0 = &fChColl->at(0);
 
     for (int i=0; i<nhits; i++) {
       stntuple::TEvdComboHit* ech = (stntuple::TEvdComboHit*) fListOfComboHits->At(i);
@@ -793,8 +781,9 @@ void TTrkVisNode::PaintTZ(Option_t* Option) {
       }
       
       float time  = ech->correctedTime();
+      float edep  = ch->energyDep();
       
-      if ((time >= tmin) && (time <= tmax)) {
+      if ((time >= tmin) and (time <= tmax) and (edep >= emin) and (edep <= emax)) {
         // check if the hit belongs to the time cluster
         int ok = 1;
         if (etcl and vm->DisplayOnlyTCHits()) { 

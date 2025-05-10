@@ -71,8 +71,11 @@ public:
     fhicl::Atom<int>         displayStrawHitsXY {Name("displayStrawHitsXY" )    , Comment("display straw hits in XY") };
     fhicl::Atom<int>         debugLevel         {Name("debugLevel"         )    , Comment("debug level" ) };
     fhicl::Atom<float>       bField             {Name("bField"             )    , Comment("bField"      ) };
+    fhicl::Atom<float>       ewLength           {Name("ewLength"           )    , Comment("ewLength"    ) };
     fhicl::Atom<float>       tMin               {Name("tMin"               )    , Comment("tMin"        ) };
     fhicl::Atom<float>       tMax               {Name("tMax"               )    , Comment("tMax"        ) };
+    fhicl::Atom<float>       minEDep            {Name("minEDep"            )    , Comment("minEDep"     ) };
+    fhicl::Atom<float>       maxEDep            {Name("maxEDep"            )    , Comment("maxEDep"     ) };
     fhicl::Atom<std::string> defaultView        {Name("defaultView"        )    , Comment("defaultView" ) };
   };
     

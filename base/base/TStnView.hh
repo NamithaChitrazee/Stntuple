@@ -66,6 +66,8 @@ public:
   void          SetIndex      (int Index) { fIndex = Index; } 
 
   void          SetTimeWindow (float TMin, float TMax);  // *MENU* 
+  void          SetMinEDep    (float E);                 // *MENU* 
+  void          SetMaxEDep    (float E);                 // *MENU* 
   void          SetStations   (int I1, int I2);          // *MENU* 
   void          SetDebugLevel (int Level);               // *MENU*
 //-----------------------------------------------------------------------------
