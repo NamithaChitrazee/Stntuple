@@ -166,6 +166,11 @@ void TEvdTimeCluster::Print(Option_t* Option) const {
 }
 
 //-----------------------------------------------------------------------------
+  void TEvdTimeCluster::PrintMe() const {
+    Print("");
+}
+
+//-----------------------------------------------------------------------------
 void TEvdTimeCluster::ExecuteEvent(int Event, int Px, int Py) {
 
   // switch (Event) {

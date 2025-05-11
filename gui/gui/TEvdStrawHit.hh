@@ -110,7 +110,8 @@ public:
   virtual Int_t DistancetoPrimitiveXY(Int_t px, Int_t py);
   virtual Int_t DistancetoPrimitiveRZ(Int_t px, Int_t py);
 
-  virtual void  Print(const char* Opt = "") const ;               // *MENU*
+  virtual void  Print  (const char* Opt = "") const ;               // *MENU*
+  virtual void  PrintMe()                     const ;               // *MENU*
 
   ClassDef(stntuple::TEvdStrawHit,0)
 };

@@ -268,19 +268,16 @@ Stntuple: {
     analyzers: {
 	InitStntuple: { module_type:InitStntuple
 	    THistModule: { @table::StntupleTHistModule }                   # defaults of the base class
-	    module_name       : InitStntuple
 	    histFileName      : "default.stn"
 	    splitLevel        : 99
 	}
 
 	FillStntuple: { module_type:FillStntuple
 	    THistModule: {@table::StntupleTHistModule}                   # defaults of the base class
-	    module_name       : FillStntuple
 	}
 
 	StntupleEventDump : { module_type:StntupleEventDump 
 	    THistModule: {@table::StntupleTHistModule}                   # defaults of the base class
-	    module_name       : StntupleEventDump
 	}
 #------------------------------------------------------------------------------
 # downstream electrons - explicitly - the same as default
@@ -415,26 +412,6 @@ Stntuple: {
 # track reconstruction studies: 
 # make 3 track blocks, for the moment need to specify all other labels
 #------------------------------------------------------------------------------
-	StntupleMakerTcm : { @table::StntupleMakerTemplate 
-	    makePid                    : 0
-	    makeTrackSeeds             : 1
-	    makeTimeClusters           : 1
-	    makeHelices                : 1
-	    timeClusterBlockName       : [ "TprTimeClusterBlock"     , "CprTimeClusterBlock"     ]
-	    timeClusterCollTag         : [ "TimeClusterFinderDe"     , "CalTimePeakFinder"       ]
-	    helixBlockName             : [ "TprHelixBlock"           , "CprHelixBlock"           ]
-	    helixCollTag               : [ "HelixFindere:Positive"   , "CalHelixFinder:Positive" ]
-	    trackSeedBlockName         : [ "TprTrackSeedBlock"       , "CprTrackSeedBlock"       ]
-	    trackSeedModuleLabel       : [ "KSFDeM"                  , "CalSeedFit"              ]
-	    trackBlockName             : [ "TprTrackBlock"           , "CprTrackBlock"           , "TrackBlock"             ]
-	    trackCollTag               : [ "MergePatRecTpr"          , "MergePatRecCpr"          , "MergePatRec"            ]
-	    tciCollTag                 : [ "TrackCaloIntersectionTpr", "TrackCaloIntersectionCpr", "TrackCaloIntersection"  ]
-	    tcmCollTag                 : [ "TrackCaloMatchingTpr"    , "TrackCaloMatchingCpr"    , "TrackCaloMatching"      ]
-	    trackSHBlockName           : [ "TrackHitBlockTpr"        , "TrackHitBlockCpr"        , "TrackHitBlock"          ] 
-	    pidBlockName               : [ ""                        , ""                        , "PidBlock"               ] 
-	    pidCollTag                 : [                        "" ,                         "", "AvikPIDNew"             ]
-	}
-#------------------------------------------------------------------------------
 # track reconstruction studies: 
 # make 3 track blocks, for the moment need to specify all other labels
 #------------------------------------------------------------------------------
@@ -458,35 +435,6 @@ Stntuple: {
 
 	    tciCollTag                 : [ "TrackCaloIntersectionTprDem", "TrackCaloIntersectionCprDem", "TrackCaloIntersectionDem" ]
 	    tcmCollTag                 : [ "TrackCaloMatchingTprDem"    , "TrackCaloMatchingCprDem"    , "TrackCaloMatchingDem"     ]
-	    trackSHBlockName           : [ "TrackHitBlockTpr"           , "TrackHitBlockCpr"           , "TrackHitBlock"            ] 
-	    pidBlockName               : [ ""                           , ""                           , "PidBlock"                 ] 
-	    pidCollTag                 : [                        ""    ,                         ""   , "AvikPIDNew"               ]
-	}
-#------------------------------------------------------------------------------
-# track reconstruction studies: 
-# make 3 track blocks, for the moment need to specify all other labels
-#------------------------------------------------------------------------------
-	StntupleMakerTcmDep : { @table::StntupleMakerTemplate 
-	    makePid                    : 0
-	    makeTrackSeeds             : 1
-	    makeTimeClusters           : 1
-	    makeHelices                : 1
-	    timeClusterBlockName       : [ "TimeClusterBlockTpr"        , "TimeClusterBlockCpr"        ]
-	    timeClusterCollTag         : [ "TimeClusterFinderDe"        , "CalTimePeakFinder"          ]
-
-	    helixBlockName             : [ "HelixBlockTpr"              , "HelixBlockCpr"              , "HelixBlock"               ]
-	    helixCollTag               : [ "HelixFinder:Negative"       , "CalHelixFinderDe:Negative"  , ""                         ]
-
-	    trackSeedBlockName         : [ "TrackSeedBlockTpr"          , "TrackSeedBlockCpr"          , "TrackSeedBlock"           ]
-	    trackSeedCollTag           : [ "KSFDeP"                     , "CalSeedFitDep"              , "MergePatRecDep"           ]
-
-	    trackBlockName             : [ "TrackBlockTpr"              , "TrackBlockCpr"              , "TrackBlock"               ]
-	    trackCollTag               : [ "MergePatRecTprDep"          , "MergePatRecCprDep"          , "MergePatRecDep"           ]
-	    trackTsBlockName           : [ "TrackSeedBlockTpr"          , "TrackSeedBlockCpr"          , "TrackSeedBlock"           ]
-	    trackTsCollTag             : [ "KSFDeP"                     , "CalSeedFitDep"              , "MergePatRecDep"           ]
-
-	    tciCollTag                 : [ "TrackCaloIntersectionTprDep", "TrackCaloIntersectionCprDep", "TrackCaloIntersectionDep" ]
-	    tcmCollTag                 : [ "TrackCaloMatchingTprDep"    , "TrackCaloMatchingCprDep"    , "TrackCaloMatchingDep"     ]
 	    trackSHBlockName           : [ "TrackHitBlockTpr"           , "TrackHitBlockCpr"           , "TrackHitBlock"            ] 
 	    pidBlockName               : [ ""                           , ""                           , "PidBlock"                 ] 
 	    pidCollTag                 : [                        ""    ,                         ""   , "AvikPIDNew"               ]

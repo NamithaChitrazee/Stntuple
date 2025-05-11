@@ -84,7 +84,9 @@ public:
 //-----------------------------------------------------------------------------
   virtual void  Paint(Option_t* Opt = "");
   virtual void  Clear(Option_t* Opt = "");
-  virtual void  Print(Option_t* Opt = "") const ; // **MENU**
+
+  virtual void  PrintMe() const ; // **MENU**
+  virtual void  Print  (Option_t* Opt = "") const ; // **MENU**
 
   virtual int   DistancetoPrimitive(Int_t px, Int_t py);
   virtual void  ExecuteEvent       (int Event, int Px, int Py);	

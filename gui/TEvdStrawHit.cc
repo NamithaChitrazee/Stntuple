@@ -190,4 +190,9 @@ void TEvdStrawHit::Print(Option_t* Option) const {
   else           ad->printComboHit(fHit, step, Option       , -1, flags);
 }
 
+//-----------------------------------------------------------------------------
+void TEvdStrawHit::PrintMe() const {
+  Print("");
+}
+
 }
