@@ -60,7 +60,7 @@ public:
 // constructors
 //------------------------------------------------------------------------------
 FillStntuple::FillStntuple(fhicl::ParameterSet const& PSet): 
-  StntupleModule   (PSet,"FillStntuple")
+  StntupleModule   (PSet.get<fhicl::ParameterSet>("THistModule"),"FillStntuple")
 {
   fLastRun = -1;
   TTree::SetMaxTreeSize(8000000000LL);
@@ -81,7 +81,7 @@ void FillStntuple::beginRun(const art::Run &  aRun) {
   if (runnum != fLastRun) {
 					// create new subdirectory and store 
 					// calibration constants in there
-    ProcessNewRun(runnum);
+    // [2025-05-12 PM bypass for the time being]  ProcessNewRun(runnum);
     fLastRun = runnum;
   }
 

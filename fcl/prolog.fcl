@@ -59,8 +59,9 @@ StntupleTHistModule : {
 # default configuration of StntupleMaker
 #------------------------------------------------------------------------------
 StntupleMakerTemplate : { module_type:StntupleMaker
-    THistModule          : {@table::StntupleTHistModule}            ## defaults of the base class
-    module_name          : StntupleMaker
+    THistModule          : {          ## defaults of the base class
+        @table::StntupleTHistModule
+    }
     processName          : undefined
 #------------------------------------------------------------------------------
 # define branches to be filled by default, in alphabetical order
@@ -267,22 +268,37 @@ Stntuple: {
 #------------------------------------------------------------------------------
     analyzers: {
 	InitStntuple: { module_type:InitStntuple
-	    THistModule: { @table::StntupleTHistModule }                   # defaults of the base class
-	    histFileName      : "default.stn"
-	    splitLevel        : 99
+	    THistModule: { @table::StntupleTHistModule                    # defaults of the base class
+                # module_name       : InitStntuple
+                histFileName      : "default.stn"
+                splitLevel        : 99
+                module_label      : "InitStntuple"
+            }
 	}
 
 	FillStntuple: { module_type:FillStntuple
-	    THistModule: {@table::StntupleTHistModule}                   # defaults of the base class
+	    THistModule: {                                               # defaults of the base class
+                @table::StntupleTHistModule
+                module_label: "FillStntuple"
+            }                   
 	}
 
 	StntupleEventDump : { module_type:StntupleEventDump 
-	    THistModule: {@table::StntupleTHistModule}                   # defaults of the base class
+	    THistModule: {
+                @table::StntupleTHistModule
+            }                   # defaults of the base class
+	    module_name       : StntupleEventDump
 	}
 #------------------------------------------------------------------------------
 # downstream electrons - explicitly - the same as default
 #------------------------------------------------------------------------------
-	StntupleMaker     : { @table::StntupleMakerTemplate }
+	StntupleMaker     : { @table::StntupleMakerTemplate
+            module_type:StntupleMaker
+	    THistModule: { 
+                @table::StntupleTHistModule
+                module_label : "StntupleMaker"
+            }
+        }
 
 	StntupleMakerCpr  : { @table::StntupleMakerTemplate 
 	    trackBlockName            : [ "TrackBlock"               ] 
@@ -695,14 +711,5 @@ Stntuple: {
 #------------------------------------------------------------------------------
 Stntuple.stnmaker         : [ InitStntuple, StntupleMaker   ,                   FillStntuple ]
 Stntuple.stnmaker_trig    : [ InitStntuple, StntupleMakerTrig,                  FillStntuple ]
-#------------------------------------------------------------------------------
-# new sequences
-#------------------------------------------------------------------------------
-# Stntuple.stnmaker_De      : [ InitStntuple, StntupleMakerDe  ,                  FillStntuple ]
-# Stntuple.stnmaker_Dmu     : [ InitStntuple, StntupleMakerDmu ,                  FillStntuple ]
-# Stntuple.stnmaker_De_Dmu  : [ InitStntuple, StntupleMakerDeDmu,                 FillStntuple ]
-# 
-# Stntuple.stnmaker_De_Dmu_dar : [ InitStntuple, StntupleMakerDeDmuDar,           FillStntuple ]
-# Stntuple.stnmaker_De_Ue_dar  : [ InitStntuple, StntupleMakerDeUeDar,            FillStntuple ]
 
 END_PROLOG

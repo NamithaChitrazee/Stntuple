@@ -47,9 +47,14 @@ THistModule::THistModule(fhicl::ParameterSet const& PSet, fhicl::ParameterSet co
 
   fgBufferSize       = THistModulePSet.get<int>        ("bufferSize"      ,fgBufferSize);
   fgMaxFileSize      = THistModulePSet.get<int>        ("maxFileSize"     ,fgMaxFileSize);
-  fgFileName         = THistModulePSet.get<std::string>("histFileName"    ,fgFileName.Data()).data();
   fgSplitLevel       = THistModulePSet.get<int>        ("splitLevel"      ,fgSplitLevel);
   fgCompressionLevel = THistModulePSet.get<int>        ("compressionLevel",fgCompressionLevel);
+
+  TString s = THistModulePSet.get<std::string>("histFileName"    ,fgFileName.Data()).data();
+  // redefine only if non-default
+  if (s != "") fgFileName = s;
+
+  std::cout << "-- module name:" << Name << " fgFileName:" << fgFileName.Data() << std::endl;
 
   fHistogramList->SetName("HistogramList");
   fFolder->Add(fHistogramList);
@@ -58,7 +63,6 @@ THistModule::THistModule(fhicl::ParameterSet const& PSet, fhicl::ParameterSet co
 
   if (fgModuleList == 0) {
     fgModuleList = new TObjArray(10);
-    //    framework()->actions()->append(new THistModuleAction());
 //-----------------------------------------------------------------------------
 // do not append the histograms to the directory list of objects to allow
 // using short histogram names
@@ -81,10 +85,6 @@ THistModule::THistModule(const fhicl::Table<THistModule::Config>& config, const 
   fgFileName            = config().histFileName    ();
   fgSplitLevel          = config().splitLevel      ();
   fgCompressionLevel    = config().compressionLevel();
-
-  // fgBufferSize       = PSet.get<int>        ("bufferSize"      ,fgBufferSize);
-  // fgSplitLevel       = PSet.get<int>        ("splitLevel"      ,fgSplitLevel);
-  // fgCompressionLevel = PSet.get<int>        ("compressionLevel",fgCompressionLevel);
 
   fHistogramList->SetName("HistogramList");
   fFolder->Add(fHistogramList);
