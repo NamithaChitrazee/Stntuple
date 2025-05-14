@@ -23,35 +23,45 @@ GEN_ID              : "particleGun"                        #    ignore GEN_ID ch
 # see example of redefining GEN_ID in Stntuple/test/read_reco_stntuple.fcl
 # to be included by Stntuple/fcl/stntuple.fcl
 #------------------------------------------------------------------------------
-StntupleTModuleFclDefaults : {
-    interactiveMode     : 0
-    maxFileSize         : 4000   # in MBytes
+StntupleTHistModule : {
 #------------------------------------------------------------------------------
+# THistModule 
+#------------------------------------------------------------------------------
+    maxFileSize         :  4000           ## MBytes
+    bufferSize          : 64000           ## bytes
+    histFileName        : ""              ##
+    splitLevel          :    99           ##
+    compressionLevel    :     1           ##
+#------------------------------------------------------------------------------
+# TModule
+#
 # if rootMacro is non-empty, it defines the name of a ROOT macro to be executed 
 # in interpreted mode in the art event loop
 # see https://github.com/Mu2e/Stntuple/blob/muse/doc/event_display.org#plugins
 #------------------------------------------------------------------------------
-    rootMacro           : ""
-#------------------------------------------------------------------------------
-# unlike everywhere else, TAnaDump sets mcTruth to 1 by default
-#------------------------------------------------------------------------------
-    TAnaDump : {
-	printUtils      : { @table::TrkReco.PrintUtils 
-	    mcTruth     : 1
-	}
-    }
-    debugBits       : { 
-	# bit0:1  
-	# bit1:1 
-	# bit51:1
+    TModule: {
+        interactiveMode     :     0           ##
+        rootMacro           : ""
+        
+        TAnaDump : {
+            printUtils      : { @table::TrkReco.PrintUtils 
+                mcTruth     : 1
+            }
+        }
+        debugBits       : { 
+            # bit0:1  
+            # bit1:1 
+            # bit51:1
+        }
     }
 }
 #------------------------------------------------------------------------------
 # default configuration of StntupleMaker
 #------------------------------------------------------------------------------
 StntupleMakerTemplate : { module_type:StntupleMaker
-    @table::StntupleTModuleFclDefaults                  # defaults of the base class
-    module_name          : StntupleMaker
+    THistModule          : {          ## defaults of the base class
+        @table::StntupleTHistModule
+    }
     processName          : undefined
 #------------------------------------------------------------------------------
 # define branches to be filled by default, in alphabetical order
@@ -180,11 +190,14 @@ StntupleMakerTemplate : { module_type:StntupleMaker
 #------------------------------------------------------------------------------
 # when needed, mask DeltaFinder under 'FlagBkgHits' label
 #------------------------------------------------------------------------------
-MuHitDisplay: { module_type:MuHitDisplay                 # class name;
-    @table::StntupleTModuleFclDefaults                   # defaults of the base class
-
-    interactiveMode              : 1                                # 1:stop  after each event 2: stop at end-of-job
-    
+MuHitDisplay: { module_type: MuHitDisplay                 # class name;
+# -- defaults of the base class
+    THistModule: { @table::StntupleTHistModule
+        TModule: { @table::StntupleTHistModule.TModule
+            interactiveMode  : 1                      # 1:stop  after each event 2: stop at end-of-job
+        }
+    }
+# --
     crvRecoPulsesCollTag         : "CrvRecoPulses"
     showCRVOnly 		 : false
     showTracks                   : true
@@ -208,26 +221,20 @@ MuHitDisplay: { module_type:MuHitDisplay                 # class name;
     kffCollTag                   : "KKDeMHPar"                       ## "KSFDeMHDar"
     ksfCollTag                   : "KFFDeMHDar"
 
-    trkExtrapol                  : "TrackCaloIntersection"
-    trkCalMatch                  : "TrackCaloMatching"
-
-    pidCollTag                   : "ParticleID"
     primaryParticleTag           : "compressDigiMCs"                 # this is new, to be passed to InitSimpBlock
     vdHitsCollTag                : "compressDigiMCs:virtualdetector" # this is new, to be passed to InitSimpBlock
     
-    #      goodHitMask                 : ["EnergySelection","RadiusSelection","TimeSelection"]
-    goodHitMask                  : ["EnergySelection", "RadiusSelection"]
-    badHitMask                   : ["Background"] 
+    # goodHitMask                 : ["EnergySelection","RadiusSelection","TimeSelection"]
+    # goodHitMask                  : ["EnergySelection", "RadiusSelection"]
+    # badHitMask                   : ["Background"] 
     
-    minHits                      : 5
     minSimpMomentum              : 40.      ## MeV
     maxSimpMomentum              : 1.e12    ## MeV
-    timeWindow                   : 100000.
 #------------------------------------------------------------------------------
 # kalDiag and Doublet Resolver
 #------------------------------------------------------------------------------
 #    KalDiag                 : { @table::KalDiagDirect    }
-    DoubletAmbigResolver    : { @table::TrkReco.DoubletAmbigResolver }
+#    DoubletAmbigResolver    : { @table::TrkReco.DoubletAmbigResolver }
 #------------------------------------------------------------------------------
 # configuration of the underlying visualization manager 
 #------------------------------------------------------------------------------
@@ -237,23 +244,20 @@ MuHitDisplay: { module_type:MuHitDisplay                 # class name;
 	displayStrawHitsXY : 1
 	debugLevel         : 0
 	bField             : 1.0      # in Tesla
+        ewLength           : 1800     # with some margin
 	tMin               : 0.
-	tMax               : 2000.    # override for extracted position
+	tMax               : 2000.    # for extracted position, needs to be overriden
+        minEDep            : 0.       # for straw/combo hits
+        maxEDep            : 1.       # 1 MeV (very large number)
     }
-#------------------------------------------------------------------------------
-# plugin configuration, plugin is a name of the script to be loaded
-# it is assumed that if the name of the script is "/s/../b/a.C", a call to void "a()" 
-# should be executed once per event
-#------------------------------------------------------------------------------
-    rootMacro              : ""
 }
 #------------------------------------------------------------------------------
 # namespace
 #------------------------------------------------------------------------------
-Stntuple : {
-    producers : {}  # empty table
+Stntuple: {
+    producers: {}  # empty table
 
-    filters   : {
+    filters: {
 	EventFilter : { module_type:EventFilter
 	    printFreq    : 1000000
 	    eventList    : []          # [ run1, subrun1, event1, ...]
@@ -262,27 +266,39 @@ Stntuple : {
 #------------------------------------------------------------------------------
 # STNTUPLE modules become analyzers - need to deal with the trigger intormation
 #------------------------------------------------------------------------------
-    analyzers : {
-	InitStntuple : { module_type:InitStntuple
-	    @table::StntupleTModuleFclDefaults                  # defaults of the base class
-	    module_name       : InitStntuple
-	    histFileName      : "default.stn"
-	    splitLevel        : 99
+    analyzers: {
+	InitStntuple: { module_type:InitStntuple
+	    THistModule: { @table::StntupleTHistModule                    # defaults of the base class
+                # module_name       : InitStntuple
+                histFileName      : "default.stn"
+                splitLevel        : 99
+                module_label      : "InitStntuple"
+            }
 	}
 
-	FillStntuple : { module_type:FillStntuple
-	    @table::StntupleTModuleFclDefaults                  # defaults of the base class
-	    module_name       : FillStntuple
+	FillStntuple: { module_type:FillStntuple
+	    THistModule: {                                               # defaults of the base class
+                @table::StntupleTHistModule
+                module_label: "FillStntuple"
+            }                   
 	}
 
 	StntupleEventDump : { module_type:StntupleEventDump 
-	    @table::StntupleTModuleFclDefaults                  # defaults of the base class
+	    THistModule: {
+                @table::StntupleTHistModule
+            }                   # defaults of the base class
 	    module_name       : StntupleEventDump
 	}
 #------------------------------------------------------------------------------
 # downstream electrons - explicitly - the same as default
 #------------------------------------------------------------------------------
-	StntupleMaker     : { @table::StntupleMakerTemplate }
+	StntupleMaker     : { @table::StntupleMakerTemplate
+            module_type:StntupleMaker
+	    THistModule: { 
+                @table::StntupleTHistModule
+                module_label : "StntupleMaker"
+            }
+        }
 
 	StntupleMakerCpr  : { @table::StntupleMakerTemplate 
 	    trackBlockName            : [ "TrackBlock"               ] 
@@ -412,26 +428,6 @@ Stntuple : {
 # track reconstruction studies: 
 # make 3 track blocks, for the moment need to specify all other labels
 #------------------------------------------------------------------------------
-	StntupleMakerTcm : { @table::StntupleMakerTemplate 
-	    makePid                    : 0
-	    makeTrackSeeds             : 1
-	    makeTimeClusters           : 1
-	    makeHelices                : 1
-	    timeClusterBlockName       : [ "TprTimeClusterBlock"     , "CprTimeClusterBlock"     ]
-	    timeClusterCollTag         : [ "TimeClusterFinderDe"     , "CalTimePeakFinder"       ]
-	    helixBlockName             : [ "TprHelixBlock"           , "CprHelixBlock"           ]
-	    helixCollTag               : [ "HelixFindere:Positive"   , "CalHelixFinder:Positive" ]
-	    trackSeedBlockName         : [ "TprTrackSeedBlock"       , "CprTrackSeedBlock"       ]
-	    trackSeedModuleLabel       : [ "KSFDeM"                  , "CalSeedFit"              ]
-	    trackBlockName             : [ "TprTrackBlock"           , "CprTrackBlock"           , "TrackBlock"             ]
-	    trackCollTag               : [ "MergePatRecTpr"          , "MergePatRecCpr"          , "MergePatRec"            ]
-	    tciCollTag                 : [ "TrackCaloIntersectionTpr", "TrackCaloIntersectionCpr", "TrackCaloIntersection"  ]
-	    tcmCollTag                 : [ "TrackCaloMatchingTpr"    , "TrackCaloMatchingCpr"    , "TrackCaloMatching"      ]
-	    trackSHBlockName           : [ "TrackHitBlockTpr"        , "TrackHitBlockCpr"        , "TrackHitBlock"          ] 
-	    pidBlockName               : [ ""                        , ""                        , "PidBlock"               ] 
-	    pidCollTag                 : [                        "" ,                         "", "AvikPIDNew"             ]
-	}
-#------------------------------------------------------------------------------
 # track reconstruction studies: 
 # make 3 track blocks, for the moment need to specify all other labels
 #------------------------------------------------------------------------------
@@ -455,35 +451,6 @@ Stntuple : {
 
 	    tciCollTag                 : [ "TrackCaloIntersectionTprDem", "TrackCaloIntersectionCprDem", "TrackCaloIntersectionDem" ]
 	    tcmCollTag                 : [ "TrackCaloMatchingTprDem"    , "TrackCaloMatchingCprDem"    , "TrackCaloMatchingDem"     ]
-	    trackSHBlockName           : [ "TrackHitBlockTpr"           , "TrackHitBlockCpr"           , "TrackHitBlock"            ] 
-	    pidBlockName               : [ ""                           , ""                           , "PidBlock"                 ] 
-	    pidCollTag                 : [                        ""    ,                         ""   , "AvikPIDNew"               ]
-	}
-#------------------------------------------------------------------------------
-# track reconstruction studies: 
-# make 3 track blocks, for the moment need to specify all other labels
-#------------------------------------------------------------------------------
-	StntupleMakerTcmDep : { @table::StntupleMakerTemplate 
-	    makePid                    : 0
-	    makeTrackSeeds             : 1
-	    makeTimeClusters           : 1
-	    makeHelices                : 1
-	    timeClusterBlockName       : [ "TimeClusterBlockTpr"        , "TimeClusterBlockCpr"        ]
-	    timeClusterCollTag         : [ "TimeClusterFinderDe"        , "CalTimePeakFinder"          ]
-
-	    helixBlockName             : [ "HelixBlockTpr"              , "HelixBlockCpr"              , "HelixBlock"               ]
-	    helixCollTag               : [ "HelixFinder:Negative"       , "CalHelixFinderDe:Negative"  , ""                         ]
-
-	    trackSeedBlockName         : [ "TrackSeedBlockTpr"          , "TrackSeedBlockCpr"          , "TrackSeedBlock"           ]
-	    trackSeedCollTag           : [ "KSFDeP"                     , "CalSeedFitDep"              , "MergePatRecDep"           ]
-
-	    trackBlockName             : [ "TrackBlockTpr"              , "TrackBlockCpr"              , "TrackBlock"               ]
-	    trackCollTag               : [ "MergePatRecTprDep"          , "MergePatRecCprDep"          , "MergePatRecDep"           ]
-	    trackTsBlockName           : [ "TrackSeedBlockTpr"          , "TrackSeedBlockCpr"          , "TrackSeedBlock"           ]
-	    trackTsCollTag             : [ "KSFDeP"                     , "CalSeedFitDep"              , "MergePatRecDep"           ]
-
-	    tciCollTag                 : [ "TrackCaloIntersectionTprDep", "TrackCaloIntersectionCprDep", "TrackCaloIntersectionDep" ]
-	    tcmCollTag                 : [ "TrackCaloMatchingTprDep"    , "TrackCaloMatchingCprDep"    , "TrackCaloMatchingDep"     ]
 	    trackSHBlockName           : [ "TrackHitBlockTpr"           , "TrackHitBlockCpr"           , "TrackHitBlock"            ] 
 	    pidBlockName               : [ ""                           , ""                           , "PidBlock"                 ] 
 	    pidCollTag                 : [                        ""    ,                         ""   , "AvikPIDNew"               ]
@@ -726,7 +693,7 @@ Stntuple : {
 # 
 #------------------------------------------------------------------------------
         StntupleRecoAna : { module_type : StntupleRecoAna
-            @table::StntupleTModuleFclDefaults                  # defaults of the base class
+            THistModule: {@table::StntupleTHistModule}                   # defaults of the base class
             sschCollTag : "makeSH"
             chCollTag   : "makeSH"
             tcCollTag   : "TZClusterFinder"
@@ -744,14 +711,5 @@ Stntuple : {
 #------------------------------------------------------------------------------
 Stntuple.stnmaker         : [ InitStntuple, StntupleMaker   ,                   FillStntuple ]
 Stntuple.stnmaker_trig    : [ InitStntuple, StntupleMakerTrig,                  FillStntuple ]
-#------------------------------------------------------------------------------
-# new sequences
-#------------------------------------------------------------------------------
-# Stntuple.stnmaker_De      : [ InitStntuple, StntupleMakerDe  ,                  FillStntuple ]
-# Stntuple.stnmaker_Dmu     : [ InitStntuple, StntupleMakerDmu ,                  FillStntuple ]
-# Stntuple.stnmaker_De_Dmu  : [ InitStntuple, StntupleMakerDeDmu,                 FillStntuple ]
-# 
-# Stntuple.stnmaker_De_Dmu_dar : [ InitStntuple, StntupleMakerDeDmuDar,           FillStntuple ]
-# Stntuple.stnmaker_De_Ue_dar  : [ InitStntuple, StntupleMakerDeUeDar,            FillStntuple ]
 
 END_PROLOG

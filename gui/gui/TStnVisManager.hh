@@ -106,12 +106,16 @@ protected:
   float               fTMin;
   float               fTMax;
 
+  float               fMinEDep;         // in MeV .. ???? what is the normalization
+  float               fMaxEDep;
+
   int                 fMinStation;
   int                 fMaxStation;
                                         // min and max momentum values for displayed MC particles
   float               fMinSimpMomentum;
   float               fMaxSimpMomentum;
 
+  float               fEWLength;        // event window length, ns 
   float               fMbTime;
 
   float               fBField;          // by defautl , 1 T, but could be less. Need to know to display straight
@@ -188,6 +192,9 @@ public:
 
   float          TMin               () const { return fTMin; }
   float          TMax               () const { return fTMax; }
+
+  float          MinEDep            () const { return fMinEDep; }
+  float          MaxEDep            () const { return fMaxEDep; }
 //-----------------------------------------------------------------------------
 // modifiers
 //-----------------------------------------------------------------------------
@@ -199,6 +206,9 @@ public:
   void           SetDisplayTracks      (int Flag) { fDisplayTracks       = Flag; }
   void           SetDisplaySimParticles(int Flag) { fDisplaySimParticles = Flag; }
   void           SetDisplayOnlyTCHits  (int Flag) { fDisplayOnlyTCHits   = Flag; }
+
+  void           SetEWLength           (float EWLength) { fEWLength   = EWLength; }
+
   void           SetIgnoreComptonHits  (int Flag) { fIgnoreComptonHits   = Flag; }
   void           SetIgnoreProtonHits   (int Flag) { fIgnoreProtonHits    = Flag; }
   void           SetIgnoreProtons      (int Flag) { fIgnoreProtons       = Flag; }
@@ -216,7 +226,10 @@ public:
     fTMax = TMax;
   }
 
-  void  SetMbTime(float MbTime) { fMbTime = MbTime; }
+  void   SetMinEDep(float E) override { fMinEDep = E; }
+  void   SetMaxEDep(float E) override { fMaxEDep = E; }
+
+  void  SetMbTime(float MbTime) { fMbTime = MbTime; } // *FIXME* almost the same meaning with EWLength
   void  SetBField(float BField) { fBField = BField; }
 //-----------------------------------------------------------------------------
 // print functions

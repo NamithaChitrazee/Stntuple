@@ -42,6 +42,7 @@
 #include "Offline/CalPatRec/fcl/prolog.fcl"
 #include "Offline/CalPatRec/fcl/prolog_common.fcl"
 #include "Offline/CosmicReco/fcl/prolog.fcl"
+#include "Offline/CRVReco/fcl/prolog.fcl"
 #------------------------------------------------------------------------------
 # trigger prologs
 #------------------------------------------------------------------------------

@@ -374,8 +374,20 @@ void    TStnView::SetStations(int I1, int I2) {
 
 //-----------------------------------------------------------------------------
 void    TStnView::SetTimeWindow(float TMin, float TMax) {
-  fTMin = TMin;
-  fTMax = TMax;
+  TVisManager* vm = TVisManager::Instance();
+  vm->SetTimeWindow(TMin,TMax);
+}
+
+//-----------------------------------------------------------------------------
+void    TStnView::SetMinEDep(float E) {
+  TVisManager* vm = TVisManager::Instance();
+  vm->SetMinEDep(E);
+}
+
+//-----------------------------------------------------------------------------
+void    TStnView::SetMaxEDep(float E) {
+  TVisManager* vm = TVisManager::Instance();
+  vm->SetMaxEDep(E);
 }
 
 //-----------------------------------------------------------------------------

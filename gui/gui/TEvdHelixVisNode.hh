@@ -29,7 +29,7 @@ protected:
 
   const mu2e::HelixSeedCollection*  fHsColl;
 
-  std::string                       fHsCollTag;
+  art::InputTag                     fHsCollTag;
   art::InputTag                     fShCollTag;   // straw/combo hit collection
   art::InputTag                     fSdmcCollTag; // straw digi collection
 
@@ -63,13 +63,13 @@ public:
     return (stntuple::TEvdHelixSeed*)    fListOfHelixSeeds->At(I); 
   }
 
-  std::string&   HsCollTag  ()   { return fHsCollTag   ; }
+  art::InputTag& HsCollTag  () { return fHsCollTag   ; }
   art::InputTag& ShCollTag  () { return fShCollTag   ; }
   art::InputTag& SdmcCollTag() { return fSdmcCollTag ; }
 //-----------------------------------------------------------------------------
 // modifiers
 //-----------------------------------------------------------------------------
-  void SetHelixSeedCollTag (std::string& Tag) { fHsCollTag   = Tag; }
+  void SetHelixSeedCollTag (art::InputTag& Tag) { fHsCollTag   = Tag; }
   void SetSdmcCollTag      (art::InputTag& Tag) { fSdmcCollTag = Tag; }
   void SetShCollTag        (art::InputTag& Tag) { fShCollTag   = Tag; }
 

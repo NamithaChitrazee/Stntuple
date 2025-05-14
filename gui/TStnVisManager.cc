@@ -461,7 +461,7 @@ int TStnVisManager::OpenTrkTZView() {
   TString name1(name);
   name1 += "_1";
   TPad* p1 = (TPad*) c->FindObject(name1);
-  p1->Range(-1600., 0., 1600., 1800.);
+  p1->Range(-1600., 0., 1600., fEWLength);
   p1->cd();
 
   TStnView* v = FindView(TStnVisManager::kTZ,-1);

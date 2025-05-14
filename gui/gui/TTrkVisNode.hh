@@ -46,7 +46,7 @@ public:
 protected:
   
   const mu2e::ComboHitCollection*              fChColl;     // several SH per CH
-  std::string                                  fChCollTag;
+  art::InputTag                                fChCollTag;
   
   const mu2e::ComboHitCollection*              fSchColl;     // one     SH per CH
   const mu2e::StrawHitCollection*              fShColl;      // straw hit coll
@@ -60,7 +60,7 @@ protected:
   const mu2e::StrawDigiADCWaveformCollection** fSwColl;		   // straw digi waveform coll
 
   const mu2e::KalSeedCollection*               fKsColl;
-  std::string                                  fKsCollTag;         // straw digi collection
+  art::InputTag                                fKsCollTag;         // straw digi collection
 
   const mu2e::SimParticleCollection**          fSimpColl;
   art::InputTag                                fSimpCollTag;       // sim particle coll
@@ -131,8 +131,8 @@ public:
 // modifiers
 //-----------------------------------------------------------------------------
 
-  void SetKsCollTag     (std::string&   CollTag) { fKsCollTag   = CollTag; }
-  void SetChCollTag     (std::string&   CollTag) { fChCollTag   = CollTag; }
+  void SetKsCollTag     (art::InputTag& CollTag) { fKsCollTag   = CollTag; }
+  void SetChCollTag     (art::InputTag& CollTag) { fChCollTag   = CollTag; }
   void SetShCollTag     (art::InputTag& CollTag) { fShCollTag   = CollTag; }
   void SetSdmcCollTag   (art::InputTag& CollTag) { fSdmcCollTag = CollTag; }
   void SetSimpCollTag   (art::InputTag& CollTag) { fSimpCollTag = CollTag; }
