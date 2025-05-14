@@ -28,6 +28,10 @@
 namespace art {
   class Event;
 }
+
+namespace fhicl {
+  class ParameterSet;
+}
 #endif
 
 #include "Offline/MCDataProducts/inc/CaloMCTruthAssns.hh"

@@ -109,9 +109,9 @@ TModule::TModule(const fhicl::Table<TModule::Config>& config, const char* Name):
 //-----------------------------------------------------------------------------
 // pass parameters to TAnaDump
 //-----------------------------------------------------------------------------
-//  fhicl::ParameterSet tadPset = config().TAnaDump;
+  fhicl::ParameterSet tadPset = config().TAnaDump.get<fhicl::ParameterSet>();
 
-  fDump = TAnaDump::Instance(&config().TAnaDump.get<fhicl::ParameterSet>());
+  fDump = TAnaDump::Instance(&tadPset);
 
   const char* key;
                                         // a flag is an integer!

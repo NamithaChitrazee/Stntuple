@@ -29,6 +29,7 @@ class THistModule : public TModule {
 //  static data members
 //------------------------------------------------------------------------------
 public:
+#ifndef __CLING__
     struct Config { 
       using Name    = fhicl::Name; 
       using Comment = fhicl::Comment;
@@ -40,6 +41,7 @@ public:
       fhicl::Atom<int>                      splitLevel      {Name("splitLevel"      ),Comment("split level"       ) };
       fhicl::Atom<int>                      compressionLevel{Name("compressionLevel"),Comment("compression level" ) };
     };
+#endif
 protected:
 					// there are some initializations 
 					// which need to be done just once
@@ -74,9 +76,9 @@ public:
   explicit THistModule(const fhicl::ParameterSet&   PSet  ,
                        const fhicl::ParameterSet&   THistModulePSet,
                        const char*                  Name);
-  
+#ifndef __CLING__  
   explicit THistModule(const fhicl::Table<THistModule::Config>& Config, const char* Name);
-
+#endif
   ~THistModule( );
 //-----------------------------------------------------------------------------
 // accessors

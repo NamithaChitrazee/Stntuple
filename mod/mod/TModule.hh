@@ -36,15 +36,20 @@ namespace art {
 
 #include "Stntuple/obj/AbsEvent.hh"
 //#include "Stntuple/print/TAnaDump.hh"
-
+// PM this is obviously a hack around art complexities (which is to be fixed_, but for as long
+// as one is only using non-virtual functions of the  derived classes, but not the data members,
+// everything should be OK
 class TAnaRint;
 class TAnaDump;
-
+#ifndef __CLING__
 class TModule : public art::EDAnalyzer, public TNamed {
-
+#else
+class TModule {
+#endif
   enum { kNDebugBits = 100 };
 
 public:
+#ifndef __CLING__
   struct Config {
     using Name    = fhicl::Name;
     using Comment = fhicl::Comment;
@@ -53,7 +58,7 @@ public:
     fhicl::Table<fhicl::ParameterSet>  debugBits      {Name("debugBits"      ), Comment("debug bits"           ) };
     fhicl::DelegatedParameter          TAnaDump       {Name("TAnaDump"       ), Comment("TAnaDump parameters"  ) };
   };
-
+#endif
 					// there are some initializations which need 
 					// to be done just once
   static int          fgInitialized;
@@ -95,8 +100,10 @@ public:
                    const fhicl::ParameterSet&  TModulePSet,
                    const char* Name                       );
   
+#ifndef __CLING__
   explicit TModule(const fhicl::Table<TModule::Config>& config, const char* Name);
-
+#endif
+  
   virtual      ~TModule();
 
   virtual int  beforeBeginJob();

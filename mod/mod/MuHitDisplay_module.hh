@@ -63,7 +63,7 @@ namespace mu2e {
 
 class MuHitDisplay : public THistModule {
 public:
-  
+#ifndef __CLING__  
   struct VmConfig {
     using Name    = fhicl::Name;
     using Comment = fhicl::Comment;
@@ -112,7 +112,7 @@ public:
     fhicl::Atom<bool>            showTracks             {Name("showTracks"        )    , Comment("showTracks"     ) };
     fhicl::Table<VmConfig>       visManager             {Name("visManager"        )    , Comment("vis manager config" ) };
   };
-
+#endif
 private:
 //-----------------------------------------------------------------------------
 // Input parameters: Module labels 
@@ -154,7 +154,9 @@ private:
   bool				_showTracks;
 
   //  fhicl::ParameterSet           _vmConfig;
+#ifndef __CLING__
   VmConfig           _vmConfig;
+#endif
 //-----------------------------------------------------------------------------
 // end of input parameters
 // Options to control the display
@@ -203,9 +205,10 @@ private:
 
 public:
   // for some reason, this line is required by art to allow the command line help print
+#ifndef __CLING__
   typedef art::EDAnalyzer::Table<Config> Parameters;
-
   explicit MuHitDisplay(const art::EDAnalyzer::Table<Config>& config);
+#endif
   // explicit MuHitDisplay(fhicl::ParameterSet const& pset);
   virtual ~MuHitDisplay();
 
