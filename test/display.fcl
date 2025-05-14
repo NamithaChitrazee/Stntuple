@@ -1,9 +1,12 @@
 # -*- mode:tcl -*-
 #------------------------------------------------------------------------------
 # read output of reconstruction. run event display
+# make sure the combohit collection name passed to the event display
+# is the same as used by the reconstruction
 #------------------------------------------------------------------------------
 BEGIN_PROLOG
-  TRIGGER_PATHS : [ p1 ]
+  TRIGGER_PATHS                     : [ p1 ]
+  COMBO_HIT_COLL_TAG @protect_ignore: "makeSH"
 END_PROLOG
 
 #include "Stntuple/fcl/stntuple.fcl"
@@ -50,7 +53,7 @@ outputs.detectorOutput.fileName           : "sim.user.display.xxx.000001.art"
 #------------------------------------------------------------------------------
 physics.analyzers.MuHitDisplay.primaryParticleTag   : ""
 physics.analyzers.MuHitDisplay.timeClusterCollTag   : "TZClusterFinder"
-physics.analyzers.MuHitDisplay.comboHitCollTag      : "makePH"  ## "FlagBkgHits"
+physics.analyzers.MuHitDisplay.comboHitCollTag      : @local::COMBO_HIT_COLL_TAG    ## "makePH" "FlagBkgHits"
 physics.analyzers.MuHitDisplay.strawHitCollTag      : "makeSH"  ## "FlagBkgHits"
 physics.analyzers.MuHitDisplay.visManager.ewLength  : 10000.
 physics.analyzers.MuHitDisplay.visManager.tMax      : 10000.
