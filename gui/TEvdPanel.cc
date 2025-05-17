@@ -41,34 +41,27 @@ namespace {
 namespace stntuple {
 //_____________________________________________________________________________
 TEvdPanel::TEvdPanel(): TObject() {
+  fVisible      = 0;
 }
 
 //_____________________________________________________________________________
   TEvdPanel::TEvdPanel(int ID, const mu2e::Panel* Panel, TEvdPlane* Plane, const mu2e::Tracker* Tracker): TObject() {
 
-  TEvdStraw* evd_straw;
-
   fID      = ID;
   fNLayers = Panel->nLayers();
   fPanel   = Panel;
+  fVisible = 1;
 					// assume that the number of straws is the same
   int id;
 
-  for (int il=0; il<fNLayers; il++) {
-    //    const mu2e::Layer* layer = &fPanel->getLayer(il);
-
-    fNStraws     [il] = Panel->nStraws()/2;
-    fListOfStraws[il] = new TObjArray(fNStraws[il]);
-  }
-
   int nst = Panel->nStraws();
+  fListOfStraws = new TObjArray(nst);
+
 
   for (uint16_t ist=0; ist<nst; ist++) {
     const mu2e::Straw* straw = &Panel->getStraw(ist);
 
-    //    const mu2e::Layer* layer = &fPanel->getLayer(il);
-
-    id        = straw->id().asUint16();
+    id           = straw->id().asUint16();
     
     int ill      = straw->id().getLayer();
     int iss      = straw->id().getStraw();
@@ -80,9 +73,18 @@ TEvdPanel::TEvdPanel(): TObject() {
 	     istation, ipp, ill, iss, straw->getMidPoint().z());
     }
 
-    evd_straw = new TEvdStraw(id,straw,this,Tracker);
-    fListOfStraws[ill]->Add(evd_straw);
+    TEvdStraw* evd_straw = new TEvdStraw(id,straw,this,Tracker);
+    fListOfStraws->Add(evd_straw);
   }
+
+  TVector3* p0  = Straw( 0)->Pos();
+  TVector3* p95 = Straw(95)->Pos();
+
+  double xc = (p0->X()+p95->X())/2;
+  double yc = (p0->Y()+p95->Y())/2;
+  double zc = (p0->Z()+p95->Z())/2;
+
+  fPos.SetXYZ(xc,yc,zc);
 }
 
 //_____________________________________________________________________________
@@ -90,13 +92,13 @@ TEvdPanel::~TEvdPanel() {
 }
 
 //-----------------------------------------------------------------------------
-void TEvdPanel::Paint(Option_t* option) {
+void TEvdPanel::Paint(Option_t* Option) {
 
 
   int view = TVisManager::Instance()->GetCurrentView()->Type();
 
-  if      (view == TStnVisManager::kXY) PaintXY (option);
-  else if (view == TStnVisManager::kRZ) PaintRZ (option);
+  if      (view == TStnVisManager::kXY) PaintXY (Option);
+  else if (view == TStnVisManager::kRZ) PaintRZ (Option);
   else {
     // what is the default?
     //    Warning("Paint",Form("Unknown option %s",option));
@@ -106,15 +108,33 @@ void TEvdPanel::Paint(Option_t* option) {
 }
 
 
-//_____________________________________________________________________________
+//-----------------------------------------------------------------------------
 void TEvdPanel::PaintXY(Option_t* Option) {
 }
 
-
-
-//_____________________________________________________________________________
+//-----------------------------------------------------------------------------
 void TEvdPanel::PaintRZ(Option_t* option) {
   // draw straws
+}
+
+//-----------------------------------------------------------------------------
+  void TEvdPanel::PaintVST(Option_t* Option) {
+  // draw straws
+  int nstraws = NStraws();
+  for (int is=0; is<nstraws; is++) {
+    TEvdStraw* straw  = Straw(is);
+    straw->PaintVST(Option);
+  }
+}
+
+//-----------------------------------------------------------------------------
+  void TEvdPanel::PaintVRZ(Option_t* Option) {
+  // draw straws
+  int nstraws = NStraws();
+  for (int is=0; is<nstraws; is++) {
+    TEvdStraw* straw  = Straw(is);
+    straw->PaintVRZ(Option);
+  }
 }
 
 //_____________________________________________________________________________
@@ -139,6 +159,16 @@ Int_t TEvdPanel::DistancetoPrimitiveXY(Int_t px, Int_t py) {
 
 //_____________________________________________________________________________
 Int_t TEvdPanel::DistancetoPrimitiveRZ(Int_t px, Int_t py) {
+  return 9999;
+}
+
+//_____________________________________________________________________________
+Int_t TEvdPanel::DistancetoPrimitiveVST(Int_t px, Int_t py) {
+  return 9999;
+}
+
+//_____________________________________________________________________________
+Int_t TEvdPanel::DistancetoPrimitiveVRZ(Int_t px, Int_t py) {
   return 9999;
 }
 

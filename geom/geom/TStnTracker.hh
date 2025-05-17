@@ -11,8 +11,6 @@
 #include "TGeoTube.h"
 #include "TGeoVolume.h"
 
-//namespace murat {
-
 class TStnTracker : public TObject {
 public:
   struct GeomData_t {

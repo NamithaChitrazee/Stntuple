@@ -46,6 +46,7 @@ class TApplication;
 
 #include "Stntuple/base/TNamedHandle.hh"
 #include "Stntuple/gui/TStnVisManager.hh"
+#include "Stntuple/gui/TStnGeoManager.hh"
 
 #include "Stntuple/alg/TStnTrackID.hh"
 
@@ -191,6 +192,10 @@ private:
   int                                         _firstCall;    
   TStnVisManager*                             fVisManager;
 //-----------------------------------------------------------------------------
+// geometry manager may need to be reinitialized at  run boundary
+//-----------------------------------------------------------------------------
+  TStnGeoManager*                             fGeoManager;
+//-----------------------------------------------------------------------------
 // reuse STNTUPLE data blocks
 //-----------------------------------------------------------------------------
   TStnHeaderBlock*       fHeaderBlock;
@@ -200,7 +205,6 @@ private:
 
   const Tracker*         fTracker;    // straw tracker geometry
 
-  // TNamedHandle*          fDarHandle;
   // DoubletAmbigResolver*  fDar;
 
 public:
@@ -224,9 +228,8 @@ public:
 
   TSimpBlock*                                   GetSimpBlock      () { return fSimpBlock      ; }
 
-  void             InitVisManager();
-
-  // void     printCaloCluster(const CaloCluster* Cl, const char* Opt);
+  void                                          InitVisManager();
+  void                                          InitGeoManager();
 //-----------------------------------------------------------------------------
 // overloaded virtual methods of the base class - EDAnalyzer 
 //-----------------------------------------------------------------------------

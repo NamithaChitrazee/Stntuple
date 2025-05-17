@@ -21,12 +21,18 @@
 #include "Offline/GeometryService/inc/GeometryService.hh"
 #include "Offline/GeometryService/inc/GeomHandle.hh"
 
+#include "Stntuple/gui/TEvdTracker.hh"
+#include "Stntuple/gui/TEvdStation.hh"
+#include "Stntuple/gui/TEvdPlane.hh"
+#include "Stntuple/gui/TEvdPanel.hh"
+
 #include "Stntuple/gui/THeaderVisNode.hh"
 #include "Stntuple/gui/TCalVisNode.hh"
 #include "Stntuple/gui/TCrvVisNode.hh"
 #include "Stntuple/gui/TTrkVisNode.hh"
 #include "Stntuple/gui/TEvdHelixVisNode.hh"
 #include "Stntuple/gui/TEvdTimeClusterVisNode.hh"
+#include "Stntuple/gui/TEvdPanelVisNode.hh"
 
 #include "Stntuple/gui/TMcTruthVisNode.hh"
 #include "Stntuple/gui/TCalView.hh"
@@ -80,6 +86,7 @@ MuHitDisplay::MuHitDisplay(const art::EDAnalyzer::Table<Config>& config) :
   fApplication = 0;
   fHeaderBlock = new TStnHeaderBlock();
   fVisManager  = TStnVisManager::Instance();
+  fGeoManager  = TStnGeoManager::Instance();
   _mcUtils     = std::make_unique<McUtilsToolBase>();
   fTrackID     = new TStnTrackID();
   
@@ -177,6 +184,24 @@ void MuHitDisplay::endRun(const art::Run& Run) {
   TModule::endRun(Run);
 }
 
+
+//-----------------------------------------------------------------------------
+// initialize the visualization manager
+// TStnVisManager is responsible for deleting all nodes created here
+//-----------------------------------------------------------------------------
+void MuHitDisplay::InitGeoManager() {
+
+  mu2e::GeomHandle<mu2e::Tracker> handle;
+
+  const mu2e::Tracker* mu2e_tracker = handle.get();
+
+  TStnGeoManager* gm = TStnGeoManager::Instance();
+
+  stntuple::TEvdTracker* t = new stntuple::TEvdTracker(mu2e_tracker);
+  gm->AddDetector(t);
+  
+  return;
+}
 
 //-----------------------------------------------------------------------------
 // initialize the visualization manager
@@ -353,11 +378,52 @@ void MuHitDisplay::InitVisManager() {
   vphiz->AddNode(tnode);
   vm->AddView(vphiz);
 //-----------------------------------------------------------------------------
-// 5. VST view : TTrkNode only, so far
+// 5. VST XY view : TTrkNode only, so far
 //-----------------------------------------------------------------------------
   TStnView* vst = new TStnView(TStnVisManager::kVST,-1,"VSTView","VST View");
   vst->AddNode(tnode);
   vm->AddView(vst);
+//-----------------------------------------------------------------------------
+// VRZ: "VST RZ" view - one per panel, each VRZ view shows only one panel
+//-----------------------------------------------------------------------------
+  TStnView*                    vrz_view[18][2][6];
+  stntuple::TEvdPanelVisNode*  vp_node [18][2][6];
+  
+  TStnGeoManager* gm = TStnGeoManager::Instance();
+  stntuple::TEvdTracker* evd_t = gm->GetTracker();
+
+  int ns = 1; // fTracker->nStations();
+
+  for (int is=0; is<ns; ++is) {
+    for (int ipln=0; ipln<2; ++ipln) {
+      for (int i=0; i<6; ++i) {
+        // int inode = 12*is+6*ipln+i;
+        stntuple::TEvdPanel* panel = evd_t->Station(is)->Plane(ipln)->Panel(i);
+        vp_node [is][ipln][i] = new stntuple::TEvdPanelVisNode (Form("EvdPanel_VN_%02i_%i_%i",is,ipln,i),panel);
+      }
+    }
+  }
+
+  for (int is=0; is<ns; ++is) {
+    for (int ipln=0; ipln<2; ++ipln) {
+      for (int i=0; i<6; ++i) {
+        int iview = 12*is+6*ipln+i;
+        vrz_view[is][ipln][i] = new TStnView(TStnVisManager::kVRZ,iview,"VRZView","VRZ View");
+        vrz_view[is][ipln][i]->AddNode(vp_node[is][ipln][i]);
+        // vrz_view[i]->AddNode(vpd_node[i]);
+        // vrz_view[i]->AddNode(trk_node);
+      }
+    }
+  }
+  
+  for (int is=0; is<ns; ++is) {
+    for (int ipln=0; ipln<2; ++ipln) {
+      for (int i=0; i<6; ++i) {
+        vm->AddView(vrz_view[is][ipln][i]);
+      }
+    }
+  }
+ 
 //-----------------------------------------------------------------------------
 // upon startup, open either an XY or a VST view
 //-----------------------------------------------------------------------------
@@ -532,6 +598,7 @@ void MuHitDisplay::analyze(const art::Event& Evt) {
 //-----------------------------------------------------------------------------
   if (_firstCall == 1) {
     _firstCall = 0;
+    InitGeoManager();
     InitVisManager();
   }
 

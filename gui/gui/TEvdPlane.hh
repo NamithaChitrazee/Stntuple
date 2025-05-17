@@ -25,6 +25,7 @@ public:
   
 protected:
   int                 fID;
+  int                 fVisible;
   int                 fNPanels;
   TObjArray*          fListOfPanels;
 
@@ -44,9 +45,11 @@ public:
 //-----------------------------------------------------------------------------
   int        NPanels    () { return fNPanels;  }
   TEvdPanel* Panel (int I) { return (TEvdPanel*) fListOfPanels->UncheckedAt(I); }
+  int        Visible()     { return fVisible; }
 //-----------------------------------------------------------------------------
 // modifiers
 //-----------------------------------------------------------------------------
+  void        SetVisible(int YesNo) { fVisible = YesNo; }
 
   //  virtual void  Draw    (Option_t* option = "");
 

@@ -1,8 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
 // May 04 2013 P.Murat
-// 
-// in 'XY' mode draw calorimeter clusters as circles with different colors 
-// in 'Cal' mode draw every detail...
 ///////////////////////////////////////////////////////////////////////////////
 #include "TVirtualX.h"
 #include "TPad.h"
@@ -19,55 +16,48 @@
 #include "art/Framework/Principal/Handle.h"
 
 #include "Offline/DataProducts/inc/StrawId.hh"
+#include "Offline/TrackerGeom/inc/Tracker.hh"
 
-#include "Offline/GeometryService/inc/GeometryService.hh"
-#include "Offline/GeometryService/inc/GeomHandle.hh"
+// #include "Offline/GeometryService/inc/GeometryService.hh"
+// #include "Offline/GeometryService/inc/GeomHandle.hh"
 
 #include "Stntuple/gui/TEvdStraw.hh"
 #include "Stntuple/gui/TEvdPlane.hh"
-// #include "Stntuple/gui/TEvdFace.hh"
 #include "Stntuple/gui/TEvdPanel.hh"
 #include "Stntuple/gui/TEvdStation.hh"
-#include "Stntuple/gui/TEvdStrawTracker.hh"
+#include "Stntuple/gui/TEvdTracker.hh"
 #include "Stntuple/gui/TStnVisManager.hh"
 
-// #include "CalorimeterGeom/inc/VaneCalorimeter.hh"
-#include "Offline/CalorimeterGeom/inc/Crystal.hh"
-#include "Offline/CalorimeterGeom/inc/Disk.hh"
-#include "Offline/CalorimeterGeom/inc/DiskCalorimeter.hh"
-#include "Offline/CalorimeterGeom/inc/Calorimeter.hh"
-
-
-ClassImp(stntuple::TEvdStrawTracker)
+ClassImp(stntuple::TEvdTracker)
 
 namespace stntuple {
 //_____________________________________________________________________________
-TEvdStrawTracker::TEvdStrawTracker(const mu2e::Tracker* Tracker): TObject() {
-
-  //  const mu2e::Station* station;
-  TEvdStation*         s;
+  TEvdTracker::TEvdTracker(const mu2e::Tracker* Tracker): TNamed("tracker","Mu2e tracker") {
 
   fTracker = Tracker;
 
   if (Tracker == NULL) {
-    printf(">>> TEvdStrawTracker::TEvdStrawTracker ERROR: Tracker = NULL\n");
+    printf(">>> TEvdTracker::TEvdTracker ERROR: Tracker = NULL\n");
   }
 
   fNStations      = mu2e::StrawId::_nstations; // fTracker->nStations();
   fListOfStations = new TObjArray(fNStations);
 
   for (int i=0; i<fNStations; i++) {
-    //    station = &fTracker->getStation(i);
+    TEvdStation* s = new TEvdStation(i,Tracker);
 
-    s = new TEvdStation(i,Tracker);
+    // for VST, make only one station visible
+    if (i == 0) s->SetVisible(1);
+    else        s->SetVisible(0);
+    
     fListOfStations->Add(s);
   }
 }
 
 //-----------------------------------------------------------------------------
-// need destructor...
+// need a destructor...
 //-----------------------------------------------------------------------------
-TEvdStrawTracker::~TEvdStrawTracker() {
+TEvdTracker::~TEvdTracker() {
   if (fListOfStations) {
     fListOfStations->Delete();
     delete fListOfStations;
@@ -75,7 +65,7 @@ TEvdStrawTracker::~TEvdStrawTracker() {
 }
 
 //-----------------------------------------------------------------------------
-void TEvdStrawTracker::Paint(Option_t* option) {
+void TEvdTracker::Paint(Option_t* option) {
 
   int view = TVisManager::Instance()->GetCurrentView()->Type();
 
@@ -92,13 +82,13 @@ void TEvdStrawTracker::Paint(Option_t* option) {
 
 
 //_____________________________________________________________________________
-void TEvdStrawTracker::PaintXY(Option_t* Option) {
+void TEvdTracker::PaintXY(Option_t* Option) {
 }
 
 
 
 //_____________________________________________________________________________
-void TEvdStrawTracker::PaintRZ(Option_t* option) {
+void TEvdTracker::PaintRZ(Option_t* option) {
   // draw tracker
 
   TEvdStation*   station;
@@ -107,7 +97,7 @@ void TEvdStrawTracker::PaintRZ(Option_t* option) {
   TEvdPanel*     panel;
   TEvdStraw*     straw;
 
-  int            nplanes, npanels, nlayers, nstraws;
+  int            nplanes, npanels, nstraws;
 
   for (int ist=0; ist<fNStations; ist++) {
     station = Station(ist);
@@ -117,32 +107,54 @@ void TEvdStrawTracker::PaintRZ(Option_t* option) {
       npanels = plane->NPanels();
       for (int ipanel=0; ipanel<npanels; ipanel++) {
 	panel   = plane->Panel(ipanel);
-	nlayers = panel->NLayers();
-	for (int il=0; il<nlayers; il++) {
-	  nstraws = panel->NStraws(il);
-	  for (int is=0; is<nstraws; is++) {
-	    straw  = panel->Straw(il,is);
-	    straw->PaintRZ();
-	  }
+        nstraws = panel->NStraws();
+        for (int is=0; is<nstraws; is++) {
+          straw  = panel->Straw(is);
+          straw->PaintRZ();
 	}
       }
     }
   }
 }
 
-//_____________________________________________________________________________
-void TEvdStrawTracker::PaintVST(Option_t* Option) {
-  printf("TEvdStrawTracker::%s is not implemented yet.\n",__func__);
+//-----------------------------------------------------------------------------
+// only Panel needs PaintVST
+//-----------------------------------------------------------------------------
+void TEvdTracker::PaintVST(Option_t* Option) {
+  printf("TEvdTracker::%s is not implemented yet.\n",__func__);
+
+  TEvdStation*   station;
+  TEvdPlane*     plane;
+  TEvdPanel*     panel;
+
+  int            nplanes, npanels;
+
+  for (int ist=0; ist<fNStations; ist++) {
+    station = Station(ist);
+    if (station->Visible() == 0) continue;
+    
+    nplanes = station->NPlanes();
+    for (int ipl=0; ipl<nplanes; ipl++) {
+      plane   = station->Plane(ipl);
+      if (plane->Visible() == 0) continue;
+      npanels = plane->NPanels();
+      for (int ipanel=0; ipanel<npanels; ipanel++) {
+	panel   = plane->Panel(ipanel);
+        if (panel->Visible() == 0) continue;
+	panel->PaintVST(Option);
+      }
+    }
+  }
+  
 }
 
-
 //_____________________________________________________________________________
-Int_t TEvdStrawTracker::DistancetoPrimitive(Int_t px, Int_t py) {
+Int_t TEvdTracker::DistancetoPrimitive(Int_t px, Int_t py) {
   return 9999;
 }
 
 //_____________________________________________________________________________
-Int_t TEvdStrawTracker::DistancetoPrimitiveXY(Int_t px, Int_t py) {
+Int_t TEvdTracker::DistancetoPrimitiveXY(Int_t px, Int_t py) {
 
   Int_t dist = 9999;
 
@@ -157,12 +169,12 @@ Int_t TEvdStrawTracker::DistancetoPrimitiveXY(Int_t px, Int_t py) {
 }
 
 //_____________________________________________________________________________
-Int_t TEvdStrawTracker::DistancetoPrimitiveRZ(Int_t px, Int_t py) {
+Int_t TEvdTracker::DistancetoPrimitiveRZ(Int_t px, Int_t py) {
   return 9999;
 }
 
 //_____________________________________________________________________________
-Int_t TEvdStrawTracker::DistancetoPrimitiveVST(Int_t px, Int_t py) {
+Int_t TEvdTracker::DistancetoPrimitiveVST(Int_t px, Int_t py) {
   return 9999;
 }
 

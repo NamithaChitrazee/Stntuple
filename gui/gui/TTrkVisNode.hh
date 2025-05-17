@@ -28,7 +28,7 @@ namespace mu2e {
 }
 
 namespace stntuple {
-  class TEvdStrawTracker;
+  class TEvdTracker;
   class TEvdStrawHit;
   class TEvdComboHit;
   class TEvdTrack;
@@ -52,25 +52,25 @@ protected:
   const mu2e::StrawHitCollection*              fShColl;      // straw hit coll
   art::InputTag                                fShCollTag;
 
-  const mu2e::StrawDigiCollection**            fSdColl;		   // straw digi coll
+  const mu2e::StrawDigiCollection**            fSdColl;	     // straw digi coll
 
-  const mu2e::StrawDigiMCCollection*           fSdmcColl;          // straw digi MC coll
-  art::InputTag                                fSdmcCollTag;       // straw digi collection
+  const mu2e::StrawDigiMCCollection*           fSdmcColl;    // straw digi MC coll
+  art::InputTag                                fSdmcCollTag; // straw digi collection
 
-  const mu2e::StrawDigiADCWaveformCollection** fSwColl;		   // straw digi waveform coll
+  const mu2e::StrawDigiADCWaveformCollection** fSwColl;      // straw digi waveform coll
 
   const mu2e::KalSeedCollection*               fKsColl;
-  art::InputTag                                fKsCollTag;         // straw digi collection
+  art::InputTag                                fKsCollTag;   // straw digi collection
 
   const mu2e::SimParticleCollection**          fSimpColl;
-  art::InputTag                                fSimpCollTag;       // sim particle coll
+  art::InputTag                                fSimpCollTag; // sim particle coll
 
   const mu2e::StepPointMCCollection**          fSpmcColl;
 
   TStnTrackBlock*           fTrackBlock;
   Color_t                   fTrackColor;
 
-  stntuple::TEvdStrawTracker* fTracker;
+  stntuple::TEvdTracker*    fTracker;                        // cached, not owned
 
   TArc*                     fArc;
 

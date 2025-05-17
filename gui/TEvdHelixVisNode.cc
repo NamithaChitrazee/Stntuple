@@ -17,9 +17,6 @@
 
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
-// #include "art/Framework/Principal/Event.h"
-// #include "art/Framework/Principal/Handle.h"
-
 #include "Offline/GeometryService/inc/GeometryService.hh"
 #include "Offline/GeometryService/inc/GeomHandle.hh"
 #include "Offline/ConditionsService/inc/ConditionsHandle.hh"
@@ -37,7 +34,7 @@
 #include "Stntuple/gui/TEvdStation.hh"
 #include "Stntuple/gui/TEvdPanel.hh"
 #include "Stntuple/gui/TEvdPlane.hh"
-#include "Stntuple/gui/TEvdStrawTracker.hh"
+#include "Stntuple/gui/TEvdTracker.hh"
 #include "Stntuple/gui/TEvdSimParticle.hh"
 #include "Stntuple/gui/TStnVisManager.hh"
 

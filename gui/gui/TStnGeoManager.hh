@@ -5,7 +5,7 @@
 #include "TString.h"
 #include "TGeoManager.h"
 
-#include "Stntuple/geom/TStnTracker.hh"
+#include "Stntuple/gui/TEvdTracker.hh"
 
 class TEvdCrvSection;
 
@@ -30,7 +30,7 @@ public:
 
   TGeoManager*    fGeoManager;
 
-  TStnTracker*    fTracker;
+  stntuple::TEvdTracker*    fTracker;
 
   int             fTransp;
 
@@ -48,8 +48,11 @@ public:
 
 					// here I explicitly assume that the name is known
 
-  TStnTracker*    Tracker() const { return (TStnTracker*) fListOfDetectors->FindObject("tracker"); }
-  TObject*        Detector(const char* Name) const { return fListOfDetectors->FindObject(Name); }
+  stntuple::TEvdTracker*    GetTracker() const {
+    return (stntuple::TEvdTracker*) fListOfDetectors->FindObject("tracker");
+  }
+  
+  TObject*        GetDetector(const char* Name) const { return fListOfDetectors->FindObject(Name); }
 //-----------------------------------------------------------------------------
 // setters
 // from this point , TStnGeoManager owns detectors

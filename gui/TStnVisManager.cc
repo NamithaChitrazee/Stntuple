@@ -27,6 +27,10 @@
 #include "Stntuple/gui/TStnFrame.hh"
 #include "Stntuple/gui/TStnVisManager.hh"
 #include "Stntuple/gui/TStnWidgetID.hh"
+#include "Stntuple/gui/TStnGeoManager.hh"
+#include "Stntuple/gui/TEvdPanel.hh"
+#include "Stntuple/gui/TEvdPlane.hh"
+#include "Stntuple/gui/TEvdStation.hh"
 
 #include "Stntuple/print/Stntuple_print_functions.hh"
 
@@ -240,6 +244,7 @@ int TStnVisManager::GetViewID(const char* View) {
   else if (view_id == "cal" ) return TStnVisManager::kCal;
   else if (view_id == "crv" ) return TStnVisManager::kCrv;
   else if (view_id == "vst" ) return TStnVisManager::kVST;
+  else if (view_id == "vrz" ) return TStnVisManager::kVRZ;
   else {
     printf("TStnVisManager::%s: ERROR: unknown view type : %s\n",__func__,View);
     return -1;
@@ -259,6 +264,7 @@ void TStnVisManager::OpenView(const char* View) {
   else if (view_id == "cal" ) OpenCalView  ();
   else if (view_id == "crv" ) OpenCrvView  ();
   else if (view_id == "vst" ) OpenVSTView  ();
+  else if (view_id == "vrz" ) OpenVRZView  ();
   else {
     printf("TStnVisManager::OpenView: ERROR: unknown view type : %s\n",View);
   }
@@ -275,6 +281,7 @@ void TStnVisManager::OpenView(TStnView* Mother, int Px1, int Py1, int Px2, int P
   else if (vtype == TStnVisManager::kCal ) OpenCalView  (Mother,Px1,Py1,Px2,Py2);
   else if (vtype == TStnVisManager::kCrv ) OpenCrvView  (Mother,Px1,Py1,Px2,Py2);
   else if (vtype == TStnVisManager::kVST ) OpenVSTView  (Mother,Px1,Py1,Px2,Py2);
+  else if (vtype == TStnVisManager::kVRZ ) OpenVRZView  (Mother,Px1,Py1,Px2,Py2);
   else {
     printf("TStnVisManager::OpenView: ERROR: unknown view type : %i\n",vtype);
   }
@@ -948,6 +955,105 @@ int TStnVisManager::OpenVSTView(TStnView* Mother, Axis_t x1, Axis_t y1, Axis_t x
   ysize = (Int_t) (xsize*TMath::Abs((y2 - y1) / (x2 - x1)) + 20);
 
   TStnFrame* win = new TStnFrame(name, title, this, TStnVisManager::kVST, xsize+TStnFrame::fGroupFrameWidth, ysize);
+  TCanvas* c = win->GetCanvas();
+  fListOfCanvases->Add(c);
+
+  TString name1(name);
+  name1 += "_1";
+  TPad* p1 = (TPad*) c->FindObject(name1);
+  p1->Range(x1, y1, x2, y2);
+  p1->cd();
+  Mother->Draw();
+
+  TString name_title(name);
+  name1 += "_title";
+  TPad* title_pad = (TPad*) c->FindObject(name_title);
+  title_pad->cd();
+  fTitleNode->Draw();
+
+  c->Modified();
+  c->Update();
+  return 0;
+}
+
+//-----------------------------------------------------------------------------
+// open new RZ view of the detector with the default options
+//-----------------------------------------------------------------------------
+Int_t TStnVisManager::OpenVRZView() {
+
+  int n = fListOfCanvases->GetSize();
+
+  char name[100], title[100];
+
+  sprintf(name, "vrz_view_%i", n);
+  sprintf(title, "VRZ view number %i", n);
+
+  TStnFrame* win = new TStnFrame(name, title, this, TStnVisManager::kVRZ, 1400+TStnFrame::fGroupFrameWidth,1000);
+  TCanvas* c = win->GetCanvas();
+  fListOfCanvases->Add(c);
+
+  TString name1(name);
+  name1 += "_1";
+  TPad* p1 = (TPad*) c->FindObject(name1);
+//-----------------------------------------------------------------------------
+// display 12 panels together
+// VRZ: a plane has 6 panels, each panel has a view and is displayed on a separate pad
+// need tracekr as we need position of the panel
+//-----------------------------------------------------------------------------
+  TStnGeoManager* gm = TStnGeoManager::Instance();
+  stntuple::TEvdTracker* vt    = gm->GetTracker();
+  
+  p1->Divide(6, 2);
+					// ranges in mm
+  for (int iy=0; iy<2; ++iy) {
+    for (int ix=0; ix<6; ++ix) {
+      int ipad = 6*iy+ix; // for now, assume one station , otherwise 12*station + ...
+      p1->cd(ipad+1);
+      stntuple::TEvdPanel* panel = vt->Station(0)->Plane(iy)->Panel(ix);
+
+      gPad->Range(panel->Pos()->Z()-40., 350., panel->Pos()->Z()+40., 700.);
+      TStnView* v = (TStnView*) FindView(TStnVisManager::kVRZ,ipad);
+      if (v) {
+        v->Draw();
+        gPad->Modified();
+      }
+    }
+  }
+//-----------------------------------------------------------------------------
+// draw title
+//-----------------------------------------------------------------------------
+  TString name_title(name);
+  name1 += "_title";
+  TPad* title_pad = (TPad*) c->FindObject(name_title);
+  title_pad->cd();
+  fTitleNode->Draw();
+
+  c->Modified();
+  c->Update();
+  return 0;
+}
+
+//-----------------------------------------------------------------------------
+// open new RZ view of the detector with the default options
+//-----------------------------------------------------------------------------
+Int_t TStnVisManager::OpenVRZView(TStnView* Mother, Axis_t x1, Axis_t y1, Axis_t x2, Axis_t y2) {
+
+  int n = fListOfCanvases->GetSize();
+
+  char name[100], title[100];
+
+  sprintf(name, "vrz_view_%i", n);
+  sprintf(title, "VRZ view number %i", n);
+//-----------------------------------------------------------------------------
+// try to preserve the aspect ratio
+//-----------------------------------------------------------------------------
+  Int_t   xsize, ysize;
+
+  xsize = x2-x1;
+  ysize = (Int_t) (xsize*TMath::Abs((y2 - y1) / (x2 - x1)) + 20);
+
+  xsize = xsize*800./ysize;
+  TStnFrame* win = new TStnFrame(name, title, this, TStnVisManager::kVRZ, xsize+TStnFrame::fGroupFrameWidth, 800);
   TCanvas* c = win->GetCanvas();
   fListOfCanvases->Add(c);
 

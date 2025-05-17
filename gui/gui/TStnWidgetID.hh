@@ -42,6 +42,7 @@ enum GuiCommandID {
   M_OPEN_CAL,
   M_OPEN_CRV,
   M_OPEN_VST,
+  M_OPEN_VRZ,
 
   M_PRINT_STRAW_H,
   M_PRINT_COMBO_H

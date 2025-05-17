@@ -39,7 +39,7 @@
 #include "Stntuple/gui/TEvdStation.hh"
 #include "Stntuple/gui/TEvdPanel.hh"
 #include "Stntuple/gui/TEvdPlane.hh"
-#include "Stntuple/gui/TEvdStrawTracker.hh"
+// #include "Stntuple/gui/TEvdTracker.hh"
 #include "Stntuple/gui/TEvdSimParticle.hh"
 #include "Stntuple/gui/TStnVisManager.hh"
 
@@ -170,7 +170,7 @@ int TEvdTimeClusterVisNode::InitEvent() {
     }
       
     stntuple::TEvdTimeCluster* tcl;
-    tcl = new stntuple::TEvdTimeCluster(i,tc,t0,tmin,tmax,zmin,zmax,phimin,phimax,this);
+    tcl = new stntuple::TEvdTimeCluster(i,tc,fChColl,t0,tmin,tmax,zmin,zmax,phimin,phimax,this);
     fListOfTimeClusters->Add(tcl);
   }
 //-----------------------------------------------------------------------------
@@ -219,7 +219,7 @@ int TEvdTimeClusterVisNode::InitEvent() {
     }
       
     stntuple::TEvdTimeCluster* pcl;
-    pcl = new stntuple::TEvdTimeCluster(i,pc,t0,tmin,tmax,zmin,zmax,phimin,phimax,this);
+    pcl = new stntuple::TEvdTimeCluster(i,pc,fChColl,t0,tmin,tmax,zmin,zmax,phimin,phimax,this);
     fListOfPhiClusters->Add(pcl);
   }
 

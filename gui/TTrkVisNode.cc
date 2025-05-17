@@ -45,9 +45,10 @@
 #include "Stntuple/gui/TEvdStation.hh"
 #include "Stntuple/gui/TEvdPanel.hh"
 #include "Stntuple/gui/TEvdPlane.hh"
-#include "Stntuple/gui/TEvdStrawTracker.hh"
+#include "Stntuple/gui/TEvdTracker.hh"
 #include "Stntuple/gui/TEvdSimParticle.hh"
 #include "Stntuple/gui/TStnVisManager.hh"
+#include "Stntuple/gui/TStnGeoManager.hh"
 
 #include "Stntuple/obj/TSimpBlock.hh"
 
@@ -65,7 +66,10 @@ TTrkVisNode::TTrkVisNode() : TStnVisNode("") {
 //_____________________________________________________________________________
 TTrkVisNode::TTrkVisNode(const char* name, const mu2e::Tracker* Tracker, TStnTrackBlock* TrackBlock): 
   TStnVisNode(name) {
-  fTracker    = new stntuple::TEvdStrawTracker(Tracker);
+
+  TStnGeoManager* gm = TStnGeoManager::Instance();
+  
+  fTracker    = gm->GetTracker();
   fTrackBlock = TrackBlock;
 
   fArc        = new TArc;
@@ -145,12 +149,9 @@ int TTrkVisNode::InitEvent() {
       npanels = plane->NPanels();
       for (int ipanel=0; ipanel<npanels; ipanel++) {
 	panel = plane->Panel(ipanel);
-	nl    = panel->NLayers();
-	for (int il=0; il<nl; il++) {
-	  ns = panel->NStraws(il);
-	  for (int is=0; is<ns; is++) {
-	    panel->Straw(il,is)->Clear();
-	  }
+        ns = panel->NStraws();
+        for (int is=0; is<ns; is++) {
+          panel->Straw(is)->Clear();
 	}
       }
     }
@@ -292,17 +293,17 @@ int TTrkVisNode::InitEvent() {
     if (intime          ) mask |= stntuple::TEvdStrawHit::kInTimeBit;
     if (isFromConversion) mask |= stntuple::TEvdStrawHit::kConversionBit;
     
-    int ist, ipl, ippl, /*ifc,*/ ipn, il, is;
+    int ist, ipl, ippl, /*ifc,*/ ipn, is;
 
     ipl  = straw->id().getPlane();      // plane number here runs from 0 to 2*NStations-1
     ist  = straw->id().getStation();
     ippl = ipl % 2 ;                    // plane number within the station
     ipn  = straw->id().getPanel();
-    il   = straw->id().getLayer();
+    // il   = straw->id().getLayer();
     is   = straw->id().getStraw();
 
     w             = &straw->getDirection();
-    evd_straw     = fTracker->Station(ist)->Plane(ippl)->Panel(ipn)->Straw(il,is/2);
+    evd_straw     = fTracker->Station(ist)->Plane(ippl)->Panel(ipn)->Straw(is);
     evd_straw_hit = new stntuple::TEvdStrawHit(hit,
 					       evd_straw,
 					       mcdigi,
@@ -447,32 +448,6 @@ int TTrkVisNode::InitEvent() {
 }
 
 //-----------------------------------------------------------------------------
-// check if a hit with 'Index' in the fShColl collection belongs to the time cluster
-// time cluster is made out of ComboHit's
-// the code could be made a bit more efficient for combo hits at a cost of passing the 
-// the hit type explicitly
-//-----------------------------------------------------------------------------
-int TTrkVisNode::TCHit(const mu2e::TimeCluster* TimeCluster, int Index) {
-  int ok(0);
-
-  int nch = TimeCluster->nhits();
-  for (int i=0; i<nch; i++) {
-    int ind = TimeCluster->hits().at(i);
-    const mu2e::ComboHit* ch = &fChColl->at(ind);
-    int nsh = ch->nStrawHits();
-    for (int ish=0; ish<nsh; ish++) {
-      if (ch->index(ish) == Index) {
-	ok = 1;
-	break;
-      }
-    }
-  }
-
-  return ok;
-}
-
-
-//-----------------------------------------------------------------------------
 // draw reconstructed tracks and STRAW hits, may want to display COMBO hits instead
 //-----------------------------------------------------------------------------
 void TTrkVisNode::PaintXY(Option_t* Option) {
@@ -556,9 +531,9 @@ void TTrkVisNode::PaintXY(Option_t* Option) {
 //-----------------------------------------------------------------------------
 	    int ok = 1;
 	    if (etcl and vm->DisplayOnlyTCHits()) { 
-	      ok = TCHit(etcl->TimeCluster(),sch->index());
+	      ok = etcl->TCHit(sch->index());
 	    }
-	    if (ok  ) evd_sh->PaintXY(Option);
+	    if (ok) evd_sh->PaintXY(Option);
 	  }
 	}
       }
@@ -600,7 +575,7 @@ void TTrkVisNode::PaintXY(Option_t* Option) {
             // check if the hit belongs to the time cluster
             int ok = 1;
             if (etcl and vm->DisplayOnlyTCHits()) { 
-              ok = TCHit(etcl->TimeCluster(),ch->index(0));
+              ok = etcl->TCHit(ch->index(0));
             }
             if (ok  ) evd_ch->PaintXY(Option);
           }
@@ -787,7 +762,7 @@ void TTrkVisNode::PaintTZ(Option_t* Option) {
         // check if the hit belongs to the time cluster
         int ok = 1;
         if (etcl and vm->DisplayOnlyTCHits()) { 
-          ok = TCHit(etcl->TimeCluster(),ech->ComboHit()->index(0));
+          ok = etcl->TCHit(ech->ComboHit()->index(0));
         }
         if (ok) ech->PaintTZ(Option);
       }
@@ -874,7 +849,7 @@ void TTrkVisNode::PaintPhiZ(Option_t* Option) {
                                         // check if the hit belongs to the time cluster
             int ok = 1;
             if (etcl and vm->DisplayOnlyTCHits()) { 
-              ok = TCHit(etcl->TimeCluster(),ech->ComboHit()->index(0));
+              ok = etcl->TCHit(ech->ComboHit()->index(0));
             }
             if (ok) ech->PaintPhiZ(Option);
           }

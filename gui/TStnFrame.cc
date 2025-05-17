@@ -120,6 +120,7 @@ TStnFrame::TStnFrame(const char*  Name,
   fMenuOpen->AddEntry("&Cal View",           M_OPEN_CAL);
   fMenuOpen->AddEntry("&CRV View",           M_OPEN_CRV);
   fMenuOpen->AddEntry("&VST View",           M_OPEN_VST);
+  fMenuOpen->AddEntry("&VRZ View",           M_OPEN_VRZ);
 //-----------------------------------------------------------------------------
 // PRINT menu item on top 
 //-----------------------------------------------------------------------------
@@ -582,6 +583,14 @@ Bool_t TStnFrame::ProcessMessage(Long_t msg, Long_t parm1, Long_t parm2) {
 		 msg,parm1,parm2);
 	}
 	fVisManager->OpenView("vst");
+	break;
+      case M_OPEN_VRZ:
+	
+	if (vm->DebugLevel() > 0) {
+	  printf(" *** TStnFrame::ProcessMessage M_OPEN_VRZ: msg = %li parm1 = %li parm2 = %li\n", 
+		 msg,parm1,parm2);
+	}
+	fVisManager->OpenView("vrz");
 	break;
 //-----------------------------------------------------------------------------
 //  default

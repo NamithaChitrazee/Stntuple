@@ -75,9 +75,14 @@ TStnGeoManager* TStnGeoManager::Instance(const char* Name, const char* Fn, int U
 
 //-----------------------------------------------------------------------------
 // has to be compiled, non-inlined
+// for convenience, several detectors have standard names: "tracker", "calorimeter", "crv"
 //-----------------------------------------------------------------------------
 void TStnGeoManager::AddDetector(TObject* Detector) { 
-  fListOfDetectors->Add(Detector); 
+  fListOfDetectors->Add(Detector);
+
+  if (strcmp(Detector->GetName(),"tracker") == 0) fTracker = (stntuple::TEvdTracker*) Detector;
+  
+  return;
 }
 
 //-----------------------------------------------------------------------------

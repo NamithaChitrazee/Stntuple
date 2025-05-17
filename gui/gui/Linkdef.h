@@ -21,12 +21,13 @@
 #pragma link C++ class TEvdHelixVisNode;
 #pragma link C++ class TEvdMainFrame;
 #pragma link C++ class stntuple::TEvdPanel;
+#pragma link C++ class stntuple::TEvdPanelVisNode;
 #pragma link C++ class stntuple::TEvdPlane;
 #pragma link C++ class stntuple::TEvdSimParticle;
 #pragma link C++ class stntuple::TEvdStation;
 #pragma link C++ class stntuple::TEvdStrawHit;
 #pragma link C++ class stntuple::TEvdStraw;
-#pragma link C++ class stntuple::TEvdStrawTracker;
+#pragma link C++ class stntuple::TEvdTracker;
 #pragma link C++ class stntuple::TEvdTimeCluster;
 #pragma link C++ class TEvdTimeClusterVisNode;
 #pragma link C++ class stntuple::TEvdTrack;
