@@ -9,6 +9,7 @@
 #include "art/Framework/Principal/Event.h"
 					// has to be here because of typedef's
 #include "Offline/RecoDataProducts/inc/KalSeed.hh"
+#include "Offline/RecoDataProducts/inc/CosmicTrackSeed.hh"
 
 #include "Offline/RecoDataProducts/inc/ComboHit.hh"
 #include "Offline/RecoDataProducts/inc/StrawDigi.hh"
@@ -32,6 +33,7 @@ namespace stntuple {
   class TEvdStrawHit;
   class TEvdComboHit;
   class TEvdTrack;
+  class TEvdCosmicTrack;
   class TEvdSimParticle;
 }
 
@@ -60,7 +62,10 @@ protected:
   const mu2e::StrawDigiADCWaveformCollection** fSwColl;      // straw digi waveform coll
 
   const mu2e::KalSeedCollection*               fKsColl;
-  art::InputTag                                fKsCollTag;   // straw digi collection
+  art::InputTag                                fKsCollTag;   // kal seed collection
+
+  const mu2e::CosmicTrackSeedCollection*       fCtsColl;
+  art::InputTag                                fCtsCollTag;   // cosmic track seed collection
 
   const mu2e::SimParticleCollection**          fSimpColl;
   art::InputTag                                fSimpCollTag; // sim particle coll
@@ -82,6 +87,7 @@ protected:
   TObjArray*                fListOfComboHits;
   TObjArray*                fListOfStrawHits;
   TObjArray*                fListOfTracks;
+  TObjArray*                fListOfCosmicTracks;
   TObjArray*                fListOfSimParticles;
 
   TSimpBlock*               fSimpBlock;
@@ -96,7 +102,9 @@ public:
 //-----------------------------------------------------------------------------
 // accessors
 //-----------------------------------------------------------------------------
-  TObjArray* GetListOfTracks() { return fListOfTracks; }
+  TObjArray* GetListOfTracks      () { return fListOfTracks; }
+  TObjArray* GetListOfCosmicTracks() { return fListOfCosmicTracks; }
+  
   Color_t    GetTrackColor  () { return fTrackColor;   }
 
   int        GetNTracks()      { return fListOfTracks->GetEntriesFast(); }
@@ -113,6 +121,10 @@ public:
 
   stntuple::TEvdTrack*    GetEvdTrack   (int I) { 
     return (stntuple::TEvdTrack*)    fListOfTracks->At(I); 
+  }
+
+  stntuple::TEvdCosmicTrack*    GetEvdCosmicTrack   (int I) { 
+    return (stntuple::TEvdCosmicTrack*)    fListOfCosmicTracks->At(I); 
   }
 
   stntuple::TEvdSimParticle* GetEvdSimParticle(int I) { 
@@ -132,6 +144,7 @@ public:
 //-----------------------------------------------------------------------------
 
   void SetKsCollTag     (art::InputTag& CollTag) { fKsCollTag   = CollTag; }
+  void SetCtsCollTag    (art::InputTag& CollTag) { fCtsCollTag  = CollTag; }
   void SetChCollTag     (art::InputTag& CollTag) { fChCollTag   = CollTag; }
   void SetShCollTag     (art::InputTag& CollTag) { fShCollTag   = CollTag; }
   void SetSdmcCollTag   (art::InputTag& CollTag) { fSdmcCollTag = CollTag; }
@@ -162,11 +175,14 @@ public:
 //-----------------------------------------------------------------------------
   virtual int  InitEvent();
 
+  virtual void PaintCal (Option_t* option = "");
+  virtual void PaintCrv (Option_t* option = "");
   virtual void PaintXY  (Option_t* option = "");
   virtual void PaintRZ  (Option_t* option = "");
   virtual void PaintTZ  (Option_t* option = "");
   virtual void PaintPhiZ(Option_t* option = "");
   virtual void PaintVST (Option_t* option = "");
+  virtual void PaintVRZ (Option_t* option = "");
 //-----------------------------------------------------------------------------
 // overloaded methods of TObject
 //-----------------------------------------------------------------------------
@@ -174,6 +190,7 @@ public:
   virtual int  DistancetoPrimitiveRZ  (Int_t px, Int_t py);
   virtual int  DistancetoPrimitiveTZ  (Int_t px, Int_t py);
   virtual int  DistancetoPrimitivePhiZ(Int_t px, Int_t py);
+  virtual int  DistancetoPrimitiveVRZ (Int_t px, Int_t py);
 
   virtual void Clear(const char* Opt = "")       ; // **MENU**
   virtual void Print(const char* Opt = "") const ; // **MENU**

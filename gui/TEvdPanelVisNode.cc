@@ -19,7 +19,7 @@
  namespace stntuple {
 
 //-----------------------------------------------------------------------------
-TEvdPanelVisNode::TEvdPanelVisNode(const char* Name, TEvdPanel* Panel): TVisNode(Name) {
+TEvdPanelVisNode::TEvdPanelVisNode(const char* Name, TEvdPanel* Panel): TStnVisNode(Name) {
   fPanel    = Panel;
 }
 
@@ -37,19 +37,11 @@ int TEvdPanelVisNode::InitEvent() {
 }
 
 //-----------------------------------------------------------------------------
-void  TEvdPanelVisNode::Paint(Option_t* Option) {
+void TEvdPanelVisNode::PaintCrv(Option_t* Option) {
+}
 
-  int view  = TStnVisManager::Instance()->GetCurrentView()->Type();
-  //  int index = TVstVisManager::Instance()->GetCurrentView()->Index();
- 
-  if      (view == TStnVisManager::kXY ) PaintXY (Option);
-  else if (view == TStnVisManager::kRZ ) PaintRZ (Option);
-  else if (view == TStnVisManager::kVST) PaintVST(Option);
-  else if (view == TStnVisManager::kVRZ) PaintVRZ(Option);
-  else {
-    // what is the default?
-    //    Warning("Paint",Form("Unknown option %s",option));
-  }
+//-----------------------------------------------------------------------------
+void TEvdPanelVisNode::PaintCal(Option_t* Option) {
 }
 
 //-----------------------------------------------------------------------------
@@ -58,8 +50,16 @@ void TEvdPanelVisNode::PaintXY (Option_t* Option) {
 }
 
 //-----------------------------------------------------------------------------
+void TEvdPanelVisNode::PaintPhiZ(Option_t* Option) {
+}
+
+//-----------------------------------------------------------------------------
 void TEvdPanelVisNode::PaintRZ (Option_t* Option) {
   fPanel->PaintRZ(Option);
+}
+
+//-----------------------------------------------------------------------------
+void TEvdPanelVisNode::PaintTZ(Option_t* Option) {
 }
 
 //-----------------------------------------------------------------------------

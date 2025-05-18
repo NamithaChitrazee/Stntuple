@@ -17,7 +17,8 @@ set (include_files
   TEvdCrystal.hh TEvdHelixSeed.hh TEvdHelixVisNode.hh TEvdMainFrame.hh
   TEvdPanel.hh TEvdPanelVisNode.hh TEvdPlane.hh
   TEvdSimParticle.hh TEvdStation.hh TEvdStrawHit.hh TEvdStraw.hh
-  TEvdTracker.hh TEvdTimeCluster.hh TEvdTimeClusterVisNode.hh TEvdTrack.hh
+  TEvdTracker.hh TEvdTimeCluster.hh TEvdTimeClusterVisNode.hh
+  TEvdTrack.hh TEvdCosmicTrack.hh
   TEvdTrkStrawHit.hh TEventDisplayUtils.hh THeaderVisNode.hh TMcTruthVisNode.hh
   TMu2eBField.hh TStnFrame.hh TStnGeoManager.hh TStnVisManager.hh
   TStnVisNode.hh TTrkVisNode.hh
@@ -36,8 +37,10 @@ set (source_files
   TEvdMainFrame.cc
   TEvdPanel.cc TEvdPanelVisNode.cc 
   TEvdPlane.cc TEvdSimParticle.cc TEvdStation.cc TEvdStraw.cc TEvdStrawHit.cc
-  TEvdTracker.cc TEvdTimeCluster.cc TEvdTimeClusterVisNode.cc TEvdTrack.cc
+  TEvdTracker.cc
   TEvdTrkStrawHit.cc TEventDisplayUtils.cc THeaderVisNode.cc TMcTruthVisNode.cc
+  TEvdTimeCluster.cc TEvdTimeClusterVisNode.cc
+  TEvdTrack.cc TEvdCosmicTrack.cc
   TMu2eBField.cc TStnFrame.cc TStnGeoManager.cc TStnVisManager.cc TStnVisNode.cc
   TTrkVisNode.cc
   TEvdPanelVisNode.cc

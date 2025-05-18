@@ -263,6 +263,20 @@ void TEvdTimeClusterVisNode::PaintTZ(Option_t* Option) {
 }
 
 //-----------------------------------------------------------------------------
+void TEvdTimeClusterVisNode::PaintRZ(Option_t *Option) {}
+
+//-----------------------------------------------------------------------------
+void TEvdTimeClusterVisNode::PaintPhiZ(Option_t* Option) {}
+//-----------------------------------------------------------------------------
+void TEvdTimeClusterVisNode::PaintCrv(Option_t* Option) {}
+//-----------------------------------------------------------------------------
+void TEvdTimeClusterVisNode::PaintCal(Option_t* Option) {}
+//-----------------------------------------------------------------------------
+void TEvdTimeClusterVisNode::PaintVST(Option_t* Option) {}
+//-----------------------------------------------------------------------------
+void TEvdTimeClusterVisNode::PaintVRZ(Option_t* Option) {}
+
+//-----------------------------------------------------------------------------
 // sets closest object among objects associated with the node 
 // returns min_dist to the view
 //-----------------------------------------------------------------------------

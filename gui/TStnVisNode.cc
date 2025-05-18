@@ -27,6 +27,7 @@ void TStnVisNode::Paint   (Option_t* Option) {
   else if (view_type == TStnVisManager::kTZ  ) PaintTZ  (Option);
   else if (view_type == TStnVisManager::kPhiZ) PaintPhiZ(Option);
   else if (view_type == TStnVisManager::kVST ) PaintVST (Option);
+  else if (view_type == TStnVisManager::kVRZ ) PaintVRZ (Option);
   else if (view_type == TStnVisManager::kCal ) PaintCal (Option);
   else if (view_type == TStnVisManager::kCrv ) PaintCrv (Option);
   else {
@@ -37,33 +38,33 @@ void TStnVisNode::Paint   (Option_t* Option) {
   gPad->Modified();
 }
 
-//-----------------------------------------------------------------------------
-void TStnVisNode::PaintXY (Option_t* Option) {
-}
+// //-----------------------------------------------------------------------------
+// void TStnVisNode::PaintXY (Option_t* Option) {
+// }
 
-//-----------------------------------------------------------------------------
-void TStnVisNode::PaintRZ (Option_t* Option) {
-}
+// //-----------------------------------------------------------------------------
+// void TStnVisNode::PaintRZ (Option_t* Option) {
+// }
 
-//-----------------------------------------------------------------------------
-void TStnVisNode::PaintTZ (Option_t* Option) {
-}
+// //-----------------------------------------------------------------------------
+// void TStnVisNode::PaintTZ (Option_t* Option) {
+// }
 
-//-----------------------------------------------------------------------------
-void TStnVisNode::PaintPhiZ(Option_t* Option) {
-}
+// //-----------------------------------------------------------------------------
+// void TStnVisNode::PaintPhiZ(Option_t* Option) {
+// }
 
-//-----------------------------------------------------------------------------
-void TStnVisNode::PaintCal(Option_t* Option) {
-}
+// //-----------------------------------------------------------------------------
+// void TStnVisNode::PaintCal(Option_t* Option) {
+// }
 
-//-----------------------------------------------------------------------------
-void TStnVisNode::PaintCrv(Option_t* Option) {
-}
+// //-----------------------------------------------------------------------------
+// void TStnVisNode::PaintCrv(Option_t* Option) {
+// }
 
-//-----------------------------------------------------------------------------
-void TStnVisNode::PaintVST(Option_t* Option) {
-}
+// //-----------------------------------------------------------------------------
+// void TStnVisNode::PaintVST(Option_t* Option) {
+// }
 
 //-----------------------------------------------------------------------------
 int  TStnVisNode::DistancetoPrimitive(Int_t px, Int_t py) {

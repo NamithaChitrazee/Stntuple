@@ -99,7 +99,7 @@ public:
     fhicl::Atom<art::InputTag>   helixSeedCollTag       {Name("helixSeedCollTag"  )    , Comment("helix seed collection tag"   ) };
     fhicl::Atom<art::InputTag>   ksfCollTag             {Name("ksfCollTag"        )    , Comment("KSF   collection tag"   ) };
     fhicl::Atom<art::InputTag>   kffCollTag             {Name("kffCollTag"        )    , Comment("KFF   collection tag"   ) };
-    fhicl::Atom<art::InputTag>   trackCollTag           {Name("trackCollTag"      )    , Comment("track collection tag"   ) };
+    fhicl::Atom<art::InputTag>   ctsCollTag             {Name("ctsCollTag"        )    , Comment("Cosmic Track Seed coll tag"   ) };
     fhicl::Atom<art::InputTag>   simpCollTag            {Name("simpCollTag"       )    , Comment("SIMP  collection tag"   ) };
     fhicl::Atom<art::InputTag>   timeClusterCollTag     {Name("timeClusterCollTag")    , Comment("time cluster collection tag") };
     fhicl::Atom<art::InputTag>   phiClusterCollTag      {Name("phiClusterCollTag" )    , Comment("phi  cluster collection tag") };
@@ -132,6 +132,7 @@ private:
   art::InputTag _helixSeedCollTag;	// helix seed collection tag
   art::InputTag _ksfCollTag;
   art::InputTag _kffCollTag;
+  art::InputTag _ctsCollTag;            // cosmic track seed coll tag
   art::InputTag _trackCollTag;
   art::InputTag _simpCollTag;
   art::InputTag _timeClusterCollTag;

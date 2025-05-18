@@ -334,6 +334,22 @@ void TCalVisNode::PaintRZ(Option_t* option) {
 // }
 
 //-----------------------------------------------------------------------------
+void TCalVisNode::PaintCrv(Option_t* Option) {
+}
+//-----------------------------------------------------------------------------
+void TCalVisNode::PaintPhiZ(Option_t* Option) {
+}
+
+//-----------------------------------------------------------------------------
+void TCalVisNode::PaintTZ(Option_t* Option) {
+}
+//-----------------------------------------------------------------------------
+void TCalVisNode::PaintVST(Option_t* Option) {
+}
+//-----------------------------------------------------------------------------
+void TCalVisNode::PaintVRZ(Option_t* Option) {
+}
+//-----------------------------------------------------------------------------
 Int_t TCalVisNode::DistancetoPrimitiveXY(Int_t px, Int_t py) {
 
   static TVector3 global;

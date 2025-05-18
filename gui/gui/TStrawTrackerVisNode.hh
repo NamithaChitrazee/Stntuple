@@ -53,7 +53,6 @@ protected:
 
 public:
 					// ****** constructors and destructor
-
   TStrawTrackerVisNode() {}
   TStrawTrackerVisNode(const char* Name, const mu2e::Disk* Disk, int SectionID); 
 
@@ -74,10 +73,15 @@ public:
   // ::Draw functions are called only for T**View objects
 
   //  virtual void  Draw    (Option_t* option = "");
-  virtual void  Paint   (Option_t* option = "");
-          void  PaintXY (Option_t* option = "");
-          void  PaintRZ (Option_t* option = "");
-          void  PaintCal(Option_t* option = "");
+
+  virtual void  PaintXY  (Option_t* option = "") override;
+  virtual void  PaintRZ  (Option_t* option = "") override;
+  virtual void  PaintTZ  (Option_t* option = "") override;
+  virtual void  PaintPhiZ(Option_t* option = "") override;
+  virtual void  PaintCal (Option_t* option = "") override;
+  virtual void  PaintVST (Option_t* option = "") override;
+  virtual void  PaintVRZ (Option_t* option = "") override;
+
   //  virtual void  ExecuteEvent(Int_t event, Int_t px, Int_t py);
 
   virtual Int_t DistancetoPrimitive  (Int_t px, Int_t py);

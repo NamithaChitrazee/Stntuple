@@ -117,9 +117,14 @@ public:
   int InitEvent();
 
   virtual void  Paint   (Option_t* option = "");
-  virtual void  PaintXY (Option_t* option = "");
-  virtual void  PaintRZ (Option_t* option = "");
-  virtual void  PaintCal(Option_t* option = "");
+
+  virtual void  PaintXY  (Option_t* option = "") override;
+  virtual void  PaintRZ  (Option_t* option = "") override;
+  virtual void  PaintTZ  (Option_t* option = "") override;
+  virtual void  PaintPhiZ(Option_t* option = "") override;
+  virtual void  PaintCal (Option_t* option = "") override;
+  virtual void  PaintVST (Option_t* option = "") override;
+  virtual void  PaintVRZ (Option_t* option = "") override;
 
   //  virtual void  ExecuteEvent(Int_t event, Int_t px, Int_t py);
 

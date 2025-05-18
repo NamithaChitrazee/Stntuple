@@ -67,8 +67,13 @@ TEvdStrawHit::TEvdStrawHit(const mu2e::ComboHit*    Hit,
 //-----------------------------------------------------------------------------
   fColor = Color;
 //-----------------------------------------------------------------------------
-// define lines
+// define marker and lines
 //-----------------------------------------------------------------------------
+  fMarker.SetX(fPos.X());
+  fMarker.SetY(fPos.Y());
+  fMarker.SetMarkerSize(0.4);
+  fMarker.SetMarkerColor(Color);
+
   fLineW.SetX1(fPos.X()-fDir.X()*fSigW);
   fLineW.SetY1(fPos.Y()-fDir.Y()*fSigW);
   fLineW.SetX2(fPos.X()+fDir.X()*fSigW);
@@ -126,6 +131,7 @@ void TEvdStrawHit::Paint(Option_t* Option) {
 
 //_____________________________________________________________________________
 void TEvdStrawHit::PaintXY(Option_t* Option) {
+  fMarker.Paint(Option);
   fLineW.Paint(Option);
   fLineR.Paint(Option);
 }

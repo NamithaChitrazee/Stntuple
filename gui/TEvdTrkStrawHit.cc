@@ -44,7 +44,7 @@ namespace stntuple {
   double zw     = Straw->getMidPoint().z();
   double rw     = Straw->getMidPoint().perp();
 
-  double rdrift = fHit->driftRadius();
+  double rdrift = 4.0 ; // P.Murat: <FIXME> fHit->driftRadius();
 
   fEllipse.SetX1(zw);
   fEllipse.SetY1(rw);

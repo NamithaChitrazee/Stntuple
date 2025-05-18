@@ -65,7 +65,7 @@ MuHitDisplay::MuHitDisplay(const art::EDAnalyzer::Table<Config>& config) :
   _helixSeedCollTag            (config().helixSeedCollTag()),
   _ksfCollTag                  (config().ksfCollTag()),
   _kffCollTag                  (config().kffCollTag()),
-  _trackCollTag                (config().trackCollTag()),
+  _ctsCollTag                  (config().ctsCollTag()),
   _simpCollTag                 (config().simpCollTag()),
   _timeClusterCollTag          (config().timeClusterCollTag()),
   _phiClusterCollTag           (config().phiClusterCollTag()),
@@ -310,26 +310,26 @@ void MuHitDisplay::InitVisManager() {
   cal_view->AddNode(cal_node[1]);
   vm->AddView(cal_view);
 //-----------------------------------------------------------------------------
-// TrkVisNode: tracker, tracks and straw hits
-// add tracker node to two views - RZ and XY
+// TrkVisNode: tracker, tracks, cosmic tracks and straw hits
+// add tracker node to two views - RZ and XY, also - to the panel VRZ
 // tracks are KalSeed's
 //-----------------------------------------------------------------------------
-  TTrkVisNode* tnode = new TTrkVisNode ("TrkVisNode", fTracker, NULL);
+  TTrkVisNode* trk_vis_node = new TTrkVisNode ("TrkVisNode", fTracker, NULL);
 
-  tnode->SetShCollTag       (_shCollTag      );
-  tnode->SetChCollTag       (_comboHitCollTag);
-  tnode->SetKsCollTag       (_kffCollTag     );
-  tnode->SetSdmcCollTag     (_sdmcCollTag    );
+  trk_vis_node->SetShCollTag       (_shCollTag      );
+  trk_vis_node->SetChCollTag       (_comboHitCollTag);
+  trk_vis_node->SetKsCollTag       (_kffCollTag     );
+  trk_vis_node->SetCtsCollTag      (_ctsCollTag     );
 
-  tnode->SetSimpColl        (&_simpColl      );
-  tnode->SetSimpCollTag     (_simpCollTag    );
-
-  tnode->SetSpmcColl        (&_spmcColl      );
-  tnode->SetSwColl          (&_swColl        );
+  trk_vis_node->SetSdmcCollTag     (_sdmcCollTag    );
+  trk_vis_node->SetSimpColl        (&_simpColl      );
+  trk_vis_node->SetSimpCollTag     (_simpCollTag    );
+  trk_vis_node->SetSpmcColl        (&_spmcColl      );
+  trk_vis_node->SetSwColl          (&_swColl        );
 //-----------------------------------------------------------------------------
 // SimpBlock is initialized in the module, a node references it via the pointer
 //-----------------------------------------------------------------------------
-  tnode->SetSimpBlock       (fSimpBlock      );
+  trk_vis_node->SetSimpBlock       (fSimpBlock      );
 //-----------------------------------------------------------------------------
 // HelixVisNode: one helix collection - lets see how it plays out
 // add helix node to only one view - XY
@@ -352,7 +352,7 @@ void MuHitDisplay::InitVisManager() {
 // 1. XY view : tracker + calorimeter + time clusters
 //-----------------------------------------------------------------------------
   TStnView* vxy = new TStnView(TStnVisManager::kXY,-1,"XYView","XY View");
-  vxy->AddNode(tnode);
+  vxy->AddNode(trk_vis_node);
   vxy->AddNode(hnode);
   vxy->AddNode(cal_node[0]);
   vxy->AddNode(cal_node[1]);
@@ -362,26 +362,26 @@ void MuHitDisplay::InitVisManager() {
 // 2. RZ view : tracker only, so far
 //-----------------------------------------------------------------------------
   TStnView* vrz = new TStnView(TStnVisManager::kRZ,-1,"RZView","RZ View");
-  vrz->AddNode(tnode);
+  vrz->AddNode(trk_vis_node);
   vm->AddView(vrz);
 //-----------------------------------------------------------------------------
 // 3. TZ view : TrkNode + TimeClusterNode
 //-----------------------------------------------------------------------------
   TStnView* vtz = new TStnView(TStnVisManager::kTZ,-1,"TZView","TZ View");
-  vtz->AddNode(tnode);
+  vtz->AddNode(trk_vis_node);
   vtz->AddNode(tc_node);
   vm->AddView(vtz);
 //-----------------------------------------------------------------------------
 // 4. TZ view : TrkNode - for now, hits only 
 //-----------------------------------------------------------------------------
   TStnView* vphiz = new TStnView(TStnVisManager::kPhiZ,-1,"PhiZView","PhiZ View");
-  vphiz->AddNode(tnode);
+  vphiz->AddNode(trk_vis_node);
   vm->AddView(vphiz);
 //-----------------------------------------------------------------------------
 // 5. VST XY view : TTrkNode only, so far
 //-----------------------------------------------------------------------------
   TStnView* vst = new TStnView(TStnVisManager::kVST,-1,"VSTView","VST View");
-  vst->AddNode(tnode);
+  vst->AddNode(trk_vis_node);
   vm->AddView(vst);
 //-----------------------------------------------------------------------------
 // VRZ: "VST RZ" view - one per panel, each VRZ view shows only one panel
@@ -410,6 +410,7 @@ void MuHitDisplay::InitVisManager() {
         int iview = 12*is+6*ipln+i;
         vrz_view[is][ipln][i] = new TStnView(TStnVisManager::kVRZ,iview,"VRZView","VRZ View");
         vrz_view[is][ipln][i]->AddNode(vp_node[is][ipln][i]);
+        vrz_view[is][ipln][i]->AddNode(trk_vis_node);
         // vrz_view[i]->AddNode(vpd_node[i]);
         // vrz_view[i]->AddNode(trk_node);
       }

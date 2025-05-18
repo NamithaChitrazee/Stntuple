@@ -31,10 +31,11 @@
 #pragma link C++ class stntuple::TEvdTimeCluster;
 #pragma link C++ class TEvdTimeClusterVisNode;
 #pragma link C++ class stntuple::TEvdTrack;
+#pragma link C++ class stntuple::TEvdCosmicTrack;
 #pragma link C++ class stntuple::TEvdTrkStrawHit;
 #pragma link C++ class stntuple::TEventDisplayUtils;
 #pragma link C++ class THeaderVisNode;
-#pragma link C++ class TMcTruthVisNode;
+#pragma link C++ class stntuple::TMcTruthVisNode;
 #pragma link C++ class stntuple::TMu2eBField;
 #pragma link C++ class TStnFrame;
 #pragma link C++ class TStnGeoManager;

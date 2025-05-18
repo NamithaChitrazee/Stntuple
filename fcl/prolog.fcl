@@ -217,9 +217,9 @@ MuHitDisplay: { module_type: MuHitDisplay                 # class name;
 
     phiClusterCollTag            : "TZClusterFinder"                 ## "PhiClusterFinder"
     timeClusterCollTag           : "CalTimePeakFinder"
-    trackCollTag                 : "KKDeMHPar"                       ## need to recover : "KFFDeMHDar"
     kffCollTag                   : "KKDeMHPar"                       ## "KSFDeMHDar"
     ksfCollTag                   : "KFFDeMHDar"
+    ctsCollTag                   : "LineFinder"
 
     primaryParticleTag           : "compressDigiMCs"                 # this is new, to be passed to InitSimpBlock
     vdHitsCollTag                : "compressDigiMCs:virtualdetector" # this is new, to be passed to InitSimpBlock

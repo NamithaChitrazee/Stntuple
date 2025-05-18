@@ -12,7 +12,7 @@
 #include "canvas/Utilities/InputTag.h"
 #include "art/Framework/Principal/Event.h"
 
-#include "Stntuple/base/TVisNode.hh"
+#include "Stntuple/gui/TStnVisNode.hh"
 #include "Offline/RecoDataProducts/inc/ComboHit.hh"
 
 class TStrawHitBlock;
@@ -21,7 +21,7 @@ namespace stntuple {
 
   class TEvdPanel;
 
-class TEvdPanelVisNode: public TVisNode {
+class TEvdPanelVisNode: public TStnVisNode {
 public:
   
   stntuple::TEvdPanel*      fPanel;	      // not owned
@@ -53,12 +53,14 @@ public:
 //-----------------------------------------------------------------------------
   virtual int  InitEvent();
 
-  virtual void Paint   (Option_t* option = "");
-  virtual void PaintXY (Option_t* option = "");
-  virtual void PaintRZ (Option_t* option = "");
-  virtual void PaintVST(Option_t* option = "");
-  virtual void PaintVRZ(Option_t* option = "");
-  //  virtual void PaintWF (Option_t* option = "");
+  virtual void  PaintXY  (Option_t* option = "") override;
+  virtual void  PaintRZ  (Option_t* option = "") override;
+  virtual void  PaintTZ  (Option_t* option = "") override;
+  virtual void  PaintPhiZ(Option_t* option = "") override;
+  virtual void  PaintCrv (Option_t* option = "") override;
+  virtual void  PaintCal (Option_t* option = "") override;
+  virtual void  PaintVST (Option_t* option = "") override;
+  virtual void  PaintVRZ (Option_t* option = "") override;
 //-----------------------------------------------------------------------------
 // overloaded methods of TObject
 //-----------------------------------------------------------------------------

@@ -276,6 +276,20 @@ void TEvdHelixVisNode::PaintVST(Option_t* Option) {
 }
 
 //-----------------------------------------------------------------------------
+void TEvdHelixVisNode::PaintPhiZ(Option_t* Option) {
+}
+//-----------------------------------------------------------------------------
+void TEvdHelixVisNode::PaintCal(Option_t *Option) {
+}
+//-----------------------------------------------------------------------------
+void TEvdHelixVisNode::PaintCrv(Option_t *Option) {
+}
+
+//-----------------------------------------------------------------------------
+void TEvdHelixVisNode::PaintVRZ(Option_t *Option) {
+}
+
+//------------------------------------
 int TEvdHelixVisNode::DistancetoPrimitiveXY(Int_t px, Int_t py) {
   static TVector3 global;
   global.SetXYZ(gPad->AbsPixeltoX(px),gPad->AbsPixeltoY(py),0);
