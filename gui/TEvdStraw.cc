@@ -73,7 +73,7 @@ TEvdStraw::TEvdStraw(): TObject() {
   fWire = new TLine(x1,y1,x2,y2);
 
   fListOfHits = new TObjArray(5);
-  fListOfHits->SetOwner(kTRUE);
+  fListOfHits->SetOwner(kFALSE);
 }
 
 //_____________________________________________________________________________
