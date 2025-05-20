@@ -34,7 +34,7 @@ add_library(${lib} SHARED
   ${dict}.cxx
 )
 
-target_link_libraries(${lib} ROOT::Core ROOT::Matrix ROOT::Tree ROOT::Graf ROOT::Gpad)
+target_link_libraries(${lib} ROOT::Physics ROOT::Core ROOT::Matrix ROOT::Tree ROOT::Graf ROOT::Gpad  ROOT::Geom)
 
 cet_add_compiler_flags(-g -O0)
 

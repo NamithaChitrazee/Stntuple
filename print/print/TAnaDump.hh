@@ -47,7 +47,6 @@ namespace mu2e {
 #endif
 
   class StrawHit;
-  //  class StrawHitMCTruth;
   class CaloCluster;
   class CaloProtoCluster;
   class CrvDigi;
@@ -62,6 +61,7 @@ namespace mu2e {
   class TimeCluster;
   class KalSeed;
   class ComboHit;
+  class CosmicTrackSeed;
   class HelixSeed;
   class TrackClusterMatch;
   class TrkCaloHit;
@@ -222,16 +222,26 @@ public:
 				double TMin = -1.e6,
 				double TMax =  1.e6);
  
+  void printCosmicTrackSeed    (const mu2e::CosmicTrackSeed* CTSeed    , 
+				const char* StrawHitCollTag            ,  // usually - "makeSH"
+				const char* StrawDigiCollTag = "makeSD",
+				const char* Opt              = ""      );
+
   void printHelixSeed          (const mu2e::HelixSeed*         Helix   , 
 				//				const char* HelixSeedCollTag           ,
 				const char* StrawHitCollTag            ,  // usually - "makeSH"
 				const char* StrawDigiCollTag = "makeSD",
 				const char* Opt              = ""      );
 
+  void printCosmicTrackSeedCollection(const char* CTSCollTag             ,  // always needed
+				int         PrintHits          = 0       ,
+				const char* StrawHitCollTag    = "makeSH",  // usually, "makeSH"
+				const char* StrawDigiMCCollTag = "compressDigiMCs" ); // "makeSD" or "compressDigiMCs"
+
   void printHelixSeedCollection(const char* HelixSeedCollTag             ,  // always needed
 				int         PrintHits          = 0       ,
 				const char* StrawHitCollTag    = "makeSH",  // usually, "makeSH"
-				const char* StrawDigiMCCollTag = "compressDigiMCs" ); // most often, "makeSD" or "compressDigiMCs"
+				const char* StrawDigiMCCollTag = "compressDigiMCs" ); // "makeSD" or "compressDigiMCs"
 
   void printHelixHit      (const mu2e::HelixHit*     HelHit,
 			   const mu2e::ComboHit*     Hit, 
@@ -240,7 +250,12 @@ public:
 			   int                       INit  = -1,
 			   int                       Flags = -1);
   
-  void printKalSeed            (const mu2e::KalSeed* TrkSeed                      , 
+  void printKalSeed_Line        (const mu2e::KalSeed* Seed                   , 
+                                 const char* Opt         = ""                ,
+                                 const char* ShCollTag   = "makeSH"          ,
+                                 const char* SdmcCollTag = "compressDigiMCs"); // "makeSD" 
+
+  void printKalSeed            (const mu2e::KalSeed* Seed                      , 
 				const char* Opt                = ""               ,
 				const char* StrawHitCollTag    = "makeSH"         ,
 				const char* StrawDigiMCCollTag = "compressDigiMCs");

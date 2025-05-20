@@ -3,6 +3,9 @@ set (subpkg "mod"                    )
 set (dict   "Stntuple_${subpkg}_dict")
 set (lib    "Stntuple_${subpkg}"     )
 
+set (MuHitDisplayModule "Stntuple_MuHitDisplay_module" )
+set (MuHitDisplayDict   "Stntuple_MuHitDisplay_module_dict" )
+
 include_directories(
   $ENV{ROOTSYS}/include/root
   ${CMAKE_SOURCE_DIR}
@@ -12,14 +15,21 @@ include_directories(
 # link_directories($ENV{ROOTSYS}/lib)
 
 set (include_files
-# MuHitDisplay_module.hh
-# StntupleRecoAna_module.hh
-# THistModule.hh TModule.hh
-TAnaRint.hh
+  # StntupleRecoAna_module.hh
+  THistModule.hh TModule.hh
+  TAnaRint.hh
 )
 
-ROOT_GENERATE_DICTIONARY(${dict} ${include_files} LINKDEF ${subpkg}/Linkdef.h)
+ROOT_GENERATE_DICTIONARY(${MuHitDisplayDict} MuHitDisplay_module.hh
+  LINKDEF ${subpkg}/MuHitDisplay_module_Linkdef.h
+  OPTIONS -D__CLING__
+)
+set_property(SOURCE ${MuHitDisplayDict}.cxx PROPERTY generated)
 
+ROOT_GENERATE_DICTIONARY(${dict} ${include_files}
+  LINKDEF ${subpkg}/Linkdef.h
+  OPTIONS -D__CLING__
+)
 set_property(SOURCE ${dict}.cxx PROPERTY generated)
 
 cet_build_plugin(EventFilter art::module LIBRARIES REG
@@ -74,7 +84,10 @@ cet_build_plugin(InitStntuple art::module LIBRARIES REG
   Offline::RecoDataProducts
 )
 
-cet_build_plugin(MuHitDisplay art::module LIBRARIES REG
+add_library(${MuHitDisplayModule} SHARED MuHitDisplay_module.cc  ${MuHitDisplayDict}.cxx)
+  
+target_link_libraries(${MuHitDisplayModule} 
+  PRIVATE
   Stntuple_mod
   Stntuple_gui
   Stntuple_print
@@ -82,6 +95,7 @@ cet_build_plugin(MuHitDisplay art::module LIBRARIES REG
   Stntuple_geom
   Stntuple_obj
   Stntuple_base
+  Offline::RecoDataProducts
   art_root_io::TFileService_service
   artdaq-core-mu2e::Data
   ROOT::Hist
@@ -89,7 +103,6 @@ cet_build_plugin(MuHitDisplay art::module LIBRARIES REG
   ROOT::Core
   ROOT::RIO
   ROOT::Gui
-  Offline::RecoDataProducts
 )
 
 cet_build_plugin(StntupleEventDump art::module LIBRARIES REG
@@ -181,7 +194,7 @@ target_link_libraries(${lib}
 
 cet_add_compiler_flags(-g -O0)
 
-install(TARGETS ${lib})
+install(TARGETS ${lib} ${MuHitDisplayModule})
 
 # install_headers()
 # install_source()

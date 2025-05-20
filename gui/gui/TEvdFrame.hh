@@ -1,5 +1,5 @@
-#ifndef TStnFrame_hh
-#define TStnFrame_hh
+#ifndef TEvdFrame_hh
+#define TEvdFrame_hh
 
 #include "TGFrame.h"
 #include "TCanvasImp.h"
@@ -18,7 +18,7 @@ class TGRadioButton;
 class TVisManager;
 
 //_____________________________________________________________________________
-class TStnFrame: public TGMainFrame, public TCanvasImp {
+class TEvdFrame: public TGMainFrame, public TCanvasImp {
 public:
 
   enum { fGroupFrameWidth = 150 };
@@ -57,12 +57,12 @@ protected:
   int                 fView;		   // !
 
 public:
-  TStnFrame(const char* name, const char* title, 
+  TEvdFrame(const char* name, const char* title, 
 	    TVisManager* VisManager, Int_t View, 
 	    UInt_t w, UInt_t h,
 	    UInt_t options = kMainFrame | kVerticalFrame);
 
-  virtual ~TStnFrame();
+  virtual ~TEvdFrame();
 
 					// ****** accessors
 
@@ -87,7 +87,7 @@ public:
 
   virtual void CloseWindow();
 
-  ClassDef(TStnFrame,1)
+  ClassDef(TEvdFrame,1)
 };
 
 

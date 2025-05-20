@@ -296,6 +296,28 @@ void TCrvVisNode::PaintCrv(Option_t* Option) {
 }
 
 //-----------------------------------------------------------------------------
+void TCrvVisNode::PaintXY(Option_t* Option) {
+}
+//-----------------------------------------------------------------------------
+void TCrvVisNode::PaintRZ(Option_t* Option) {
+}
+//-----------------------------------------------------------------------------
+void TCrvVisNode::PaintTZ(Option_t* Option) {
+}
+//-----------------------------------------------------------------------------
+void TCrvVisNode::PaintPhiZ(Option_t* Option) {
+}
+//-----------------------------------------------------------------------------
+void TCrvVisNode::PaintCal(Option_t* Option) {
+}
+//-----------------------------------------------------------------------------
+void TCrvVisNode::PaintVST(Option_t* Option) {
+}
+//-----------------------------------------------------------------------------
+void TCrvVisNode::PaintVRZ(Option_t* Option) {
+}
+
+//-----------------------------------------------------------------------------
 Int_t TCrvVisNode::DistancetoPrimitive(Int_t px, Int_t py) {
   int              min_dist(9999);
   static TVector3  global;

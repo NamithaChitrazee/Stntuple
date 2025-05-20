@@ -28,13 +28,14 @@ public:
 // windows with this view
 //-----------------------------------------------------------------------------
   virtual void  Paint    (Option_t* option = "");
-  virtual void  PaintXY  (Option_t* option = "");
-  virtual void  PaintRZ  (Option_t* option = "");
-  virtual void  PaintTZ  (Option_t* option = "");
-  virtual void  PaintPhiZ(Option_t* option = "");
-  virtual void  PaintCal (Option_t* option = "");
-  virtual void  PaintCrv (Option_t* option = "");
-  virtual void  PaintVST (Option_t* option = "");
+  virtual void  PaintXY  (Option_t* option = "") = 0;
+  virtual void  PaintRZ  (Option_t* option = "") = 0;
+  virtual void  PaintTZ  (Option_t* option = "") = 0;
+  virtual void  PaintPhiZ(Option_t* option = "") = 0;
+  virtual void  PaintCal (Option_t* option = "") = 0;
+  virtual void  PaintCrv (Option_t* option = "") = 0;
+  virtual void  PaintVST (Option_t* option = "") = 0;
+  virtual void  PaintVRZ (Option_t* option = "") = 0;
 
   virtual int   DistancetoPrimitive    (Int_t px, Int_t py);
   virtual int   DistancetoPrimitiveXY  (Int_t px, Int_t py);

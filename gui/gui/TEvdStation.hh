@@ -27,6 +27,7 @@ public:
   
 protected:
   int                   fID;
+  int                   fVisible; // 
   int                   fNPlanes;
   TObjArray*            fListOfPlanes;
 
@@ -43,6 +44,7 @@ public:
 //-----------------------------------------------------------------------------
 // accessors
 //-----------------------------------------------------------------------------
+  int          Visible     () { return fVisible;      }
   int          NPlanes     () { return fNPlanes;      }
   TObjArray*   ListOfPlanes() { return fListOfPlanes; }
 
@@ -52,7 +54,8 @@ public:
 //-----------------------------------------------------------------------------
 // modifiers
 //-----------------------------------------------------------------------------
-
+  void SetVisible(int YesNo) { fVisible = YesNo; }
+  
   //  virtual void  Draw    (Option_t* option = "");
 
   virtual void  Paint   (Option_t* option = "");

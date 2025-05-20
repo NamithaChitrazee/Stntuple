@@ -32,6 +32,7 @@ namespace stntuple {
 //_____________________________________________________________________________
 TEvdStation::TEvdStation(): TObject() {
   fListOfPlanes = NULL;
+  fVisible      = 0;
 }
 
 //_____________________________________________________________________________
@@ -41,6 +42,7 @@ TEvdStation::TEvdStation(int ID, const mu2e::Tracker* Tracker): TObject() {
   TEvdPlane*  evd_plane;
 
   fID      = ID;
+  fVisible = 1;
   //  fStation = Station;
   fNPlanes = 2; // was Station->nPlanes();
 

@@ -9,6 +9,7 @@
 #include "TH1.h"
 #include "TPad.h"
 #include "TArc.h"
+#include "TMarker.h"
 #include "TVector2.h"
 #include "TVector3.h"
 #include "TLine.h"
@@ -52,6 +53,7 @@ protected:
   TVector2    fDir;                     // direction of the straw
   double      fSigW;      		// error in the wire direction
   double      fSigR;      		// error in radial direction
+  TMarker     fMarker;			// paint on XY view
   TLine       fLineW;			// paint on XY view
   TLine       fLineR;
   TEllipse    fEllipse;

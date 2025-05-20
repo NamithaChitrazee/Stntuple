@@ -37,6 +37,7 @@ TEvdPlane::TEvdPlane(): TObject() {
   fID           = -1;
   fListOfPanels = NULL;
   fNPanels      = 0;
+  fVisible      = 0;
 }
 
 //_____________________________________________________________________________
@@ -49,6 +50,7 @@ TEvdPlane::TEvdPlane(): TObject() {
   fStation = Station;
   fPlane   = Plane;
   fNPanels  = Plane->nPanels();
+  fVisible  = 1;
 
   fListOfPanels = new TObjArray(fNPanels);
 

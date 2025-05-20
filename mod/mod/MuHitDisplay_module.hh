@@ -16,8 +16,6 @@
 #include "Stntuple/mod/THistModule.hh"
 
 #include "art/Framework/Principal/Event.h"
-// #include "fhiclcpp/ParameterSet.h"
-// #include "art/Framework/Core/EDAnalyzer.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
 #include "Offline/TrackerConditions/inc/StrawResponse.hh"
@@ -44,8 +42,9 @@
 
 class TApplication;
 
-#include "Stntuple/base/TNamedHandle.hh"
+// #include "Stntuple/base/TNamedHandle.hh"
 #include "Stntuple/gui/TStnVisManager.hh"
+#include "Stntuple/gui/TStnGeoManager.hh"
 
 #include "Stntuple/alg/TStnTrackID.hh"
 
@@ -54,8 +53,7 @@ class TApplication;
 
 #include "Offline/Mu2eUtilities/inc/McUtilsToolBase.hh"
 
-using namespace std;
-using CLHEP::Hep3Vector;
+// using namespace std;
 
 class DoubletAmbigResolver;
 
@@ -63,7 +61,7 @@ namespace mu2e {
 
 class MuHitDisplay : public THistModule {
 public:
-#ifndef __CLING__  
+  // #ifndef __CLING__  
   struct VmConfig {
     using Name    = fhicl::Name;
     using Comment = fhicl::Comment;
@@ -98,7 +96,7 @@ public:
     fhicl::Atom<art::InputTag>   helixSeedCollTag       {Name("helixSeedCollTag"  )    , Comment("helix seed collection tag"   ) };
     fhicl::Atom<art::InputTag>   ksfCollTag             {Name("ksfCollTag"        )    , Comment("KSF   collection tag"   ) };
     fhicl::Atom<art::InputTag>   kffCollTag             {Name("kffCollTag"        )    , Comment("KFF   collection tag"   ) };
-    fhicl::Atom<art::InputTag>   trackCollTag           {Name("trackCollTag"      )    , Comment("track collection tag"   ) };
+    fhicl::Atom<art::InputTag>   ctsCollTag             {Name("ctsCollTag"        )    , Comment("Cosmic Track Seed coll tag"   ) };
     fhicl::Atom<art::InputTag>   simpCollTag            {Name("simpCollTag"       )    , Comment("SIMP  collection tag"   ) };
     fhicl::Atom<art::InputTag>   timeClusterCollTag     {Name("timeClusterCollTag")    , Comment("time cluster collection tag") };
     fhicl::Atom<art::InputTag>   phiClusterCollTag      {Name("phiClusterCollTag" )    , Comment("phi  cluster collection tag") };
@@ -112,7 +110,7 @@ public:
     fhicl::Atom<bool>            showTracks             {Name("showTracks"        )    , Comment("showTracks"     ) };
     fhicl::Table<VmConfig>       visManager             {Name("visManager"        )    , Comment("vis manager config" ) };
   };
-#endif
+  // #endif
 private:
 //-----------------------------------------------------------------------------
 // Input parameters: Module labels 
@@ -131,6 +129,7 @@ private:
   art::InputTag _helixSeedCollTag;	// helix seed collection tag
   art::InputTag _ksfCollTag;
   art::InputTag _kffCollTag;
+  art::InputTag _ctsCollTag;            // cosmic track seed coll tag
   art::InputTag _trackCollTag;
   art::InputTag _simpCollTag;
   art::InputTag _timeClusterCollTag;
@@ -138,7 +137,7 @@ private:
   art::InputTag _caloHitCollTag;
   art::InputTag _ppTag;			// primary particle tag
   art::InputTag _vdHitsCollTag;
-  string        _defaultView;           // view open in the first window
+  std::string   _defaultView;           // view open in the first window
   
   GenId         _generatorID;
 
@@ -191,6 +190,10 @@ private:
   int                                         _firstCall;    
   TStnVisManager*                             fVisManager;
 //-----------------------------------------------------------------------------
+// geometry manager may need to be reinitialized at  run boundary
+//-----------------------------------------------------------------------------
+  TStnGeoManager*                             fGeoManager;
+//-----------------------------------------------------------------------------
 // reuse STNTUPLE data blocks
 //-----------------------------------------------------------------------------
   TStnHeaderBlock*       fHeaderBlock;
@@ -200,15 +203,14 @@ private:
 
   const Tracker*         fTracker;    // straw tracker geometry
 
-  // TNamedHandle*          fDarHandle;
   // DoubletAmbigResolver*  fDar;
 
 public:
   // for some reason, this line is required by art to allow the command line help print
-#ifndef __CLING__
+  // #ifndef __CLING__
   typedef art::EDAnalyzer::Table<Config> Parameters;
   explicit MuHitDisplay(const art::EDAnalyzer::Table<Config>& config);
-#endif
+  // #endif
   // explicit MuHitDisplay(fhicl::ParameterSet const& pset);
   virtual ~MuHitDisplay();
 
@@ -224,9 +226,8 @@ public:
 
   TSimpBlock*                                   GetSimpBlock      () { return fSimpBlock      ; }
 
-  void             InitVisManager();
-
-  // void     printCaloCluster(const CaloCluster* Cl, const char* Opt);
+  void                                          InitVisManager();
+  void                                          InitGeoManager();
 //-----------------------------------------------------------------------------
 // overloaded virtual methods of the base class - EDAnalyzer 
 //-----------------------------------------------------------------------------

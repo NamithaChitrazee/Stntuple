@@ -22,12 +22,14 @@
 #include "TRootEmbeddedCanvas.h"
 #include "TCanvas.h"
 
+#include "Stntuple/print/Stntuple_print_functions.hh"
+
 #include "Stntuple/base/TVisManager.hh"
 
-#include "Stntuple/gui/TStnFrame.hh"
+#include "Stntuple/gui/TEvdFrame.hh"
 #include "Stntuple/gui/TStnWidgetID.hh"
 
-ClassImp(TStnFrame)
+ClassImp(TEvdFrame)
 
 //-----------------------------------------------------------------------------
 Int_t mb_button_id[9] = { kMBYes, kMBNo, kMBOk, kMBApply,
@@ -43,7 +45,7 @@ const char *filetypes[] = { "All files",     "*",
                             0,               0 };
 
 //-----------------------------------------------------------------------------
-TStnFrame::TStnFrame(const char*  Name,
+TEvdFrame::TEvdFrame(const char*  Name,
 		     const char*  Title, 
 		     TVisManager* VisManager, 
 		     Int_t        View,
@@ -120,6 +122,7 @@ TStnFrame::TStnFrame(const char*  Name,
   fMenuOpen->AddEntry("&Cal View",           M_OPEN_CAL);
   fMenuOpen->AddEntry("&CRV View",           M_OPEN_CRV);
   fMenuOpen->AddEntry("&VST View",           M_OPEN_VST);
+  fMenuOpen->AddEntry("&VRZ View",           M_OPEN_VRZ);
 //-----------------------------------------------------------------------------
 // PRINT menu item on top 
 //-----------------------------------------------------------------------------
@@ -256,22 +259,10 @@ TStnFrame::TStnFrame(const char*  Name,
   const char* cmd_format = "PrintColls(=\"%s\")";
   int x0(5), y0(50), dy(35);
 
-  const char* button_name[] = {
-    "ComboHits"   ,
-    "Helices"     ,
-    "KalSeedColls",
-    "KalSeeds"    ,
-    "SdmcColls"   ,
-    "SimParticles",
-    "StrawHits"   ,
-    "StrawDigis"  ,
-    "TcColls"     ,
-    "TimeClusters",
-    0
-  };
-
-  for (int i=0; button_name[i] != 0; i++) {
-    tb          = new TGTextButton(frame,button_name[i],-1,
+#include "Stntuple/gui/print_buttons.h"
+  
+  for (int i=0; print_buttons[i].name != nullptr; i++) {
+    tb          = new TGTextButton(frame,print_buttons[i].name,-1,
                                    TGTextButton::GetDefaultGC()(),
                                    TGTextButton::GetDefaultFontStruct(),
                                    kRaisedFrame);
@@ -280,7 +271,7 @@ TStnFrame::TStnFrame(const char*  Name,
     tb->SetWrapLength(-1);
     frame->AddFrame(tb, new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
     tb->MoveResize(x0,y0+dy*i,120,30);
-    tb->Connect("Pressed()","TStnVisManager",vm,Form(cmd_format,button_name[i]));
+    tb->Connect("Pressed()","TStnVisManager",vm,Form(cmd_format,print_buttons[i].name));
   }
 //-----------------------------------------------------------------------------
   // TGPictureButton *fPictureButton821 = new TGPictureButton(fVerticalFrame820,gClient->GetPicture("f1_s.xpm"),-1,TGPictureButton::GetDefaultGC()(),kRaisedFrame);
@@ -402,8 +393,8 @@ TStnFrame::TStnFrame(const char*  Name,
 }
 
 //-----------------------------------------------------------------------------
-TStnFrame::~TStnFrame() {
-  // Delete window, as TStnFrame's do not exist by themselves, but they are
+TEvdFrame::~TEvdFrame() {
+  // Delete window, as TEvdFrame's do not exist by themselves, but they are
   // always managed by TVisManager, we need to erase this frame from the
   // list of frames
 
@@ -433,7 +424,7 @@ TStnFrame::~TStnFrame() {
 }
 
 //-----------------------------------------------------------------------------
-void TStnFrame::EditorBar() {
+void TEvdFrame::EditorBar() {
   // Create the Editor Controlbar
 
    TControlBar *ed = new TControlBar("vertical", "Editor");
@@ -458,7 +449,7 @@ void TStnFrame::EditorBar() {
 }
 
 //-----------------------------------------------------------------------------
-Bool_t TStnFrame::ProcessMessage(Long_t msg, Long_t parm1, Long_t parm2) {
+Bool_t TEvdFrame::ProcessMessage(Long_t msg, Long_t parm1, Long_t parm2) {
   // Handle menu items.
 
   TCanvas* c;
@@ -474,7 +465,7 @@ Bool_t TStnFrame::ProcessMessage(Long_t msg, Long_t parm1, Long_t parm2) {
   case kC_COMMAND:
     int submessage = GET_SUBMSG(msg);
 
-    printf(" *** TStnFrame::ProcessMessage SUBMESSAGE: %i \n",submessage);
+    printf(" *** TEvdFrame::ProcessMessage SUBMESSAGE: %i \n",submessage);
 
     switch (submessage) {
     case kCM_MENU:
@@ -507,7 +498,7 @@ Bool_t TStnFrame::ProcessMessage(Long_t msg, Long_t parm1, Long_t parm2) {
 //-----------------------------------------------------------------------------
       case M_OPTION_EVENT_STATUS:
 
-	printf(" *** TStnFrame::ProcessMessage M_OPTION_EVENT_STATUS: msg = %li parm1 = %li parm2 = %li\n", 
+	printf(" *** TEvdFrame::ProcessMessage M_OPTION_EVENT_STATUS: msg = %li parm1 = %li parm2 = %li\n", 
 	       msg,parm1,parm2);
 	c->ToggleEventStatus();
 	if (c->GetShowEventStatus()) {
@@ -535,34 +526,34 @@ Bool_t TStnFrame::ProcessMessage(Long_t msg, Long_t parm1, Long_t parm2) {
 //-----------------------------------------------------------------------------
       case M_OPEN_XY:
 	if (vm->DebugLevel() > 0) {
-	  printf(" *** TStnFrame::ProcessMessage M_OPEN_XY: msg = %li parm1 = %li parm2 = %li\n", 
+	  printf(" *** TEvdFrame::ProcessMessage M_OPEN_XY: msg = %li parm1 = %li parm2 = %li\n", 
 		 msg,parm1,parm2);
 	}
 	fVisManager->OpenView("xy");
 	break;
       case M_OPEN_RZ:
 	if (vm->DebugLevel() > 0) {
-	  printf(" *** TStnFrame::ProcessMessage M_OPEN_RZ: msg = %li parm1 = %li parm2 = %li\n", 
+	  printf(" *** TEvdFrame::ProcessMessage M_OPEN_RZ: msg = %li parm1 = %li parm2 = %li\n", 
 		 msg,parm1,parm2);
 	}
 	fVisManager->OpenView("rz");
 	break;
       case M_OPEN_TZ:
 	
-	printf(" *** TStnFrame::ProcessMessage M_OPEN_TZ: msg = %li parm1 = %li parm2 = %li\n", 
+	printf(" *** TEvdFrame::ProcessMessage M_OPEN_TZ: msg = %li parm1 = %li parm2 = %li\n", 
 	       msg,parm1,parm2);
 	fVisManager->OpenView("tz");
 	break;
       case M_OPEN_PHIZ:
 	
-	printf(" *** TStnFrame::ProcessMessage M_OPEN_PHIZ: msg = %li parm1 = %li parm2 = %li\n", 
+	printf(" *** TEvdFrame::ProcessMessage M_OPEN_PHIZ: msg = %li parm1 = %li parm2 = %li\n", 
 	       msg,parm1,parm2);
 	fVisManager->OpenView("phiz");
 	break;
       case M_OPEN_CAL:
 	
 	if (vm->DebugLevel() > 0) {
-	  printf(" *** TStnFrame::ProcessMessage M_OPEN_CAL: msg = %li parm1 = %li parm2 = %li\n", 
+	  printf(" *** TEvdFrame::ProcessMessage M_OPEN_CAL: msg = %li parm1 = %li parm2 = %li\n", 
 		 msg,parm1,parm2);
 	}
 	fVisManager->OpenView("cal");
@@ -570,7 +561,7 @@ Bool_t TStnFrame::ProcessMessage(Long_t msg, Long_t parm1, Long_t parm2) {
       case M_OPEN_CRV:
 	
 	if (vm->DebugLevel() > 0) {
-	  printf(" *** TStnFrame::ProcessMessage M_OPEN_CRV: msg = %li parm1 = %li parm2 = %li\n", 
+	  printf(" *** TEvdFrame::ProcessMessage M_OPEN_CRV: msg = %li parm1 = %li parm2 = %li\n", 
 		 msg,parm1,parm2);
 	}
 	fVisManager->OpenView("crv");
@@ -578,17 +569,25 @@ Bool_t TStnFrame::ProcessMessage(Long_t msg, Long_t parm1, Long_t parm2) {
       case M_OPEN_VST:
 	
 	if (vm->DebugLevel() > 0) {
-	  printf(" *** TStnFrame::ProcessMessage M_OPEN_VST: msg = %li parm1 = %li parm2 = %li\n", 
+	  printf(" *** TEvdFrame::ProcessMessage M_OPEN_VST: msg = %li parm1 = %li parm2 = %li\n", 
 		 msg,parm1,parm2);
 	}
 	fVisManager->OpenView("vst");
+	break;
+      case M_OPEN_VRZ:
+	
+	if (vm->DebugLevel() > 0) {
+	  printf(" *** TEvdFrame::ProcessMessage M_OPEN_VRZ: msg = %li parm1 = %li parm2 = %li\n", 
+		 msg,parm1,parm2);
+	}
+	fVisManager->OpenView("vrz");
 	break;
 //-----------------------------------------------------------------------------
 //  default
 //-----------------------------------------------------------------------------
       default:
 	if (vm->DebugLevel() > 0) {
-	  printf(" *** TStnFrame::ProcessMessage msg = %li parm1 = %li parm2 = %li\n", 
+	  printf(" *** TEvdFrame::ProcessMessage msg = %li parm1 = %li parm2 = %li\n", 
 		 msg,parm1,parm2);
 	}
 	break;
@@ -596,7 +595,7 @@ Bool_t TStnFrame::ProcessMessage(Long_t msg, Long_t parm1, Long_t parm2) {
       break;
     default:
       if (vm->DebugLevel() > 0) {
-	printf(" *** TStnFrame::ProcessMessage msg = %li parm1 = %li parm2 = %li\n", 
+	printf(" *** TEvdFrame::ProcessMessage msg = %li parm1 = %li parm2 = %li\n", 
 	       msg,parm1,parm2);
       }
       break;
@@ -618,7 +617,7 @@ Bool_t TStnFrame::ProcessMessage(Long_t msg, Long_t parm1, Long_t parm2) {
 }
 
 //-----------------------------------------------------------------------------
-void TStnFrame::CloseWindow() {
+void TEvdFrame::CloseWindow() {
   // Called when window is closed via the window manager.
   
   TVirtualPad *savepad = gPad;
@@ -630,7 +629,7 @@ void TStnFrame::CloseWindow() {
 }
 
 //-----------------------------------------------------------------------------
-void TStnFrame::ShowStatusBar(Bool_t show) {
+void TEvdFrame::ShowStatusBar(Bool_t show) {
   // Show or hide statusbar.
 
   if (show) {
@@ -643,19 +642,19 @@ void TStnFrame::ShowStatusBar(Bool_t show) {
 }
 
 //-----------------------------------------------------------------------------
-void TStnFrame::SetStatusText(const char *txt, Int_t partidx) {
+void TEvdFrame::SetStatusText(const char *txt, Int_t partidx) {
   // Set text in status bar.
 
   fStatusBar->SetText(txt, partidx);
 }
 
 //-----------------------------------------------------------------------------
-void TStnFrame::DoOK() {
+void TEvdFrame::DoOK() {
   printf("\nTerminating dialog: OK pressed\n");
 
   // Send a close message to the main frame. This will trigger the
   // emission of a CloseWindow() signal, which will then call
-  // TStnFrame::CloseWindow(). Calling directly CloseWindow() will cause
+  // TEvdFrame::CloseWindow(). Calling directly CloseWindow() will cause
   // a segv since the OK button is still accessed after the DoOK() method.
   // This works since the close message is handled synchronous (via
   // message going to/from X server).
@@ -663,22 +662,22 @@ void TStnFrame::DoOK() {
   SendCloseMessage();
   
   // The same effect can be obtained by using a singleshot timer:
-  //TTimer::SingleShot(50, "TStnFrame", this, "CloseWindow()");
+  //TTimer::SingleShot(50, "TEvdFrame", this, "CloseWindow()");
 }
 
 //_____________________________________________________________________________
-void TStnFrame::DoCancel() {
+void TEvdFrame::DoCancel() {
   printf("\nTerminating dialog: Cancel pressed\n");
   SendCloseMessage();
 }
 
 //_____________________________________________________________________________
-void TStnFrame::HandleButtons(Int_t id) {
+void TEvdFrame::HandleButtons(Int_t id) {
   // Handle different buttons.
 }
 
 //-----------------------------------------------------------------------------
-void TStnFrame::DoTab(Int_t id) {
-   printf("*** TStnFrame::DoTab : Tab item %d activated\n", id);
+void TEvdFrame::DoTab(Int_t id) {
+   printf("*** TEvdFrame::DoTab : Tab item %d activated\n", id);
 }
 

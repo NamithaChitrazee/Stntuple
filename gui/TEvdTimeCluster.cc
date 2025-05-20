@@ -57,13 +57,16 @@ TEvdTimeCluster::TEvdTimeCluster(): TObject() {
 //-----------------------------------------------------------------------------
 // pointer to track is just cached
 //-----------------------------------------------------------------------------
-  TEvdTimeCluster::TEvdTimeCluster(int Number, const mu2e::TimeCluster* TimeCluster, 
+  TEvdTimeCluster::TEvdTimeCluster(int Number,
+                                   const mu2e::TimeCluster* TimeCluster,
+                                   const mu2e::ComboHitCollection* ChColl,
                                    float T0,
 				   float TMin, float TMax, float ZMin, float ZMax, 
                                    float PhiMin, float PhiMax,
                                    TStnVisNode* VisNode): TObject() {
   fNumber      = Number;
   fTimeCluster = TimeCluster;
+  fChColl      = ChColl;
   fVisNode     = VisNode;
 
   fT0     = T0;
@@ -120,7 +123,20 @@ void TEvdTimeCluster::PaintXY(Option_t* Option) {
 }
 
 //-----------------------------------------------------------------------------
+// make sure the width is not too small, so one could click and select a cluster
+//-----------------------------------------------------------------------------
 void TEvdTimeCluster::PaintTZ(Option_t* Option) {
+
+  int y1  = gPad->YtoAbsPixel(fTMin);
+  int y2  = gPad->YtoAbsPixel(fTMax);
+  if (fabs(y1-y2) < 5) {
+    float scale = fabs(fTMax-fTMin)/(fabs(y1-y2)+1.e-12);
+    float t1 = (fTMin+fTMax)/2.-2.5*scale;
+    float t2 = (fTMin+fTMax)/2.+2.5*scale;
+    fBox->SetY1(t1);
+    fBox->SetY2(t2);
+  }
+
   fBox->Paint(Option);
 }
 
@@ -168,7 +184,7 @@ void TEvdTimeCluster::Print(Option_t* Option) const {
 //-----------------------------------------------------------------------------
   void TEvdTimeCluster::PrintMe() const {
     Print("");
-}
+  }
 
 //-----------------------------------------------------------------------------
 void TEvdTimeCluster::ExecuteEvent(int Event, int Px, int Py) {
@@ -208,5 +224,30 @@ void TEvdTimeCluster::Select() {
   }
   
 }
+//-----------------------------------------------------------------------------
+// check if a hit with 'Index' in the fShColl collection belongs to the time cluster
+// time cluster is made out of ComboHit's
+// the code could be made a bit more efficient for combo hits at a cost of passing the 
+// the hit type explicitly
+//-----------------------------------------------------------------------------
+  int TEvdTimeCluster::TCHit(int Index) {
+  int ok(0);
+
+  int nch = TimeCluster()->nhits();
+  for (int i=0; i<nch; i++) {
+    int ind = TimeCluster()->hits().at(i);
+    const mu2e::ComboHit* ch = &fChColl->at(ind);
+    int nsh = ch->nStrawHits();
+    for (int ish=0; ish<nsh; ish++) {
+      if (ch->index(ish) == Index) {
+	ok = 1;
+	break;
+      }
+    }
+  }
+
+  return ok;
+}
+
 
 }

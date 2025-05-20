@@ -1,14 +1,15 @@
 ///////////////////////////////////////////////////////////////////////////////
-// vis node displays one wedge
+// vis node 
 ///////////////////////////////////////////////////////////////////////////////
-#ifndef TEvdPanel_hh
-#define TEvdPanel_hh
+#ifndef Stntuple_gui_TEvdPanel_hh
+#define Stntuple_gui_TEvdPanel_hh
 
 #include "Gtypes.h"
 #include "TClonesArray.h"
 #include "TH1.h"
 #include "TPad.h"
 #include "TArc.h"
+#include "TVector3.h"
 
 namespace mu2e {
   class Panel;
@@ -25,9 +26,10 @@ public:
   
 protected:
   int                fID;
+  int                fVisible;
   int                fNLayers;
-  int                fNStraws[2];
-  TObjArray*         fListOfStraws[2];
+  TObjArray*         fListOfStraws;
+  TVector3           fPos;
 
   TEvdPlane*         fPlane; 		// backward pointer
   const mu2e::Panel* fPanel;
@@ -43,27 +45,34 @@ public:
 //-----------------------------------------------------------------------------
 // accessors
 //-----------------------------------------------------------------------------
-  int          NLayers          () { return fNLayers;    }
-  int          NStraws     (int I) { return fNStraws[I]; }
+  int          NLayers     () { return fNLayers;    }
+  int          NStraws     () { return fListOfStraws->GetEntriesFast(); }
+  int          Visible     () { return fVisible;    }
 
-  TEvdStraw* Straw  (int Layer, int I) { 
-    return (TEvdStraw*) fListOfStraws[Layer]->UncheckedAt(I); 
+  TEvdStraw* Straw  (int I) { 
+    return (TEvdStraw*) fListOfStraws->UncheckedAt(I); 
   }
+
+  TVector3*    Pos() { return &fPos; };         // position of the center
 //-----------------------------------------------------------------------------
 // modifiers
 //-----------------------------------------------------------------------------
-
+  void SetVisible(int YesNo) { fVisible = YesNo; }
   //  virtual void  Draw    (Option_t* option = "");
 
   virtual void  Paint   (Option_t* option = "");
           void  PaintXY (Option_t* option = "");
           void  PaintRZ (Option_t* option = "");
+          void  PaintVST(Option_t* option = "");
+          void  PaintVRZ(Option_t* option = "");
 
   //  virtual void  ExecuteEvent(Int_t event, Int_t px, Int_t py);
 
-  virtual Int_t DistancetoPrimitive  (Int_t px, Int_t py);
-  virtual Int_t DistancetoPrimitiveXY(Int_t px, Int_t py);
-  virtual Int_t DistancetoPrimitiveRZ(Int_t px, Int_t py);
+  virtual Int_t DistancetoPrimitive   (Int_t px, Int_t py);
+  virtual Int_t DistancetoPrimitiveXY (Int_t px, Int_t py);
+  virtual Int_t DistancetoPrimitiveRZ (Int_t px, Int_t py);
+  virtual Int_t DistancetoPrimitiveVST(Int_t px, Int_t py);
+  virtual Int_t DistancetoPrimitiveVRZ(Int_t px, Int_t py);
 
   //  virtual void   Print(const char* Opt = "") const ; // **MENU**
 

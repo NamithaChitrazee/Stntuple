@@ -80,7 +80,16 @@ public:
 //-----------------------------------------------------------------------------
   virtual int   InitEvent();
   void	        UpdateEvent();
-  virtual void  PaintCrv(Option_t* option = "");
+  
+  virtual void  PaintCrv(Option_t* option = "") override;
+  
+  virtual void  PaintXY  (Option_t* option = "") override;
+  virtual void  PaintRZ  (Option_t* option = "") override;
+  virtual void  PaintTZ  (Option_t* option = "") override;
+  virtual void  PaintPhiZ(Option_t* option = "") override;
+  virtual void  PaintCal (Option_t* option = "") override;
+  virtual void  PaintVST (Option_t* option = "") override;
+  virtual void  PaintVRZ (Option_t* option = "") override;
 //-----------------------------------------------------------------------------
 // Overloaded methods of TObject
 //-----------------------------------------------------------------------------

@@ -41,7 +41,8 @@ public:
     kPhiZ      =  4,
     kCal       =  5,
     kCrv       =  6,
-    kVST       =  7			// VST view
+    kVST       =  7,			// VST view
+    kVRZ       =  8			// VST RZ view
   };
 
 //-----------------------------------------------------------------------------
@@ -277,6 +278,9 @@ public:
   
   Int_t   OpenVSTView();
   Int_t   OpenVSTView  (TStnView* Mother, Axis_t x1, Axis_t y1, Axis_t x2, Axis_t y2);
+  
+  Int_t   OpenVRZView();
+  Int_t   OpenVRZView  (TStnView* Mother, Axis_t x1, Axis_t y1, Axis_t x2, Axis_t y2);
   
   void    CloseWindow();
 //-----------------------------------------------------------------------------

@@ -21,12 +21,18 @@
 #include "Offline/GeometryService/inc/GeometryService.hh"
 #include "Offline/GeometryService/inc/GeomHandle.hh"
 
+#include "Stntuple/gui/TEvdTracker.hh"
+#include "Stntuple/gui/TEvdStation.hh"
+#include "Stntuple/gui/TEvdPlane.hh"
+#include "Stntuple/gui/TEvdPanel.hh"
+
 #include "Stntuple/gui/THeaderVisNode.hh"
 #include "Stntuple/gui/TCalVisNode.hh"
 #include "Stntuple/gui/TCrvVisNode.hh"
 #include "Stntuple/gui/TTrkVisNode.hh"
 #include "Stntuple/gui/TEvdHelixVisNode.hh"
 #include "Stntuple/gui/TEvdTimeClusterVisNode.hh"
+#include "Stntuple/gui/TEvdPanelVisNode.hh"
 
 #include "Stntuple/gui/TMcTruthVisNode.hh"
 #include "Stntuple/gui/TCalView.hh"
@@ -40,6 +46,7 @@
 #include "Stntuple/obj/TSimpBlock.hh"
 #include "Stntuple/mod/InitSimpBlock.hh"
 
+using namespace std;
 
 namespace mu2e {
 //-----------------------------------------------------------------------------
@@ -59,7 +66,7 @@ MuHitDisplay::MuHitDisplay(const art::EDAnalyzer::Table<Config>& config) :
   _helixSeedCollTag            (config().helixSeedCollTag()),
   _ksfCollTag                  (config().ksfCollTag()),
   _kffCollTag                  (config().kffCollTag()),
-  _trackCollTag                (config().trackCollTag()),
+  _ctsCollTag                  (config().ctsCollTag()),
   _simpCollTag                 (config().simpCollTag()),
   _timeClusterCollTag          (config().timeClusterCollTag()),
   _phiClusterCollTag           (config().phiClusterCollTag()),
@@ -80,6 +87,7 @@ MuHitDisplay::MuHitDisplay(const art::EDAnalyzer::Table<Config>& config) :
   fApplication = 0;
   fHeaderBlock = new TStnHeaderBlock();
   fVisManager  = TStnVisManager::Instance();
+  fGeoManager  = TStnGeoManager::Instance();
   _mcUtils     = std::make_unique<McUtilsToolBase>();
   fTrackID     = new TStnTrackID();
   
@@ -177,6 +185,24 @@ void MuHitDisplay::endRun(const art::Run& Run) {
   TModule::endRun(Run);
 }
 
+
+//-----------------------------------------------------------------------------
+// initialize the visualization manager
+// TStnVisManager is responsible for deleting all nodes created here
+//-----------------------------------------------------------------------------
+void MuHitDisplay::InitGeoManager() {
+
+  mu2e::GeomHandle<mu2e::Tracker> handle;
+
+  const mu2e::Tracker* mu2e_tracker = handle.get();
+
+  TStnGeoManager* gm = TStnGeoManager::Instance();
+
+  stntuple::TEvdTracker* t = new stntuple::TEvdTracker(mu2e_tracker);
+  gm->AddDetector(t);
+  
+  return;
+}
 
 //-----------------------------------------------------------------------------
 // initialize the visualization manager
@@ -285,26 +311,26 @@ void MuHitDisplay::InitVisManager() {
   cal_view->AddNode(cal_node[1]);
   vm->AddView(cal_view);
 //-----------------------------------------------------------------------------
-// TrkVisNode: tracker, tracks and straw hits
-// add tracker node to two views - RZ and XY
+// TrkVisNode: tracker, tracks, cosmic tracks and straw hits
+// add tracker node to two views - RZ and XY, also - to the panel VRZ
 // tracks are KalSeed's
 //-----------------------------------------------------------------------------
-  TTrkVisNode* tnode = new TTrkVisNode ("TrkVisNode", fTracker, NULL);
+  TTrkVisNode* trk_vis_node = new TTrkVisNode ("TrkVisNode", fTracker, NULL);
 
-  tnode->SetShCollTag       (_shCollTag      );
-  tnode->SetChCollTag       (_comboHitCollTag);
-  tnode->SetKsCollTag       (_kffCollTag     );
-  tnode->SetSdmcCollTag     (_sdmcCollTag    );
+  trk_vis_node->SetShCollTag       (_shCollTag      );
+  trk_vis_node->SetChCollTag       (_comboHitCollTag);
+  trk_vis_node->SetKsCollTag       (_kffCollTag     );
+  trk_vis_node->SetCtsCollTag      (_ctsCollTag     );
 
-  tnode->SetSimpColl        (&_simpColl      );
-  tnode->SetSimpCollTag     (_simpCollTag    );
-
-  tnode->SetSpmcColl        (&_spmcColl      );
-  tnode->SetSwColl          (&_swColl        );
+  trk_vis_node->SetSdmcCollTag     (_sdmcCollTag    );
+  trk_vis_node->SetSimpColl        (&_simpColl      );
+  trk_vis_node->SetSimpCollTag     (_simpCollTag    );
+  trk_vis_node->SetSpmcColl        (&_spmcColl      );
+  trk_vis_node->SetSwColl          (&_swColl        );
 //-----------------------------------------------------------------------------
 // SimpBlock is initialized in the module, a node references it via the pointer
 //-----------------------------------------------------------------------------
-  tnode->SetSimpBlock       (fSimpBlock      );
+  trk_vis_node->SetSimpBlock       (fSimpBlock      );
 //-----------------------------------------------------------------------------
 // HelixVisNode: one helix collection - lets see how it plays out
 // add helix node to only one view - XY
@@ -327,7 +353,7 @@ void MuHitDisplay::InitVisManager() {
 // 1. XY view : tracker + calorimeter + time clusters
 //-----------------------------------------------------------------------------
   TStnView* vxy = new TStnView(TStnVisManager::kXY,-1,"XYView","XY View");
-  vxy->AddNode(tnode);
+  vxy->AddNode(trk_vis_node);
   vxy->AddNode(hnode);
   vxy->AddNode(cal_node[0]);
   vxy->AddNode(cal_node[1]);
@@ -337,27 +363,91 @@ void MuHitDisplay::InitVisManager() {
 // 2. RZ view : tracker only, so far
 //-----------------------------------------------------------------------------
   TStnView* vrz = new TStnView(TStnVisManager::kRZ,-1,"RZView","RZ View");
-  vrz->AddNode(tnode);
+  vrz->AddNode(trk_vis_node);
   vm->AddView(vrz);
 //-----------------------------------------------------------------------------
 // 3. TZ view : TrkNode + TimeClusterNode
 //-----------------------------------------------------------------------------
   TStnView* vtz = new TStnView(TStnVisManager::kTZ,-1,"TZView","TZ View");
-  vtz->AddNode(tnode);
+  vtz->AddNode(trk_vis_node);
   vtz->AddNode(tc_node);
   vm->AddView(vtz);
 //-----------------------------------------------------------------------------
 // 4. TZ view : TrkNode - for now, hits only 
 //-----------------------------------------------------------------------------
   TStnView* vphiz = new TStnView(TStnVisManager::kPhiZ,-1,"PhiZView","PhiZ View");
-  vphiz->AddNode(tnode);
+  vphiz->AddNode(trk_vis_node);
   vm->AddView(vphiz);
 //-----------------------------------------------------------------------------
-// 5. VST view : TTrkNode only, so far
+// 5. VST XY view : TTrkNode only, so far
 //-----------------------------------------------------------------------------
   TStnView* vst = new TStnView(TStnVisManager::kVST,-1,"VSTView","VST View");
-  vst->AddNode(tnode);
+  vst->AddNode(trk_vis_node);
   vm->AddView(vst);
+//-----------------------------------------------------------------------------
+// VRZ: "VST RZ" view - one per panel, each VRZ view shows only one panel
+//-----------------------------------------------------------------------------
+  TStnView*                    vrz_view[18][2][6];
+  stntuple::TEvdPanelVisNode*  vp_node [18][2][6];
+  
+  TStnGeoManager* gm = TStnGeoManager::Instance();
+  stntuple::TEvdTracker* evd_t = gm->GetTracker();
+
+  int ns = 1; // fTracker->nStations();
+
+  for (int is=0; is<ns; ++is) {
+    for (int ipln=0; ipln<2; ++ipln) {
+      for (int i=0; i<6; ++i) {
+        // int inode = 12*is+6*ipln+i;
+        stntuple::TEvdPanel* panel = evd_t->Station(is)->Plane(ipln)->Panel(i);
+        vp_node [is][ipln][i] = new stntuple::TEvdPanelVisNode (Form("EvdPanel_VN_%02i_%i_%i",is,ipln,i),panel);
+      }
+    }
+  }
+
+  for (int is=0; is<ns; ++is) {
+    for (int ipln=0; ipln<2; ++ipln) {
+      for (int i=0; i<6; ++i) {
+        int geo_id = 12*is+6*ipln+i;
+        TStnView* v = new TStnView(TStnVisManager::kVRZ,geo_id,"VRZView","VRZ View");
+
+        mu2e::StrawId sid(ipln,i,0);
+        const mu2e::Panel* panel = &fTracker->getPanel(sid);
+
+        auto hept = panel->dsToPanel();
+          
+        CLHEP::Hep3Vector  const& disp = panel->origin();
+        CLHEP::Hep3Vector  const& uDir = panel->uDirection();
+        CLHEP::Hep3Vector  const& vDir = panel->vDirection();
+        CLHEP::Hep3Vector  const& wDir = panel->wDirection();
+
+        // ROOT uses angles in degrees
+        double phi   = 0.; //rot.getPhi  ()*180./M_PI;
+        double psi   = 0.; //rot.getPsi  ()*180./M_PI;
+        double theta = 0.; //rot.getTheta()*180./M_PI;
+        
+        // v->GetCombiTrans()->SetTranslation(disp.x(),disp.y(),disp.z());
+        // v->GetCombiTrans()->GetRotation()->SetAngles(phi,theta,0);
+        v->UDir()->SetXYZ(uDir.x(),uDir.y(),uDir.z());
+        v->VDir()->SetXYZ(vDir.x(),vDir.y(),vDir.z());
+        v->WDir()->SetXYZ(wDir.x(),wDir.y(),wDir.z());
+        vrz_view[is][ipln][i] = v;
+        vrz_view[is][ipln][i]->AddNode(vp_node[is][ipln][i]);
+        vrz_view[is][ipln][i]->AddNode(trk_vis_node);
+        // vrz_view[i]->AddNode(vpd_node[i]);
+        // vrz_view[i]->AddNode(trk_node);
+      }
+    }
+  }
+  
+  for (int is=0; is<ns; ++is) {
+    for (int ipln=0; ipln<2; ++ipln) {
+      for (int i=0; i<6; ++i) {
+        vm->AddView(vrz_view[is][ipln][i]);
+      }
+    }
+  }
+ 
 //-----------------------------------------------------------------------------
 // upon startup, open either an XY or a VST view
 //-----------------------------------------------------------------------------
@@ -532,6 +622,7 @@ void MuHitDisplay::analyze(const art::Event& Evt) {
 //-----------------------------------------------------------------------------
   if (_firstCall == 1) {
     _firstCall = 0;
+    InitGeoManager();
     InitVisManager();
   }
 

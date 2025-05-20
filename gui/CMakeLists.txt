@@ -15,11 +15,14 @@ set (include_files
   DisplayMu2eGeometry.hh TCalView.hh TCalVisNode.hh TCrvView.hh TCrvVisNode.hh
   TEvdCalSection.hh TEvdCluster.hh TEvdComboHit.hh TEvdCrvBar.hh TEvdCrvSection.hh
   TEvdCrystal.hh TEvdHelixSeed.hh TEvdHelixVisNode.hh TEvdMainFrame.hh
-  TEvdPanel.hh TEvdPlane.hh TEvdSimParticle.hh TEvdStation.hh TEvdStrawHit.hh TEvdStraw.hh
-  TEvdStrawTracker.hh TEvdTimeCluster.hh TEvdTimeClusterVisNode.hh TEvdTrack.hh
+  TEvdPanel.hh TEvdPanelVisNode.hh TEvdPlane.hh
+  TEvdSimParticle.hh TEvdStation.hh TEvdStrawHit.hh TEvdStraw.hh
+  TEvdTracker.hh TEvdTimeCluster.hh TEvdTimeClusterVisNode.hh
+  TEvdTrack.hh TEvdCosmicTrack.hh
   TEvdTrkStrawHit.hh TEventDisplayUtils.hh THeaderVisNode.hh TMcTruthVisNode.hh
-  TMu2eBField.hh TStnFrame.hh TStnGeoManager.hh TStnVisManager.hh
+  TMu2eBField.hh TEvdFrame.hh TStnGeoManager.hh TStnVisManager.hh
   TStnVisNode.hh TTrkVisNode.hh
+  TEvdPanelVisNode.hh
 )
 
 ROOT_GENERATE_DICTIONARY(${dict} ${include_files} LINKDEF ${subpkg}/Linkdef.h)
@@ -29,12 +32,18 @@ set_property(SOURCE ${dict}.cxx PROPERTY generated)
 set (source_files
   DisplayMu2eGeometry.cc TCalView.cc TCalVisNode.cc TCrvView.cc TCrvVisNode.cc
   TEvdCalSection.cc TEvdCluster.cc TEvdComboHit.cc TEvdCrvBar.cc TEvdCrvSection.cc
-  TEvdCrystal.cc TEvdHelixSeed.cc TEvdHelixVisNode.cc TEvdMainFrame.cc TEvdPanel.cc
+  TEvdCrystal.cc
+  TEvdHelixSeed.cc TEvdHelixVisNode.cc
+  TEvdMainFrame.cc
+  TEvdPanel.cc TEvdPanelVisNode.cc 
   TEvdPlane.cc TEvdSimParticle.cc TEvdStation.cc TEvdStraw.cc TEvdStrawHit.cc
-  TEvdStrawTracker.cc TEvdTimeCluster.cc TEvdTimeClusterVisNode.cc TEvdTrack.cc
+  TEvdTracker.cc
   TEvdTrkStrawHit.cc TEventDisplayUtils.cc THeaderVisNode.cc TMcTruthVisNode.cc
-  TMu2eBField.cc TStnFrame.cc TStnGeoManager.cc TStnVisManager.cc TStnVisNode.cc
+  TEvdTimeCluster.cc TEvdTimeClusterVisNode.cc
+  TEvdTrack.cc TEvdCosmicTrack.cc
+  TMu2eBField.cc TEvdFrame.cc TStnGeoManager.cc TStnVisManager.cc TStnVisNode.cc
   TTrkVisNode.cc
+  TEvdPanelVisNode.cc
 )
 
 add_library(${lib} SHARED ${source_files} ${dict}.cxx)
@@ -57,8 +66,8 @@ target_link_libraries(${lib}
   art::Persistency_Provenance
   art::Utilities
 
-  ROOT::Physics ROOT::GenVector ROOT::Eve ROOT::Graf ROOT::Graf3d ROOT::Gui ROOT::Gpad
-  ROOT::Geom ROOT::Matrix ROOT::Core
+  ROOT::Physics ROOT::EG  ROOT::Eve ROOT::Graf ROOT::Graf3d ROOT::Gui ROOT::Gpad
+  ROOT::Geom ROOT::Matrix ROOT::GenVector ROOT::Core
 )
 
 cet_add_compiler_flags(-g -O0)
