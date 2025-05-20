@@ -37,7 +37,7 @@
 #pragma link C++ class THeaderVisNode;
 #pragma link C++ class stntuple::TMcTruthVisNode;
 #pragma link C++ class stntuple::TMu2eBField;
-#pragma link C++ class TStnFrame;
+#pragma link C++ class TEvdFrame;
 #pragma link C++ class TStnGeoManager;
 #pragma link C++ class TStnVisManager;
 #pragma link C++ class TStnVisNode;

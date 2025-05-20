@@ -8,6 +8,8 @@
 #include "TNamed.h"
 #include "TObjArray.h"
 #include "TGaxis.h"
+#include "TGeoMatrix.h"
+#include "TVector3.h"
 
 #include "Stntuple/base/TVisNode.hh"
 
@@ -17,6 +19,11 @@ protected:
   int                 fIndex; // for calorimeter - 2 views, for example
 
   int                 fDebugLevel;
+  
+  TGeoCombiTrans      fCombiTrans;   // rotate, then translate
+  TVector3            fUDir;         // temporary
+  TVector3            fVDir;
+  TVector3            fWDir;
   
   Int_t               fPx1;
   Int_t               fPy1;
@@ -54,9 +61,15 @@ public:
   int           Type () { return fType;  }
   int           Index() { return fIndex; }
 
+  TGeoCombiTrans*  GetCombiTrans() { return &fCombiTrans; }
+
   int           GetNNodes()      { return fListOfNodes->GetEntriesFast(); }
   TVisNode*     GetNode  (int I) { return (TVisNode*) fListOfNodes->UncheckedAt(I);   }
   TObjArray*    GetListOfNodes() { return fListOfNodes; }
+
+  TVector3*     UDir() { return & fUDir; }
+  TVector3*     VDir() { return & fVDir; }
+  TVector3*     WDir() { return & fWDir; }
 
   void          AddNode(TVisNode* Node) { fListOfNodes->Add(Node); }
 //-----------------------------------------------------------------------------

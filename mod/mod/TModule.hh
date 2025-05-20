@@ -4,20 +4,21 @@
 #ifndef __Stntuple_mod_TModule_hh__
 #define __Stntuple_mod_TModule_hh__
 
-#if !defined(__CLING__)
+// #if !defined(__CLING__)
 #include "fhiclcpp/types/Atom.h"
 #include "fhiclcpp/types/DelegatedParameter.h"
 #include "fhiclcpp/ParameterSet.h"
+// #else
+// namespace fhiclcpp {
+//   class Atom;
+//   class DelegatedParameter;
+// };
+// namespace art {
+  //  class EDAnalyzer;
+// };
+// #endif
+
 #include "art/Framework/Core/EDAnalyzer.h"
-#else
-namespace fhiclcpp {
-  class Atom;
-  class DelegatedParameter;
-};
-namespace art {
-  class EDAnalyzer;
-};
-#endif
 
 #include "art/Framework/Core/ModuleMacros.h"
 #include "art/Framework/Principal/Event.h"
@@ -41,15 +42,15 @@ namespace art {
 // everything should be OK
 class TAnaRint;
 class TAnaDump;
-#ifndef __CLING__
+// #ifndef __CLING__
 class TModule : public art::EDAnalyzer, public TNamed {
-#else
-class TModule {
-#endif
+// #else
+// class TModule {
+// #endif
   enum { kNDebugBits = 100 };
 
 public:
-#ifndef __CLING__
+  // #ifndef __CLING__
   struct Config {
     using Name    = fhicl::Name;
     using Comment = fhicl::Comment;
@@ -58,7 +59,7 @@ public:
     fhicl::Table<fhicl::ParameterSet>  debugBits      {Name("debugBits"      ), Comment("debug bits"           ) };
     fhicl::DelegatedParameter          TAnaDump       {Name("TAnaDump"       ), Comment("TAnaDump parameters"  ) };
   };
-#endif
+  // #endif
 					// there are some initializations which need 
 					// to be done just once
   static int          fgInitialized;

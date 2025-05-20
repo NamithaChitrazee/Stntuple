@@ -1307,6 +1307,13 @@ void TTrkVisNode::NodePrint(const void* Object, const char* ClassName) {
     if (Object) ad->printComboHit          ((const mu2e::ComboHit*) Object,nullptr);
     else        ad->printComboHitCollection(fChCollTag.encode().data(),fSdmcCollTag.encode().data());
   }
+  else if (class_name == "CosmicTrackSeed") {
+//-----------------------------------------------------------------------------
+// print a single CosmicTrackSeed or a collection
+//-----------------------------------------------------------------------------
+    if (Object) ad->printCosmicTrackSeed((const mu2e::CosmicTrackSeed*) Object,"",fShCollTag.encode().data(),fSdmcCollTag.encode().data());
+    else        ad->printCosmicTrackSeedCollection(fCtsCollTag.encode().data(),1,fShCollTag.encode().data(),fSdmcCollTag.encode().data());
+  }
   else if (class_name == "KalSeed") {
 //-----------------------------------------------------------------------------
 // print a KalSeed or a KalSeed collection

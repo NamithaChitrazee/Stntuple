@@ -20,7 +20,7 @@ set (include_files
   TEvdTracker.hh TEvdTimeCluster.hh TEvdTimeClusterVisNode.hh
   TEvdTrack.hh TEvdCosmicTrack.hh
   TEvdTrkStrawHit.hh TEventDisplayUtils.hh THeaderVisNode.hh TMcTruthVisNode.hh
-  TMu2eBField.hh TStnFrame.hh TStnGeoManager.hh TStnVisManager.hh
+  TMu2eBField.hh TEvdFrame.hh TStnGeoManager.hh TStnVisManager.hh
   TStnVisNode.hh TTrkVisNode.hh
   TEvdPanelVisNode.hh
 )
@@ -41,7 +41,7 @@ set (source_files
   TEvdTrkStrawHit.cc TEventDisplayUtils.cc THeaderVisNode.cc TMcTruthVisNode.cc
   TEvdTimeCluster.cc TEvdTimeClusterVisNode.cc
   TEvdTrack.cc TEvdCosmicTrack.cc
-  TMu2eBField.cc TStnFrame.cc TStnGeoManager.cc TStnVisManager.cc TStnVisNode.cc
+  TMu2eBField.cc TEvdFrame.cc TStnGeoManager.cc TStnVisManager.cc TStnVisNode.cc
   TTrkVisNode.cc
   TEvdPanelVisNode.cc
 )
@@ -66,8 +66,8 @@ target_link_libraries(${lib}
   art::Persistency_Provenance
   art::Utilities
 
-  ROOT::Physics ROOT::GenVector ROOT::Eve ROOT::Graf ROOT::Graf3d ROOT::Gui ROOT::Gpad
-  ROOT::Geom ROOT::Matrix ROOT::Core
+  ROOT::Physics ROOT::EG  ROOT::Eve ROOT::Graf ROOT::Graf3d ROOT::Gui ROOT::Gpad
+  ROOT::Geom ROOT::Matrix ROOT::GenVector ROOT::Core
 )
 
 cet_add_compiler_flags(-g -O0)

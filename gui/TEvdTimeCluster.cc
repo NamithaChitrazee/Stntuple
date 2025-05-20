@@ -123,7 +123,20 @@ void TEvdTimeCluster::PaintXY(Option_t* Option) {
 }
 
 //-----------------------------------------------------------------------------
+// make sure the width is not too small, so one could click and select a cluster
+//-----------------------------------------------------------------------------
 void TEvdTimeCluster::PaintTZ(Option_t* Option) {
+
+  int y1  = gPad->YtoAbsPixel(fTMin);
+  int y2  = gPad->YtoAbsPixel(fTMax);
+  if (fabs(y1-y2) < 5) {
+    float scale = fabs(fTMax-fTMin)/(fabs(y1-y2)+1.e-12);
+    float t1 = (fTMin+fTMax)/2.-2.5*scale;
+    float t2 = (fTMin+fTMax)/2.+2.5*scale;
+    fBox->SetY1(t1);
+    fBox->SetY2(t2);
+  }
+
   fBox->Paint(Option);
 }
 
@@ -171,7 +184,7 @@ void TEvdTimeCluster::Print(Option_t* Option) const {
 //-----------------------------------------------------------------------------
   void TEvdTimeCluster::PrintMe() const {
     Print("");
-}
+  }
 
 //-----------------------------------------------------------------------------
 void TEvdTimeCluster::ExecuteEvent(int Event, int Px, int Py) {

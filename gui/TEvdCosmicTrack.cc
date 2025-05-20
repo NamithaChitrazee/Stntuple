@@ -171,6 +171,51 @@ void TEvdCosmicTrack::PaintVST(Option_t* Option) {
 
 //-----------------------------------------------------------------------------
 void TEvdCosmicTrack::PaintVRZ(Option_t* Option) {
+  double y1(10000.), y2(-10000.);
+
+  TStnVisManager* vm = TStnVisManager::Instance();
+  TStnView* cv = vm->GetCurrentView();
+  
+  double rx1,rx2,ry1,ry2;
+  gPad->GetRange(rx1,ry1,rx2,ry2);
+
+
+  TVector3 v(fCTSeed->_track.FitParams.A1,1.,fCTSeed->_track.FitParams.B1);
+
+  double xmast[3], xloc [3], dxm[3], dxl[3];
+
+  xmast[0] = fCTSeed->_track.FitParams.A0;
+  xmast[1] = 0;;
+  xmast[2] = fCTSeed->_track.FitParams.B0;
+
+  //  cv->GetCombiTrans()->MasterToLocal(xmast,xloc);
+
+  dxm[0] = fCTSeed->_track.FitParams.A1;
+  dxm[1] = 1.;
+  dxm[2] = fCTSeed->_track.FitParams.B1;
+
+  //  cv->GetCombiTrans()->MasterToLocal(dxm,dxl);
+
+  double cosu = cv->UDir()->X();
+  double sinu = cv->UDir()->Y();
+
+  double sinv = cv->VDir()->X();
+  double cosv = cv->VDir()->Y();
+  
+  double cosw = cv->WDir()->Z();
+  
+  double z0    =  xmast[2]; // *cosw;
+  //  double dzdy  = dxm[2]*cosv*cosw;
+  double dzdy  = dxm[2]/(dxm[0]*sinu + cosu);
+
+  double z1 = z0+dzdy*y1;
+  double z2 = z0+dzdy*y2;
+
+  fLineZY->SetX1(z1); 
+  fLineZY->SetY1(y1); 
+  fLineZY->SetX2(z2); 
+  fLineZY->SetY2(y2); 
+    
   fLineZY->Paint(Option);
 }
 

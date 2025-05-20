@@ -16,8 +16,6 @@
 #include "Stntuple/mod/THistModule.hh"
 
 #include "art/Framework/Principal/Event.h"
-// #include "fhiclcpp/ParameterSet.h"
-// #include "art/Framework/Core/EDAnalyzer.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
 #include "Offline/TrackerConditions/inc/StrawResponse.hh"
@@ -44,7 +42,7 @@
 
 class TApplication;
 
-#include "Stntuple/base/TNamedHandle.hh"
+// #include "Stntuple/base/TNamedHandle.hh"
 #include "Stntuple/gui/TStnVisManager.hh"
 #include "Stntuple/gui/TStnGeoManager.hh"
 
@@ -55,8 +53,7 @@ class TApplication;
 
 #include "Offline/Mu2eUtilities/inc/McUtilsToolBase.hh"
 
-using namespace std;
-using CLHEP::Hep3Vector;
+// using namespace std;
 
 class DoubletAmbigResolver;
 
@@ -64,7 +61,7 @@ namespace mu2e {
 
 class MuHitDisplay : public THistModule {
 public:
-#ifndef __CLING__  
+  // #ifndef __CLING__  
   struct VmConfig {
     using Name    = fhicl::Name;
     using Comment = fhicl::Comment;
@@ -113,7 +110,7 @@ public:
     fhicl::Atom<bool>            showTracks             {Name("showTracks"        )    , Comment("showTracks"     ) };
     fhicl::Table<VmConfig>       visManager             {Name("visManager"        )    , Comment("vis manager config" ) };
   };
-#endif
+  // #endif
 private:
 //-----------------------------------------------------------------------------
 // Input parameters: Module labels 
@@ -140,7 +137,7 @@ private:
   art::InputTag _caloHitCollTag;
   art::InputTag _ppTag;			// primary particle tag
   art::InputTag _vdHitsCollTag;
-  string        _defaultView;           // view open in the first window
+  std::string   _defaultView;           // view open in the first window
   
   GenId         _generatorID;
 
@@ -210,10 +207,10 @@ private:
 
 public:
   // for some reason, this line is required by art to allow the command line help print
-#ifndef __CLING__
+  // #ifndef __CLING__
   typedef art::EDAnalyzer::Table<Config> Parameters;
   explicit MuHitDisplay(const art::EDAnalyzer::Table<Config>& config);
-#endif
+  // #endif
   // explicit MuHitDisplay(fhicl::ParameterSet const& pset);
   virtual ~MuHitDisplay();
 

@@ -20,12 +20,17 @@ ROOT_GENERATE_DICTIONARY(${dict} ${include_files} LINKDEF ${subpkg}/Linkdef.h)
 set_property(SOURCE ${dict}.cxx PROPERTY generated)
 
 set (source_files
-  print_calo_cluster_colls.cc print_ch_colls.cc print_combo_hit_coll.cc print_genp_colls.cc
+  print_calo_cluster_colls.cc
+  print_ch_colls.cc
+  print_combo_hit_coll.cc
+  print_cts_colls.cc
+  print_genp_colls.cc
   print_helix_seed_colls.cc print_kalrep_colls.cc print_kalseed_colls.cc print_sd_colls.cc
   print_sdmc_colls.cc print_sh_colls.cc print_shf_colls.cc print_simp_colls.cc print_spmc_colls.cc
   print_tc_colls.cc
   TAnaDump.cc TAnaDump_comboHit.cc TAnaDump_helixSeed.cc TAnaDump_kalSeed.cc TAnaDump_SimParticle.cc
   TAnaDump_timeCluster.cc
+  TAnaDump_CosmicTrackSeed.cc
 )
 
 add_library(${lib} SHARED ${source_files} ${dict}.cxx)

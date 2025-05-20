@@ -10,7 +10,7 @@ namespace {
   TCanvas*            c      (nullptr);
 }
 
-mu2e::MuHitDisplay* m_disp (nullptr); 
+TTrkVisNode* tnode(nullptr);
 //-----------------------------------------------------------------------------
 // Mode = 0: begin job (run)
 // Mode = 1: event
@@ -21,7 +21,7 @@ void display_001(int Mode, TModule* Module) {
 
   // TStnVisManager* vm = TStnVisManager::Instance();
   
-  m_disp = (mu2e::MuHitDisplay*) Module;
+  //  m_disp = (mu2e::MuHitDisplay*) Module;
 
   if (Mode == 0) {  
 //-----------------------------------------------------------------------------
@@ -36,7 +36,10 @@ void display_001(int Mode, TModule* Module) {
 //-----------------------------------------------------------------------------
 // fill histograms 
 //-----------------------------------------------------------------------------
-    const mu2e::ComboHitCollection* chc = m_disp->GetComboHitColl();
+    if (tnode == nullptr) {
+      tnode = (TTrkVisNode*) TStnVisManager::Instance()->FindNode("TrkVisNode");
+    }
+    const mu2e::ComboHitCollection* chc = tnode->GetCComboHitColl();
 
     int nh = chc->size();
 
