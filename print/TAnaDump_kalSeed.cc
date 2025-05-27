@@ -43,7 +43,7 @@ void TAnaDump::printKalSeed_Line(const mu2e::KalSeed* KalSeed      ,
     double t0     = KalSeed->t0()._t0;
     double t0err  = KalSeed->t0()._t0err;
     double ndof   = KalSeed->nDOF();
-    auto status   = KalSeed->status();
+    // auto status   = KalSeed->status();
     float chi2    = KalSeed->chisquared()/(ndof+1.e-12);
     
     for (const mu2e::KalSegment& kalSeg : KalSeed->segments()) {
@@ -55,9 +55,9 @@ void TAnaDump::printKalSeed_Line(const mu2e::KalSeed* KalSeed      ,
       double fmin        = kalSeg.fmin();
       double fmax        = kalSeg.fmax();
 
-      const mu2e::CaloCluster*cluster = KalSeed->caloCluster().get();
-      double clusterEnergy(-1);
-      if (cluster != 0) clusterEnergy = cluster->energyDep();
+      // const mu2e::CaloCluster*cluster = KalSeed->caloCluster().get();
+      // double clusterEnergy(-1);
+      // if (cluster != 0) clusterEnergy = cluster->energyDep();
       printf("%5i %16p %3i %8.3f %8.3f %8.5f %10.3f %10.3f %10.3f %10.3f %10.3f %10.3f %8.2f %8.2f %8.2f %8.2f\n",
 	     -1,
 	     static_cast<const void*>(KalSeed),

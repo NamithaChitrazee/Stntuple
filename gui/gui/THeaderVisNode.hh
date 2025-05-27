@@ -25,7 +25,7 @@ public:
 
 					// ****** modifiers
 
-  int   InitEvent();
+  int   InitEvent() override;
 
   virtual void Paint  (Option_t* option = "") override;
 
@@ -38,9 +38,9 @@ public:
   virtual void  PaintVST (Option_t* option = "") override;
   virtual void  PaintVRZ (Option_t* option = "") override;
   
-  virtual Int_t DistancetoPrimitive  (Int_t px, Int_t py);
-  virtual Int_t DistancetoPrimitiveXY(Int_t px, Int_t py);
-  virtual Int_t DistancetoPrimitiveRZ(Int_t px, Int_t py);
+  virtual Int_t DistancetoPrimitive  (Int_t px, Int_t py) override;
+  virtual Int_t DistancetoPrimitiveXY(Int_t px, Int_t py) override;
+  virtual Int_t DistancetoPrimitiveRZ(Int_t px, Int_t py) override;
 
   ClassDef(THeaderVisNode,0)
 };

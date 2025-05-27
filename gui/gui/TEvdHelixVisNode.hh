@@ -79,7 +79,7 @@ public:
 //-----------------------------------------------------------------------------
 // overloaded methods of TVisNode
 //-----------------------------------------------------------------------------
-  virtual int  InitEvent();
+  virtual int  InitEvent() override;
 
   virtual void NodePrint(const void* Object, const char* ClassName) ;
 

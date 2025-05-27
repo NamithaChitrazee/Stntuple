@@ -8,12 +8,14 @@
 #include "TClonesArray.h"
 #include "TH1.h"
 #include "TPad.h"
-#include "TArc.h"
-#include "TEllipse.h"
+// #include "TArc.h"
+// #include "TEllipse.h"
 
 namespace mu2e {
   class CosmicTrackSeed;
 }
+
+class TLine;
 
 namespace stntuple {
 
