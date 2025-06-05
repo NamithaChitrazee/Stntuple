@@ -8,7 +8,8 @@
 #include "TClonesArray.h"
 #include "TH1.h"
 #include "TPad.h"
-#include "TArc.h"
+// #include "TArc.h"
+// #include "TLine.h"
 #include "TVector3.h"
 
 namespace mu2e {
@@ -16,6 +17,8 @@ namespace mu2e {
   class Tracker;
 }
 
+class TLine;
+class TArc;
 
 namespace stntuple {
 

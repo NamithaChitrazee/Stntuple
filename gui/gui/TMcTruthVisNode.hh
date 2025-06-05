@@ -74,7 +74,7 @@ public:
 
   //  virtual void  Draw    (Option_t* option = "");
 
-  int InitEvent();
+  int InitEvent() override;
 
   virtual void  PaintXY  (Option_t* option = "") override;
   virtual void  PaintRZ  (Option_t* option = "") override;
@@ -86,13 +86,13 @@ public:
 
   //  virtual void  ExecuteEvent(Int_t event, Int_t px, Int_t py);
 
-  virtual Int_t DistancetoPrimitive  (Int_t px, Int_t py);
-  virtual Int_t DistancetoPrimitiveXY(Int_t px, Int_t py);
-  virtual Int_t DistancetoPrimitiveRZ(Int_t px, Int_t py);
+  virtual Int_t DistancetoPrimitive  (Int_t px, Int_t py) override;
+  virtual Int_t DistancetoPrimitiveXY(Int_t px, Int_t py) override;
+  virtual Int_t DistancetoPrimitiveRZ(Int_t px, Int_t py) override;
 
   //  virtual void   Print(const char* Opt = "") const ; // **MENU**
 
-  ClassDef(TMcTruthVisNode,0)
+  //  ClassDef(TMcTruthVisNode,0)
 };
 }
 #endif

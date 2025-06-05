@@ -14,7 +14,7 @@ include_directories(
 set (include_files
   stntuple_geom_tests.hh TCrvNumerology.hh
   TDiskCalorimeter.hh TDiskIndex.hh TDisk.hh TStnCrystal.hh
-  # TStnTracker.hh
+  TStnTracker.hh
 )
 
 ROOT_GENERATE_DICTIONARY(${dict} ${include_files} LINKDEF ${subpkg}/Linkdef.h)
@@ -25,7 +25,7 @@ set (source_files
   StnInitVirtualDetectors.cc stntuple_geom_tests.cc TCrvNumerology.cc
   TDiskCalorimeter.cc TDisk.cc TDiskCrystalMap.cc test_TDisk.cc
   THexCrystalMap.cc TSqrCrystalMap.cc TSsqCrystalMap.cc TStnCrystal.cc
-  # TStnTracker.cc
+  TStnTracker.cc
 )
 
 add_library(${lib} SHARED ${source_files} ${dict}.cxx)

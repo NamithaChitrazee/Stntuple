@@ -43,7 +43,7 @@ void TAnaDump::printCosmicTrackSeed(const mu2e::CosmicTrackSeed* Cts        ,
     double chi2x  = Cts->_track.Diag.FinalChiX;
     double chi2z  = Cts->_track.Diag.FinalChiY;
     
-    printf(" %5i 0x%08x %4i 0x%08x %8.3f %8.3f %8.3f %8.4f %8.3f %8.4f %8.3f %8.3f\n",
+    printf(" %5i 0x%8p %4i 0x%08x %8.3f %8.3f %8.3f %8.4f %8.3f %8.4f %8.3f %8.3f\n",
            -1, (void*) Cts, nhits, *((int*) &status),
            t0,t0err,a0,a1,b0,b1,chi2x,chi2z);
   }

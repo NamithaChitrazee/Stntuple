@@ -182,7 +182,7 @@ void TEvdCosmicTrack::PaintVRZ(Option_t* Option) {
 
   TVector3 v(fCTSeed->_track.FitParams.A1,1.,fCTSeed->_track.FitParams.B1);
 
-  double xmast[3], xloc [3], dxm[3], dxl[3];
+  double xmast[3], dxm[3]; // , xloc [3], dxl[3];
 
   xmast[0] = fCTSeed->_track.FitParams.A0;
   xmast[1] = 0;;
@@ -199,10 +199,10 @@ void TEvdCosmicTrack::PaintVRZ(Option_t* Option) {
   double cosu = cv->UDir()->X();
   double sinu = cv->UDir()->Y();
 
-  double sinv = cv->VDir()->X();
-  double cosv = cv->VDir()->Y();
+  // double sinv = cv->VDir()->X();
+  // double cosv = cv->VDir()->Y();
   
-  double cosw = cv->WDir()->Z();
+  // double cosw = cv->WDir()->Z();
   
   double z0    =  xmast[2]; // *cosw;
   //  double dzdy  = dxm[2]*cosv*cosw;

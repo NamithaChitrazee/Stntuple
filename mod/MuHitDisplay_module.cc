@@ -422,9 +422,9 @@ void MuHitDisplay::InitVisManager() {
         CLHEP::Hep3Vector  const& wDir = panel->wDirection();
 
         // ROOT uses angles in degrees
-        double phi   = 0.; //rot.getPhi  ()*180./M_PI;
-        double psi   = 0.; //rot.getPsi  ()*180./M_PI;
-        double theta = 0.; //rot.getTheta()*180./M_PI;
+        // double phi   = 0.; //rot.getPhi  ()*180./M_PI;
+        // double psi   = 0.; //rot.getPsi  ()*180./M_PI;
+        // double theta = 0.; //rot.getTheta()*180./M_PI;
         
         // v->GetCombiTrans()->SetTranslation(disp.x(),disp.y(),disp.z());
         // v->GetCombiTrans()->GetRotation()->SetAngles(phi,theta,0);

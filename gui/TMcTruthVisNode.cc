@@ -30,7 +30,7 @@
 
 #include <vector>
 
-ClassImp(stntuple::TMcTruthVisNode)
+// ClassImp(stntuple::TMcTruthVisNode)
 
 namespace stntuple {    
 //_____________________________________________________________________________
