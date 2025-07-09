@@ -50,6 +50,10 @@ using namespace std;
 
 namespace mu2e {
 //-----------------------------------------------------------------------------
+MuHitDisplay::MuHitDisplay() : THistModule() {
+}
+
+//-----------------------------------------------------------------------------
 MuHitDisplay::MuHitDisplay(const art::EDAnalyzer::Table<Config>& config) :
   THistModule                  (config.get_PSet(), config().THistModule.get<fhicl::ParameterSet>(),"MuHitDisplay"),
   _genpCollTag                 (config().genpCollTag()         ),

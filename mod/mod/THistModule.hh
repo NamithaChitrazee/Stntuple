@@ -72,11 +72,12 @@ protected:
 //------------------------------------------------------------------------------
 public:
 					// ****** constructors and destructor
-
+  THistModule();
+  
+#ifndef __CLING__  
   explicit THistModule(const fhicl::ParameterSet&   PSet  ,
                        const fhicl::ParameterSet&   THistModulePSet,
                        const char*                  Name);
-#ifndef __CLING__  
   explicit THistModule(const fhicl::Table<THistModule::Config>& Config, const char* Name);
 #endif
   ~THistModule( );

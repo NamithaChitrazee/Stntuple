@@ -36,7 +36,9 @@ TFile*     THistModule::fgFile         = 0;
 TTree*     THistModule::fgTree         = 0;
 int        THistModule::fgMakeSubdirs  = 1;
 
-
+//-----------------------------------------------------------------------------
+THistModule::THistModule() : TModule() {
+}
 
 //______________________________________________________________________________
 THistModule::THistModule(fhicl::ParameterSet const& PSet, fhicl::ParameterSet const& THistModulePSet, const char* Name): 

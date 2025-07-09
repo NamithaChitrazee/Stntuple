@@ -23,7 +23,10 @@
 
 using namespace std;
 
-//-----------------------------------------------------------------------------
+TModule::TModule(): art::EDAnalyzer(fhicl::ParameterSet{}), TNamed("","") {
+}
+
+  //-----------------------------------------------------------------------------
 TModule::TModule(const fhicl::ParameterSet& PSet, const fhicl::ParameterSet& TModulePSet, const char* Name):
   art::EDAnalyzer(PSet),
   TNamed(Name,Name)
