@@ -1,4 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
+// clang-format off 
 // interactive 2D event display. 
 //
 // $Id: MuHitDisplay_module.cc,v 1.6 2014/09/20 17:54:06 murat Exp $
@@ -18,6 +19,7 @@
 #include "art/Framework/Principal/Event.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
+#include "Offline/ProditionsService/inc/ProditionsHandle.hh"
 #include "Offline/TrackerConditions/inc/StrawResponse.hh"
 
 #include "Offline/TrackerGeom/inc/Tracker.hh"
@@ -59,6 +61,8 @@ class DoubletAmbigResolver;
 
 namespace mu2e {
 
+class TrackerPanelMap;
+
 class MuHitDisplay : public THistModule {
 public:
 #ifndef __CLING__  
@@ -68,13 +72,21 @@ public:
     fhicl::Atom<int>         displayStrawDigiMC {Name("displayStrawDigiMC" )    , Comment("display sdmc") };
     fhicl::Atom<int>         displayStrawHitsXY {Name("displayStrawHitsXY" )    , Comment("display straw hits in XY") };
     fhicl::Atom<int>         debugLevel         {Name("debugLevel"         )    , Comment("debug level" ) };
-    fhicl::Atom<float>       bField             {Name("bField"             )    , Comment("bField"      ) };
     fhicl::Atom<float>       ewLength           {Name("ewLength"           )    , Comment("ewLength"    ) };
     fhicl::Atom<float>       tMin               {Name("tMin"               )    , Comment("tMin"        ) };
     fhicl::Atom<float>       tMax               {Name("tMax"               )    , Comment("tMax"        ) };
     fhicl::Atom<float>       minEDep            {Name("minEDep"            )    , Comment("minEDep"     ) };
     fhicl::Atom<float>       maxEDep            {Name("maxEDep"            )    , Comment("maxEDep"     ) };
     fhicl::Atom<std::string> defaultView        {Name("defaultView"        )    , Comment("defaultView" ) };
+    fhicl::Sequence<int>     visibleStations    {Name("visibleStations"    )    , Comment("list of visible stations" ) };
+    fhicl::Atom<int>         evdPanelDebugLevel {Name("evdPanelDebugLevel" )    , Comment("TEvdPanel::fgDebugLevel"  ) };
+    fhicl::Atom<int>         stnViewDebugLevel  {Name("stnViewDebugLevel"  )    , Comment("TStnView::fgDebugLevel"   ) };
+  };
+                                        // Geometry Manager configuration
+  struct GmConfig {
+    using Name    = fhicl::Name;
+    using Comment = fhicl::Comment;
+    fhicl::Atom<float>       bField             {Name("bField"             )    , Comment("bField"      ) };
   };
     
   struct Config {
@@ -109,6 +121,7 @@ public:
     fhicl::Atom<bool>            showCRVOnly            {Name("showCRVOnly"       )    , Comment("showCRVOnly"    ) };
     fhicl::Atom<bool>            showTracks             {Name("showTracks"        )    , Comment("showTracks"     ) };
     fhicl::Table<VmConfig>       visManager             {Name("visManager"        )    , Comment("vis manager config" ) };
+    fhicl::Table<GmConfig>       geoManager             {Name("geoManager"        )    , Comment("geo manager config" ) };
   };
 #endif
 private:
@@ -137,7 +150,8 @@ private:
   art::InputTag _caloHitCollTag;
   art::InputTag _ppTag;			// primary particle tag
   art::InputTag _vdHitsCollTag;
-  std::string   _defaultView;           // view open in the first window
+  std::string _defaultView; // view open in the first window
+  std::vector<int> _listOfVisibleStations;
   
   GenId         _generatorID;
 
@@ -155,6 +169,7 @@ private:
   //  fhicl::ParameterSet           _vmConfig;
 #ifndef __CLING__
   VmConfig           _vmConfig;
+  GmConfig           _gmConfig;
 #endif
 //-----------------------------------------------------------------------------
 // end of input parameters
@@ -189,7 +204,8 @@ private:
 //-----------------------------------------------------------------------------
 // need to detect the first call to initialize fVisManager
 //-----------------------------------------------------------------------------
-  int                                         _firstCall;    
+  int                                         fFirstCall;    
+  int                                         fLastRun;
   TStnVisManager*                             fVisManager;
 //-----------------------------------------------------------------------------
 // geometry manager may need to be reinitialized at  run boundary
@@ -203,9 +219,16 @@ private:
 
   TStnTrackID*           fTrackID;
 
-  const Tracker*         fTracker;    // straw tracker geometry
+  ProditionsHandle<Tracker> fAlignedTracker_h;
+
+  const Tracker*            fTracker;        // straw tracker geometry
+  const Tracker*            fAlignedTracker; // straw tracker geometry
 
   // DoubletAmbigResolver*  fDar;
+//-----------------------------------------------------------------------------
+// run-dependent things
+//-----------------------------------------------------------------------------
+  const mu2e::TrackerPanelMap*  fTrkPanelMap;
 
 public:
   // for some reason, this line is required by art to allow the command line help print

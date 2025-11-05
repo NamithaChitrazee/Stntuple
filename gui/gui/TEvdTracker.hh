@@ -42,9 +42,13 @@ public:
   int          NStations     () { return fNStations;      }
   TObjArray*   ListOfStations() { return fListOfStations; }
 
+  const mu2e::Tracker* GetMu2eTracker() { return fTracker; }
+
   TEvdStation* Station  (int I) { 
     return (TEvdStation*) fListOfStations->UncheckedAt(I); 
   }
+  
+  static void  ConvertPanelGeoIndices(int Station, int ZFace, int IPFace, int& Plane, int& Panel);
 //-----------------------------------------------------------------------------
 // modifiers
 //-----------------------------------------------------------------------------

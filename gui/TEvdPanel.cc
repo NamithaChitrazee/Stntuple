@@ -21,27 +21,28 @@
 #include "Offline/GeometryService/inc/GeometryService.hh"
 #include "Offline/GeometryService/inc/GeomHandle.hh"
 
-// #include "TrackerGeom/inc/Layer.hh"
+#include "Offline/GeneralUtilities/inc/HepTransform.hh"
 #include "Offline/TrackerGeom/inc/Straw.hh"
-// #include "TrackerGeom/inc/Sector.hh"
 
 #include "Stntuple/gui/TEvdPanel.hh"
+#include "Stntuple/gui/TEvdPlane.hh"
 #include "Stntuple/gui/TEvdStraw.hh"
 #include "Stntuple/gui/TStnVisManager.hh"
+#include "Stntuple/gui/TStnGeoManager.hh"
 
 #include "Offline/TrackerGeom/inc/Panel.hh"
-//#include "TTrackerGeom/inc/ZLayer.hh"
+
+using namespace CLHEP;
 
 ClassImp(stntuple::TEvdPanel)
 
-namespace {
-  static int fgLocalDebug = 0;
-}
+int stntuple::TEvdPanel::fgDebugLevel(0);
 
 namespace stntuple {
 //_____________________________________________________________________________
 TEvdPanel::TEvdPanel(): TObject() {
   fVisible      = 0;
+  fMnID         = -1;
 }
 
 //_____________________________________________________________________________
@@ -51,40 +52,74 @@ TEvdPanel::TEvdPanel(): TObject() {
   fNLayers = Panel->nLayers();
   fPanel   = Panel;
   fVisible = 1;
-					// assume that the number of straws is the same
-  int id;
+
+  TStnGeoManager* gm = TStnGeoManager::Instance();
+  const mu2e::TrkPanelMap::Row* tpm = gm->PanelMap(Plane->ID(),ID); // plane ID : 0-35 (???)
+  if (tpm) fMnID              = tpm->mnid();
 
   int nst = Panel->nStraws();
   fListOfStraws = new TObjArray(nst);
 
+  mu2e::StrawId pid = Panel->id();
+  if (TEvdPanel::fgDebugLevel != 0) {
+    printf("--- station, plane, panel: %3i %3i %3i\n",
+           pid.getStation(),pid.getPlane(),pid.getPanel());
+  }
 
   for (uint16_t ist=0; ist<nst; ist++) {
     const mu2e::Straw* straw = &Panel->getStraw(ist);
 
-    id           = straw->id().asUint16();
-    
-    int ill      = straw->id().getLayer();
-    int iss      = straw->id().getStraw();
-    int ipp      = straw->id().getPanel();
-    int istation = straw->id().getStation();
+    int id = straw->id().asUint16();
 
-    if (fgLocalDebug != 0) {
-      printf(" station, panel, layer, straw, z : %3i %3i %3i %3i %10.3f\n",
-	     istation, ipp, ill, iss, straw->getMidPoint().z());
-    }
-
-    TEvdStraw* evd_straw = new TEvdStraw(id,straw,this,Tracker);
+    TEvdStraw* evd_straw = new TEvdStraw(id,straw,this, Tracker);
     fListOfStraws->Add(evd_straw);
   }
+//-----------------------------------------------------------------------------
+// build the transformation matrix
+//-----------------------------------------------------------------------------
+  const mu2e::HepTransform& ds_to_p = Panel->dsToPanel();
+  const HepRotation&  hr            = ds_to_p.rotation();
+  const Hep3Vector&   ht            = ds_to_p.displacement();
 
-  TVector3* p0  = Straw( 0)->Pos();
-  TVector3* p95 = Straw(95)->Pos();
+  double phix = hr.phiX  ()*180./M_PI;
+  double phiy = hr.phiY  ()*180./M_PI;
+  double phiz = hr.phiZ  ()*180./M_PI;
+  double thtx = hr.thetaX()*180./M_PI;
+  double thty = hr.thetaY()*180./M_PI;
+  double thtz = hr.thetaZ()*180./M_PI;
 
-  double xc = (p0->X()+p95->X())/2;
-  double yc = (p0->Y()+p95->Y())/2;
-  double zc = (p0->Z()+p95->Z())/2;
+  double disp[3], disp1[3];
+  disp[0]  = ht.x();
+  disp[1]  = ht.y();
+  disp[2]  = ht.z();
 
-  fPos.SetXYZ(xc,yc,zc);
+  // if (hr.zz() > 0) {
+  //   // thtx    = thtx+180;
+  //   // thty    = thty+180;
+  //   disp[0] = -disp[0];
+  //   disp[1] = -disp[1];
+  //   disp[2] = -disp[2];
+  // }
+
+  TGeoRotation* gr = new TGeoRotation(Form("rot_%02i_%i",pid.getPlane(),pid.getPanel()),thtx,phix,thty,phiy,thtz,phiz);
+  //  gr->SetMatrix(r);
+
+  gr->MasterToLocal(disp,disp1);
+
+  fCombiTrans     = new TGeoCombiTrans(Form("trk_%02i_%i",pid.getPlane(),pid.getPanel()),-disp1[0], -disp1[1], -disp1[2],gr);
+  //  fCombiTrans     = new TGeoCombiTrans(Form("trk_%02i_%i",pid.getPlane(),pid.getPanel()),0,0,0,gr);
+  
+  //  fPos.SetXYZ(disp[0],disp[1], disp[2]);
+  fPos.SetXYZ(0,0,0); // fPos[3] is used in TStnVisManager.cc:OpenVRZView
+
+  if (TEvdPanel::fgDebugLevel & 0x2) {
+    printf("panel fCombiTrans:\n");
+    fCombiTrans->Print();
+    printf("mu2e::Panel HepTransform Panel->DS:\n");
+    std::cout << Panel->panelToDS() << std::endl;
+    printf("mu2e::Panel HepTransform DS->Panel:\n");
+    std::cout << Panel->dsToPanel() << std::endl;
+  }
 }
 
 //_____________________________________________________________________________

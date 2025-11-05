@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // May 04 2013 P.Murat
-// 
-// in 'XY' mode draw calorimeter clusters as circles with different colors 
+//
+// in 'XY' mode draw calorimeter clusters as circles with different colors
 // in 'Cal' mode draw every detail...
 ///////////////////////////////////////////////////////////////////////////////
 #include "TVirtualX.h"
@@ -27,14 +27,14 @@
 #include "Offline/GeometryService/inc/GeomHandle.hh"
 #include "Offline/TrackerGeom/inc/Tracker.hh"
 
-#include "Offline/ConditionsService/inc/ConditionsHandle.hh"
+// #include "Offline/ConditionsService/inc/ConditionsHandle.hh"
 #include "Offline/TrackerConditions/inc/StrawResponse.hh"
 
 #include "Offline/DataProducts/inc/StrawId.hh"
 
 #include "Offline/RecoDataProducts/inc/StrawHit.hh"
 #include "Offline/RecoDataProducts/inc/StrawHitFlag.hh"
-#include "Offline/RecoDataProducts/inc/KalSegment.hh"
+// #include "Offline/RecoDataProducts/inc/KalSegment.hh"
 #include "Offline/RecoDataProducts/inc/CosmicTrackSeed.hh"
 #include "Offline/RecoDataProducts/inc/TimeCluster.hh"
 
@@ -67,7 +67,7 @@ TTrkVisNode::TTrkVisNode() : TStnVisNode("") {
 }
 
 //_____________________________________________________________________________
-TTrkVisNode::TTrkVisNode(const char* name, const mu2e::Tracker* Tracker, TStnTrackBlock* TrackBlock): 
+TTrkVisNode::TTrkVisNode(const char* name, const mu2e::Tracker* Tracker, TStnTrackBlock* TrackBlock):
   TStnVisNode(name) {
 
   TStnGeoManager* gm = TStnGeoManager::Instance();
@@ -102,7 +102,7 @@ TTrkVisNode::TTrkVisNode(const char* name, const mu2e::Tracker* Tracker, TStnTra
 //-----------------------------------------------------------------------------
 TTrkVisNode::~TTrkVisNode() {
   delete fArc;
-  
+
   delete fListOfStrawHits;
   delete fListOfComboHits;
 
@@ -121,8 +121,8 @@ int TTrkVisNode::InitEvent() {
 
   //  const char* oname = "TTrkVisNode::InitEvent";
 
-  mu2e::GeomHandle<mu2e::Tracker> ttHandle;
-  const mu2e::Tracker* tracker = ttHandle.get();
+  // mu2e::GeomHandle<mu2e::Tracker> ttHandle;
+  const mu2e::Tracker* tracker = fTracker->GetMu2eTracker();
 
   TStnVisManager* vm      = TStnVisManager::Instance();
   const art::Event* event = vm->Event();
@@ -131,13 +131,13 @@ int TTrkVisNode::InitEvent() {
   // mu2e::ConditionsHandle<mu2e::StrawResponse> srep = mu2e::ConditionsHandle<mu2e::StrawResponse>("ignored");
 
   const mu2e::ComboHit              *hit;
-  stntuple::TEvdStrawHit            *evd_straw_hit; 
-  const CLHEP::Hep3Vector           *w; 
-  const mu2e::Straw                 *straw; 
+  stntuple::TEvdStrawHit            *evd_straw_hit;
+  const CLHEP::Hep3Vector           *w;
+  const mu2e::Straw                 *straw;
 
   int                               n_straw_hits, color, ns; // , ipeak, ihit;
   bool                              isFromConversion, intime;
-  double                            sigw(1000.), /*vnorm, v,*/ sigr; 
+  double                            sigw(1000.), /*vnorm, v,*/ sigr;
   CLHEP::Hep3Vector                 vx0, vx1, vx2;
 //-----------------------------------------------------------------------------
 // first, clear the cached hit information from the previous event
@@ -146,7 +146,7 @@ int TTrkVisNode::InitEvent() {
   stntuple::TEvdPlane*              plane;
   stntuple::TEvdPanel*              panel;
 
-  int                               nst, nplanes, npanels/*, isec*/; 
+  int                               nst, nplanes, npanels/*, isec*/;
 
   nst = mu2e::StrawId::_nstations; // tracker->nStations();
   for (int ist=0; ist<nst; ist++) {
@@ -171,8 +171,8 @@ int TTrkVisNode::InitEvent() {
   event->getByLabel(art::InputTag(fChCollTag), chcH);
   if (chcH.isValid()) fChColl = chcH.product();
   else {
-    mf::LogWarning("TTrkVisNode::InitEvent") << " WARNING:" << __LINE__ 
-                                             << " : mu2e::ComboHitCollection " 
+    mf::LogWarning("TTrkVisNode::InitEvent") << " WARNING:" << __LINE__
+                                             << " : mu2e::ComboHitCollection "
                                              << fChCollTag << " not found";
     fChColl = nullptr;
   }
@@ -181,8 +181,8 @@ int TTrkVisNode::InitEvent() {
   // event->getByLabel(art::InputTag(fChfCollTag), chfcH);
   // if (chfcH.isValid()) fChfColl = chfcH.product();
   // else {
-  //   mf::LogWarning("TTrkVisNode::InitEvent") << " WARNING:" << __LINE__ 
-  //                                            << " : mu2e::StrawHitFlagCollection " 
+  //   mf::LogWarning("TTrkVisNode::InitEvent") << " WARNING:" << __LINE__
+  //                                            << " : mu2e::StrawHitFlagCollection "
   //                                            << fChfCollTag << " not found";
   //   fChfColl = nullptr;
   // }
@@ -191,8 +191,8 @@ int TTrkVisNode::InitEvent() {
   event->getByLabel(art::InputTag(fShCollTag), schcH);
   if (schcH.isValid()) fSchColl = schcH.product();
   else {
-    mf::LogWarning("TTrkVisNode::InitEvent") << " WARNING:" << __LINE__ 
-                                             << " : mu2e::ComboHitCollection " 
+    mf::LogWarning("TTrkVisNode::InitEvent") << " WARNING:" << __LINE__
+                                             << " : mu2e::ComboHitCollection "
                                              << fShCollTag << " not found";
     fSchColl = nullptr;
   }
@@ -201,8 +201,8 @@ int TTrkVisNode::InitEvent() {
   // event->getByLabel(art::InputTag(fShfCollTag), shfcH);
   // if (shfcH.isValid()) fShfColl = shfcH.product();
   // else {
-  //   mf::LogWarning("TTrkVisNode::InitEvent") << " WARNING:" << __LINE__ 
-  //                                            << " : mu2e::StrawHitFlagCollection " 
+  //   mf::LogWarning("TTrkVisNode::InitEvent") << " WARNING:" << __LINE__
+  //                                            << " : mu2e::StrawHitFlagCollection "
   //                                            << fShfCollTag << " not found";
   //   fShfColl = nullptr;
   // }
@@ -211,8 +211,8 @@ int TTrkVisNode::InitEvent() {
   event->getByLabel(art::InputTag(fShCollTag), shcH);
   if (shcH.isValid()) fShColl = shcH.product();
   else {
-    mf::LogWarning("TTrkVisNode::InitEvent") << " WARNING:" << __LINE__ 
-                                             << " : mu2e::StrawHitCollection " 
+    mf::LogWarning("TTrkVisNode::InitEvent") << " WARNING:" << __LINE__
+                                             << " : mu2e::StrawHitCollection "
                                              << fShCollTag << " not found";
     fShColl = nullptr;
   }
@@ -221,11 +221,12 @@ int TTrkVisNode::InitEvent() {
   event->getByLabel(art::InputTag(fSdmcCollTag), sdmccH);
   if (sdmccH.isValid()) fSdmcColl = sdmccH.product();
   else {
-    mf::LogWarning("TTrkVisNode::InitEvent") << " WARNING:" << __LINE__ 
-                                             << " : mu2e::StrawDigiMCCollection " 
+    mf::LogWarning("TTrkVisNode::InitEvent") << " WARNING:" << __LINE__
+                                             << " : mu2e::StrawDigiMCCollection "
                                              << fSdmcCollTag << " not found";
     fSdmcColl = nullptr;
   }
+
 //-----------------------------------------------------------------------------
 // KalSeeds
 //-----------------------------------------------------------------------------
@@ -233,15 +234,14 @@ int TTrkVisNode::InitEvent() {
   event->getByLabel(art::InputTag(fKsCollTag), kscH);
   if (kscH.isValid()) fKsColl = kscH.product();
   else {
-    mf::LogWarning("TTrkVisNode::InitEvent") << " WARNING:" << __LINE__ 
-                                             << " : mu2e::KalSeedCollection " 
+    mf::LogWarning("TTrkVisNode::InitEvent") << " WARNING:" << __LINE__
+                                             << " : mu2e::KalSeedCollection "
                                              << fKsCollTag << " not found";
     fKsColl = nullptr;
   }
 //-----------------------------------------------------------------------------
 // CosmicTrackSeeds
 //-----------------------------------------------------------------------------
-  fKsColl = nullptr;
   // an empty coll tag is not worth a warning
   if (fCtsCollTag != "") {
     art::Handle<mu2e::CosmicTrackSeedCollection> ctscH;
@@ -269,7 +269,8 @@ int TTrkVisNode::InitEvent() {
   for (int ihit=0; ihit<n_straw_hits; ihit++ ) {
 
     hit              = &fSchColl->at(ihit);
-    straw            = &tracker->getStraw(hit->strawId());
+    mu2e::StrawId sid = hit->strawId();
+    straw            = &tracker->getStraw(sid);
     color            = kBlack;
     intime           = 0;
     isFromConversion = false;
@@ -278,14 +279,14 @@ int TTrkVisNode::InitEvent() {
 //-----------------------------------------------------------------------------
     const mu2e::StrawDigiMC*             mcdigi(nullptr);
     if (fSdmcColl and (fSdmcColl->size() > 0)) {
-      mcdigi = &fSdmcColl->at(ihit); 
+      mcdigi = &fSdmcColl->at(ihit);
     }
 
     if (mcdigi) {
 
       const mu2e::StrawGasStep* step = mcdigi->earlyStrawGasStep().get();
       const mu2e::SimParticle*  sim  = &(*step->simParticle());
-    
+
       if (sim->fromGenerator()) {
 	mu2e::GenParticle* gen = (mu2e::GenParticle*) &(*sim->genParticle());
 	//	    if ( gen->generatorId() == mu2e::GenId::conversionGun ){
@@ -295,24 +296,28 @@ int TTrkVisNode::InitEvent() {
       }
       int   pdg_id = sim->pdgId();
       float mc_mom = step->momvec().mag();
-	
+
       intime = fabs(hit->time()-fEventTime) < fTimeWindow;
-	
+
       if      (pdg_id == 11) {
-	if    (mc_mom > 20  ) { 
-	  if (intime) color = kRed;
-	  else        color = kBlue;
+	if    (mc_mom > 20  ) {
+          // if (intime) color = kRed;
+          // else        color = kAzure+1;
+          color = kRed;
 	}
-	else                   { color = kRed+2;  }
+	else                   { color = kRed+2;    }
       }
-      else if (pdg_id ==  -11) { color = kBlue;   } 
-      else if (pdg_id ==   13) { color = kGreen+2;} 
-      else if (pdg_id ==  -13) { color = kGreen-2;} 
-      else if (pdg_id == 2212) { color = kBlue+2; } 
-      else                     { color = kBlack;  } 
+      else if (pdg_id ==  -11) { color = kBlue;     }
+      else if (pdg_id ==   13) { color = kGreen+2;  }
+      else if (pdg_id ==  -13) { color = kGreen-2;  }
+      else if (pdg_id == 2212) { color = kBlue+2;   }
+      else if (pdg_id ==  211) { color = kOrange-3; }
+      else if (pdg_id == -211) { color = kOrange+7; }
+
+      else                     { color = kBlack;    }
     }
 //-----------------------------------------------------------------------------
-// add a pointer to the hit to the straw 
+// add a pointer to the hit to the straw
 //-----------------------------------------------------------------------------
     sigw     = hit->wireRes();      // P.Murat
     sigr     = 2.5;                    // in mm
@@ -320,17 +325,16 @@ int TTrkVisNode::InitEvent() {
     if (intime          ) mask |= stntuple::TEvdStrawHit::kInTimeBit;
     if (isFromConversion) mask |= stntuple::TEvdStrawHit::kConversionBit;
     
-    int ist, ipl, ippl, /*ifc,*/ ipn, is;
+    int ist, ipl, ippl, ipnl, is;
 
-    ipl  = straw->id().getPlane();      // plane number here runs from 0 to 2*NStations-1
-    ist  = straw->id().getStation();
+    ipl  = sid.getPlane();      // plane number here runs from 0 to 2*NStations-1
+    ist  = sid.getStation();
     ippl = ipl % 2 ;                    // plane number within the station
-    ipn  = straw->id().getPanel();
-    // il   = straw->id().getLayer();
-    is   = straw->id().getStraw();
+    ipnl = sid.getPanel();
+    is   = sid.getStraw();
 
     w             = &straw->getDirection();
-    evd_straw     = fTracker->Station(ist)->Plane(ippl)->Panel(ipn)->Straw(is);
+    evd_straw     = fTracker->Station(ist)->Plane(ippl)->Panel(ipnl)->Straw(is);
     evd_straw_hit = new stntuple::TEvdStrawHit(hit,
 					       evd_straw,
 					       mcdigi,
@@ -359,7 +363,7 @@ int TTrkVisNode::InitEvent() {
 
     float                     mc_mom(-1.), mc_mom_z(-1.);
     int                       mother_pdg_id(0);
-    const mu2e::SimParticle*  mother(nullptr); 
+    const mu2e::SimParticle*  mother(nullptr);
     const mu2e::StrawGasStep* step  (nullptr);
     const mu2e::SimParticle*  sim   (nullptr);
 
@@ -374,7 +378,7 @@ int TTrkVisNode::InitEvent() {
 
 	step = mcdigi->earlyStrawGasStep().get();
 
-	const art::Ptr<mu2e::SimParticle>& simptr = step->simParticle(); 
+	const art::Ptr<mu2e::SimParticle>& simptr = step->simParticle();
 	sim = simptr.operator->();
 
 	art::Ptr<mu2e::SimParticle>        momptr = simptr;
@@ -410,7 +414,7 @@ int TTrkVisNode::InitEvent() {
   int ntrk = 0;
 
   if (fKsColl) ntrk = fKsColl->size();
-  
+
   for (int i=0; i<ntrk; i++) {
     kseed = &fKsColl->at(i);
     trk  = new stntuple::TEvdTrack(i,kseed);
@@ -421,12 +425,20 @@ int TTrkVisNode::InitEvent() {
 
     for (auto it=hits->begin(); it!=hits->end(); it++) {
       const mu2e::TrkStrawHitSeed* hit =  &(*it);
-      // track_hit = dynamic_cast<mu2e::TrkStrawHit*> (*it);
       if (hit == nullptr) continue;
       // need to find this hit in the list of TEvdStrawHits (already existing) ... later
 
-      const mu2e::Straw* straw = &tracker->straw(hit->strawId());
-      stntuple::TEvdTrkStrawHit* evd_hit = new stntuple::TEvdTrkStrawHit(hit,straw);
+      mu2e::StrawId sid = hit->strawId();
+      int ist, upl, pln, pnl, stn;
+
+      stn  = sid.getStation();
+      upl  = sid.getPlane();      // plane number here runs from 0 to 2*NStations-1
+      pln = upl % 2 ;                    // plane number within the station
+      pnl  = sid.getPanel();
+      ist  = sid.getStraw();
+
+      stntuple::TEvdStraw*       evd_straw = fTracker->Station(stn)->Plane(pln)->Panel(pnl)->Straw(ist);
+      stntuple::TEvdTrkStrawHit* evd_hit   = new stntuple::TEvdTrkStrawHit(hit,evd_straw);
       trk->AddHit(evd_hit);
     }
 
@@ -522,7 +534,7 @@ void TTrkVisNode::PaintXY(Option_t* Option) {
   double                  time;
   int                     station;
 
-  const mu2e::Straw      *straw; 
+  const mu2e::Straw      *straw;
 
   //  int view_type = TVisManager::Instance()->GetCurrentView()->Type();
 
@@ -544,7 +556,7 @@ void TTrkVisNode::PaintXY(Option_t* Option) {
 
     if (vm->DisplayStrawHitsXY()) {
 //-----------------------------------------------------------------------------
-// when displaying straw hits, tmin and tmax should be defined by the straw, 
+// when displaying straw hits, tmin and tmax should be defined by the straw,
 // not combo, hit times
 //-----------------------------------------------------------------------------
       const mu2e::TimeCluster* tc = etcl->TimeCluster();
@@ -562,7 +574,7 @@ void TTrkVisNode::PaintXY(Option_t* Option) {
       }
     }
   }
-  
+
   if (vm->DisplayStrawHitsXY()) {
 //-----------------------------------------------------------------------------
 // display straw hits
@@ -611,7 +623,7 @@ void TTrkVisNode::PaintXY(Option_t* Option) {
 // display combo hits
 //-----------------------------------------------------------------------------
     int nch = fListOfComboHits->GetEntries();
-    if (nch > 0) { 
+    if (nch > 0) {
       // const mu2e::ComboHit* ch0 = &fChColl->at(0);
       for (int i=0; i<nch; i++) {
 	stntuple::TEvdComboHit* evd_ch = (stntuple::TEvdComboHit*) fListOfComboHits->At(i);
@@ -663,12 +675,14 @@ void TTrkVisNode::PaintXY(Option_t* Option) {
       evd_trk = GetEvdTrack(i);
       evd_trk->Paint(Option);
     }
+  }
 
+  if (vm->DisplayCosmicSeeds()) {
     stntuple::TEvdCosmicTrack* evd_ctrk;
-                                        // tracks
+                                        // cosmic seeds
     int nctrk(0);
     if (fListOfCosmicTracks != nullptr) nctrk = fListOfCosmicTracks->GetEntriesFast();
-
+    
     for (int i=0; i<nctrk; i++ ) {
       evd_ctrk = GetEvdCosmicTrack(i);
       evd_ctrk->PaintXY(Option);
@@ -725,7 +739,7 @@ void TTrkVisNode::PaintRZ(Option_t* Option) {
 
     if (vm->DisplayStrawHitsXY()) {
 //-----------------------------------------------------------------------------
-// for straw hit display, tmin and tmax should be defined by the straw, 
+// for straw hit display, tmin and tmax should be defined by the straw,
 // not combo, hit times
 //-----------------------------------------------------------------------------
       const mu2e::TimeCluster* tc = etcl->TimeCluster();
@@ -757,7 +771,8 @@ void TTrkVisNode::PaintRZ(Option_t* Option) {
       nhits = evd_trk->NHits();
       for (int ih=0; ih<nhits; ih++) {
 	stntuple::TEvdTrkStrawHit* hit = evd_trk->Hit(ih);
-	float time = hit->TrkStrawHitSeed()->hitTime();
+	// float time = hit->TrkStrawHitSeed()->hitTime();
+	float time = hit->TrkStrawHitSeed()->time();
         float edep = hit->TrkStrawHitSeed()->energyDep();
 	if ((time >= tmin) and (time <= tmax) and (edep >= min_edep) and (edep <= max_edep)) {
 	  hit->PaintRZ(Option);
@@ -814,13 +829,13 @@ void TTrkVisNode::PaintRZ(Option_t* Option) {
 
 //-----------------------------------------------------------------------------
 // TZ view is only for the pattern recognition / time cluster finding
-// display reconstructed tracks and combo hits 
+// display reconstructed tracks and combo hits
 //-----------------------------------------------------------------------------
 void TTrkVisNode::PaintTZ(Option_t* Option) {
 
   TStnVisManager* vm = TStnVisManager::Instance();
 
-  double tmin = vm->TMin(); 
+  double tmin = vm->TMin();
   double tmax = vm->TMax();
 
   double emin = vm->MinEDep(); 
@@ -845,11 +860,11 @@ void TTrkVisNode::PaintTZ(Option_t* Option) {
       if (vm->IgnoreComptonHits()) {
         if (flag.hasAnyProperty(mu2e::StrawHitFlagDetail::bkg))      continue;
       }
-      
+
       if (vm->IgnoreProtonHits()) {
         if (! flag.hasAnyProperty(mu2e::StrawHitFlagDetail::energysel)) continue;
       }
-      
+
       float time  = ech->correctedTime();
       float edep  = ch->energyDep();
       
@@ -889,7 +904,7 @@ void TTrkVisNode::PaintTZ(Option_t* Option) {
 
 //-----------------------------------------------------------------------------
 // PhiZ view is only for the pattern recognition / time cluster finding
-// display reconstructed tracks and combo hits 
+// display reconstructed tracks and combo hits
 //-----------------------------------------------------------------------------
 void TTrkVisNode::PaintPhiZ(Option_t* Option) {
 
@@ -898,10 +913,10 @@ void TTrkVisNode::PaintPhiZ(Option_t* Option) {
   mu2e::GeomHandle<mu2e::Tracker> ttHandle;
   const mu2e::Tracker* tracker = ttHandle.get();
 
-  double tmin   = vm->TMin(); 
+  double tmin   = vm->TMin();
   double tmax   = vm->TMax();
 
-  double phimin = -M_PI; // vm->TMin(); 
+  double phimin = -M_PI; // vm->TMin();
   double phimax =  M_PI; // vm->TMax();
 
   stntuple::TEvdTimeCluster* etcl = vm->SelectedTimeCluster();
@@ -924,11 +939,11 @@ void TTrkVisNode::PaintPhiZ(Option_t* Option) {
       if (vm->IgnoreComptonHits()) {
         if (flag.hasAnyProperty(mu2e::StrawHitFlagDetail::bkg))      continue;
       }
-      
+
       if (vm->IgnoreProtonHits()) {
         if (! flag.hasAnyProperty(mu2e::StrawHitFlagDetail::energysel)) continue;
       }
-      
+
       int index = ch->index(0);
       const mu2e::ComboHit* sh = &fSchColl->at(index);
 
@@ -936,10 +951,10 @@ void TTrkVisNode::PaintPhiZ(Option_t* Option) {
       int station = straw->id().getStation();
       double time = ch->correctedTime();
 
-      if ((station >= vm->MinStation()) && (station <= vm->MaxStation())) { 
+      if ((station >= vm->MinStation()) && (station <= vm->MaxStation())) {
         if ((time >= tmin) && (time <= tmax)) {
           float phi = ech->Pos()->Phi();
-      
+
           if ((phi >= phimin) && (phi <= phimax)) {
                                         // check if the hit belongs to the time cluster
             int ok = 1;
@@ -977,7 +992,7 @@ void TTrkVisNode::PaintPhiZ(Option_t* Option) {
 }
 
 //-----------------------------------------------------------------------------
-// VST view : display all straws 
+// VST view : display all straws
 //-----------------------------------------------------------------------------
 void TTrkVisNode::PaintVST(Option_t* Option) {
 
@@ -987,50 +1002,61 @@ void TTrkVisNode::PaintVST(Option_t* Option) {
 }
 
 //-----------------------------------------------------------------------------
-// VST view : display all straws 
+// VST view : display all straws in the local panel ref systems
+// display tracks and track hits - how to decide which hits should not be displayed in which view ?
+// hit "knows" its panel
 //-----------------------------------------------------------------------------
 void TTrkVisNode::PaintVRZ(Option_t* Option) {
-
-//-----------------------------------------------------------------------------
-// display tracks and track hits
-//-----------------------------------------------------------------------------
   TStnVisManager* vm = TStnVisManager::Instance();
+  TStnView*       cv = vm->GetCurrentView();
+  
   if (vm->DisplayTracks()) {
-    // int ntrk(0);
-    // if (fListOfTracks != nullptr) ntrk = fListOfTracks->GetEntriesFast();
+    int ntrk(0);
+    if (fListOfTracks != nullptr) ntrk = fListOfTracks->GetEntriesFast();
 
-    // for (int i=0; i<ntrk; i++ ) {
-    //   stntuple::TEvdTrack* evd_trk = (stntuple::TEvdTrack*) fListOfTracks->At(i);
-    //   evd_trk->Paint(Option);
+    const mu2e::Panel* panel = (const mu2e::Panel*) cv->GetMother();
+    int pln = panel->id().getPlane();
+    int pnl = panel->id().getPanel();
+    
+    for (int i=0; i<ntrk; i++ ) {
+      stntuple::TEvdTrack* evd_trk = (stntuple::TEvdTrack*) fListOfTracks->At(i);
+      evd_trk->PaintVRZ(Option);
 
-    //   nhits = evd_trk->NHits();
-    //   for (int ih=0; ih<nhits; ih++) {
-    //     stntuple::TEvdTrkStrawHit* hit = evd_trk->Hit(ih);
-    //     float time = hit->TrkStrawHitSeed()->hitTime();
-    //     float edep = hit->TrkStrawHitSeed()->energyDep();
-    //     if ((time >= tmin) and (time <= tmax) and (edep >= min_edep) and (edep <= max_edep)) {
-    //       hit->PaintRZ(Option);
-    //     }
-    //   }
-    // }
-    // cosmic tracks
+      int nhits = evd_trk->NHits();
+      for (int ih=0; ih<nhits; ih++) {
+        stntuple::TEvdTrkStrawHit* hit = evd_trk->Hit(ih);
+        //     float time = hit->TrkStrawHitSeed()->hitTime();
+        //     float edep = hit->TrkStrawHitSeed()->energyDep();
+        // if ((time >= tmin) and (time <= tmax) and (edep >= min_edep) and (edep <= max_edep)) {
+        const mu2e::TrkStrawHitSeed* hs = hit->TrkStrawHitSeed();
+        if ((hs->strawId().getPlane() == pln) and (hs->strawId().getPanel() == pnl)) {
+          hit->PaintVRZ(Option);
+        }
+        //     }
+      }
+    }
 
-    int nctrk(0);
-    if (fListOfCosmicTracks != nullptr) nctrk = fListOfCosmicTracks->GetEntriesFast();
+    if (vm->DisplayCosmicSeeds()) {
+//-----------------------------------------------------------------------------
+// cosmic tracks (?) seeds (?)
+//-----------------------------------------------------------------------------
+      int nctrk(0);
+      if (fListOfCosmicTracks != nullptr) nctrk = fListOfCosmicTracks->GetEntriesFast();
 
-    for (int i=0; i<nctrk; i++ ) {
-      stntuple::TEvdCosmicTrack* evd_ctrk = (stntuple::TEvdCosmicTrack*) fListOfCosmicTracks->At(i);
-      evd_ctrk->PaintVRZ(Option);
+      for (int i=0; i<nctrk; i++ ) {
+        stntuple::TEvdCosmicTrack* evd_ctrk = (stntuple::TEvdCosmicTrack*) fListOfCosmicTracks->At(i);
+        evd_ctrk->PaintVRZ(Option);
 
-      // int nhits = evd_ctrk->NHits();
-      // for (int ih=0; ih<nhits; ih++) {
-      //   stntuple::TEvdTrkStrawHit* hit = evd_ctrk->Hit(ih);
-      //   float time = hit->TrkStrawHitSeed()->hitTime();
-      //   float edep = hit->TrkStrawHitSeed()->energyDep();
-      //   if ((time >= tmin) and (time <= tmax) and (edep >= min_edep) and (edep <= max_edep)) {
-      //     hit->PaintRZ(Option);
-      //   }
-      // }
+        // int nhits = evd_ctrk->NHits();
+        // for (int ih=0; ih<nhits; ih++) {
+        //   stntuple::TEvdTrkStrawHit* hit = evd_ctrk->Hit(ih);
+        //   float time = hit->TrkStrawHitSeed()->hitTime();
+        //   float edep = hit->TrkStrawHitSeed()->energyDep();
+        //   if ((time >= tmin) and (time <= tmax) and (edep >= min_edep) and (edep <= max_edep)) {
+        //     hit->PaintRZ(Option);
+        //   }
+        // }
+      }
     }
   }
 
