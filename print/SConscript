@@ -35,7 +35,6 @@ def local_build():
                         'mu2e_SeedService_SeedService_service',
                         'mu2e_GlobalConstantsService',
                         'mu2e_TrackerConditions',
-                        'mu2e_ConditionsService',
                         'mu2e_GlobalConstantsService_GlobalConstantsService_service',
                         'mu2e_Mu2eUtilities',
                         'mu2e_GeneralUtilities',
@@ -44,7 +43,6 @@ def local_build():
                         'mu2e_RecoDataProducts',
                         'mu2e_DataProducts',
                         'mu2e_CaloMC',
-                        'mu2e_BTrkData',
                                                 
                         babarlibs,
                         

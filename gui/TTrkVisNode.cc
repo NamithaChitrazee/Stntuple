@@ -27,7 +27,6 @@
 #include "Offline/GeometryService/inc/GeomHandle.hh"
 #include "Offline/TrackerGeom/inc/Tracker.hh"
 
-// #include "Offline/ConditionsService/inc/ConditionsHandle.hh"
 #include "Offline/TrackerConditions/inc/StrawResponse.hh"
 
 #include "Offline/DataProducts/inc/StrawId.hh"
@@ -126,9 +125,6 @@ int TTrkVisNode::InitEvent() {
 
   TStnVisManager* vm      = TStnVisManager::Instance();
   const art::Event* event = vm->Event();
-
-  // Tracker calibration object.
-  // mu2e::ConditionsHandle<mu2e::StrawResponse> srep = mu2e::ConditionsHandle<mu2e::StrawResponse>("ignored");
 
   const mu2e::ComboHit              *hit;
   stntuple::TEvdStrawHit            *evd_straw_hit;
@@ -1324,14 +1320,18 @@ void TTrkVisNode::Print(Option_t* Opt) const {
 void TTrkVisNode::NodePrint(const void* Object, const char* ClassName) {
   TString class_name(ClassName);
 
-  TAnaDump* ad = TAnaDump::Instance();
+  TAnaDump*       ad = TAnaDump::Instance();
+  TStnVisManager* vm = TStnVisManager::Instance();
 
   if (class_name == "ComboHit") {
 //-----------------------------------------------------------------------------
 // print a ComboHit or a collection of those
 //-----------------------------------------------------------------------------
-    if (Object) ad->printComboHit          ((const mu2e::ComboHit*) Object,nullptr);
-    else        ad->printComboHitCollection(fChCollTag.encode().data(),fSdmcCollTag.encode().data());
+    if (Object) ad->printComboHit((const mu2e::ComboHit*) Object,nullptr);
+    else        {
+      ad->printComboHitCollection(fChCollTag.encode().data(),fSdmcCollTag.encode().data(),
+                                  vm->TMin(),vm->TMax(),vm->MinEDep(),vm->MaxEDep());
+    }
   }
   else if (class_name == "CosmicTrackSeed") {
 //-----------------------------------------------------------------------------
