@@ -409,7 +409,7 @@ void TStnModule::Print(const char* Opt) const {
 //-----------------------------------------------------------------------------
 // Ip1, Ip2 
 //-----------------------------------------------------------------------------
-int TStnModule::FitHistogram(TH1* Hist, fit_result_t* Fr, float XMin, float XMax, int MinSum) {
+int TStnModule::FitHistogram(TH1* Hist, fit_result_t* Fr,  float Dx, float XMin, float XMax, int MinSum, int PrintLevel) {
 
   //  fit_result_t* fr = &fFr[Ip2][Ip1];
 
@@ -426,7 +426,8 @@ int TStnModule::FitHistogram(TH1* Hist, fit_result_t* Fr, float XMin, float XMax
   int integral  = Hist->Integral(1,nbins);
       
   if (integral < MinSum) {
-    std::cout << std::format("ERROR: integral:{} < {}. BAIL OUT\n",integral,MinSum);
+    std::cout << std::format("ERROR: hist:{} integral:{} < {}. BAIL OUT\n",
+                             Hist->GetTitle(),integral,MinSum);
     return -1;
   }
 
@@ -442,8 +443,12 @@ int TStnModule::FitHistogram(TH1* Hist, fit_result_t* Fr, float XMin, float XMax
     }
   }
 
+  if (PrintLevel > 0) {
+    std::cout << std::format("001 imax:{} qmax:{}\n",imax, qmax);
+  }
+
   if (qmax < 3) {
-    std::cout << std::format("ERROR: qmax:{} < 3. BAIL OUT\n",qmax);
+    std::cout << std::format("ERROR: hist:{}  qmax:{} < 3. BAIL OUT\n",Hist->GetTitle(),qmax);
     return -2;
   }
 
@@ -485,20 +490,29 @@ int TStnModule::FitHistogram(TH1* Hist, fit_result_t* Fr, float XMin, float XMax
     if ((iplus > nbins) and (iminus < 0)) break;
   }
 
+  if (PrintLevel > 0) {
+    std::cout << std::format("002: sum(level=0.2):{}\n",sum);
+  }
+
   if (sum < MinSum) {
-    std::cout << std::format("ERROR: sum:{} < {}. BAIL OUT\n",sum,MinSum);
+    std::cout << std::format("ERROR: hist:{} sum:{} < {}. BAIL OUT\n",Hist->GetTitle(),sum,MinSum);
     return -3;
   }
 
   float t0 = Hist->GetBinCenter(imax);
   
-  // for some reason, "sq" is required for tfr be defined
-  float tmin{t0-50}, tmax{t0+50};
+  float tmin{t0-Dx}, tmax{t0+Dx};
   if (XMax > XMin) {
     tmin = XMin;
     tmax = XMax;
   }
-  
+
+  if (PrintLevel > 0) {
+    std::cout << std::format("003: t0:{:10.3f} Dx:{:10.3f} tmin:{:10.3f}  tmax:{:10.3f}\n",
+                             t0, Dx, tmin,tmax);
+  }
+
+  // for some reason, "sq" is required for tfr be defined
   TFitResultPtr tfr = Hist->Fit("gaus","sql","",tmin,tmax);
   
   if ((! tfr->IsValid()) or tfr->IsEmpty()) {

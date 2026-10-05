@@ -33,6 +33,8 @@ public:
     return (TCaloRecoDigi*) fListOfCaloRecoDigis->UncheckedAt(I);
   }
 
+  TCaloRecoDigi* FindDigi(int ID);
+
   TClonesArray* GetListOfCaloRecoDigis () { return fListOfCaloRecoDigis ; } 
 //-----------------------------------------------------------------------------
 // modifiers

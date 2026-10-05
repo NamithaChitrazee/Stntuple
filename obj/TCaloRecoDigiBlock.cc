@@ -92,7 +92,22 @@ TCaloRecoDigiBlock::~TCaloRecoDigiBlock() {
   delete fListOfCaloRecoDigis;
 }
 
-//_____________________________________________________________________________
+//-----------------------------------------------------------------------------
+TCaloRecoDigi* TCaloRecoDigiBlock::FindDigi(int ID) {
+  TCaloRecoDigi* found(nullptr);
+  
+  for (int i=0; i<fNDigis; i++) {
+    TCaloRecoDigi* digi = CaloRecoDigi(i);
+    if (digi->GetUniqueID() == (UInt_t) ID) {
+      found = digi;
+      break;
+    }
+  }
+  
+  return found;
+}
+
+ //_____________________________________________________________________________
 void TCaloRecoDigiBlock::Clear(Option_t* opt) {
   fListOfCaloRecoDigis->Clear();
   fNDigis             = 0;

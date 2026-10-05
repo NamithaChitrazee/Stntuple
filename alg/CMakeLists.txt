@@ -16,14 +16,18 @@ include_directories(
 
 ROOT_GENERATE_DICTIONARY(${dict}
   smooth.hh TEmuLogLH.hh TStnTrackID.hh TStntuple.hh TStnPrintUtils.hh
+  TRunDb.hh
   LINKDEF ${subpkg}/Linkdef.h)
 
 set_property(SOURCE ${dict}.cxx PROPERTY generated)
 
 add_library(${lib} SHARED
-  InitPbarCommon.cc RMCSpectra.cc smooth.cc TEmuLogLH.cc TStnTrackID.cc TStntuple.cc TStntuple_Pbar_Striganov.cc
+  InitPbarCommon.cc RMCSpectra.cc smooth.cc TEmuLogLH.cc TStnTrackID.cc
+  TStntuple.cc
+  TStntuple_Pbar_Striganov.cc
   pbar_common_address.f pbar.f
   TStnPrintUtils.cc
+  TRunDb.cc
   ${dict}.cxx
 )
 add_library(Stntuple::alg ALIAS ${lib}  )

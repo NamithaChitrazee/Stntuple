@@ -165,7 +165,10 @@ public:
 
   TCanvas* NewSlide(const char* name, const char* title, int nx, int ny);
 
-  int      FitHistogram(TH1* Hist, fit_result_t* Fp, float XMin = 1, float XMax = -1, int NMin = 100);
+  int      FitHistogram(TH1* Hist, fit_result_t* Fp,
+                        float Dx = 0., float XMin = 1., float XMax = -1.,
+                        int NMin = 100,
+                        int PrintLevel = -1);
 //-----------------------------------------------------------------------------
 // overloaded methods of TObject
 //-----------------------------------------------------------------------------
