@@ -605,7 +605,7 @@ void TAnaDump::printCrvCoincidenceCluster(const mu2e::CrvCoincidenceCluster* CCl
     printf("---------------------------------------------------------------------\n");
     printf("BarIndex       bar_length       Tcorrected(MD)     Xcorrected(MD)    \n");
     printf("---------------------------------------------------------------------\n");
-    float totaltimeavg(0),totalxavg(0);
+    float totaltimeavg(0)/*,totalxavg(0)*/;
     float nbars = 0;
     int   twoendbars   = 0;
     for (size_t i=0; i<bars.size(); i++) {
@@ -648,7 +648,7 @@ void TAnaDump::printCrvCoincidenceCluster(const mu2e::CrvCoincidenceCluster* CCl
 	}
       
 	totaltimeavg += tcorrected;
-	totalxavg    += xcorrected;
+	//totalxavg    += xcorrected;
 	nbars        += 1;
 
 	printf("%8i %14.2f %16.2f %14.3f\n",bar,bar_length, tcorrected,xcorrected);
@@ -657,10 +657,10 @@ void TAnaDump::printCrvCoincidenceCluster(const mu2e::CrvCoincidenceCluster* CCl
     }
     if (nbars > 0) {
       totaltimeavg /= nbars;
-      totalxavg    /= nbars;
+      //totalxavg    /= nbars;
     }
     if (twoendbars == 0) {
-      totalxavg = -10.;
+      //totalxavg = -10.;
     }
 
     //   for (size_t i=0; i<bars.size(); i++) {

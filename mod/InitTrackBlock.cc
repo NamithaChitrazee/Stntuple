@@ -480,13 +480,13 @@ void StntupleInitTrackBlock::SetHitInfo(TStnTrack* track,
   track->fNDoublets = nd_os | (nd_ss << 8) | (nhitsambig0 << 16) | (nad << 24);
 
   // check the material crossing info
-  int nmat(0), nmatactive (0); double radlen(0.);
+  int nmat(0), nmatactive (0); // double radlen(0.);
   if(verbose > 2) printf("Printing material crossing collection:\n");
   for (const auto& straw : ks->straws()) {
     ++nmat;
     if (straw.active()) {
       ++nmatactive;
-      radlen += straw._radlen;
+      //radlen += straw._radlen;
     }
     if(verbose > 2) {
       printf("%3i: active = %o; ID = %5i, plane = %2i, panel = %5i, layer = %5i\n", nmat-1, straw.active(),

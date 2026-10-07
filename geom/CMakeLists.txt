@@ -41,7 +41,8 @@ add_library(${lib} SHARED ${source_files} ${dict}.cxx)
 
 target_link_libraries(${lib}
   Stntuple_base
-  fhiclcpp  cetlib
+  art::Framework_Principal
+  fhiclcpp::fhiclcpp  cetlib::cetlib
   ROOT::Physics ROOT::Matrix ROOT::Tree ROOT::Geom ROOT::Core)
 
 cet_add_compiler_flags(-g -O0)

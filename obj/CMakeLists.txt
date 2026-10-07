@@ -8,6 +8,11 @@ include_directories(
   ${CMAKE_SOURCE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/${subpkg}
 )
+get_cmake_property(_variableNames VARIABLES)
+list (SORT _variableNames)
+foreach (_variableName ${_variableNames})
+  message(STATUS "${_variableName}=${${_variableName}}")
+endforeach()
 
 # link_directories($ENV{ROOTSYS}/lib)
 
@@ -57,7 +62,13 @@ add_library(${lib} SHARED ${source_files} ${dict}.cxx)
 
 target_link_libraries(${lib}
   Stntuple_base
+  Offline::DataProducts
+  art::Framework_Principal
   ROOT::Physics ROOT::EG ROOT::Graf3d ROOT::Graf ROOT::Geom ROOT::Matrix ROOT::GenVector ROOT::Core)
+
+target_include_directories(${lib}
+  PRIVATE ${art_INCLUDE_DIR}
+)
 
 cet_add_compiler_flags(-g -O0)
 

@@ -157,7 +157,7 @@ double THexCrystalMap::GetRadius(int I) {
 //-----------------------------------------------------------------------------
 int THexCrystalMap::InsideCode(TDiskIndex* Index, double* Fraction) {
 
-  int       inside, nvin(0), nbelow(0), nabove(0);
+  int       inside, nvin(0), /*nbelow(0),*/ nabove(0);// PM:unused
   double    x0, y0, r, x, y, phi, s, s0, /*s1,*/ r0, dr, adr;
   double    fr, step;
 					// crystal center position
@@ -177,7 +177,7 @@ int THexCrystalMap::InsideCode(TDiskIndex* Index, double* Fraction) {
     r   = sqrt(x*x+y*y);
 
     if (r < fRMin) {
-      nbelow += 1;
+      // nbelow += 1;//PM:unused
     }
     else if (r > fRMax) {
       nabove += 1;

@@ -521,7 +521,7 @@ namespace stntuple {
       int   ng(0);
 
       prob = 0.05;
-      for (int i=0; prob < 0.99; i++) {
+      while (prob < 0.99) { // for (int i=0; prob < 0.99; i++) {
 	double mu = fFC->FindForMedianN(ndisc,prob);
 	printf("For a median of %i, prob:%6.2f minimum R_mue is: %.3e (%.3f mean events = mu * (nominal signal eff))\n",
 	       ndisc, prob, mu*fSes, mu*fSig_eff->nom_*fTrigEff*scaleLuminosity_);

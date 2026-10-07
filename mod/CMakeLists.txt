@@ -161,7 +161,14 @@ set (source_files
   TAnaRint.cc THistModule.cc TModule.cc
   MFInterface.cc
 )
-add_library(${lib} SHARED ${source_files} ${dict}.cxx)
+
+
+add_library(Stntuple_mod SHARED 
+  ${source_files} ${dict}.cxx
+)
+
+set_target_properties(${lib} PROPERTIES IMPORTED_LOCATION "${STNTUPLE_LIBRARY_DIR}/lib${lib}.so")
+add_library(Stntuple::${subpkg} ALIAS ${lib}  )
 
 target_link_libraries(${lib}
   Stntuple_print

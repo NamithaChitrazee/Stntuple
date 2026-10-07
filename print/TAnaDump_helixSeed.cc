@@ -30,7 +30,7 @@ void TAnaDump::evalHelixInfo(const mu2e::HelixSeed* Helix,
   NHitsLoopFailed = 0;
   
   int           nMinHitsLoop(3), nHitsLoop(0), nHitsLoopChecked(0);
-  float         meanHitRadialDist(0), z_first_hit(0), z_last_hit(0), counter(0); 
+  float         /*meanHitRadialDist(0),*/ z_first_hit(0), z_last_hit(0)/*, counter(0)*/; 
   bool          isFirst(true);
   float         half_pitch  =  M_PI*fabs(Helix->_helix._lambda);
   float         dz_min_toll = 600.;
@@ -40,8 +40,8 @@ void TAnaDump::evalHelixInfo(const mu2e::HelixSeed* Helix,
     hit = &Helix->_hhits[f];
     if (hit->_flag.hasAnyProperty(mu2e::StrawHitFlag::outlier))     continue;
       
-    meanHitRadialDist += sqrtf(hit->pos().x()*hit->pos().x() + hit->pos().y()*hit->pos().y());
-    ++counter;
+    //meanHitRadialDist += sqrtf(hit->pos().x()*hit->pos().x() + hit->pos().y()*hit->pos().y());
+    //++counter;
     float z = hit->pos().z();
     if (isFirst){
       z_first_hit = z;
@@ -75,7 +75,7 @@ void TAnaDump::evalHelixInfo(const mu2e::HelixSeed* Helix,
 	
   }//end loop over the hits
 
-  if (counter > 0) meanHitRadialDist /= counter;
+  //if (counter > 0) meanHitRadialDist /= counter;
   if (nHitsLoop >= nMinHitsLoop) {
     ++NLoops;
     nHitsLoopChecked +=  nHitsLoop;

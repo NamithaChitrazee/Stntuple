@@ -26,9 +26,39 @@ add_library(${lib} SHARED
   TStnPrintUtils.cc
   ${dict}.cxx
 )
+add_library(Stntuple::alg ALIAS ${lib}  )
 
+target_include_directories(${lib} PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+)
 
-target_link_libraries(${lib}      ROOT::Core ROOT::Matrix ROOT::Tree ROOT::Graf ROOT::Gpad)
+install(TARGETS ${lib}
+  EXPORT StntupleTargets
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+  INCLUDES DESTINATION include
+)
+
+install(EXPORT StntupleTargets
+  FILE StntupleTargets.cmake
+  NAMESPACE Stntuple::
+  DESTINATION lib/cmake/Stntuple
+)
+
+target_link_libraries(${lib}
+  Offline::DataProducts
+  fhiclcpp::fhiclcpp
+  cetlib::cetlib
+  cetlib_except::cetlib_except
+  ROOT::Core ROOT::Matrix ROOT::Tree ROOT::Graf ROOT::Gpad
+)
+
+target_include_directories(${lib}
+#  PUBLIC  ${art_INCLUDE_DIR}
+  PRIVATE ${art_INCLUDE_DIR}
+  PRIVATE ${canvas_INCLUDE_DIR}
+)
 
 cet_add_compiler_flags(-g -O0)
 

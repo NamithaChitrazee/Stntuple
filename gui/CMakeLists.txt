@@ -58,6 +58,10 @@ set (source_files
 
 add_library(${lib} SHARED ${source_files} ${dict}.cxx)
 
+set_target_properties(${lib} PROPERTIES IMPORTED_LOCATION "${STNTUPLE_LIBRARY_DIR}/lib${lib}.so")
+add_library(Stntuple::${subpkg} ALIAS ${lib}  )
+
+
 target_link_libraries(${lib}
   Stntuple_print
   Stntuple_geom
