@@ -39,10 +39,9 @@ private:
   ~TRunDb();
 
 public:
-  static TRunDb* Instance();
-
-  int           GetRunInfo(int RunNumber, TRunDb::Data_t* RunInfo);
-
+  static TRunDb*      Instance();
+  
+  int                 GetRunInfo(int RunNumber, TRunDb::Data_t* RunInfo);
   fhicl::ParameterSet GetTable(const char* TableName, int RunNumber);
 
 };

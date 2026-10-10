@@ -5,6 +5,8 @@
 # p2 : read and ntuple (use with RootInput to ntuple MDC'2018 files)
 # p3 : path to debug the TPR and CPR reconstruction paths separately
 # p4 : read, reconstruct, run event display : MuHitDisplayDeMHDar
+#
+# 2026-10-05 PM: data and MC geometries for the moment are different
 #------------------------------------------------------------------------------
 BEGIN_PROLOG
   bgHitFiles                  : @nil
@@ -168,7 +170,7 @@ services.message.destinations.log.categories.ArtReport.limit       : 1000
 services.message.destinations.log.categories.ArtReport.timespan    : 300
 
 services.GeometryService.bFieldFile: "Offline/Mu2eG4/geom/bfgeom_no_field.txt"
-services.GeometryService.inputFile : "Offline/Mu2eG4/geom/geom_common_extracted.txt"
+services.GeometryService.inputFile : "Stntuple/fcl/geom_common_extracted_data.txt"
 #include "Offline/CRVReco/fcl/epilog_extracted.fcl"
 #----------------------------------------------------------------------
 #  overrides by submit_mu2e_job.py

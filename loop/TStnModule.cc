@@ -77,10 +77,10 @@ TStnModule::TStnModule(const char* name, const char* title):TNamed(name,title)
 
   fFolder->Add(this);
 
-  // TFolder* hist = fFolder->AddFolder("Hist","ListOfHistograms");
-  fFolder->AddFolder("Hist","ListOfHistograms");
+  TFolder* hist_folder = fFolder->AddFolder("Hist","ListOfHistograms");
+  // fFolder->AddFolder("Hist","ListOfHistograms");
 
-  fBookHist          = new TStnBookHist(fFolder);
+  fBookHist          = new TStnBookHist(hist_folder);
 
   fListOfL3TrigNames = new TObjArray();
   fListOfL3Triggers  = new TObjArray();
