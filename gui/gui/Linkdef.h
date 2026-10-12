@@ -46,9 +46,5 @@
 #pragma link C++ class TStrawHitVisNode;
 #pragma link C++ class TTrkVisNode;
 
-#pragma link C++ class    Counter;
-#pragma link C++ class    DrawCrvGeometry;
-#pragma link C++ class    HitInfo;
-
 #endif
 

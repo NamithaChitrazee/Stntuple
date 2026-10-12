@@ -28,7 +28,7 @@ set (include_files
 #  TStnVisNodeA.hh
   TTrkVisNode.hh
   TEvdPanelVisNode.hh
-  draw_crv_geometry.hh
+  # draw_crv_geometry.hh
 )
 
 ROOT_GENERATE_DICTIONARY(${dict} ${include_files} LINKDEF ${subpkg}/Linkdef.h)
@@ -56,7 +56,7 @@ set (source_files
   TTrkVisNode.cc
   TEvdPanelVisNode.cc
 
-  draw_crv_geometry.cc
+#  draw_crv_geometry.cc
 )
 
 add_library(${lib} SHARED ${source_files} ${dict}.cxx)
