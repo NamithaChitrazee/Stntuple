@@ -30,24 +30,17 @@ add_library(${lib} SHARED
   TRunDb.cc
   ${dict}.cxx
 )
-add_library(Stntuple::alg ALIAS ${lib}  )
+
+add_library(Stntuple::${subpkg} ALIAS ${lib}  )
 
 target_include_directories(${lib} PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
 )
 
-install(TARGETS ${lib}
-  EXPORT StntupleTargets
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib
-  INCLUDES DESTINATION include
-)
-
-install(EXPORT StntupleTargets
-  FILE StntupleTargets.cmake
-  NAMESPACE Stntuple::
-  DESTINATION lib/cmake/Stntuple
+target_include_directories(${lib}
+  PRIVATE ${art_INCLUDE_DIR}
+  PRIVATE ${canvas_INCLUDE_DIR}
 )
 
 target_link_libraries(${lib}
@@ -58,15 +51,15 @@ target_link_libraries(${lib}
   ROOT::Core ROOT::Matrix ROOT::Tree ROOT::Graf ROOT::Gpad
 )
 
-target_include_directories(${lib}
-#  PUBLIC  ${art_INCLUDE_DIR}
-  PRIVATE ${art_INCLUDE_DIR}
-  PRIVATE ${canvas_INCLUDE_DIR}
+install(TARGETS ${lib}
+  EXPORT StntupleTargets
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+  RUNTIME DESTINATION bin
+  INCLUDES DESTINATION include
 )
 
 cet_add_compiler_flags(-g -O0)
-
-install(TARGETS ${lib})
 
 # install_headers()
 # install_source()

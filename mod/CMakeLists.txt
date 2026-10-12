@@ -33,12 +33,12 @@ ROOT_GENERATE_DICTIONARY(${dict} ${include_files}
 set_property(SOURCE ${dict}.cxx PROPERTY generated)
 
 cet_build_plugin(EventFilter art::module LIBRARIES REG
-  Stntuple_mod
-  Stntuple_gui
-  Stntuple_print
-  Stntuple_geom
-  Stntuple_obj
-  Stntuple_base
+  Stntuple::mod
+  Stntuple::gui
+  Stntuple::print
+  Stntuple::geom
+  Stntuple::obj
+  Stntuple::base
   art_root_io::TFileService_service
   artdaq-core-mu2e::Data
   ROOT::Hist
@@ -50,12 +50,12 @@ cet_build_plugin(EventFilter art::module LIBRARIES REG
 )
 
 cet_build_plugin(FillStntuple art::module LIBRARIES REG
-  Stntuple_mod
-  Stntuple_gui
-  Stntuple_print
-  Stntuple_geom
-  Stntuple_obj
-  Stntuple_base
+  Stntuple::mod
+  Stntuple::gui
+  Stntuple::print
+  Stntuple::geom
+  Stntuple::obj
+  Stntuple::base
   art_root_io::TFileService_service
   artdaq-core-mu2e::Data
   ROOT::Hist
@@ -67,13 +67,13 @@ cet_build_plugin(FillStntuple art::module LIBRARIES REG
 )
 
 cet_build_plugin(InitStntuple art::module LIBRARIES REG
-  Stntuple_mod
-  Stntuple_gui
-  Stntuple_print
-  Stntuple_geom
-  Stntuple_alg
-  Stntuple_obj
-  Stntuple_base
+  Stntuple::mod
+  Stntuple::gui
+  Stntuple::print
+  Stntuple::geom
+  Stntuple::alg
+  Stntuple::obj
+  Stntuple::base
   art_root_io::TFileService_service
   artdaq-core-mu2e::Data
   ROOT::Hist
@@ -88,13 +88,13 @@ add_library(${MuHitDisplayModule} SHARED MuHitDisplay_module.cc  ${MuHitDisplayD
   
 target_link_libraries(${MuHitDisplayModule} 
   PRIVATE
-  Stntuple_mod
-  Stntuple_gui
-  Stntuple_print
-  Stntuple_alg
-  Stntuple_geom
-  Stntuple_obj
-  Stntuple_base
+  Stntuple::mod
+  Stntuple::gui
+  Stntuple::print
+  Stntuple::alg
+  Stntuple::geom
+  Stntuple::obj
+  Stntuple::base
   Offline::RecoDataProducts
   art_root_io::TFileService_service
   artdaq-core-mu2e::Data
@@ -106,12 +106,12 @@ target_link_libraries(${MuHitDisplayModule}
 )
 
 cet_build_plugin(StntupleEventDump art::module LIBRARIES REG
-  Stntuple_mod
-  Stntuple_gui
-  Stntuple_print
-  Stntuple_geom
-  Stntuple_obj
-  Stntuple_base
+  Stntuple::mod
+  Stntuple::gui
+  Stntuple::print
+  Stntuple::geom
+  Stntuple::obj
+  Stntuple::base
   art_root_io::TFileService_service
   artdaq-core-mu2e::Data
   ROOT::Hist
@@ -123,12 +123,12 @@ cet_build_plugin(StntupleEventDump art::module LIBRARIES REG
 )
 
 cet_build_plugin(StntupleMaker art::module LIBRARIES REG
-  Stntuple_mod
-  Stntuple_gui
-  Stntuple_print
-  Stntuple_geom
-  Stntuple_obj
-  Stntuple_base
+  Stntuple::mod
+  Stntuple::gui
+  Stntuple::print
+  Stntuple::geom
+  Stntuple::obj
+  Stntuple::base
   art_root_io::TFileService_service
   artdaq-core-mu2e::Data
   ROOT::Hist
@@ -162,19 +162,14 @@ set (source_files
   MFInterface.cc
 )
 
-
-add_library(Stntuple_mod SHARED 
-  ${source_files} ${dict}.cxx
-)
-
-set_target_properties(${lib} PROPERTIES IMPORTED_LOCATION "${STNTUPLE_LIBRARY_DIR}/lib${lib}.so")
+add_library(${lib} SHARED  ${source_files} ${dict}.cxx )
 add_library(Stntuple::${subpkg} ALIAS ${lib}  )
 
 target_link_libraries(${lib}
-  Stntuple_print
-  Stntuple_geom
-  Stntuple_obj
-  Stntuple_base
+  Stntuple::print
+  Stntuple::geom
+  Stntuple::obj
+  Stntuple::base
   
   Offline::RecoDataProducts
   Offline::MCDataProducts
@@ -194,7 +189,14 @@ target_link_libraries(${lib}
 
 cet_add_compiler_flags(-g -O0)
 
-install(TARGETS ${lib} ${MuHitDisplayModule})
+install(TARGETS ${lib} ${MuHitDisplayModule}
+  EXPORT   StntupleTargets
+  LIBRARY  DESTINATION lib
+  ARCHIVE  DESTINATION lib
+  RUNTIME  DESTINATION bin
+  INCLUDES DESTINATION include
+)
+
 
 # install_headers()
 # install_source()

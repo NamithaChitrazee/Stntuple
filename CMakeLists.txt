@@ -72,4 +72,10 @@ add_subdirectory(ana)
 add_subdirectory(val)
 add_subdirectory(mod)
 
+install(EXPORT StntupleTargets
+  FILE StntupleTargets.cmake
+  NAMESPACE Stntuple::
+  DESTINATION lib/cmake/Stntuple
+)
+
 cet_cmake_config()

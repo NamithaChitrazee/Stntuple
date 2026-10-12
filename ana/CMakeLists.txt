@@ -54,7 +54,7 @@ endif()
 add_library(${lib} SHARED ${source_files} ${dict}.cxx)
 
 target_link_libraries(${lib}
-  Stntuple_alg Stntuple_obj Stntuple_loop Stntuple_gui Stntuple_geom Stntuple_base
+  Stntuple::alg Stntuple::obj Stntuple::loop Stntuple::gui Stntuple::geom Stntuple::base
   ROOT::Core ROOT::Matrix ROOT::Tree ROOT::Graf ROOT::Gpad)
 
 cet_add_compiler_flags(-g -O0)

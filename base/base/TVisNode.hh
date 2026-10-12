@@ -32,7 +32,7 @@ public:
 
   virtual int         InitEvent();
 
-  void        SetDebugLevel(int Level) { fDebugLevel = Level; }
+  void                SetDebugLevel(int Level) { fDebugLevel = Level; }
 
   void                SetClosestObject(TObject* Obj, int Dist) {
     fClosestObject = Obj;

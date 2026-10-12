@@ -38,16 +38,22 @@ set (source_files
 )
 
 add_library(${lib} SHARED ${source_files} ${dict}.cxx)
+add_library(Stntuple::${subpkg} ALIAS ${lib}  )
 
 target_link_libraries(${lib}
-  Stntuple_base
+  Stntuple::base
   art::Framework_Principal
   fhiclcpp::fhiclcpp  cetlib::cetlib
   ROOT::Physics ROOT::Matrix ROOT::Tree ROOT::Geom ROOT::Core)
 
 cet_add_compiler_flags(-g -O0)
 
-install(TARGETS ${lib})
-# install_headers()
-# install_source()
+install(TARGETS ${lib}
+  EXPORT StntupleTargets
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+  RUNTIME DESTINATION bin
+  INCLUDES DESTINATION include
+)
+
 install(DIRECTORY ${subpkg} DESTINATION include/Stntuple)

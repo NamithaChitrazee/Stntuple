@@ -59,9 +59,10 @@ set (source_files
 )
 
 add_library(${lib} SHARED ${source_files} ${dict}.cxx)
+add_library(Stntuple::${subpkg} ALIAS ${lib}  )
 
 target_link_libraries(${lib}
-  Stntuple_base
+  Stntuple::base
   Offline::DataProducts
   art::Framework_Principal
   ROOT::Physics ROOT::EG ROOT::Graf3d ROOT::Graf ROOT::Geom ROOT::Matrix ROOT::GenVector ROOT::Core)
@@ -73,6 +74,12 @@ target_include_directories(${lib}
 cet_add_compiler_flags(-g -O0)
 
 install(TARGETS ${lib})
-# install_headers()
-# install_source()
+install(TARGETS ${lib}
+  EXPORT StntupleTargets
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+  RUNTIME DESTINATION bin
+  INCLUDES DESTINATION include
+)
+
 install(DIRECTORY ${subpkg} DESTINATION include/Stntuple)
