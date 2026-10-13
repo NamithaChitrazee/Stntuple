@@ -67,5 +67,26 @@ void TStrTrack::Clear(const char* Opt) {
 
 //-----------------------------------------------------------------------------
 void TStrTrack::Print(const char* Opt) const {
-  std::cout << std::format("TStrTrack::Print not implemented yet\n");
+  TString opt(Opt);
+
+  opt.ToLower();
+					// "non-const *this" for printing purposes
+  // TStrTrack* t = (TStrTrack*) this;
+
+  if ((opt == "") || (opt.Index("banner") >= 0)) {
+//-----------------------------------------------------------------------------
+// print banner
+//-----------------------------------------------------------------------------
+    printf("------------------------------------------------------------------------------------------------");
+    printf("------------------------------------------------------------------\n");
+    printf(" i   nh  ndof TcInd     chi2d     T0         X0         Y0        Z0          Nx         Ny       Nz\n");
+    printf("------------------------------------------------------------------------------------------------");
+    printf("------------------------------------------------------------------\n");
+  }
+
+  if ((opt == "") || (opt.Index("data") >= 0)) {
+    printf("%2i  %3i  %4i  %4i  ",GetUniqueID(), fNHits, fNDof, fTcIndex);
+    printf("%8.2f %9.2f %10.3f %10.3f %10.3f %10.3f %10.3f %10.3f",fChi2/fNDof,fT0,fX0,fY0,fZ0,fNx,fNy,fNz);
+    printf("\n");
+  }
 }

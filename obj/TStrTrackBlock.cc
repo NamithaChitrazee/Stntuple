@@ -109,7 +109,7 @@ void TStrTrackBlock::Print(Option_t* opt) const {
   if (fNTracks > 0) {
     fListOfTracks->At(0)->Print("banner");
     for (int i=0; i<fNTracks; i++) {
-      fListOfTracks->At(i)->Print();
+      fListOfTracks->At(i)->Print("data");
     }
   }
 }
