@@ -41,8 +41,11 @@ TStnModule::TStnModule()
   fFilteringMode     =  0;
 				// by default all the events pass
   fPassed            =  1;
-  fFolder            =  0;
-  fListOfL3TrigNames =  0;
+  fFolder            =  nullptr;
+  
+  fListOfL3TrigNames = nullptr;
+  fListOfL3Triggers  = nullptr;
+  
   for (int i=0; i<kNDebugBits; i++) fDebugBit[i] = 0;
 
   fBookHist          = nullptr;
@@ -93,14 +96,17 @@ TStnModule::~TStnModule() {
   // destructor: module owns its histograms, but there could be other objects
   // added to it... derived classes should not delete objecs added to fFolder
 
-  delete fBookHist;
-  delete fFolder;
-  
-  fListOfL3TrigNames->Delete();
-  delete fListOfL3TrigNames;
-  fListOfL3Triggers->Delete();
-  fListOfL3Triggers->Clear();
-  delete fListOfL3Triggers;
+  if (fBookHist) delete fBookHist;
+  if (fFolder  ) delete fFolder;
+
+  if (fListOfL3TrigNames) {
+    fListOfL3TrigNames->Delete();
+    delete fListOfL3TrigNames;
+  }
+  if (fListOfL3Triggers) {
+    fListOfL3Triggers->Delete();
+    delete fListOfL3Triggers;
+  }
 }
 
 //_____________________________________________________________________________
