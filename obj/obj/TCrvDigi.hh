@@ -25,7 +25,10 @@ public:
   TCrvDigi(int Ns);
   virtual ~TCrvDigi();
 
-  int     Ns() { return fNs; }
+  int     Sbid() { return fSbid; }
+  int     Sipm() { return fSipm; }
+  int     Roc () { return fRoc;  }
+  int     Ns  () { return fNs;   }
   int     Init(int Ns);
 
   std::vector<uint16_t>& Adc() { return fAdc; }

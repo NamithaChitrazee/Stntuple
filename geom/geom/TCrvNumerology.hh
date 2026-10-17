@@ -73,7 +73,8 @@ public:
 //-----------------------------------------------------------------------------
 // other methods
 //-----------------------------------------------------------------------------
-  int        GetBarInfo(int BarIndex, int& Sector, int& Module, int& Layer, int& Bar);
+  int         GetBarInfo(int BarIndex, int& Sector, int& Module, int& Layer, int& Bar);
+  int         GetSector (int Sbid);  // sbid = bar index
 
   static TCrvNumerology*  Instance();
 //-----------------------------------------------------------------------------

@@ -19,6 +19,12 @@ public:
   
   struct Data_t {
     int  och;                           // offline channel
+    int  sbid;
+    int  sector;
+    int  module;
+    int  layer;
+    int  counter;                       // counter within the layer
+    int  side;
     int  roc;
     int  feb;
     int  fch;                           // FEB channel

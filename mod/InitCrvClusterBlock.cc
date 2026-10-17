@@ -5,6 +5,7 @@
 // #include "messagefacility/MessageLogger/MessageLogger.h"
 #include "Stntuple/mod/MFInterface.hh"
 
+#include "Stntuple/geom/TCrvNumerology.hh"
 #include "Stntuple/mod/InitCrvClusterBlock.hh"
 #include "Stntuple/obj/TCrvPulseBlock.hh"
 #include "Stntuple/obj/TStnEvent.hh"
@@ -20,9 +21,9 @@ int StntupleInitCrvClusterBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* E
   // const char oname []  = {"stntuple::InitCrvClusterBlock::InitDataBlock"};
 
   art::EventID eid = Event->id();
-  const int ev = Event->event();
-  const int rn = Event->run();
-  const int sr = Event->subRun();
+  const int ev     = Event->event();
+  const int rn     = Event->run();
+  const int sr     = Event->subRun();
 
   if (Block->Initialized(ev,rn,sr)) return 0;
 
@@ -126,8 +127,16 @@ int StntupleInitCrvClusterBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* E
 
     const std::vector<art::Ptr<mu2e::CrvRecoPulse>>* list_of_pulses = &cluster->GetCrvRecoPulses();
 
-    int    sector = cluster->GetCrvSectorType();
+    int    stype  = cluster->GetCrvSectorType();
     int    np     = list_of_pulses->size();
+    int    sbid   = list_of_pulses->at(0)->GetScintillatorBarIndex().asInt();
+    int    sector = TCrvNumerology::Instance()->GetSector(sbid);
+    
+    if (sector < 0) {
+      std::string msg = std::format("wrong SBID={}\n",sbid);
+      stntuple::print_(eid,stntuple::e_ERROR,msg);    
+    }
+    
     float  pes    = cluster->GetPEs();
     float  slope  = cluster->GetSlope();
 
@@ -137,10 +146,10 @@ int StntupleInitCrvClusterBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* E
     float  t1     = cluster->GetStartTime();
     float  t2     = cluster->GetEndTime();
 
-    ccc->Set(iccc,sector,np,pes,x,y,z,t1,t2, slope);
+    ccc->Set(iccc,((sector<<8) | stype),np,pes,x,y,z,t1,t2, slope);
     if (verbose > 1) {
       printf("  Cluster sector = %2i, N(pulses) = %2i, N(PE) = %4.1f, x = %7.1f, y = %7.1f, z = %8.1f, t1 = %6.1f, t2 = %6.1f, slope = %6.2f, mc_found = %o\n",
-             sector, np, pes, x, y, z, t1, t2, slope, mc_cluster != nullptr);
+             stype, np, pes, x, y, z, t1, t2, slope, mc_cluster != nullptr);
     }
     if (mc_cluster) {
       auto sim = mc_cluster->GetMostLikelySimParticle();

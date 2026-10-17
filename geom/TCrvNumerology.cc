@@ -170,6 +170,24 @@ int TCrvNumerology::GetBarInfo(int BarIndex, int& Sector, int& Module, int& Laye
   return Sector;
 }
 
+//-----------------------------------------------------------------------------
+// extracted geometry
+// 2026-10-16: this will need to be rewritten
+//-----------------------------------------------------------------------------
+int TCrvNumerology::GetSector(int Sbid) {
+  int sector(-1);
+  if      (Sbid < 256) sector = 0;
+  else if (Sbid < 384) sector = 1;
+  else if (Sbid < 512) sector = 2;
+  else if (Sbid < 576) {
+    sector = (Sbid-512) / 8;
+  }
+  else {
+    printf("ERROR: non-existent SBID:%i\n",Sbid);
+  }
+  return sector;
+}
+
 //------------------------------------------------------------------------------
 void TCrvNumerology::Clear(Option_t* Opt) {
 }

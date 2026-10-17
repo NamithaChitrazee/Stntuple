@@ -53,7 +53,7 @@ void TCrvCoincidenceCluster::Set(int Index, int SectorType, int NPulses, float P
 				 float X, float Y, float Z, float T1, float T2, float Slope)
 {
   fIndex      = Index;
-  fSectorType = SectorType;
+  fSectorType = SectorType;             // (sector<<8) | sector_type
   fNPulses    = NPulses;
   fPes        = Pes;
   fPosition.SetXYZ(X,Y,Z);

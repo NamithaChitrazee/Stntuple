@@ -12,14 +12,14 @@ namespace mu2e {
 class TCrvCoincidenceCluster: public TObject {
 public:
   enum {
-    kNFreeInts = 10,
-    kNFreeFloats = 9
+    kNFreeInts   = 10,
+    kNFreeFloats =  9
   };
 
   int          fIndex;                   // index in the list
-  int          fSectorType;
+  int          fSectorType;              // (sector << 8) | (sector_type)
   int          fNPulses;
-  int          fSimID; //most likely SIM particle
+  int          fSimID;                   // most likely SIM particle
   int          fMCNPulses;
   int          fFreeInts[kNFreeInts];
   float        fPes;
@@ -42,8 +42,9 @@ public:
   virtual ~TCrvCoincidenceCluster();
 					// ****** accessors
 
-  int     Index           () const { return fIndex;          }
-  int     SectorType      () const { return fSectorType;      }
+  int     Index           () const { return fIndex;           }
+  int     SectorType      () const { return (fSectorType >> 0) & 0xff; }
+  int     Sector          () const { return (fSectorType >> 8) & 0xff; }
   float   Pes             () const { return fPes;             }
   int     NPulses         () const { return fNPulses;         }
 
