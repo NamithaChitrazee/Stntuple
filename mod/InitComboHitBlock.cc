@@ -4,6 +4,7 @@
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
 #include "Stntuple/mod/InitComboHitBlock.hh"
+#include "Stntuple/mod/StntupleUtilities.hh"
 
 #include "Offline/RecoDataProducts/inc/ComboHit.hh"
 
@@ -18,7 +19,7 @@ using std::vector ;
 //-----------------------------------------------------------------------------
 namespace stntuple {
 
-  //-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 InitComboHitBlock::InitComboHitBlock() : TStnInitDataBlock() {
   fSaveShLinks = 0;
   fMinDt       = -1;     // if < 0, save all hits
@@ -26,23 +27,6 @@ InitComboHitBlock::InitComboHitBlock() : TStnInitDataBlock() {
   fLastRun     = -1;
 }
   
-//-----------------------------------------------------------------------------
-// compressing ntuple for specialized studies
-// check whether the hist time is close enough to one of the time clusters
-//-----------------------------------------------------------------------------
-bool InitComboHitBlock::CloseEnough(float Time) {
-  bool close_enough = false;
-  for (int itc=0; itc<fNTc; itc++) {
-    const mu2e::TimeCluster* tc = &fTcc->at(itc);
-    float dt = Time - tc->t0().t0();
-    if (fabs(dt) < fMinDt) {
-      close_enough = true;
-      break;
-    }
-  }
-  return close_enough;
-}
-
 //-----------------------------------------------------------------------------
 int InitComboHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int Mode) {
   std::string oname("InitComboHitBlock::InitDataBlock");
@@ -62,7 +46,6 @@ int InitComboHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int 
     fTpm      = &fTpmh.get(Event->id());
     fLastRun  = rn_number;
   }
-    
 //-----------------------------------------------------------------------------
 // straw hit information
 //-----------------------------------------------------------------------------
@@ -124,9 +107,9 @@ int InitComboHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int 
     const mu2e::ComboHit* ch = &fChc->at(i);
     int ind = ch-ch0;
     float corrected_time = ch->correctedTime();
-    if (fMinDt > 0) {
+    if (fStoreCloseHitsOnly) {
       if (ch->energyDep() < fMinEDep) {
-        bool close_enough = CloseEnough(corrected_time);
+        bool close_enough = stntuple::CloseEnough(corrected_time,fTcc,fMinDt);
         if (not close_enough) continue;
       }
     }

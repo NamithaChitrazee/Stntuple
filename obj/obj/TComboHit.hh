@@ -53,7 +53,11 @@ public:
   float X          () const { return fX; }
   float Y          () const { return fY; }
   float Z          () const { return fZ; }
-  float EDep       () const { return fEDep;        }
+  float EDep       () const { return fEDep;   }
+  float Ux         () const { return fUx; }
+  float Uy         () const { return fUy; }
+  float Ures       () const { return fUres; }
+  float Vres       () const { return fVres; }
 
   mu2e::ComboHit* OfflineCh() { return fOfflineCh; }
 //-----------------------------------------------------------------------------

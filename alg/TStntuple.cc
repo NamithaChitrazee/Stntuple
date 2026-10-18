@@ -12,13 +12,10 @@
 #include "TString.h"
 
 #include "Stntuple/alg/TStntuple.hh"
-
 #include "Stntuple/loop/TStnModule.hh"
-
 #include "Stntuple/obj/TStnTrack.hh"
-
-#include <Stntuple/obj/TStnHeaderBlock.hh>
-#include <Stntuple/obj/TStnTrackBlock.hh>
+#include "Stntuple/obj/TStnHeaderBlock.hh"
+#include "Stntuple/obj/TStnTrackBlock.hh"
 
 #include "Stntuple/obj/TStnEvent.hh"
 #include "Stntuple/obj/TStnErrorLogger.hh"
@@ -31,17 +28,16 @@
 // ClassImp(TStntuple)
 
 
-TStntuple*        TStntuple::fgInstance  = 0;
+TStntuple*        TStntuple::fgInstance(nullptr);
 
-Int_t             TStntuple::fgRunNumber = 0;
-
+Int_t             TStntuple::fgRunNumber(0);
 //-----------------------------------------------------------------------------
 TStntuple::TStntuple() {
 
 //-----------------------------------------------------------------------------
 // initialize the LO DIO spectrum
 //-----------------------------------------------------------------------------
-  TTree tree("t1","t1");
+  TTree  tree("t1","t1");
   double emin = 0.05;
   double emax = 110.05;
   int    nb   = 1100;

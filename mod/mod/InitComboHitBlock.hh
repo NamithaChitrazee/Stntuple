@@ -34,7 +34,8 @@ public:
   int             fNTc;
   int             fNSh;
   int             fNCh;
-  
+
+  bool            fStoreCloseHitsOnly;
   float           fMinDt;
   float           fMinEDep;
 
@@ -49,14 +50,14 @@ public:
 
   InitComboHitBlock();
   
-  void   SetChCollTag          (art::InputTag& Tag) { fChCollTag          = Tag; }
-  void   SetShCollTag          (art::InputTag& Tag) { fShCollTag          = Tag; }
-  void   SetTcCollTag          (art::InputTag& Tag) { fTcCollTag          = Tag; }
+  void   SetChCollTag          (art::InputTag& Tag) { fChCollTag  = Tag; }
+  void   SetShCollTag          (art::InputTag& Tag) { fShCollTag  = Tag; }
+  void   SetTcCollTag          (art::InputTag& Tag) { fTcCollTag  = Tag; }
   
-  void   SetMinDt   (float Dt  ) { fMinDt   = Dt  ; }
-  void   SetMinEDep (float EDep) { fMinEDep = EDep; }
+  void   SetStoreCloseHitsOnly (bool  Flag) { fStoreCloseHitsOnly = Flag; }
+  void   SetMinDt              (float Dt  ) { fMinDt              = Dt  ; }
+  void   SetMinEDep            (float EDep) { fMinEDep            = EDep; }
 
-  bool        CloseEnough  (float Time);
   virtual int InitDataBlock(TStnDataBlock* Block, AbsEvent* Evt, int Mode) override;
   virtual int ResolveLinks (TStnDataBlock* Block, AbsEvent* Evt, int Mode) override;
 };

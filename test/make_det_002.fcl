@@ -114,10 +114,14 @@ physics : {
     analyzers  : { @table::stntuple.analyzers 
 	StntupleMaker: { @table::stntuple.analyzers.StntupleMaker
 #------------------------------------------------------------------------------
-# don't need hits...
+# comment out the hit section if don't need hits... by default, store close hits only
 #------------------------------------------------------------------------------
-            # makeStrawHits      : 1
-            # makeComboHits      : 1
+            makeStrawHits      : 1
+            makeComboHits      : 1
+            storeCloseHitsOnly : true
+            minStrawHitEDep    : 0.0005          ## 0.5 keV
+            minStrawHitDt      : 80              ## ns
+            
             makeCaloClusters   : 1
             makeCaloHits       : 1
             makeCaloDigis      : 1

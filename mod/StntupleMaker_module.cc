@@ -158,7 +158,6 @@ protected:
   string                   fCrvCoincidenceCollTag;          //
   string                   fCrvCoincidenceClusterCollTag;   //
   string                   fCrvCoincidenceClusterMCCollTag; //
-  //  int                      fCrvClustersStorePulses;
 
   art::InputTag            fVdhCollTag;                     // hits on virtual detectors (StepPointMCCollection)
 
@@ -179,7 +178,6 @@ protected:
 
   vector<string>           fTrackBlockName;
   vector<art::InputTag>    fTrackCollTag;
-  //  int                      fTrackFitType;
 
   vector<string>           fTrackTsBlockName;  // for each track block, the tag  of the corresponding TrackSeed coll
   vector<string>           fTrackTsCollTag;    // for each track block, the name of the corresponding TrackSeed block
@@ -243,6 +241,10 @@ protected:
   string                   fCutHelixSeedCollTag; // helix collection to cut on
   int                      fMinNHelices        ; // min number of helices (for cosmics)
 
+  bool                     fStoreCloseHitsOnly;  // if compressed ntuple for SH studies
+  float                    fMinStrawHitEDep;     // if fStoreCloseHitsOnly, store all hits above fMinStrawHitEDep
+                                                 // and hits within fMinStrawHitDt from one of the time clusters
+  float                    fMinStrawHitDt;       // 
 //-----------------------------------------------------------------------------
 // debug parameters
 //-----------------------------------------------------------------------------
@@ -384,6 +386,9 @@ StntupleMaker::StntupleMaker(fhicl::ParameterSet const& PSet):
   , fMinNStrawHits           (PSet.get<int>           ("minNStrawHits"       ))
   , fCutHelixSeedCollTag     (PSet.get<string>        ("cutHelixSeedCollTag" ))
   , fMinNHelices             (PSet.get<int>           ("minNHelices"         ))
+  , fStoreCloseHitsOnly      (PSet.get<bool>          ("storeCloseHitsOnly"  ))
+  , fMinStrawHitEDep         (PSet.get<float>         ("minStrawHitEDep"     ))
+  , fMinStrawHitDt           (PSet.get<float>         ("minStrawHitDt"       ))
 
   , fTrackVerbose            (PSet.get<int>           ("trackVerbose", 0     ))
   , fHelixVerbose            (PSet.get<int>           ("helixVerbose", 0     ))
@@ -673,8 +678,10 @@ void StntupleMaker::beginJob() {
     fInitComboHitBlock->SetShCollTag(fShCollTag);
     art::InputTag tc_coll_tag = fTcCollTag[0];
     fInitComboHitBlock->SetTcCollTag(tc_coll_tag); // why do I need many ????
+    fInitComboHitBlock->SetStoreCloseHitsOnly(fStoreCloseHitsOnly);
+    fInitComboHitBlock->SetMinEDep(fMinStrawHitEDep);
+    fInitComboHitBlock->SetMinDt  (fMinStrawHitDt  );
     
-    //    TStnDataBlock* db = AddDataBlock("ComboHitBlock",
     AddDataBlock("ComboHitBlock",
                  "TComboHitBlock",
                  fInitComboHitBlock,
@@ -716,7 +723,6 @@ void StntupleMaker::beginJob() {
     fInitCrvcBlock->SetCrvRecoPulseCollTag(fCrvRecoPulseCollTag);
     fInitCrvcBlock->SetCrvCoincidenceClusterCollTag(fCrvCoincidenceClusterCollTag);
     fInitCrvcBlock->SetCrvCoincidenceClusterMCCollTag(fCrvCoincidenceClusterMCCollTag);
-    // fInitCrvcBlock->SetStorePulses(fCrvClustersStorePulses);
 
     AddDataBlock("CrvcBlock","TCrvClusterBlock",
 		 fInitCrvcBlock,
@@ -850,6 +856,11 @@ void StntupleMaker::beginJob() {
     fInitStrawHitBlock->SetShCollTag         (fShCollTag);
     fInitStrawHitBlock->SetStrawDigiCollTag  (fStrawDigiCollTag);
     fInitStrawHitBlock->SetStrawDigiMCCollTag(fSdmcCollTag);
+    art::InputTag tc_coll_tag = fTcCollTag[0]; // why would I need many - for comparison between algorithms ?
+    fInitStrawHitBlock->SetTimeClusterCollTag(tc_coll_tag);
+    fInitStrawHitBlock->SetStoreCloseHitsOnly(fStoreCloseHitsOnly);
+    fInitStrawHitBlock->SetMinEDep   (fMinStrawHitEDep);
+    fInitStrawHitBlock->SetMinDt     (fMinStrawHitDt);
 
     if (fMakeStrawWaveforms) { 
       fInitStrawHitBlock->SetWriteSdwf(1);

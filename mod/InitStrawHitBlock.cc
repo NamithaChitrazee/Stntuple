@@ -1,9 +1,13 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
 ///////////////////////////////////////////////////////////////////////////////
+#include <vector>
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
+#include "Stntuple/mod/MFInterface.hh"
+
 #include "Stntuple/mod/InitStrawHitBlock.hh"
+#include "Stntuple/mod/StntupleUtilities.hh"
 
 #include "Offline/RecoDataProducts/inc/ComboHit.hh"
 #include "Offline/RecoDataProducts/inc/StrawHit.hh"
@@ -12,39 +16,44 @@
 #include "Offline/MCDataProducts/inc/StrawDigiMC.hh"
 #include "Offline/MCDataProducts/inc/StrawGasStep.hh"
 
-// #include "BTrk/BbrGeom/HepPoint.h"
-
-#include <vector>
-
 using std::vector ;
 //-----------------------------------------------------------------------------
 // in this case AbsEvent is just not used
 //-----------------------------------------------------------------------------
 namespace stntuple {
+//-----------------------------------------------------------------------------
+InitStrawHitBlock::InitStrawHitBlock() : TStnInitDataBlock() {
+  fStoreCloseHitsOnly = false;     // by default, save all hits
+  fMinEDep            = 0.5e-3; // 0.5 keV
+}
+  
 int InitStrawHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int Mode) {
 
   int ev_number, rn_number, mc_flag(0), nhits(0);
 
-  ev_number = Event->event();
-  rn_number = Event->run();
+  art::EventID eid = Event->id();
+  ev_number        = eid.event();
+  rn_number        = eid.run();
+
+  // Mu2e: run_number < 100000: Monte Carlo
   if (rn_number < 100000) mc_flag = 1;
 
   if (Block->Initialized(ev_number,rn_number)) return 0;
 
   TStrawHitBlock* data = (TStrawHitBlock*) Block;
   data->Clear();
+  
+  if (fLastRun != rn_number) {
+    fTpm      = &fTpmh.get(eid);
+    fLastRun  = rn_number;
+  }  
 //-----------------------------------------------------------------------------
-// straw hit information
+// 
 //-----------------------------------------------------------------------------
-  art::Handle<mu2e::StrawHitCollection>             shch;
-  const mu2e::StrawHitCollection*                   shc (nullptr);
-
-  art::Handle<mu2e::StrawDigiMCCollection>          sdmcch;
-  const mu2e::StrawDigiMCCollection*                sdmcc (nullptr);
-
-  art::Handle<mu2e::StrawDigiCollection>            sdch;
-  const mu2e::StrawDigiCollection*                  sdc (nullptr);
-
+  const mu2e::StrawHitCollection*    shc  (nullptr);
+  const mu2e::StrawDigiMCCollection* sdmcc(nullptr);
+  const mu2e::StrawDigiCollection*   sdc  (nullptr);
+  const mu2e::TimeClusterCollection* tcc  (nullptr);
 //-----------------------------------------------------------------------------
 // assume that straw hits and combo hits are created by the same module - why ?
 //-----------------------------------------------------------------------------
@@ -52,6 +61,7 @@ int InitStrawHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int 
     // bool ok = Event->getByLabel(fShCollTag,chch);
     // if (ok) chc = chch.product();
     
+    art::Handle<mu2e::StrawHitCollection> shch;
     bool ok = Event->getByLabel(fShCollTag,shch);
     if (ok) { 
       shc   = shch.product();
@@ -67,6 +77,7 @@ int InitStrawHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int 
   }
   
   if (! fStrawDigiCollTag.empty() != 0) {
+    art::Handle<mu2e::StrawDigiCollection> sdch;
     bool ok = Event->getByLabel(fStrawDigiCollTag,sdch);
     if (ok) sdc = sdch.product();
 
@@ -77,8 +88,19 @@ int InitStrawHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int 
 							 << " not found.";
     }
   }
+//-----------------------------------------------------------------------------
+// use time clusters only when store close hits
+//-----------------------------------------------------------------------------
+  if (fStoreCloseHitsOnly) { 
+    if (! fTimeClusterCollTag.empty() != 0) {
+      art::Handle<mu2e::TimeClusterCollection> tcch;
+      bool ok = Event->getByLabel(fTimeClusterCollTag,tcch);
+      if (ok) tcc = tcch.product();
+    }
+  }
 
   if (! fStrawDigiMCCollTag.empty() != 0) {
+    art::Handle<mu2e::StrawDigiMCCollection> sdmcch;
     bool ok = Event->getByLabel(fStrawDigiMCCollTag,sdmcch);
     if (ok) sdmcc = sdmcch.product();
 
@@ -113,7 +135,26 @@ int InitStrawHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int 
 	const mu2e::StrawDigiMC* mcdigi = &sdmcc->at(i);
 	step = mcdigi->earlyStrawGasStep().get();
       }
-
+//-----------------------------------------------------------------------------
+// if store only "close" hits, theck the timing
+// max drift time is ~ 40 ns, the TC time is made out of corrected times,
+// which on average are ~20 ns lower
+// use CAL end for time... still a window of 80 ns should be sufficiently large
+//-----------------------------------------------------------------------------
+      if (fStoreCloseHitsOnly) {
+        if (tcc != nullptr) {
+          if (sh->energyDep() < fMinEDep) {
+            bool close_enough = stntuple::CloseEnough(sh->time()-20.,tcc,fMinDt);
+            if (not close_enough) continue;
+          }
+        }
+        else {
+          std::string msg = std::format("mu2e::TimeClusterCollection {} not found, store all hits",
+                                        fTimeClusterCollTag.encode().data());
+          stntuple::print_(eid,e_WARNING,msg);
+        }
+      }
+      // preserve the hit ID: its index in the original collection
       hit = data->NewHit(i);
 
       if (step) {
@@ -159,40 +200,59 @@ int InitStrawHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int 
 	       gen_id, sim_id, 
 	       pdg_id, mother_pdg_id, 
 	       sh->energyDep(), mc_mom);
+      
+      int pln = sh->strawId().plane();
+      int pnl = sh->strawId().panel();
+      const mu2e::TrkPanelMap::Row* tpmd = fTpm->panel_map_by_offline_ind(pln,pnl);
+      
+      hit->SetMnid (tpmd->mnid ());
+      hit->SetZFace(tpmd->zface());
     }
 //-----------------------------------------------------------------------------
 // straw digis and waveforms are produced by the same module
 //-----------------------------------------------------------------------------
-    if (fWriteSdwf != 0) {
-      if (! fStrawDigiCollTag.empty() != 0) {
+    // if (fWriteSdwf != 0) {
+    //   if (! fStrawDigiCollTag.empty() != 0) {
 
-	art::Handle<mu2e::StrawDigiADCWaveformCollection> sdwfch;
-	const mu2e::StrawDigiADCWaveformCollection*       sdwfc(nullptr);
+    //     art::Handle<mu2e::StrawDigiADCWaveformCollection> sdwfch;
+    //     const mu2e::StrawDigiADCWaveformCollection*       sdwfc(nullptr);
 
-	bool ok = Event->getByLabel(fStrawDigiCollTag,sdwfch);
-	if (ok) sdwfc = sdwfch.product();
+    //     bool ok = Event->getByLabel(fStrawDigiCollTag,sdwfch);
+    //     if (ok) sdwfc = sdwfch.product();
 
-	if (sdwfc == nullptr) {
-	  mf::LogWarning(__func__) << " WARNING in InitStrawHitBlock::" << __func__ << ":" << __LINE__ 
-				   << ": StrawDigiADCWaveformCollection:" 
-				   << fStrawDigiCollTag.encode().data() << " NOT FOUND, rc = -2";
-	  return -2;
-	}
+    //     if (sdwfc == nullptr) {
+    //       mf::LogWarning(__func__) << " WARNING in InitStrawHitBlock::" << __func__ << ":" << __LINE__ 
+    //     			   << ": StrawDigiADCWaveformCollection:" 
+    //     			   << fStrawDigiCollTag.encode().data() << " NOT FOUND, rc = -2";
+    //       return -2;
+    //     }
 
-	int nwf = sdwfc->size();
-	for (int i=0; i<nwf; i++) {
-	  const mu2e::StrawDigiADCWaveform* sdwf = &sdwfc->at(i);
+    //     int nwf = sdwfc->size();
+    //     for (int i=0; i<nwf; i++) {
+    //       // SD and SH are parallel, do not store waveforms for hits which are "far"
 
-	  TStrWaveform* wf = data->NewWaveform(i);
-	  wf->Set(sdwf->samples().size(), sdwf->samples().data());
-	}
-      }
-      else {
-	mf::LogWarning(__func__) << " WARNING in InitStrawHitBlock::" << __func__ << ":" << __LINE__ 
-				 << ": StrawDigiADCWaveformCollection coll tag IS EMPTY, rc = -3" ;
-	return -3;
-      }
-    }
+    //       if (fStoreCloseHitsOnly) {           
+    //         if (tcc != nullptr) {
+    //           const mu2e::StrawHit* sh = &shc->at(i);
+    //           if (sh->energyDep() < fMinEDep) {
+    //             bool close_enough = stntuple::CloseEnough(sh->time()-20.,tcc,fMinDt);
+    //             if (not close_enough) continue;
+    //           }
+    //         }
+    //       }
+
+    //       const mu2e::StrawDigiADCWaveform* sdwf = &sdwfc->at(i);
+
+    //       TStrWaveform* wf = data->NewWaveform(i);
+    //       wf->Set(sdwf->samples().size(), sdwf->samples().data());
+    //     }
+    //   }
+    //   else {
+    //     mf::LogWarning(__func__) << " WARNING in InitStrawHitBlock::" << __func__ << ":" << __LINE__ 
+    //     			 << ": StrawDigiADCWaveformCollection coll tag IS EMPTY, rc = -3" ;
+    //     return -3;
+    //   }
+    // }
   }
 
   data->f_RunNumber   = rn_number;

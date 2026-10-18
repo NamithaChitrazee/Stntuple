@@ -44,6 +44,7 @@ target_include_directories(${lib}
 )
 
 target_link_libraries(${lib}
+  Offline::RecoDataProducts
   Offline::DataProducts
   fhiclcpp::fhiclcpp
   cetlib::cetlib

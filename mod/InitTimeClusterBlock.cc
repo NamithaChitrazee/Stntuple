@@ -217,6 +217,8 @@ int  InitTimeClusterBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, 
 }
 
 //-----------------------------------------------------------------------------
+// what does the code do in case of compressed hit storage? (storeClseHitsOnly=true)
+//-----------------------------------------------------------------------------
 Int_t InitTimeClusterBlock::ResolveLinks(TStnDataBlock* Block, AbsEvent* AnEvent, int Mode) {
   // Mu2e version, do nothing
 
@@ -231,19 +233,7 @@ Int_t InitTimeClusterBlock::ResolveLinks(TStnDataBlock* Block, AbsEvent* AnEvent
 
   if (Block->LinksInitialized()) return 0;
 //-----------------------------------------------------------------------------
-// determine the helix corresponding to this time cluster
-// what if there is more than one ? and what if several helix finders used
-// the same list of time clusters as input ?
-// - this makes having only one helix index a very questionable proposition
-// - disable that
-// instead build a list of links to the combohits
-//-----------------------------------------------------------------------------
-//  TStnHelix*                 helixseed;
-
-  // const mu2e::TimeCluster*   ktcluster, *fktcluster;
-  // const mu2e::HelixSeed*     kseed;
-
-  // char                       short_tc_block_name[100];
+// build a list of links to combohits
 
   //  TStnEvent* ev = Block->GetEvent();
   auto tc_block = (TStnTimeClusterBlock*) Block;
@@ -255,6 +245,7 @@ Int_t InitTimeClusterBlock::ResolveLinks(TStnDataBlock* Block, AbsEvent* AnEvent
     const mu2e::TimeCluster* otc = tc->OfflineTc();
     int nch = otc->hits().size();
     for (int j=0; j<nch; j++) {
+      // store the CH index in the initial collection
       uint16_t ind = otc->hits().at(j);
       tc_block->ListOfChLinks()->Add(i,ind);
     }

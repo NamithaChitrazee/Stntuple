@@ -141,6 +141,9 @@ StntupleMakerTemplate : { module_type:StntupleMaker
     simpMaxZ             : 1800.0                                # not used
     minNStrawHits        : -1                                    # min number of straw hits for a SimParticle to be stored
 
+    storeCloseHitsOnly   : false                                 # 
+    minStrawHitDt        : 80.                                   # ns
+    minStrawHitEDep      : 0.5e-3                                # 0.5 keV, in MeV
     genpCollTag          : @local::STN_COMPRESS_MCS              # save signal-only: "generate" 
 #------------------------------------------------------------------------------
 # cant input "unknown" from FCL, so try to set default in C++ - doesn't work

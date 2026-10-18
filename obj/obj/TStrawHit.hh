@@ -15,6 +15,8 @@ class TStrawHit : public TObject {
 public:
 					// data
   int     fStrawID;			// sid | (mcflag << 16)
+  int     fMnid;                        //
+  int     fZFace;                       // 
 					// -------------------- MC info, don't write out for the data
   int     fGenID;                       // generator ID + StrawDigiFlag << 16
   int     fSimID;			// sim particle ID
@@ -33,11 +35,15 @@ public:
 //-----------------------------------------------------------------------------
 // accessors
 //-----------------------------------------------------------------------------
+  mu2e::StrawId Sid() const { return mu2e::StrawId( uint16_t(fStrawID & 0xffff)); }
   int   StrawID    () const { return (fStrawID & 0x0000ffff )               ; }
   int   MCFlag     () const { return (fStrawID & 0xffff0000 ) >> 16         ; }
-		     
+
+  int   Mnid       () const { return fMnid;  }
+  int   ZFace      () const { return fZFace; }
   int   Station    () const { return (fStrawID & mu2e::StrawId::_stationmsk) >> mu2e::StrawId::_stationsft; }
   int   Panel      () const { return (fStrawID & mu2e::StrawId::_panelmsk  ) >> mu2e::StrawId::_panelsft  ; }
+  int   Plane      () const { return (fStrawID & mu2e::StrawId::_planemsk  ) >> mu2e::StrawId::_planesft  ; }
   int   Face       () const { return (fStrawID & mu2e::StrawId::_facemsk   ) >> mu2e::StrawId::_facesft   ; }
   int   Layer      () const { return (fStrawID & mu2e::StrawId::_layermsk  )               ; }
   int   Straw      () const { return (fStrawID & mu2e::StrawId::_strawmsk  )               ; }
@@ -64,6 +70,9 @@ public:
 	      int   GenID  , int    SimID, 
 	      int   PdgID  , int    MotherPdgID, 
 	      float EDep   , float  McMom);
+  
+  void    SetMnid (int Mnid ) { fMnid  = Mnid;  }
+  void    SetZFace(int ZFace) { fZFace = ZFace; }
 //-----------------------------------------------------------------------------
 // overloaded methods of TObject
 //-----------------------------------------------------------------------------
@@ -74,8 +83,9 @@ public:
 //-----------------------------------------------------------------------------
   void ReadV1(TBuffer& R__b);
   void ReadV2(TBuffer& R__b);
+  void ReadV3(TBuffer& R__b);
 
-  ClassDefOverride (TStrawHit,3)
+  ClassDefOverride (TStrawHit,4)
 };
 
 #endif

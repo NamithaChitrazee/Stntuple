@@ -9,6 +9,33 @@
 ClassImp(TStrawHit)
 
 //-----------------------------------------------------------------------------
+// V1: doesn't store the hit ID
+//-----------------------------------------------------------------------------
+void TStrawHit::ReadV1(TBuffer &R__b) {
+  int nw_data = &fSimID-&fStrawID;
+
+  R__b.ReadFastArray(&fStrawID,nw_data);
+  R__b >> fEDep;
+  if (MCFlag()) {
+    int nwi_mc  = ((int*) &fEDep) - &fSimID;
+    R__b.ReadFastArray(&fSimID ,nwi_mc);
+    R__b >> fMcMom;
+  }
+  else {
+    fGenID       = -1;
+    fSimID       = -1;
+    fPdgID       = -1;
+    fMotherPdgID = -1;
+    fMcMom       = -1.;
+  }
+//-----------------------------------------------------------------------------
+// V4
+//-----------------------------------------------------------------------------
+  fMnid  = -1;
+  fZFace = -1;
+}
+
+//-----------------------------------------------------------------------------
 // V2: for an unknown reason, has times integer
 //-----------------------------------------------------------------------------
 void TStrawHit::ReadV2(TBuffer &R__b) {
@@ -58,33 +85,57 @@ void TStrawHit::ReadV2(TBuffer &R__b) {
   
   fEDep        = sh.fEDep;
   fMcMom       = sh.fMcMom;
+//-----------------------------------------------------------------------------
+// V4
+//-----------------------------------------------------------------------------
+  fMnid  = -1;
+  fZFace = -1;
 }
 
 //-----------------------------------------------------------------------------
-// V1: doesn't store the hit ID
+// V2: for an unknown reason, has times integer
 //-----------------------------------------------------------------------------
-void TStrawHit::ReadV1(TBuffer &R__b) {
-  int nw_data = &fSimID-&fStrawID;
+void TStrawHit::ReadV3(TBuffer &R__b) {
+  struct TStrawHit_v3 {
+    int     fStrawID;			// sid | (mcflag << 16)
+					// -------------------- MC info, don't write out for the data
+    int     fGenID;                     // generator ID + StrawDigiFlag << 16
+    int     fSimID;			// sim particle ID
+    int     fPdgID;			// sim particle PDG ID
+    int     fMotherPdgID;               // mother PDG ID
+                                        // ----------------------------- floats
+    float   fTime[2];			// 
+    float   fTOT [2];                   // 
+    float   fEDep;			// energy deposition for the hit
+    float   fMcMom;			// MC particle momentum
+  } sh;
 
-  R__b.ReadFastArray(&fStrawID,nw_data);
-  R__b >> fEDep;
-  if (MCFlag()) {
-    int nwi_mc  = ((int*) &fEDep) - &fSimID;
-    R__b.ReadFastArray(&fSimID ,nwi_mc);
-    R__b >> fMcMom;
-  }
-  else {
-    fGenID       = -1;
-    fSimID       = -1;
-    fPdgID       = -1;
-    fMotherPdgID = -1;
-    fMcMom       = -1.;
-  }
+  int nwi_mc  = ((int*) &sh.fTime) - &fGenID;
+  int nwf     = &fMcMom-fTime;
+
+  TObject::Streamer(R__b);
+  R__b >> fStrawID;
+
+  fGenID       = -1;
+  fSimID       = -1;
+  fPdgID       = -1;
+  fMotherPdgID = -1;
+  if (MCFlag()) R__b.ReadFastArray(&fGenID ,nwi_mc);
+
+  fMcMom       = -1.;
+  R__b.ReadFastArray(fTime,nwf);
+  if (MCFlag()) R__b >> fMcMom;
+//-----------------------------------------------------------------------------
+// V4
+//-----------------------------------------------------------------------------
+  fMnid  = -1;
+  fZFace = -1;
 }
 
 //_____________________________________________________________________________
 void TStrawHit::Streamer(TBuffer &R__b) {
 
+  int nwi    = &fGenID-&fStrawID;
   int nwi_mc = (int*)fTime-&fGenID;
   int nwf    = &fMcMom-fTime;
 					// those are only in MC
@@ -92,20 +143,22 @@ void TStrawHit::Streamer(TBuffer &R__b) {
     Version_t R__v = R__b.ReadVersion();
     if      (R__v == 1) ReadV1(R__b);
     else if (R__v == 2) ReadV2(R__b);
+    else if (R__v == 3) ReadV3(R__b);
     else {
 //-----------------------------------------------------------------------------
-// curent version: V3 - 
+// curent version: V4
 //-----------------------------------------------------------------------------
       TObject::Streamer(R__b);
-      R__b >> fStrawID;
+      R__b.ReadFastArray(&fStrawID,nwi);
 
       fGenID       = -1;
       fSimID       = -1;
       fPdgID       = -1;
       fMotherPdgID = -1;
-      fMcMom       = -1.;
       if (MCFlag()) R__b.ReadFastArray(&fGenID ,nwi_mc);
+
       R__b.ReadFastArray(fTime,nwf);
+      fMcMom       = -1.;
       if (MCFlag()) R__b >> fMcMom;
     }
   }
@@ -115,7 +168,7 @@ void TStrawHit::Streamer(TBuffer &R__b) {
 //-----------------------------------------------------------------------------
     R__b.WriteVersion(TStrawHit::IsA());
     TObject::Streamer(R__b);
-    R__b << fStrawID;
+    R__b.WriteFastArray(&fStrawID,nwi);
     if (MCFlag()) R__b.WriteFastArray(&fGenID ,nwi_mc);
     
     R__b.WriteFastArray(fTime,nwf);
