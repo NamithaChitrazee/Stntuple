@@ -51,6 +51,7 @@ public:
   float Beta  ()   { return fBeta; }
   float Chi2  ()   { return fChi2; }
   float LeTime()   { return fLeTime; }
+  float Ped   ()   { return fPed; }
 
 //-----------------------------------------------------------------------------
 // modifiers
