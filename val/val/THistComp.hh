@@ -29,11 +29,11 @@ public:
   TH1*       GetHist1 () { return fHist1;  }
   TH1*       GetHist2 () { return fHist2;  }
   Double_t   GetKsProb() { return fKsProb; }
-  Double_t   GetNorm()   { return fNorm; }
+  Double_t   GetNorm()   { return fNorm  ; }
 //-----------------------------------------------------------------------------
 //  overloaded functions of TObject
 //-----------------------------------------------------------------------------
-  const char* GetName() const {
+  virtual const char* GetName() const override {
     static const char* name = "no_name";
     if (fHist1) {
       return fHist1->GetName();
@@ -46,13 +46,13 @@ public:
   void SetHistory(TString h) { fHistory=h;}
   TString& GetHistory() {return fHistory;}
 
-  virtual void Browse(TBrowser* b) { Draw("ep"); }
+  virtual void Browse(TBrowser* b) override { Draw("ep"); }
 
-  virtual void Draw(Option_t* Opt="");  // *MENU*;
-  void DrawEP() { Draw("ep"); }         // *MENU*;
-  virtual void        Dump() const;    // *MENU*
+  virtual void Draw  (Option_t* Opt="") override;  // *MENU*;
+  void         DrawEP() { Draw("ep"); }            // *MENU*;
+  virtual void Dump  () const           override;  // *MENU*
 
-  ClassDef(THistComp,2)
+  ClassDefOverride(THistComp,2)
 };
 
 
@@ -66,7 +66,7 @@ public:
   virtual ~TGoodHistComp(){}
 
 
-  ClassDef(TGoodHistComp,1)
+  ClassDefOverride(TGoodHistComp,1)
 };
 
 
@@ -79,7 +79,7 @@ public:
   virtual ~TBadHistComp(){}
 
 
-  ClassDef(TBadHistComp,1)
+  ClassDefOverride(TBadHistComp,1)
 };
 
 #endif

@@ -21,6 +21,7 @@ cet_set_compiler_flags(
 #------------------------------------------------------------------------------
 # it looks that these packages are looked for only after cet_cmake_env
 #------------------------------------------------------------------------------
+find_package(cetlib            REQUIRED)
 find_package(Offline           10.00.00 REQUIRED)
 
 message("---------- Stntuple: PRINT CMAKE VARIABLES " )
@@ -70,5 +71,11 @@ add_subdirectory(gui)
 add_subdirectory(ana)
 add_subdirectory(val)
 add_subdirectory(mod)
+
+install(EXPORT StntupleTargets
+  FILE StntupleTargets.cmake
+  NAMESPACE Stntuple::
+  DESTINATION lib/cmake/Stntuple
+)
 
 cet_cmake_config()

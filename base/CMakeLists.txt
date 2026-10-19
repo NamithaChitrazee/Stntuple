@@ -18,7 +18,6 @@ ROOT_GENERATE_DICTIONARY(${dict}
   TOffscl.hh TSetRunMaps.hh TStnArrayF.hh TStnArrayI.hh TStnDataset.hh TStnFileset.hh TStnHexagon.hh
   TStnRunRecord.hh TStnShape.hh TStnSquare.hh TStnUtils.hh TStnView.hh TTriggerConditions.hh
   TUsedSet.hh TVisManager.hh TVisNode.hh
-#  TVisNodeA.hh
   LINKDEF base/Linkdef.h)
 
 set_property(SOURCE ${dict}.cxx PROPERTY generated)
@@ -35,12 +34,20 @@ add_library(${lib} SHARED
 #  TVisNodeA.cc
   ${dict}.cxx
 )
+add_library(Stntuple::base ALIAS ${lib})
 
 target_link_libraries(${lib} ROOT::Physics ROOT::Core ROOT::Matrix ROOT::Tree ROOT::Graf ROOT::Gpad  ROOT::Geom)
 
 cet_add_compiler_flags(-g -O0)
 
-install(TARGETS Stntuple_base)
+install(TARGETS ${lib}
+  EXPORT StntupleTargets
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+  RUNTIME DESTINATION bin
+  INCLUDES DESTINATION include
+)
+
 install_headers()
 # install_source()
 install(DIRECTORY ${subpkg} DESTINATION include/Stntuple)

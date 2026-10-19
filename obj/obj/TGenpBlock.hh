@@ -68,15 +68,15 @@ public:
 //-----------------------------------------------------------------------------
 // overloaded functions of TObject
 //-----------------------------------------------------------------------------
-  void Clear(Option_t* opt = "");
-  void Print(Option_t* opt = "") const;
+  virtual void Clear(Option_t* opt = "") override;
+  virtual void Print(Option_t* opt = "") const override;
 //-----------------------------------------------------------------------------
 //  I/O and schema evolution
 //-----------------------------------------------------------------------------
   void ReadV1(TBuffer& R__b);
   void ReadV2(TBuffer& R__b);
 
-  ClassDef(TGenpBlock,3)		// GENP block: output of MC event generators
+  ClassDefOverride(TGenpBlock,3)		// GENP block: output of MC event generators
 };
 
 #endif

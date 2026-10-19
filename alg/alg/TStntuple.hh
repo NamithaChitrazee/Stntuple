@@ -16,7 +16,7 @@ protected:
   static TStntuple*  fgInstance;
 
   static Int_t       fgRunNumber;
-  static Float_t     fgEventVertex;
+  // static Float_t     fgEventVertex;
 
   TH1D*              fDioSpectrumHist;
   smooth*            fDioSpectrum;
@@ -87,7 +87,6 @@ public:
   // static int  PrintElectron(TStnElectron*       Ele,
   // 			    TStnElectronBlock*  ElectronBlock,
   // 			    TCalDataBlock*      CalDataBlock);
-  ClassDef(TStntuple,0)
 };
 
 #endif

@@ -34,11 +34,12 @@ set (source_files
 )
 
 add_library(${lib} SHARED ${source_files} ${dict}.cxx)
+add_library(Stntuple::${subpkg} ALIAS ${lib}  )
 
 target_link_libraries(${lib}
-  Stntuple_geom
-  Stntuple_obj
-  Stntuple_base
+  Stntuple::geom
+  Stntuple::obj
+  Stntuple::base
   Offline::CalPatRec
   Offline::CaloCluster
   #  Offline::TrkDiag
@@ -56,15 +57,6 @@ target_link_libraries(${lib}
   Offline::DataProducts
   Offline::CaloMC
 
-#  BTrk_BbrGeom
-#  BTrk_TrkBase
-#  BTrk_difAlgebra
-#  BTrk_BField
-#  BTrk_DetectorModel
-#  BTrkLegacy
-#  BTrk_MatEnv
-#  BTrk_BaBar
-
   art::Persistency_Provenance
   
   ROOT::Physics ROOT::GenVector ROOT::Graf ROOT::Graf3d ROOT::Geom ROOT::Matrix ROOT::Core
@@ -72,7 +64,12 @@ target_link_libraries(${lib}
 
 cet_add_compiler_flags(-g -O0)
 
-install(TARGETS ${lib})
-# install_headers()
-# install_source()
+install(TARGETS ${lib}
+  EXPORT StntupleTargets
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+  RUNTIME DESTINATION bin
+  INCLUDES DESTINATION include
+)
+
 install(DIRECTORY ${subpkg} DESTINATION include/Stntuple)

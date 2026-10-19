@@ -295,10 +295,10 @@ public:
 //-----------------------------------------------------------------------------
 // overloaded methods of TStnModule
 //-----------------------------------------------------------------------------
-  int     BeginJob();
-  int     BeginRun();
-  int     Event   (int ientry);
-  int     EndJob  ();
+  virtual int     BeginJob() override;
+  virtual int     BeginRun() override;
+  virtual int     Event   (int ientry) override;
+  virtual int     EndJob  () override;
 //-----------------------------------------------------------------------------
 // other methods
 //-----------------------------------------------------------------------------
@@ -322,7 +322,7 @@ public:
 //-----------------------------------------------------------------------------
   void    Test001();
 
-  ClassDef(TTrackAnaModule,0)
+  ClassDefOverride(TTrackAnaModule,0)
 };
 }
 #endif

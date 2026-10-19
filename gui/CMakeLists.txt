@@ -28,6 +28,7 @@ set (include_files
 #  TStnVisNodeA.hh
   TTrkVisNode.hh
   TEvdPanelVisNode.hh
+  # draw_crv_geometry.hh
 )
 
 ROOT_GENERATE_DICTIONARY(${dict} ${include_files} LINKDEF ${subpkg}/Linkdef.h)
@@ -54,15 +55,18 @@ set (source_files
 #  TStnVisNodeA.cc
   TTrkVisNode.cc
   TEvdPanelVisNode.cc
+
+#  draw_crv_geometry.cc
 )
 
 add_library(${lib} SHARED ${source_files} ${dict}.cxx)
+add_library(Stntuple::${subpkg} ALIAS ${lib}  )
 
 target_link_libraries(${lib}
-  Stntuple_print
-  Stntuple_geom
-  Stntuple_obj
-  Stntuple_base
+  Stntuple::print
+  Stntuple::geom
+  Stntuple::obj
+  Stntuple::base
   
   Offline::RecoDataProducts
   Offline::MCDataProducts
@@ -80,9 +84,16 @@ target_link_libraries(${lib}
   ROOT::Geom ROOT::Matrix ROOT::GenVector ROOT::Core
 )
 
+install(TARGETS ${lib}
+  EXPORT StntupleTargets
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+  RUNTIME DESTINATION bin
+  INCLUDES DESTINATION include
+)
+
 cet_add_compiler_flags(-g -O0)
 
-install(TARGETS ${lib})
 install_headers()
 # install_source()
 install(DIRECTORY ${subpkg} DESTINATION include/Stntuple)

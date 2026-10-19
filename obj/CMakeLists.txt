@@ -8,18 +8,30 @@ include_directories(
   ${CMAKE_SOURCE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/${subpkg}
 )
+get_cmake_property(_variableNames VARIABLES)
+list (SORT _variableNames)
+foreach (_variableName ${_variableNames})
+  message(STATUS "${_variableName}=${${_variableName}}")
+endforeach()
 
 # link_directories($ENV{ROOTSYS}/lib)
 
 set (include_files
-  TCalDataBlock.hh TCalHitData.hh TCrvClusterBlock.hh TCrvCoincidenceCluster.hh TCrvCoincidence.hh 
-  TCrvPulseBlock.hh TCrvRecoPulse.hh TGenParticle.hh TGenpBlock.hh TSimParticle.hh TSimpBlock.hh 
+  TCaloDigiBlock.hh TCaloDigi.hh TCaloRecoDigi.hh TCaloRecoDigiBlock.hh TCaloHitBlock.hh TCaloHit.hh
+  TCalDataBlock.hh TCalHitData.hh
+  TCrvClusterBlock.hh TCrvCoincidenceCluster.hh
+  TCrvDigi.hh TCrvDigiBlock.hh TCrvPulseBlock.hh TCrvRecoPulse.hh
+  TComboHit.hh TComboHitBlock.hh
+  TGenParticle.hh TGenpBlock.hh TSimParticle.hh TSimpBlock.hh 
   TStepPointMCBlock.hh TStepPointMC.hh TStnClusterBlock.hh TStnCluster.hh TStnDataBlock.hh
   TStnDBManager.hh TStnElectron.hh TStnErrorLogger.hh TStnEvent.hh TStnGoodRunList.hh 
   TStnHeaderBlock.hh TStnHelixBlock.hh TStnHelix.hh TStnLinkBlock.hh TStnNode.hh TStnPidBlock.hh 
-  TStnPid.hh TStnRunSummary.hh TStnTimeClusterBlock.hh TStnTimeCluster.hh TStnTrackBlock.hh 
-  TStnTrack.hh TStnTrackSeedBlock.hh TStnTrackSeed.hh TStnTriggerBlock.hh TStnTrigger.hh 
-  TStnTriggerTable.hh TStrawHitBlock.hh TStrawHit.hh TStrWaveform.hh TTrackStrawHitBlock.hh 
+  TStnPid.hh TStnRunSummary.hh TStnTimeClusterBlock.hh TStnTimeCluster.hh
+  TStnTrackBlock.hh TStnTrack.hh TStrTrack.hh TStrTrackBlock.hh
+  TStnTrackSeedBlock.hh TStnTrackSeed.hh
+  TStnTriggerBlock.hh TStnTrigger.hh TStnTriggerTable.hh
+  TStrawDigiBlock.hh TStrawDigi.hh
+  TStrawHitBlock.hh TStrawHit.hh TStrWaveform.hh TTrackStrawHitBlock.hh 
   TTrackStrawHit.hh TVDetDataBlock.hh TVDetHitData.hh 
 )
 
@@ -28,26 +40,46 @@ ROOT_GENERATE_DICTIONARY(${dict} ${include_files} LINKDEF ${subpkg}/Linkdef.h)
 set_property(SOURCE ${dict}.cxx PROPERTY generated)
 
 set (source_files
-  TCalDataBlock.cc TCalHitData.cc TCrvClusterBlock.cc TCrvCoincidence.cc TCrvCoincidenceCluster.cc
-  TCrvPulseBlock.cc TCrvRecoPulse.cc TGenParticle.cc TGenpBlock.cc TSimParticle.cc TSimpBlock.cc
+  TCaloDigiBlock.cc TCaloDigi.cc TCaloRecoDigi.cc TCaloRecoDigiBlock.cc TCaloHitBlock.cc  TCaloHit.cc
+  TCalDataBlock.cc TCalHitData.cc
+  TCrvClusterBlock.cc TCrvCoincidenceCluster.cc
+  TCrvDigi.cc TCrvDigiBlock.cc TCrvPulseBlock.cc TCrvRecoPulse.cc
+  TComboHit.cc TComboHitBlock.cc
+  TGenParticle.cc TGenpBlock.cc TSimParticle.cc TSimpBlock.cc
   TStepPointMCBlock.cc TStepPointMC.cc TStnClusterBlock.cc TStnCluster.cc TStnDataBlock.cc
   TStnDBManager.cc TStnElectron.cc TStnErrorLogger.cc TStnEvent.cc TStnGoodRunList.cc TStnHeaderBlock.cc
   TStnHelixBlock.cc TStnHelix.cc TStnInitDataBlock.cc TStnLinkBlock.cc TStnNode.cc TStnPidBlock.cc
-  TStnPid.cc TStnRunSummary.cc TStnTimeClusterBlock.cc TStnTimeCluster.cc TStnTrackBlock.cc TStnTrack.cc
+  TStnPid.cc TStnRunSummary.cc TStnTimeClusterBlock.cc TStnTimeCluster.cc
+  TStnTrackBlock.cc TStnTrack.cc TStrTrack.cc TStrTrackBlock.cc
   TStnTrackSeedBlock.cc TStnTrackSeed.cc TStnTriggerBlock.cc TStnTrigger.cc TStnTriggerTable.cc
-  TStrawHitBlock.cc TStrawHit.cc TStrWaveform.cc TTrackStrawHitBlock.cc TTrackStrawHit.cc
+  TStrawDigiBlock.cc TStrawDigi.cc
+  TStrawHitBlock.cc TStrawHit.cc TStrWaveform.cc 
+  TTrackStrawHit.cc TTrackStrawHitBlock.cc
   TVDetDataBlock.cc TVDetHitData.cc
 )
 
 add_library(${lib} SHARED ${source_files} ${dict}.cxx)
+add_library(Stntuple::${subpkg} ALIAS ${lib}  )
 
 target_link_libraries(${lib}
-  Stntuple_base
+  Stntuple::base
+  Offline::DataProducts
+  art::Framework_Principal
   ROOT::Physics ROOT::EG ROOT::Graf3d ROOT::Graf ROOT::Geom ROOT::Matrix ROOT::GenVector ROOT::Core)
+
+target_include_directories(${lib}
+  PRIVATE ${art_INCLUDE_DIR}
+)
 
 cet_add_compiler_flags(-g -O0)
 
 install(TARGETS ${lib})
-# install_headers()
-# install_source()
+install(TARGETS ${lib}
+  EXPORT StntupleTargets
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+  RUNTIME DESTINATION bin
+  INCLUDES DESTINATION include
+)
+
 install(DIRECTORY ${subpkg} DESTINATION include/Stntuple)

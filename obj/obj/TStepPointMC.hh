@@ -73,13 +73,13 @@ public:
 //-----------------------------------------------------------------------------
 // overloaded methods of TObject
 //-----------------------------------------------------------------------------
-  void     Print(Option_t* opt = "") const;
+  virtual void     Print(Option_t* opt = "") const override;
 //-----------------------------------------------------------------------------
 // schema evolution
 //-----------------------------------------------------------------------------
   void     ReadV1(TBuffer &R__b);
 
-  ClassDef(TStepPointMC,2)
+  ClassDefOverride(TStepPointMC,2)
 };
 
 #endif

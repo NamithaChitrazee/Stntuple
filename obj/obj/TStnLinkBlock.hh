@@ -8,6 +8,7 @@
 //-----------------------------------------------------------------------------
 #include "TArrayI.h"
 #include "Stntuple/obj/TStnDataBlock.hh"
+#include "Stntuple/obj/TStnLinkBlock.hh"
 
 class TStnLinkBlock: public TStnDataBlock {
 public:
@@ -52,16 +53,16 @@ public:
   }
 					// ****** setters
   Int_t  Add(Int_t i, Int_t match);
-					// ****** overloaded functions of 
-					// TObject
-  void Print(Option_t* option = "") const;
-  void Clear(Option_t* option = "");
-					// ****** schema evolution
-					// nothing has changed I/O-wise between
-					// versions 1 and 2, just a member 
-					// function has been added and a data 
-					// member has been renamed
-  ClassDef(TStnLinkBlock,2)
+//-----------------------------------------------------------------------------
+// overloaded functions of TObject
+//-----------------------------------------------------------------------------
+  virtual void Clear(Option_t* option = "") override;
+  virtual void Print(Option_t* option = "") const override;
+//-----------------------------------------------------------------------------
+// schema evolution: nothing has changed I/O-wise betweenversions 1 and 2,
+// just a member function has been added and a data member has been renamed
+//-----------------------------------------------------------------------------
+  ClassDefOverride(TStnLinkBlock,2)
 };
 
 #endif

@@ -190,10 +190,10 @@ public:
 //-----------------------------------------------------------------------------
 // overloaded methods of TStnModule
 //-----------------------------------------------------------------------------
-  int     BeginJob();
-  int     BeginRun();
-  int     Event   (int ientry);
-  int     EndJob  ();
+  virtual int     BeginJob() override;
+  virtual int     BeginRun() override;
+  virtual int     Event   (int ientry) override;
+  virtual int     EndJob  () override;
 //-----------------------------------------------------------------------------
 // other methods
 //-----------------------------------------------------------------------------
@@ -217,7 +217,7 @@ public:
 //-----------------------------------------------------------------------------
   void    Test001();
 
-  ClassDef(TSpmcAnaModule,0)
+  ClassDefOverride(TSpmcAnaModule,0)
 };
 
 }

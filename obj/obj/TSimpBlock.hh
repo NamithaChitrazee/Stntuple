@@ -67,12 +67,12 @@ public:
 //-----------------------------------------------------------------------------
 // overloaded functions of TObject
 //-----------------------------------------------------------------------------
-  void Clear(Option_t* opt = "");
-  void Print(Option_t* opt = "") const;
+  virtual void Clear(Option_t* opt = "") override;
+  virtual void Print(Option_t* opt = "") const override;
 //-----------------------------------------------------------------------------
 //  I/O and schema evolution
 //-----------------------------------------------------------------------------
-  ClassDef(TSimpBlock,1)		// TSimBlock: simulated particles
+  ClassDefOverride(TSimpBlock,1)		// TSimBlock: simulated particles
 };
 
 #endif

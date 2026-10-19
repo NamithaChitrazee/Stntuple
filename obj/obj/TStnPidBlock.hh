@@ -62,10 +62,10 @@ public:
 //-----------------------------------------------------------------------------
 // overloaded functions of  TObject
 //-----------------------------------------------------------------------------
-  void Clear(Option_t* opt="");
-  void Print(Option_t* option = "") const;
+  virtual void Clear(Option_t* opt="") override;
+  virtual void Print(Option_t* option = "") const override;
 
-  ClassDef(TStnPidBlock,1)
+  ClassDefOverride(TStnPidBlock,1)
 };
 
 #endif

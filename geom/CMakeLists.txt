@@ -14,7 +14,12 @@ include_directories(
 set (include_files
   stntuple_geom_tests.hh TCrvNumerology.hh
   TDiskCalorimeter.hh TDiskIndex.hh TDisk.hh TStnCrystal.hh
+  TDiskCrystalMap.hh
+  THexCrystalMap.hh TSqrCrystalMap.hh TSsqCrystalMap.hh 
   TStnTracker.hh
+  TCrvChannelMap.hh
+  TrkPanelMap.hh
+  TCaloChannelMap.hh
 )
 
 ROOT_GENERATE_DICTIONARY(${dict} ${include_files} LINKDEF ${subpkg}/Linkdef.h)
@@ -24,19 +29,31 @@ set_property(SOURCE ${dict}.cxx PROPERTY generated)
 set (source_files
   StnInitVirtualDetectors.cc stntuple_geom_tests.cc TCrvNumerology.cc
   TDiskCalorimeter.cc TDisk.cc TDiskCrystalMap.cc test_TDisk.cc
-  THexCrystalMap.cc TSqrCrystalMap.cc TSsqCrystalMap.cc TStnCrystal.cc
+  THexCrystalMap.cc TSqrCrystalMap.cc TSsqCrystalMap.cc
+  TStnCrystal.cc
   TStnTracker.cc
+  TCrvChannelMap.cc
+  TrkPanelMap.cc
+  TCaloChannelMap.cc
 )
 
 add_library(${lib} SHARED ${source_files} ${dict}.cxx)
+add_library(Stntuple::${subpkg} ALIAS ${lib}  )
 
 target_link_libraries(${lib}
-  Stntuple_base
+  Stntuple::base
+  art::Framework_Principal
+  fhiclcpp::fhiclcpp  cetlib::cetlib
   ROOT::Physics ROOT::Matrix ROOT::Tree ROOT::Geom ROOT::Core)
 
 cet_add_compiler_flags(-g -O0)
 
-install(TARGETS ${lib})
-# install_headers()
-# install_source()
+install(TARGETS ${lib}
+  EXPORT StntupleTargets
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+  RUNTIME DESTINATION bin
+  INCLUDES DESTINATION include
+)
+
 install(DIRECTORY ${subpkg} DESTINATION include/Stntuple)

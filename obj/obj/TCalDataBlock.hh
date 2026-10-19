@@ -8,8 +8,12 @@
 #include "TCalHitData.hh"
 #include "TBuffer.h"
 
+namespace stntuple {
+  class InitCalDataBlock;
+}
+
 class TCalDataBlock : public TStnDataBlock {
-  friend Int_t StntupleInitMu2eCalDataBlock(TStnDataBlock*, AbsEvent*, int);
+  friend class stntuple::InitCalDataBlock;
 public:
   // this is version v2
   int            fNHits;		// number of hit crystals
@@ -75,10 +79,10 @@ public:
 //-----------------------------------------------------------------------------
 // overloaded methods of TObject
 //-----------------------------------------------------------------------------
-  void        Clear(Option_t* opt="");
-  void        Print(Option_t* opt="") const;
+  void        Clear(Option_t* opt="") override;
+  void        Print(Option_t* opt="") const override;
 
-  ClassDef(TCalDataBlock,2)
+  ClassDefOverride(TCalDataBlock,2)
 };
 
 #endif

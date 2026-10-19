@@ -1,7 +1,9 @@
 //-----------------------------------------------------------------------------
 //  Dec 28 2000 P.Murat: base class for STNTUPLE analysis module
 //-----------------------------------------------------------------------------
-#include "iostream"
+#include <iostream>
+#include <format>
+
 using namespace std;
 
 #include "stdlib.h"
@@ -16,6 +18,9 @@ using namespace std;
 #include "TH1.h"
 #include "TH2.h"
 #include "TProfile.h"
+#include "TFitResult.h"
+
+#include "Stntuple/base/TStnBookHist.hh"
 
 #include "Stntuple/obj/TStnEvent.hh"
 #include "Stntuple/obj/TStnGoodRunList.hh"
@@ -36,9 +41,14 @@ TStnModule::TStnModule()
   fFilteringMode     =  0;
 				// by default all the events pass
   fPassed            =  1;
-  fFolder            =  0;
-  fListOfL3TrigNames =  0;
+  fFolder            =  nullptr;
+  
+  fListOfL3TrigNames = nullptr;
+  fListOfL3Triggers  = nullptr;
+  
   for (int i=0; i<kNDebugBits; i++) fDebugBit[i] = 0;
+
+  fBookHist          = nullptr;
 }
 
 //_____________________________________________________________________________
@@ -70,8 +80,10 @@ TStnModule::TStnModule(const char* name, const char* title):TNamed(name,title)
 
   fFolder->Add(this);
 
-  // TFolder* hist = fFolder->AddFolder("Hist","ListOfHistograms");
-  fFolder->AddFolder("Hist","ListOfHistograms");
+  TFolder* hist_folder = fFolder->AddFolder("Hist","ListOfHistograms");
+  // fFolder->AddFolder("Hist","ListOfHistograms");
+
+  fBookHist          = new TStnBookHist(hist_folder);
 
   fListOfL3TrigNames = new TObjArray();
   fListOfL3Triggers  = new TObjArray();
@@ -84,12 +96,17 @@ TStnModule::~TStnModule() {
   // destructor: module owns its histograms, but there could be other objects
   // added to it... derived classes should not delete objecs added to fFolder
 
-  delete fFolder;
-  fListOfL3TrigNames->Delete();
-  delete fListOfL3TrigNames;
-  fListOfL3Triggers->Delete();
-  fListOfL3Triggers->Clear();
-  delete fListOfL3Triggers;
+  if (fBookHist) delete fBookHist;
+  if (fFolder  ) delete fFolder;
+
+  if (fListOfL3TrigNames) {
+    fListOfL3TrigNames->Delete();
+    delete fListOfL3TrigNames;
+  }
+  if (fListOfL3Triggers) {
+    fListOfL3Triggers->Delete();
+    delete fListOfL3Triggers;
+  }
 }
 
 //_____________________________________________________________________________
@@ -260,16 +277,19 @@ TCanvas* TStnModule::NewSlide(const char* name,
 
 //_____________________________________________________________________________
 void     TStnModule::AddHistogram(TObject* hist, const char* FolderName) {
-  if(!hist) return;
+  if (hist == nullptr) return;
+  
   TFolder* fol = (TFolder*) fFolder->FindObject(FolderName);
-  if(!fol) {
+  if (fol) {
+    fBookHist->AddHistogram(hist,fol);
+  }
+  else {
     printf("TStnModule::%s: Unable to find folder %s\n", __func__, FolderName);
     return;
   }
-  fol->Add(hist); 
 }
 
-//_____________________________________________________________________________
+//-----------------------------------------------------------------------------
 void TStnModule::HBook1F(TH1F*& Hist, const char* Name, const char* Title,
 			 Int_t Nx, Double_t XMin, Double_t XMax,
 			 const char* FolderName)
@@ -283,13 +303,13 @@ void TStnModule::HBook1F(TH1F*& Hist, const char* Name, const char* Title,
 
 //_____________________________________________________________________________
 void TStnModule::HBook1F(TH1F*& Hist, const char* Name, const char* Title,
-			 Int_t Nx, const float* LowEdge,
+			 Int_t Nx, const float* XMin,
 			 const char* FolderName)
 {
   // book 1D histogram with variable size bins, add it to the module's list of histograms and 
   // return pointer to it to the user
 
-  Hist = new TH1F(Name,Title,Nx,LowEdge);
+  Hist = new TH1F(Name,Title,Nx,XMin);
   AddHistogram(Hist,FolderName);
 }
 
@@ -308,13 +328,13 @@ void TStnModule::HBook1D(TH1D*& Hist, const char* Name, const char* Title,
 
 //_____________________________________________________________________________
 void TStnModule::HBook1D(TH1D*& Hist, const char* Name, const char* Title,
-			 Int_t Nx, const double* LowEdge,
+			 Int_t Nx, const double* XMin,
 			 const char* FolderName)
 {
   // book 1D histogram with variable size bins, add it to the module's list of histograms and 
   // return pointer to it to the user
 
-  Hist = new TH1D(Name,Title,Nx,LowEdge);
+  Hist = new TH1D(Name,Title,Nx,XMin);
   AddHistogram(Hist,FolderName);
 }
 
@@ -350,22 +370,23 @@ void TStnModule::HProf(TProfile*& Hist, const char* Name, const char* Title,
 //_____________________________________________________________________________
 void TStnModule::DeleteHistograms(TFolder* Folder) {
   // internal method...
+  fBookHist->DeleteHistograms(Folder);
 
-  if (((long int) Folder) == -1) Folder = fFolder;
+  // if (((long int) Folder) == -1) Folder = fFolder;
 
-  TObject  *o1;
+  // TObject  *o1;
 
-  TIter    it1(Folder->GetListOfFolders());
+  // TIter    it1(Folder->GetListOfFolders());
 
-  while ((o1 = it1.Next())) {
-    if (o1->InheritsFrom("TFolder")) {
-      DeleteHistograms((TFolder*) o1);
-    }
-    else if (o1->InheritsFrom("TH1")) {
-      Folder->Remove(o1);
-      delete o1;
-    }
-  }
+  // while ((o1 = it1.Next())) {
+  //   if (o1->InheritsFrom("TFolder")) {
+  //     DeleteHistograms((TFolder*) o1);
+  //   }
+  //   else if (o1->InheritsFrom("TH1")) {
+  //     Folder->Remove(o1);
+  //     delete o1;
+  //   }
+  // }
 }
 
 
@@ -388,4 +409,130 @@ void TStnModule::Delete(const char* Opt) {
 
 //_____________________________________________________________________________
 void TStnModule::Print(const char* Opt) const {
+}
+
+
+//-----------------------------------------------------------------------------
+// Ip1, Ip2 
+//-----------------------------------------------------------------------------
+int TStnModule::FitHistogram(TH1* Hist, fit_result_t* Fr,  float Dx, float XMin, float XMax, int MinSum, int PrintLevel) {
+
+  //  fit_result_t* fr = &fFr[Ip2][Ip1];
+
+  Fr->chi2dof = -1;
+      
+  for (int ip=0; ip<3; ip++) {
+    Fr->p[ip] = 0;
+    Fr->e[ip] = -1;
+  }
+
+  // TH1F* h = fHist->h_dt05[Ip2][Ip1];
+
+  int nbins     = Hist->GetNbinsX();
+  int integral  = Hist->Integral(1,nbins);
+      
+  if (integral < MinSum) {
+    std::cout << std::format("ERROR: hist:{} integral:{} < {}. BAIL OUT\n",
+                             Hist->GetTitle(),integral,MinSum);
+    return -1;
+  }
+
+  // find max bin
+
+  int   imax = -1;
+  float qmax = -1;
+  for (int i=0; i<nbins; i++) {
+    float q = Hist->GetBinContent(i+1);
+    if (q > qmax) {
+      imax = i+1;
+      qmax = q;
+    }
+  }
+
+  if (PrintLevel > 0) {
+    std::cout << std::format("001 imax:{} qmax:{}\n",imax, qmax);
+  }
+
+  if (qmax < 3) {
+    std::cout << std::format("ERROR: hist:{}  qmax:{} < 3. BAIL OUT\n",Hist->GetTitle(),qmax);
+    return -2;
+  }
+
+  // estimate integral of the expected gaussian
+
+  int i=0;
+  //  int imin(0), imax(0);
+
+  float sum = qmax;
+  
+  while (1) {
+    i += 1;
+                                        // check to the right of the maximum
+    int iplus  = imax+i;
+    if (iplus <= nbins) {
+      float qplus = Hist->GetBinContent(iplus);
+      if (qplus/qmax > 0.2) {
+        sum += qplus;
+      }
+      else {
+        // done
+        iplus = nbins+1;
+      }
+    }
+                                        // check the left side
+    int iminus = imax-i;
+    if (iminus > 0) {
+                                        // bins start from 1
+      
+      float qminus = Hist->GetBinContent(iminus);
+      if (qminus/qmax > 0.2) {
+        sum += qminus;
+      }
+      else {
+        // done
+        iminus = -1;
+      }
+    }
+    if ((iplus > nbins) and (iminus < 0)) break;
+  }
+
+  if (PrintLevel > 0) {
+    std::cout << std::format("002: sum(level=0.2):{}\n",sum);
+  }
+
+  if (sum < MinSum) {
+    std::cout << std::format("ERROR: hist:{} sum:{} < {}. BAIL OUT\n",Hist->GetTitle(),sum,MinSum);
+    return -3;
+  }
+
+  float t0 = Hist->GetBinCenter(imax);
+  
+  float tmin{t0-Dx}, tmax{t0+Dx};
+  if (XMax > XMin) {
+    tmin = XMin;
+    tmax = XMax;
+  }
+
+  if (PrintLevel > 0) {
+    std::cout << std::format("003: t0:{:10.3f} Dx:{:10.3f} tmin:{:10.3f}  tmax:{:10.3f}\n",
+                             t0, Dx, tmin,tmax);
+  }
+
+  // for some reason, "sq" is required for tfr be defined
+  TFitResultPtr tfr = Hist->Fit("gaus","sql","",tmin,tmax);
+  
+  if ((! tfr->IsValid()) or tfr->IsEmpty()) {
+    // assume tha all indices are in the name/title
+    std::cout << std::format("# FIT ERROR: Hist->name:{} Hist->title:{}\n",Hist->GetName(),Hist->GetTitle());
+    return -4;
+  }
+
+  Fr->chi2dof = tfr->Chi2()/tfr->Ndf();
+  double sf    = sqrt(Fr->chi2dof);
+          
+  for (int ip=0; ip<3; ip++) {
+    Fr->p[ip] = tfr->Parameter(ip);
+    Fr->e[ip] = tfr->Error(ip)*sf;
+  }
+  return 0;
 }

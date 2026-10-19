@@ -25,7 +25,7 @@ def local_build():
     list_of_fortran_files = Glob('*.f',strings=True);
     list_of_cc_files      = Glob('*.cc', strings=True);
     skip_list             = []
-    libs                  = ['Stntuple_obj', 'Stntuple_base', rootlibs, 'gfortran'];
+    libs                  = ['Stntuple_obj', 'Stntuple_base', rootlibs, 'fhiclcpp', 'cetlib', 'gfortran'];
 
     helper.compile_fortran(list_of_fortran_files,skip_list);
 

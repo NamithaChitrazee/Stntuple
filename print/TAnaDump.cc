@@ -236,8 +236,8 @@ void TAnaDump::printCaloCluster(const mu2e::CaloCluster* Cl,
 //-----------------------------------------------------------------------------
 // transform cluster coordinates to the tracker coordiante system
 //-----------------------------------------------------------------------------
-    gpos = cal->geomUtil().diskToMu2e(Cl->diskID(),Cl->cog3Vector());
-    tpos = cal->geomUtil().mu2eToTracker(gpos);
+    gpos = cal->diskToMu2e(Cl->diskID(),Cl->cog3Vector());
+    tpos = cal->mu2eToTracker(gpos);
 
     printf(" %3i %3i %-16p %2i %6i %3i %8.3f %8.3f %10.3f %10.3f %10.3f %10.3f %10.3f %10.3f\n",
 	   row, col,
@@ -515,83 +515,6 @@ void TAnaDump::printCaloProtoClusterCollection(const char* ModuleLabel,
 }
 
 //-----------------------------------------------------------------------------
-// CRV
-//-----------------------------------------------------------------------------
-// void TAnaDump::printCrvCoincidence(const mu2e::CrvCoincidence* Coin,
-// 				   const char*                 Opt ) {
-//   TString opt = Opt;
-
-//   const std::vector<art::Ptr<mu2e::CrvRecoPulse>>* list_of_pulses = &Coin->GetCrvRecoPulses();
-
-//   int sector      = Coin->GetCrvSectorType();
-//   int np          = list_of_pulses->size();
-
-//   printf("---------------------------------------------------------------------\n");
-//   printf("Coinc Addr: %-16p Sector: %5i N(pulses): %5i\n",static_cast<const void*>(Coin), sector, np);
-
-//   const mu2e::CrvRecoPulse* pulse(NULL);
-//   printCrvRecoPulse(pulse, "banner");
-//   for (int i=0; i<np; i++) {
-//     pulse = list_of_pulses->at(i).get();
-//     printCrvRecoPulse(pulse, "data");
-//   }
-  
-//   if (opt.Index("hits") >= 0) {
-//   }
-// }
-
-// //-----------------------------------------------------------------------------
-// void TAnaDump::printCrvCoincidenceCollection(const char* ModuleLabel, 
-// 					     const char* ProductName,
-// 					     const char* ProcessName) {
-
-//   art::Handle<mu2e::CrvCoincidenceCollection> handle;
-//   const mu2e::CrvCoincidenceCollection*       coinColl;
-
-//   if (ProductName[0] != 0) {
-//     art::Selector  selector(art::ProductInstanceNameSelector(ProductName) &&
-// 			    art::ProcessNameSelector(ProcessName)         && 
-// 			    art::ModuleLabelSelector(ModuleLabel)            );
-//     fEvent->get(selector,handle);
-//   }
-//   else {
-//     art::Selector  selector(art::ProcessNameSelector(ProcessName)         && 
-// 			    art::ModuleLabelSelector(ModuleLabel)            );
-//     fEvent->get(selector,handle);
-//   }
-// //-----------------------------------------------------------------------------
-// // make sure collection exists
-// //-----------------------------------------------------------------------------
-//   if (! handle.isValid()) {
-//     printf("TAnaDump::printCrvCoincidenceCollection: no CrvCoincidenceCollection ");
-//     printf("for module %s and ProductName=%s found, BAIL OUT\n",
-// 	   ModuleLabel,ProductName);
-//     return;
-//   }
-
-//   coinColl = handle.product();
-
-//   int ncoin = coinColl->size();
-
-//   printf(">>>> ModuleLabel = %s N(coincidences) = %5i\n",ModuleLabel,ncoin);
-
-//   const mu2e::CrvCoincidence* coin;
-
-//   //  int banner_printed = 0;
-//   for (int i=0; i<ncoin; i++) {
-//     coin = &coinColl->at(i);
-//     //    if (banner_printed == 0) {
-//     //    printCrvCoincidence(coin, "banner");
-//     // banner_printed = 1;
-//     //  }
-
-//     printCrvCoincidence(coin,"banner+data");
-//   }
- 
-// }
-
-
-//-----------------------------------------------------------------------------
 void TAnaDump::printCrvCoincidenceCluster(const mu2e::CrvCoincidenceCluster* CCl, 
 					  const char* Opt                       ) {
   TString opt = Opt;
@@ -682,7 +605,7 @@ void TAnaDump::printCrvCoincidenceCluster(const mu2e::CrvCoincidenceCluster* CCl
     printf("---------------------------------------------------------------------\n");
     printf("BarIndex       bar_length       Tcorrected(MD)     Xcorrected(MD)    \n");
     printf("---------------------------------------------------------------------\n");
-    float totaltimeavg(0),totalxavg(0);
+    float totaltimeavg(0)/*,totalxavg(0)*/;
     float nbars = 0;
     int   twoendbars   = 0;
     for (size_t i=0; i<bars.size(); i++) {
@@ -725,7 +648,7 @@ void TAnaDump::printCrvCoincidenceCluster(const mu2e::CrvCoincidenceCluster* CCl
 	}
       
 	totaltimeavg += tcorrected;
-	totalxavg    += xcorrected;
+	//totalxavg    += xcorrected;
 	nbars        += 1;
 
 	printf("%8i %14.2f %16.2f %14.3f\n",bar,bar_length, tcorrected,xcorrected);
@@ -734,10 +657,10 @@ void TAnaDump::printCrvCoincidenceCluster(const mu2e::CrvCoincidenceCluster* CCl
     }
     if (nbars > 0) {
       totaltimeavg /= nbars;
-      totalxavg    /= nbars;
+      //totalxavg    /= nbars;
     }
     if (twoendbars == 0) {
-      totalxavg = -10.;
+      //totalxavg = -10.;
     }
 
     //   for (size_t i=0; i<bars.size(); i++) {
@@ -1348,17 +1271,18 @@ void TAnaDump::printCalorimeter() {
 
   int nd = cal->nDisks();
   printf(" ndisks = %i\n", nd);
-  printf(" crystal size  : %10.3f\n", cal->caloInfo().getDouble("crystalXYLength"));
-  printf(" crystal length: %10.3f\n", cal->caloInfo().getDouble("crystalZLength"));
+  printf(" crystal size  : %10.3f\n", cal->G4Info().get<double>("crystalXYLength"));
+  printf(" crystal length: %10.3f\n", cal->G4Info().get<double>("crystalZLength"));
 
   for (int i=0; i<nd; i++) {
     disk = &cal->disk(i);
     printf(" ---- disk # %i\n",i);
-    printf(" Rin  : %10.3f  Rout : %10.3f\n", disk->geomInfo().innerEnvelopeR(), disk->geomInfo().outerEnvelopeR());
+    printf(" Rin  : %10.3f  Rout : %10.3f\n", disk->diskInfo().innerEnvelopeR(),
+           disk->diskInfo().outerEnvelopeR());
     printf(" X : %12.3f Y : %12.3f Z : %12.3f\n",
-	   disk->geomInfo().origin().x(),
-	   disk->geomInfo().origin().y(),
-	   disk->geomInfo().origin().z());
+	   disk->diskInfo().origin().x(),
+	   disk->diskInfo().origin().y(),
+	   disk->diskInfo().origin().z());
     // printf(" Xsize : %10.3f Ysize : %10.3f Zsize : %10.3f\n", 
     // 	   disk->size().x(),
     // 	   disk->size().y(),
@@ -1854,8 +1778,8 @@ void TAnaDump::printStepPointMC(const mu2e::StepPointMC* Step, const char* Detec
       printf("--------------------------------------------------------------------------------------------------------------------\n");
     }
 
-    mu2e::GeomHandle<mu2e::Tracker> ttHandle;
-    const mu2e::Tracker* tracker = ttHandle.get();
+    // mu2e::GeomHandle<mu2e::Tracker> ttHandle;
+    // const mu2e::Tracker* tracker = ttHandle.get();
   
     art::Ptr<mu2e::SimParticle> const& simptr = Step->simParticle();
     const mu2e::SimParticle* sim  = simptr.operator ->();

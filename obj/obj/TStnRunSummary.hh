@@ -208,9 +208,9 @@ public:
 //-----------------------------------------------------------------------------
 // overloaded methods of TObject
 //-----------------------------------------------------------------------------
-  const char* GetName() const { return fObjName.Data(); }
-  void        Clear(Option_t* option = "");
-  void        Print(Option_t* option = "") const;   // *MENU* 
+  virtual const char* GetName() const  override{ return fObjName.Data(); }
+  virtual void        Clear(Option_t* option = "") override;
+  virtual void        Print(Option_t* option = "") const override;   // *MENU* 
 //-----------------------------------------------------------------------------
 // schema evolution
 // v6: adds low and high runsections
@@ -224,7 +224,7 @@ public:
   void      ReadV6(TBuffer& R__b, UInt_t R__s, UInt_t R__c);
   void      ReadV7(TBuffer& R__b, UInt_t R__s, UInt_t R__c);
 
-  ClassDef(TStnRunSummary,8)
+  ClassDefOverride(TStnRunSummary,8)
 };
 
 #endif

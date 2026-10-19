@@ -13,20 +13,20 @@ int sector_type[22] = {
 //-----------------------------------------------------------------------------
 TCrvNumerology::TCrvNumerology() {
 
-  const char* gdata{"Stntuple/geom/data"};
+  const char* crv_sectors_fn {"Stntuple/geom/data/crv_sectors.txt" };
+  const char* crv_counters_fn{"Stntuple/geom/data/crv_counters.txt"};
 
-  const char* dir  = gEnv->GetValue("Stntuple.GeometryData",gdata);
+  const char* sectors_fn = gEnv->GetValue("Stntuple.GeometryData.CrvSectors",crv_sectors_fn);
 //-----------------------------------------------------------------------------
 // read file and construct sectors
 //-----------------------------------------------------------------------------
-  TString fn = Form("%s/crv_sectors.txt",dir);
-  FILE* f  = fopen(fn.Data(),"r");
+  FILE* f  = fopen(sectors_fn,"r");
   if (f == 0) {
-    Error("Init",Form("missing file %s\n",fn.Data()));
+    Error("Init",Form("missing file: %s\n",sectors_fn));
     // return -2;
   }
 
-  int     sector, iwy, iwx, iwz ;
+  int     sector, type, iwy, iwx, iwz ;
   float   dy, dx, dz;
   char    name[100];
   int done = 0;
@@ -41,10 +41,12 @@ TCrvNumerology::TCrvNumerology() {
                                         // parse line
       fscanf(f,"%i" ,&sector       );
       fscanf(f,"%s" ,name          );
+      fscanf(f,"%i" ,&type         );
 
       SectorData_t* sec = &fSector[sector];
       sec->fNumber = sector;
       sec->fName   = name;
+      sec->fType   = type;
 
       fscanf(f,"%i" ,&sec->fNModules);
       fscanf(f,"%i" ,&sec->fNLayers );
@@ -69,10 +71,11 @@ TCrvNumerology::TCrvNumerology() {
 //-----------------------------------------------------------------------------
 // now the same way read in the counter geom data
 //-----------------------------------------------------------------------------
-  TString fn1 = Form("%s/crv_counter_geom.txt",dir);
-  FILE* f1  = fopen(fn1.Data(),"r");
+  
+  const char* counters_fn = gEnv->GetValue("Stntuple.GeometryData.CrvSectors",crv_counters_fn);
+  FILE* f1  = fopen(counters_fn,"r");
   if (f1 == 0) {
-    Error("Init",Form("missing file %s\n",fn1.Data()));
+    Error("Init",Form("missing file %s\n",counters_fn));
     // return -2;
   }
 
@@ -165,6 +168,24 @@ int TCrvNumerology::GetBarInfo(int BarIndex, int& Sector, int& Module, int& Laye
     }
   }
   return Sector;
+}
+
+//-----------------------------------------------------------------------------
+// extracted geometry
+// 2026-10-16: this will need to be rewritten
+//-----------------------------------------------------------------------------
+int TCrvNumerology::GetSector(int Sbid) {
+  int sector(-1);
+  if      (Sbid < 256) sector = 0;
+  else if (Sbid < 384) sector = 1;
+  else if (Sbid < 512) sector = 2;
+  else if (Sbid < 576) {
+    sector = (Sbid-512) / 8;
+  }
+  else {
+    printf("ERROR: non-existent SBID:%i\n",Sbid);
+  }
+  return sector;
 }
 
 //------------------------------------------------------------------------------

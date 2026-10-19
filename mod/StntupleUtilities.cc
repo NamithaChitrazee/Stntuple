@@ -49,4 +49,26 @@ namespace stntuple {
 
     return dt;
   }
+
+
+//-----------------------------------------------------------------------------
+// compressing ntuple for specialized studies
+// check whether the hist time is close enough to one of the time clusters
+//-----------------------------------------------------------------------------
+  bool CloseEnough(float Time, const mu2e::TimeClusterCollection* Tcc, float MinDt) {
+    bool close_enough = false;
+
+    int ntc = Tcc->size();
+    for (int i=0; i<ntc; i++) {
+      const mu2e::TimeCluster* tc = &Tcc->at(i);
+      float dt = Time - tc->t0().t0();
+      if (fabs(dt) < MinDt) {
+        close_enough = true;
+        break;
+      }
+    }
+    return close_enough;
+  }
+  
 }
+

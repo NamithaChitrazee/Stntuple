@@ -41,15 +41,17 @@ add_library(${CMAKE_PROJECT_NAME}::${subpkg} ALIAS ${lib})
 message(" -- P.Murat CMAKE_PROJECT_NAME::subpkg ${CMAKE_PROJECT_NAME}::${subpkg}")
 
 target_link_libraries(${lib}
-  Stntuple_obj
-  Stntuple_base
+  Stntuple::obj Stntuple::base
   ROOT::Physics ROOT::GenVector ROOT::Graf ROOT::Graf3d ROOT::Geom ROOT::Matrix ROOT::Core)
 
 cet_add_compiler_flags(-g -O0)
 
-install(TARGETS ${lib})
-
-# install_headers()
-# install_source()
+install(TARGETS ${lib}
+  EXPORT StntupleTargets
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+  RUNTIME DESTINATION bin
+  INCLUDES DESTINATION include
+)
 
 install(DIRECTORY ${subpkg} DESTINATION include/Stntuple)

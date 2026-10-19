@@ -11,9 +11,18 @@ include_directories(
 
 # link_directories($ENV{ROOTSYS}/lib)
 
-set (include_files TClusterAnaModule.hh TCrvAnaModule.hh TEventDisplayModule.hh 
-                   TGenAnaModule.hh THelixAnaModule.hh TSpmcAnaModule.hh TTrackAnaModule.hh
-                   TTrackSeedAnaModule.hh TTriggerAnaModule.hh TValidationModule.hh)
+set (include_files
+    TClusterAnaModule.hh
+    TCrvAnaModule.hh TCrvTimeAnaModule.hh
+    TDetTimeAnaModule.hh
+    TEventDisplayModule.hh 
+    TGenAnaModule.hh
+    THelixAnaModule.hh
+    TSpmcAnaModule.hh
+    TTrackAnaModule.hh
+    TTrackSeedAnaModule.hh
+    TTriggerAnaModule.hh
+    TValidationModule.hh)
 
 if ($ENV{STNTUPLE_MC_GEN})
   append (include_files TPhotosAnaModule.hh)
@@ -24,9 +33,19 @@ ROOT_GENERATE_DICTIONARY(${dict} ${include_files} LINKDEF ${subpkg}/Linkdef.h)
 
 set_property(SOURCE ${dict}.cxx PROPERTY generated)
 
-set (source_files InitVirtualDetectors.cc TClusterAnaModule.cc TCrvAnaModule.cc TEventDisplayModule.cc TGenAnaModule.cc 
-                   THelixAnaModule.cc TSpmcAnaModule.cc TTrackAnaModule.cc TTrackSeedAnaModule.cc 
-                   TTriggerAnaModule.cc TValidationModule.cc)
+set (source_files
+        InitVirtualDetectors.cc
+        TClusterAnaModule.cc
+        TCrvAnaModule.cc TCrvTimeAnaModule.cc
+        TDetTimeAnaModule.cc
+        TEventDisplayModule.cc
+        TGenAnaModule.cc 
+        THelixAnaModule.cc
+        TSpmcAnaModule.cc
+        TTrackAnaModule.cc
+        TTrackSeedAnaModule.cc 
+        TTriggerAnaModule.cc
+        TValidationModule.cc)
 
 if ($ENV{STNTUPLE_MC_GEN})
   append (source_files TPhotosAnaModule.cc)
@@ -35,7 +54,7 @@ endif()
 add_library(${lib} SHARED ${source_files} ${dict}.cxx)
 
 target_link_libraries(${lib}
-  Stntuple_alg Stntuple_obj Stntuple_loop Stntuple_gui Stntuple_geom Stntuple_base
+  Stntuple::alg Stntuple::obj Stntuple::loop Stntuple::gui Stntuple::geom Stntuple::base
   ROOT::Core ROOT::Matrix ROOT::Tree ROOT::Graf ROOT::Gpad)
 
 cet_add_compiler_flags(-g -O0)

@@ -33,11 +33,11 @@ public:
 //-----------------------------------------------------------------------------
 // overloaded virtual functions of TObject
 //-----------------------------------------------------------------------------
-  virtual void Paint              (Option_t* Option = "");
-  virtual void ExecuteEvent       (Int_t event, Int_t px, Int_t py);
-  virtual int  DistancetoPrimitive(Int_t px, Int_t py);
+  virtual void Paint              (Option_t* Option = "")  override;
+  virtual void ExecuteEvent       (Int_t event, Int_t px, Int_t py) override;
+  virtual int  DistancetoPrimitive(Int_t px, Int_t py) override;
   
-  ClassDef(TCrvView, 0)
+  ClassDefOverride(TCrvView, 0)
 };
 
 #endif

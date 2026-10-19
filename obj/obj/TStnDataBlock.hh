@@ -7,7 +7,6 @@
 // 
 //  base class for STNTUPLE data block
 //-----------------------------------------------------------------------------
-
 #include "Stntuple/obj/AbsEvent.hh"
 #include "Stntuple/obj/TStnInitDataBlock.hh"
 
@@ -110,6 +109,7 @@ public:
   TObjArray*  MessageList       () { return fMessageList;        }
   Int_t       EventNumber       () { return f_EventNumber;       }
   Int_t       RunNumber         () { return f_RunNumber;         }
+  Int_t       SubrunNumber      () { return f_SubrunNumber;      }
 
   void GetCollTag    (const char* CollectionClassName, char* CollTag    );
   void GetModuleLabel(const char* CollectionClassName, char* ModuleLabel);
@@ -152,10 +152,9 @@ public:
   }
 
   virtual Int_t GetEntry(Int_t ientry);
-					// ****** overloaded functions of 
-					// TObject
-  void Print(Option_t* opt="") const;
+					// ****** overloaded functions of TObject
+  virtual void Print(Option_t* opt="") const override;
 
-  ClassDef(TStnDataBlock,1)
+  ClassDefOverride(TStnDataBlock,1)
 };
 #endif

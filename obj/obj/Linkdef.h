@@ -6,13 +6,26 @@
 #pragma link C++ nestedclasses;
 #pragma link C++ nestedtypedefs;
 
+#pragma link C++  class  TCaloDigiBlock-;
+#pragma link C++  class  TCaloDigi-;
+#pragma link C++  class  TCaloRecoDigiBlock-;
+#pragma link C++  class  TCaloRecoDigi-;
+#pragma link C++  class  TCaloHitBlock-;
+#pragma link C++  class  TCaloHit-;
+
 #pragma link C++  class  TCalDataBlock-;
 #pragma link C++  class  TCalHitData-;
+
+#pragma link C++  class  TComboHit-;
+#pragma link C++  class  TComboHitBlock-;
+
+#pragma link C++  class  TCrvDigi-;
+#pragma link C++  class  TCrvDigiBlock-;
 #pragma link C++  class  TCrvClusterBlock-;
 #pragma link C++  class  TCrvCoincidenceCluster-;
-#pragma link C++  class  TCrvCoincidence-;
 #pragma link C++  class  TCrvPulseBlock-;
 #pragma link C++  class  TCrvRecoPulse-;
+
 #pragma link C++  class  TGenParticle;
 #pragma link C++  class  TGenpBlock-;
 #pragma link C++  class  TSimParticle-;
@@ -40,14 +53,20 @@
 #pragma link C++  class  TStnTrackBlock-;
 #pragma link C++  class  TStnTrack-;
 #pragma link C++  class  TStnTrack::InterData_t-;
+
+#pragma link C++  class  TStrTrackBlock-;
+#pragma link C++  class  TStrTrack-;
+
 #pragma link C++  class  TStnTrackSeedBlock-;
 #pragma link C++  class  TStnTrackSeed-;
 #pragma link C++  class  TStnTriggerBlock-;
 #pragma link C++  class  TStnTrigger-;
 #pragma link C++  class  TStnTriggerTable;
-#pragma link C++  class  TStrawHitBlock-;
+#pragma link C++  class  TStrawDigi-;
+#pragma link C++  class  TStrawDigiBlock-;
 #pragma link C++  class  TStrawHit-;
 #pragma link C++  class  TStrWaveform-;
+#pragma link C++  class  TStrawHitBlock-;
 #pragma link C++  class  TTrackStrawHitBlock-;
 #pragma link C++  class  TTrackStrawHit-;
 #pragma link C++  class  TVDetDataBlock-;

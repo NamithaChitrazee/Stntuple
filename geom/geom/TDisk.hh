@@ -117,11 +117,11 @@ public:
 //-----------------------------------------------------------------------------
 // overloaded functions of TObject
 //-----------------------------------------------------------------------------
-  virtual void   Paint(Option_t* Opt = "");
-  virtual void   Clear(Option_t* Opt = "") ;
-  virtual void   Print(Option_t* Opt = "") const ;
+  virtual void   Paint(Option_t* Opt = "") override;
+  virtual void   Clear(Option_t* Opt = "") override;
+  virtual void   Print(Option_t* Opt = "") const override;
 
-  ClassDef(TDisk,0)
+  ClassDefOverride(TDisk,0)
     
 };
 

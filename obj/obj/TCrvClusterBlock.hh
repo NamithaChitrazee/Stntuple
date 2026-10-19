@@ -53,10 +53,10 @@ public:
 //-----------------------------------------------------------------------------
 // overloaded methods of TObject
 //-----------------------------------------------------------------------------
-  void Clear(Option_t* opt="");
-  void Print(Option_t* opt="") const;
+  virtual void Clear(Option_t* opt="") override;
+  virtual void Print(Option_t* opt="") const override;
 
-  ClassDef(TCrvClusterBlock,1)	// CRV coincidence cluster block
+  ClassDefOverride(TCrvClusterBlock,1)	// CRV coincidence cluster block
 };
 
 

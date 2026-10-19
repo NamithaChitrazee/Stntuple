@@ -62,7 +62,8 @@ TH1F* get_hist(TString FName, TString ModuleName, TString HistName)
 // "Ana" is a directory
 //-----------------------------------------------------------------------------
       gROOT->cd();
-      TString hname = "Ana/"+ModuleName+"/Hist/"+HistName;
+      // TString hname = "//Ana/"+ModuleName+"/Hist/"+HistName;
+      TString hname = "//Ana/"+ModuleName+"/"+HistName;
       h = (TH1F*) file->Get(hname.Data());
     }
   }

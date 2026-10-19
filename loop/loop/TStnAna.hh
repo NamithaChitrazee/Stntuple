@@ -234,8 +234,8 @@ public:
 //-----------------------------------------------------------------------------
 //  overloaded methods of TObject
 //-----------------------------------------------------------------------------
-  void  Clear (const char* Opt = "");
-  void  Print (const char* Opt = "") const ;
+  virtual void  Clear (const char* Opt = "") override;
+  virtual void  Print (const char* Opt = "") const override;
   
 protected:
 
@@ -243,6 +243,6 @@ protected:
   Int_t  AddFolders(TFolder*   Fol1, TFolder*   Fol2);
   Int_t  AddArrays (TObjArray* A1  , TObjArray* A2  );
 
-  ClassDef(TStnAna,0)  // STNTUPLE event loop utility
+  ClassDefOverride(TStnAna,0)  // STNTUPLE event loop utility
 };
 #endif

@@ -37,10 +37,10 @@ public:
 //-----------------------------------------------------------------------------
 // overloaded methods of TObject
 //-----------------------------------------------------------------------------
-  void Clear(Option_t* opt="");
-  void Print(Option_t* opt="") const;
+  void Clear(Option_t* opt="") override;
+  void Print(Option_t* opt="") const override;
 
-  ClassDef(TVDetDataBlock,1)	// virtual data block
+  ClassDefOverride(TVDetDataBlock,1)	// virtual data block
 };
 
 

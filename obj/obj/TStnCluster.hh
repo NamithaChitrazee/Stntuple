@@ -15,6 +15,7 @@
 
 // C++ includes.
 #include <iostream>
+#include <cmath>
 
 #include "TString.h"
 #include "TFolder.h"
@@ -48,7 +49,7 @@ public:
 // integers
 //-----------------------------------------------------------------------------
   int                       fNumber;          // index in the list of reconstructed clusters
-  int                       fDiskID;	      //
+  int                       fDiskID;	      // 0 or 1
   int                       fNCrystals;       //
   int                       fNCr1     ;       // N crystals above 1 MeV
   int                       fTrackNumber;     // closest track in TStnTrackBlock
@@ -141,28 +142,29 @@ public:
   float   OutRingE    () const { return fOutRingE;}
 
   // evaluated values
-  float   E1          () const { return SeedFr() * Energy(); } // energy of main hit
+  float   E1          () const { return SeedFr() * Energy(); }         // energy of main hit
   float   E2          () const { return SeedFr2() * Energy() - E1(); } // energy of the second biggest hit
-  float   E12         () const { return SeedFr2() * Energy(); } // energy of main two hits
-  float   RingE       () const { return E9() - E1(); } // energy around the main hit
+  float   E12         () const { return SeedFr2() * Energy(); }        // energy of main two hits
+  float   RingE       () const { return E9() - E1(); }                 // energy around the main hit
   float   R           () const { return std::sqrt(fX*fX + fY*fY); }
 
   // linked track
-  TStnTrack* ClosestTrack() { return fClosestTrack; }
+  TStnTrack*               ClosestTrack  () { return fClosestTrack; }
+  const mu2e::CaloCluster* OfflineCluster() { return fCaloCluster;  }
 
   void    SetNumber(int I) { fNumber = I; } //
 
 //-----------------------------------------------------------------------------
 // overloaded methods of TObject
 //-----------------------------------------------------------------------------
-  virtual void Clear(Option_t* Opt = "") ;
-  virtual void Print(Option_t* Opt = "") const ;
+  virtual void Clear(Option_t* Opt = "") override;
+  virtual void Print(Option_t* Opt = "") const override;
 //-----------------------------------------------------------------------------
 // schema evolution
 //-----------------------------------------------------------------------------
   void ReadV1(TBuffer& R__b);
 
-  ClassDef(TStnCluster,3)
+  ClassDefOverride(TStnCluster,3)
 };
 
 #endif

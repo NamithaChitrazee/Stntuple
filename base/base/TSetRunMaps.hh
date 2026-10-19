@@ -29,8 +29,8 @@ public:
   TSetRunMaps();
   ~TSetRunMaps();
 
-  void  Print(const char* Opt = "") const ;
+  virtual void  Print(const char* Opt = "") const override;
 
-  ClassDef(TSetRunMaps,1)
+  ClassDefOverride(TSetRunMaps,1)
 };
 #endif

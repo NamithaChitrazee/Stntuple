@@ -49,11 +49,12 @@ public:
 
 					// ****** overloaded methods of TObject
 
-  const char* GetName() const { return fObjName.Data(); }
-  void        Delete(Option_t* option = "");
-  void        Print (Option_t* option = "") const; // *MENU*
+  virtual const char* GetName() const override { return fObjName.Data(); }
+  virtual void        Delete(Option_t* option = "") override;
+  
+  virtual void        Print (Option_t* option = "") const override; // *MENU*
 
-  ClassDef(TStnTriggerTable,1)
+  ClassDefOverride(TStnTriggerTable,1)
 };
 
 #endif

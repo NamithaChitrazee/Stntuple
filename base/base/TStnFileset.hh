@@ -54,10 +54,10 @@ public:
 //-----------------------------------------------------------------------------
 // overloaded methods of TObject
 //-----------------------------------------------------------------------------
-  void  Clear(Option_t* Opt = "");
-  void  Print(Option_t* Opt = "") const ;
+  virtual void  Clear(Option_t* Opt = "") override;
+  virtual void  Print(Option_t* Opt = "") const override;
 
-  ClassDef(TStnFileset,0)
+  ClassDefOverride(TStnFileset,0)
 };
 
 #endif

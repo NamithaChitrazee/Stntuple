@@ -81,9 +81,9 @@ public:
 //-----------------------------------------------------------------------------
 // overloaded methods of TObject
 //-----------------------------------------------------------------------------
-  void     Print(Option_t* opt = "") const;
+  void     Print(Option_t* opt = "") const override;
 
-  ClassDef(TGenParticle,1)
+  ClassDefOverride(TGenParticle,1)
 };
 
 #endif

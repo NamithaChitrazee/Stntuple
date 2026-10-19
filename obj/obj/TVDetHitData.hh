@@ -63,14 +63,14 @@ public:
 //-----------------------------------------------------------------------------
 // overloaded methods of TObject
 //-----------------------------------------------------------------------------
-  void Clear(Option_t* opt = "");
-  void Print(Option_t* opt = "") const;
+  void Clear(Option_t* opt = "") override;
+  void Print(Option_t* opt = "") const override;
 //-----------------------------------------------------------------------------
 // schema evolution
 //-----------------------------------------------------------------------------
   void ReadV1(TBuffer &R__b);
 
-  ClassDef (TVDetHitData,2)
+  ClassDefOverride (TVDetHitData,2)
 };
 
 #endif

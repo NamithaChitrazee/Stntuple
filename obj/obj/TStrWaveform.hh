@@ -37,14 +37,14 @@ public:
 //-----------------------------------------------------------------------------
 // overloaded methods of TObject
 //-----------------------------------------------------------------------------
-  void Clear(Option_t* opt = "");
-  void Print(Option_t* opt = "") const;
+  virtual void Clear(Option_t* opt = "")       override;
+  virtual void Print(Option_t* opt = "") const override;
 //-----------------------------------------------------------------------------
 // schema evolution - no I/O changes from v1 to v2, only transient variables added
 //-----------------------------------------------------------------------------
 //  void ReadV1(TBuffer &R__b);
 
-  ClassDef (TStrWaveform,2)
+  ClassDefOverride (TStrWaveform,2)
 };
 
 #endif

@@ -5,12 +5,15 @@
 #define StntupleUtilities_hh
 
 #include "Offline/MCDataProducts/inc/StepPointMC.hh"
+#include "Offline/RecoDataProducts/inc/TimeCluster.hh"
 
 #include <vector>
 
 namespace stntuple {
 
   double get_proper_time(const mu2e::SimParticle* Simp);
+  
+  bool   CloseEnough(float Time, const mu2e::TimeClusterCollection* Tcc, float MinDt);
 
 }
 #endif

@@ -84,14 +84,14 @@ public:
 //-----------------------------------------------------------------------------
 // overloaded functions of TObject
 //-----------------------------------------------------------------------------
-  void Clear(Option_t* opt = "");
-  void Print(Option_t* opt = "") const;
+  virtual void Clear(Option_t* opt = "") override;
+  virtual void Print(Option_t* opt = "") const override;
 //-----------------------------------------------------------------------------
 //  I/O and schema evolution
 //-----------------------------------------------------------------------------
   void   ReadV1(TBuffer& R__b);
 
-  ClassDef(TStepPointMCBlock,2)	 // TStepPointMC block: Mu2e G4 output
+  ClassDefOverride(TStepPointMCBlock,2)	 // TStepPointMC block: Mu2e G4 output
 };
 
 #endif

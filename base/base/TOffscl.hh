@@ -22,8 +22,8 @@ public:
   TOffscl();
   ~TOffscl();
 
-  void  Print(const char* Opt = "") const ;
+  virtual void  Print(const char* Opt = "") const override;
 
-  ClassDef(TOffscl,1)
+  ClassDefOverride(TOffscl,1)
 };
 #endif

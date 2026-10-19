@@ -15,11 +15,11 @@ public:
   ~TStnSquare();
   TStnSquare(double HexSize, double X = 0, double Y = 0);
 
-  void  Paint(Option_t* Opt="") ;
+  virtual void Paint(Option_t* Opt="") override;
 
   static int Test(double Size = 30., double RIn=360., double ROut=670.);
 
-  ClassDef(TStnSquare,0)
+  ClassDefOverride(TStnSquare,0)
 
 };
 

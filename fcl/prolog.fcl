@@ -30,7 +30,7 @@ StntupleTHistModule : {
     maxFileSize         :  4000           ## MBytes
     bufferSize          : 64000           ## bytes
     histFileName        : ""              ##
-    splitLevel          :    99           ##
+    splitLevel          :     0           ## 99           ##
     compressionLevel    :     1           ##
 #------------------------------------------------------------------------------
 # TModule
@@ -66,19 +66,32 @@ StntupleMakerTemplate : { module_type:StntupleMaker
     processName          : undefined
 #------------------------------------------------------------------------------
 # define branches to be filled by default, in alphabetical order
+# set all reconstruction defaults to zero, to force the settings explicit in the top-level FCL
 #------------------------------------------------------------------------------    
-    makeCalData          : 0
-    makeClusters         : 1
+    makeCalData          : 0   ## obsolete
+    makeClusters         : 0   ## obsolete
+
+    makeCaloDigis        : 0
+    makeCaloRecoDigis    : 0
+    makeCaloHits         : 0
+    makeCaloClusters     : 0
+
+    makeComboHits        : 0
+
+    makeCrvDigis         : 0
     makeCrvPulses        : 0
-    makeCrvClusters      : 1
-    makeGenp             : 1
+    makeCrvClusters      : 0 ## if pulses are stored, cluter-to-pulse links are also stored
+    
+    makeGenp             : 0
     makeHelices          : 0
-    makePid              : 1
-    makeSimp             : 1  # 0: dont write
-    makeStepPointMC      : 1
+    makePid              : 0
+    makeSimp             : 0  # 0: dont write
+    makeStepPointMC      : 0
+    makeStrawDigis       : 0
     makeStrawHits        : 0
     makeStrawWaveforms   : 0
-    makeTracks           : 1
+    makeStraightTracks   : 0  ## straight tracks, for now keep them separate from curved ones
+    makeTracks           : 0
     makeTrackStrawHits   : 0
     makeTrackSeeds       : 0
     makeTimeClusters     : 0
@@ -86,18 +99,22 @@ StntupleMakerTemplate : { module_type:StntupleMaker
     
 #    KalDiag                      : { @table::KalDiagDirect    }
     DoubletAmbigResolver         : { @table::TrkReco.DoubletAmbigResolver }
-
-    caloCrystalHitsMaker         : "CaloHitMaker"
-    caloClusterMaker             : "CaloClusterMaker"
+#------------------------------------------------------------------------------
+# calorimeter
+#------------------------------------------------------------------------------
+    caloDigiCollTag              : "CaloDigiMaker"
+    caloRecoDigiCollTag          : "CaloRecoDigiMaker"
     caloHitCollTag               : "CaloHitMaker"
+    caloClusterCollTag           : "CaloClusterMaker"
+    caloClusterMCCollTag         : ""
 #------------------------------------------------------------------------------
 # default tags for CRV reco collections
 #------------------------------------------------------------------------------
+    crvDigiCollTag                 : "CrvDigi"
     crvRecoPulseCollTag            : "CrvRecoPulses"
-    crvCoincidenceCollTag          : "CrvCoincidence"
     crvCoincidenceClusterCollTag   : "CrvCoincidenceClusterFinder"
     crvCoincidenceClusterMCCollTag : "CrvCoincidenceClusterMCAssns"
-    #------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # sometimes may need to store multiple track blocks, thus - vectors
 # by default, always run MergePatRec, which, in case only one track reconstruction
 # module is running upstream, simply copies its output
@@ -107,7 +124,6 @@ StntupleMakerTemplate : { module_type:StntupleMaker
 #------------------------------------------------------------------------------
     chCollTag            : "makePH"
     strawDigiCollTag     : "makeSD"
-    sdwfCollTag          : "makeSD"
     shCollTag            : "makeSH"
     strawDigiMCCollTag   : @local::STN_COMPRESS_MCS              # was "makeSD"
 #------------------------------------------------------------------------------
@@ -125,6 +141,9 @@ StntupleMakerTemplate : { module_type:StntupleMaker
     simpMaxZ             : 1800.0                                # not used
     minNStrawHits        : -1                                    # min number of straw hits for a SimParticle to be stored
 
+    storeCloseHitsOnly   : false                                 # 
+    minStrawHitDt        : 80.                                   # ns
+    minStrawHitEDep      : 0.5e-3                                # 0.5 keV, in MeV
     genpCollTag          : @local::STN_COMPRESS_MCS              # save signal-only: "generate" 
 #------------------------------------------------------------------------------
 # cant input "unknown" from FCL, so try to set default in C++ - doesn't work
@@ -158,7 +177,8 @@ StntupleMakerTemplate : { module_type:StntupleMaker
 #------------------------------------------------------------------------------
     trackBlockName       : [ "TrackBlock"   ]
     trackCollTag         : [ "KFFDeM"       ]
-    trackFitType         : 2                         ## 1:BTRK(KFF) 2:KinKal(KK)
+# no more BTRK
+##    trackFitType         : 2                         ## 1:BTRK(KFF) 2:KinKal(KK)
 
     trackTsBlockName     : [ "KSFBlock"     ]
     trackTsCollTag       : [ "KSFDeM"       ]        ## has to be defined for BTRK   fits
@@ -272,6 +292,7 @@ Stntuple: {
     filters: {
 	EventFilter : { module_type:EventFilter
 	    printFreq    : 1000000
+            diagLevel    : 0
 	    eventList    : []          # [ run1, subrun1, event1, ...]
 	}
     } 
@@ -283,7 +304,7 @@ Stntuple: {
 	    THistModule: { @table::StntupleTHistModule                    # defaults of the base class
                 # module_name       : InitStntuple
                 histFileName      : "default.stn"
-                splitLevel        : 99
+                splitLevel        : 1    # 99
                 module_label      : "InitStntuple"
             }
 	}
@@ -296,10 +317,10 @@ Stntuple: {
 	}
 
 	StntupleEventDump : { module_type:StntupleEventDump 
-	    THistModule: {
-                @table::StntupleTHistModule
-            }                   # defaults of the base class
-	    module_name       : StntupleEventDump
+            TModule: { @table::StntupleTHistModule.TModule
+                interactiveMode  : 1                          ## 1:stop  after each event 2: stop at end-of-job;
+                module_label: "StntupleEventDump"
+            }
 	}
 #------------------------------------------------------------------------------
 # downstream electrons - explicitly - the same as default

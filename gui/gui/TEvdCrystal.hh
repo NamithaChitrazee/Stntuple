@@ -47,6 +47,7 @@ protected:
   int                   fFillColor;
   int                   fLineColor;
   int                   fNHits;		// number of (resolved) crystal hits
+  float                 fMaxHitEnergy;  // max energy of hits in this crystal
 
   float                 fEnergy;  	// total deposited energy
   const mu2e::Disk*     fDisk;
@@ -65,6 +66,7 @@ public:
   TClonesArray*     ListOfHits   () { return fListOfHits; }
   int               NHits        () const { return fNHits;      }
   float             Energy       () const { return fEnergy;     }
+  float             MaxHitEnergy () const { return fMaxHitEnergy;  }
   double            Radius       () const { return fShape->Radius(); }
   const mu2e::Disk* Disk         () const { return fDisk; }
   double            X0           () const { return fShape->X0(); }
@@ -79,27 +81,28 @@ public:
   void  SetFillColor(int Color) { fShape->fFillColor = Color; }
   void  SetLineColor(int Color) { fShape->fLineColor = Color; }
   void  SetLineWidth(int Width) { fShape->fLineWidth = Width; }
+  void  SetMaxHitEnergy(float E) { fMaxHitEnergy = E; }
 
   void   AddHit(const mu2e::CaloHit* CrystalHit);
 
   //  virtual void  Draw    (Option_t* option = "");
 
-  virtual void  Paint   (Option_t* option = "");
+  virtual void  Paint   (Option_t* option = "") override;
   virtual void  PaintXY (Option_t* option = "");
   virtual void  PaintCal(Option_t* option = "");
 
   //  virtual void  ExecuteEvent(Int_t event, Int_t px, Int_t py);
 
-  virtual Int_t DistancetoPrimitive  (Int_t px, Int_t py);
+  virtual Int_t DistancetoPrimitive  (Int_t px, Int_t py) override;
   virtual Int_t DistancetoPrimitiveXY(Int_t px, Int_t py);
   virtual Int_t DistancetoPrimitiveRZ(Int_t px, Int_t py);
 //-----------------------------------------------------------------------------
 // overloaded methods of TObject
 //-----------------------------------------------------------------------------
-  virtual void   Clear(const char* Opt = "") ;
-  virtual void   Print(const char* Opt = "") const ; // **MENU**
+  virtual void   Clear(const char* Opt = "") override;
+  virtual void   Print(const char* Opt = "") const override; // **MENU**
 
-  ClassDef(TEvdCrystal,0)
+  ClassDefOverride(TEvdCrystal,0)
 };
 
 
