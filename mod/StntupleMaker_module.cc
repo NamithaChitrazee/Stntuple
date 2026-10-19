@@ -854,6 +854,7 @@ void StntupleMaker::beginJob() {
     fInitStrawHitBlock = new stntuple::InitStrawHitBlock();
 
     fInitStrawHitBlock->SetShCollTag         (fShCollTag);
+    fInitStrawHitBlock->SetChCollTag         (fChCollTag);
     fInitStrawHitBlock->SetStrawDigiCollTag  (fStrawDigiCollTag);
     fInitStrawHitBlock->SetStrawDigiMCCollTag(fSdmcCollTag);
     art::InputTag tc_coll_tag = fTcCollTag[0]; // why would I need many - for comparison between algorithms ?

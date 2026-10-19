@@ -109,13 +109,33 @@ int InitComboHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int 
     float corrected_time = ch->correctedTime();
     if (fStoreCloseHitsOnly) {
       if (ch->energyDep() < fMinEDep) {
-        bool close_enough = stntuple::CloseEnough(corrected_time,fTcc,fMinDt);
-        if (not close_enough) continue;
+        //        bool close_enough = stntuple::CloseEnough(corrected_time,fTcc,fMinDt);
+        bool close_enough = stntuple::CloseEnough(ch->correctedTime(),fTcc,fMinDt);
+        if (not close_enough) {
+          // accidentally, the time clustering window may be large enough
+          // so hits included into the time cluster are outside the checked window
+          // make sure the hit is not in the list explicitly
+          int ntc = fTcc->size();
+          for (int itc=0; itc<ntc; itc++) {
+            const mu2e::TimeCluster* tc = &fTcc->at(itc);
+            int nch = tc->hits().size();
+            for (int j=0; j<nch; j++) {
+              // store the CH index in the initial collection
+              uint16_t tc_ind = tc->hits().at(j);
+              if (ind == tc_ind) {
+                close_enough = true;
+                break;
+              }
+            }
+            if (close_enough) break;
+          }
+          if (not close_enough) continue;
+        }
       }
     }
-
-    //    TComboHit* nt_ch = data->NewHit(i);
-
+//-----------------------------------------------------------------------------
+// store combo hit
+//-----------------------------------------------------------------------------
     int pln = ch->strawId().plane();
     int pnl = ch->strawId().panel();
     const mu2e::TrkPanelMap::Row* tpmd = fTpm->panel_map_by_offline_ind(pln,pnl);

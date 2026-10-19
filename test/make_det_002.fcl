@@ -48,6 +48,8 @@ physics : {
             minNPanels    : 1
             TimeWindow    : 160 ## assume running with correct calibrations ## 400
             TimeStep      : 50
+            minEDep       : 0.5e-3
+            minNGoodHits  : 2
         }
         
         CaloDigiMaker : { module_type:  CaloDigisFromDTCEvents
