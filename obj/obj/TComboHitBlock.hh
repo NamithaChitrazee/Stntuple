@@ -29,6 +29,7 @@ public:
   int            NHits     () { return fNHits     ; }
 
   TComboHit*     Hit      (int I) { return (TComboHit*   ) fListOfHits->UncheckedAt     (I); }
+  TComboHit*     GetHitByID(int ID);
   
   TClonesArray*  ListOfHits     () { return fListOfHits     ; }
   TStnLinkBlock* ListOfShIndices() { return fListOfShIndices; }

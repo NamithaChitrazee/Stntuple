@@ -47,6 +47,19 @@ TComboHitBlock::~TComboHitBlock() {
   delete fListOfHits;
 }
 
+//-----------------------------------------------------------------------------
+TComboHit* TComboHitBlock::GetHitByID(int ID) {
+  TComboHit* found(nullptr);
+  for (int i=0; i<fNHits; i++) {
+    TComboHit* hit = Hit(i);
+    if (hit->GetUniqueID() == (uint32_t) ID) {
+      found = hit;
+      break;
+    }
+  }
+  return found;
+}
+
 //______________________________________________________________________________
 void TComboHitBlock::Clear(Option_t* opt) {
   fListOfHits->Clear();
