@@ -73,7 +73,6 @@ target_include_directories(${lib}
 
 cet_add_compiler_flags(-g -O0)
 
-install(TARGETS ${lib})
 install(TARGETS ${lib}
   EXPORT StntupleTargets
   LIBRARY DESTINATION lib

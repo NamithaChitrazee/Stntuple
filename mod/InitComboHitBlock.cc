@@ -101,74 +101,75 @@ int InitComboHitBlock::InitDataBlock(TStnDataBlock* Block, AbsEvent* Event, int 
     }
   }
 
-  const mu2e::ComboHit* ch0 = &fChc->at(0);
-  int ich = 0;
-  for (int i=0; i<fNCh; i++) {
-    const mu2e::ComboHit* ch = &fChc->at(i);
-    int ind = ch-ch0;
-    float corrected_time = ch->correctedTime();
-    if (fStoreCloseHitsOnly) {
-      if (ch->energyDep() < fMinEDep) {
-        //        bool close_enough = stntuple::CloseEnough(corrected_time,fTcc,fMinDt);
-        bool close_enough = stntuple::CloseEnough(ch->correctedTime(),fTcc,fMinDt);
-        if (not close_enough) {
-          // accidentally, the time clustering window may be large enough
-          // so hits included into the time cluster are outside the checked window
-          // make sure the hit is not in the list explicitly
-          int ntc = fTcc->size();
-          for (int itc=0; itc<ntc; itc++) {
-            const mu2e::TimeCluster* tc = &fTcc->at(itc);
-            int nch = tc->hits().size();
-            for (int j=0; j<nch; j++) {
-              // store the CH index in the initial collection
-              uint16_t tc_ind = tc->hits().at(j);
-              if (ind == tc_ind) {
-                close_enough = true;
-                break;
+  if (fNCh > 0) {
+    const mu2e::ComboHit* ch0 = &fChc->at(0);
+    int ich = 0;
+    for (int i=0; i<fNCh; i++) {
+      const mu2e::ComboHit* ch = &fChc->at(i);
+      int ind = ch-ch0;
+      float corrected_time = ch->correctedTime();
+      if (fStoreCloseHitsOnly) {
+        if (ch->energyDep() < fMinEDep) {
+          //        bool close_enough = stntuple::CloseEnough(corrected_time,fTcc,fMinDt);
+          bool close_enough = stntuple::CloseEnough(ch->correctedTime(),fTcc,fMinDt);
+          if (not close_enough) {
+            // accidentally, the time clustering window may be large enough
+            // so hits included into the time cluster are outside the checked window
+            // make sure the hit is not in the list explicitly
+            int ntc = fTcc->size();
+            for (int itc=0; itc<ntc; itc++) {
+              const mu2e::TimeCluster* tc = &fTcc->at(itc);
+              int nch = tc->hits().size();
+              for (int j=0; j<nch; j++) {
+                // store the CH index in the initial collection
+                uint16_t tc_ind = tc->hits().at(j);
+                if (ind == tc_ind) {
+                  close_enough = true;
+                  break;
+                }
               }
+              if (close_enough) break;
             }
-            if (close_enough) break;
+            if (not close_enough) continue;
           }
-          if (not close_enough) continue;
         }
       }
-    }
 //-----------------------------------------------------------------------------
 // store combo hit
 //-----------------------------------------------------------------------------
-    int pln = ch->strawId().plane();
-    int pnl = ch->strawId().panel();
-    const mu2e::TrkPanelMap::Row* tpmd = fTpm->panel_map_by_offline_ind(pln,pnl);
-    // ind is a hit index in the original Mu2e hit collection
-    TComboHit* nt_ch   = data->NewHit(ind);
-    ich++;
-    nt_ch->fStrawID    = ch->strawId().asUint16();
-    nt_ch->fNsh        = ch->nStrawHits();
-    nt_ch->fZface      = tpmd->zface();
-    nt_ch->fMnid       = tpmd->mnid();
-    nt_ch->fTime       = corrected_time; // ch->correctedTime();
-    nt_ch->fDrTime     = ch->driftTime();
-    nt_ch->fX          = ch->pos().x();
-    nt_ch->fY          = ch->pos().y();
-    nt_ch->fZ          = ch->pos().z();
-    nt_ch->fUx         = ch->uDir().x();
-    nt_ch->fUy         = ch->uDir().y();
-    nt_ch->fUres       = ch->uRes();
-    nt_ch->fVres       = ch->vRes();
-    nt_ch->fEDep       = ch->energyDep();
+      int pln = ch->strawId().plane();
+      int pnl = ch->strawId().panel();
+      const mu2e::TrkPanelMap::Row* tpmd = fTpm->panel_map_by_offline_ind(pln,pnl);
+      // ind is a hit index in the original Mu2e hit collection
+      TComboHit* nt_ch   = data->NewHit(ind);
+      ich++;
+      nt_ch->fStrawID    = ch->strawId().asUint16();
+      nt_ch->fNsh        = ch->nStrawHits();
+      nt_ch->fZface      = tpmd->zface();
+      nt_ch->fMnid       = tpmd->mnid();
+      nt_ch->fTime       = corrected_time; // ch->correctedTime();
+      nt_ch->fDrTime     = ch->driftTime();
+      nt_ch->fX          = ch->pos().x();
+      nt_ch->fY          = ch->pos().y();
+      nt_ch->fZ          = ch->pos().z();
+      nt_ch->fUx         = ch->uDir().x();
+      nt_ch->fUy         = ch->uDir().y();
+      nt_ch->fUres       = ch->uRes();
+      nt_ch->fVres       = ch->vRes();
+      nt_ch->fEDep       = ch->energyDep();
 
-    // if (_debugMode  > 0) {
-    //   if (_debugBit[1] != 0) {
-    //     // printf("%8i %5i %3i %3i %3i %12.4f %12.4f %6.1f %6.1f %7.4f\n",
-    //     //        _event->evn,
-    //     //        (int) nt_sh->sid, pln, pnl, nt_sh->mnid,
-    //     //        nt_sh->time, nt_sh->dt,
-    //     //        nt_sh->tot0, nt_sh->tot1,
-    //     //        nt_sh->edep);
-    //   }
-    // }
+      // if (_debugMode  > 0) {
+      //   if (_debugBit[1] != 0) {
+      //     // printf("%8i %5i %3i %3i %3i %12.4f %12.4f %6.1f %6.1f %7.4f\n",
+      //     //        _event->evn,
+      //     //        (int) nt_sh->sid, pln, pnl, nt_sh->mnid,
+      //     //        nt_sh->time, nt_sh->dt,
+      //     //        nt_sh->tot0, nt_sh->tot1,
+      //     //        nt_sh->edep);
+      //   }
+      // }
+    }
   }
-
   data->f_RunNumber   = rn_number;
   data->f_EventNumber = ev_number;
   

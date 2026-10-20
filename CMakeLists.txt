@@ -39,9 +39,6 @@ message("---------- Stntuple: PRINT CMAKE VARIABLES " )
 #    message("-- P.Murat: no MIDASSYS")
 # endif()
 
-include_directories($ENV{BTRK_INC} $ENV{KINKAL_INC})
-link_directories($ENV{BTRK_LIB} $ENV{KINKAL_LIB})
-
 #string(TOUPPER ${CMAKE_BUILD_TYPE} BTYPE_UC )
 #if( ${BTYPE_UC} MATCHES "DEBUG" )
 #  cet_add_compiler_flags(-fsanitize=address)

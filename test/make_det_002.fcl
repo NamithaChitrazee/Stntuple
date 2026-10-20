@@ -1,5 +1,7 @@
 # -*- mode:tcl -*-
 #------------------------------------------------------------------------------
+# MAKE_DET_002: close hits only
+#
 # p0 : ntupling only, assumes input being the reconstruction output
 # p1 : default reconstruction path
 # p2 : read and ntuple (use with RootInput to ntuple MDC'2018 files)
@@ -20,7 +22,7 @@ END_PROLOG
 # services.DbService and services.ProditionsService
 #------------------------------------------------------------------------------
 ## #include "daqana/rundb/124000/124155/calibration_set_v103.fcl"
-#include "rundb/fcl/calibration_set_124155_v103.fcl"
+#include "rundb/125000/latest/calibration_set_125000_v104.fcl"
 
 process_name : @local::PROCESS_NAME
 
@@ -48,8 +50,8 @@ physics : {
             minNPanels    : 1
             TimeWindow    : 160 ## assume running with correct calibrations ## 400
             TimeStep      : 50
-            minEDep       : 0.5e-3
-            minNGoodHits  : 2
+#            minEDep       : 0.5e-3
+#            minNGoodHits  : 2
         }
         
         CaloDigiMaker : { module_type:  CaloDigisFromDTCEvents
@@ -124,7 +126,7 @@ physics : {
             minStrawHitEDep    : 0.0005          ## 0.5 keV
             minStrawHitDt      : 80              ## ns
             
-            makeCaloClusters   : 1
+            # makeCaloClusters   : 1
             makeCaloHits       : 1
             makeCaloDigis      : 1
             makeCaloRecoDigis  : 1
@@ -150,7 +152,7 @@ physics : {
                 EWMProducer
                 , makeSD, makeSH, TimeCluster                           ## tracker
                 , CaloDigiMaker, CaloRecoDigiMaker, CaloHitMaker        ## calorimeter
-                , CaloProtoClusterMaker, CaloClusterMaker
+                # , CaloProtoClusterMaker, CaloClusterMaker
                 , CrvDigi, CrvRecoPulses, CrvCoincidenceClusterFinder   ## CRV
                 , LineFinder, KKLine                                    ## track reco
                ]
@@ -164,7 +166,7 @@ physics : {
 }
 
 services.TFileService.fileName              : "/dev/null" ##
-physics.analyzers.InitStntuple.THistModule.histFileName : "nts.mu2e.vst00s00r00n004.make_crv.%06r_%06s.stn"       ## "nts._USER_.read_reco.xxx.000001.stn"
+physics.analyzers.InitStntuple.THistModule.histFileName : "nts.mu2e.vst00s000r104n010.make_det_002.125000_000001.stn"       ## "nts._USER_.read_reco.xxx.000001.stn"
 
 # outputs.detectorOutput.fileName           : "sim._USER_.read_reco.xxx.000001.art"
 
