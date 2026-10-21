@@ -26,6 +26,12 @@
 #pragma link C++ class stntuple::TPhotosAnaModule;
 #pragma link C++ class stntuple::TPhotosAnaModule::Hist_t;
 
+#pragma link C++ class stntuple::TSimpAnaModule;
+#pragma link C++ class stntuple::TSimpAnaModule::Hist_t;
+#pragma link C++ class stntuple::TSimpAnaModule::EventHist_t;
+#pragma link C++ class stntuple::TSimpAnaModule::GenpHist_t;
+#pragma link C++ class stntuple::TSimpAnaModule::SimpHist_t;
+
 #pragma link C++ class stntuple::TSpmcAnaModule;
 
 #pragma link C++ class stntuple::TTrackAnaModule;

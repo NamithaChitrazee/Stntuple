@@ -20,6 +20,7 @@ namespace stntuple {
   class TGenAnaModule;
   class THelixAnaModule;
   class TPhotosAnaModule;
+  class TSimpAnaModule;
   class TTrackAnaModule;
   class TTrackSeedAnaModule;
   class TTriggerAnaModule;
@@ -33,6 +34,7 @@ namespace stntuple {
   TGenAnaModule*              m_gen   = nullptr;
   THelixAnaModule*            m_hel   = nullptr;
   TPhotosAnaModule*           m_pho   = nullptr;
+  TSimpAnaModule*             m_sim   = nullptr;
   TSpmcAnaModule*             m_spmc  = nullptr;
   TTrackAnaModule*            m_trk   = nullptr;
   TTrackSeedAnaModule*        m_trs   = nullptr;

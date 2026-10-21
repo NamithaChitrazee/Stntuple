@@ -18,6 +18,7 @@ set (include_files
     TEventDisplayModule.hh 
     TGenAnaModule.hh
     THelixAnaModule.hh
+    TSimpAnaModule.hh
     TSpmcAnaModule.hh
     TTrackAnaModule.hh
     TTrackSeedAnaModule.hh
@@ -41,6 +42,7 @@ set (source_files
         TEventDisplayModule.cc
         TGenAnaModule.cc 
         THelixAnaModule.cc
+        TSimpAnaModule.cc
         TSpmcAnaModule.cc
         TTrackAnaModule.cc
         TTrackSeedAnaModule.cc 

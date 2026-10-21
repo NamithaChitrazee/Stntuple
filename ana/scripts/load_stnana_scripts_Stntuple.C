@@ -25,6 +25,7 @@ int load_stnana_scripts_Stntuple(int Debug) {
     "helix.C"        , "PWD",
     "lumi.C"         , "PWD",
     "photos.C"       , "STNTUPLE_MC_GEN",    // analyze output of the PHOTOS MC
+    "simp.C"         , "PWD",                // analyze SimParticles
     "spmc.C"         , "PWD",                // analyze StepPointMC's
     "trk.C"          , "PWD",		     // tracks
     "trs.C"          , "PWD",                // sample track seed analysis module
