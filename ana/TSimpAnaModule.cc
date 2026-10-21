@@ -5,6 +5,8 @@
 //  2  : rejected events
 //
 //  5  : NP >= 2 (with >= 20 straw hits)
+//  6  : single CE electron (90 < p_VD10 < 110 MeV/c)
+//  7  : events with >= 2 tracks with mom at VD10 > 80 MeV/c
 //
 ///////////////////////////////////////////////////////////////////////////////
 #include "TF1.h"
@@ -28,12 +30,14 @@ ClassImp(stntuple::TSimpAnaModule)
 namespace stntuple {
 //-----------------------------------------------------------------------------
 TSimpAnaModule::TSimpAnaModule(const char* name, const char* title): TStnModule(name,title) {
-  fPDGCode       = 0;
-  fMCProcessCode = -1;
-  fMinNStrawHits = 20;
-  fNCEElectrons  = 0;
-  fNCEEvents     = 0;
-  fStnt          = TStntuple::Instance();
+  fPDGCode            = 0;
+  fMCProcessCode      = -1;
+  fMinNStrawHits      = 20;
+  fNCEElectrons       = 0;
+  fNCEEvents          = 0;
+  fNMultiTrkParticles = 0;
+  fNMultiTrkEvents    = 0;
+  fStnt               = TStntuple::Instance();
 }
 
 //-----------------------------------------------------------------------------
@@ -146,6 +150,16 @@ void TSimpAnaModule::BookHistograms() {
     fHist.fSimp[50] = new SimpHist_t;
     BookSimpHistograms(fHist.fSimp[50],Form("Hist/%s",folder_name));
   }
+//-----------------------------------------------------------------------------
+// sim_multitrk: events with >= 2 particles with MomTargetEnd (VD10) > 80 MeV/c
+//-----------------------------------------------------------------------------
+  {
+    sprintf(folder_name,"sim_multitrk");
+    fol = (TFolder*) hist_folder->FindObject(folder_name);
+    if (! fol) fol = hist_folder->AddFolder(folder_name,folder_name);
+    fHist.fSimp[51] = new SimpHist_t;
+    BookSimpHistograms(fHist.fSimp[51],Form("Hist/%s",folder_name));
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -228,6 +242,17 @@ void TSimpAnaModule::FillHistograms() {
           FillSimpHistograms(fHist.fSimp[50],simp);
           break;
         }
+      }
+    }
+  }
+//-----------------------------------------------------------------------------
+// sim_multitrk: >= 2 particles with MomTargetEnd (VD10) > 80 MeV/c
+//-----------------------------------------------------------------------------
+  if (fNMultiTrkParticles >= 2) {
+    for (int i=0; i<fEvtPar.fNSimp; i++) {
+      simp = fSimpBlock->Particle(i);
+      if (simp->fMomTargetEnd > 80) {
+        FillSimpHistograms(fHist.fSimp[51],simp);
       }
     }
   }
@@ -361,10 +386,11 @@ int TSimpAnaModule::Event(int ientry) {
 //-----------------------------------------------------------------------------
 // count particles
 //-----------------------------------------------------------------------------
-  fNMuons[0]    = 0;
-  fNMuons[1]    = 0;
-  fNElectrons   = 0;
-  fNCEElectrons = 0;
+  fNMuons[0]          = 0;
+  fNMuons[1]          = 0;
+  fNElectrons         = 0;
+  fNCEElectrons       = 0;
+  fNMultiTrkParticles = 0;
 
   for (int i=0; i<fEvtPar.fNSimp; i++) {
     TSimParticle* simp = fSimpBlock->Particle(i);
@@ -383,9 +409,11 @@ int TSimpAnaModule::Event(int ientry) {
       float p_vd10 = simp->fMomTargetEnd;
       if (p_vd10 > 90 and p_vd10 < 110) fNCEElectrons += 1;
     }
+    if (simp->fMomTargetEnd > 80) fNMultiTrkParticles += 1;
   }
 
-  if (fNCEElectrons == 1) fNCEEvents += 1;
+  if (fNCEElectrons       == 1) fNCEEvents       += 1;
+  if (fNMultiTrkParticles >= 2) fNMultiTrkEvents += 1;
 
   FillHistograms();
 
@@ -411,6 +439,13 @@ void TSimpAnaModule::Debug() {
       GetHeaderBlock()->Print(Form("NCEEvents(running)=%5i",fNCEEvents));
     }
   }
+
+  if (GetDebugBit(7) == 1) {
+    if (fNMultiTrkParticles >= 2) {
+      GetHeaderBlock()->Print(Form("NMultiTrkEvents(running)=%5i NMultiTrkParticles=%5i",
+                                   fNMultiTrkEvents, fNMultiTrkParticles));
+    }
+  }
 }
 
 //_____________________________________________________________________________
@@ -419,6 +454,10 @@ int TSimpAnaModule::EndJob() {
   if (GetDebugBit(6) == 1) {
     printf("%s::EndJob: N(events, single CE electron, 90<p_VD10<110 MeV/c): %5i\n",
            GetName(), fNCEEvents);
+  }
+  if (GetDebugBit(7) == 1) {
+    printf("%s::EndJob: N(events, >= 2 tracks with mom at VD10 > 80 MeV/c): %5i\n",
+           GetName(), fNMultiTrkEvents);
   }
   return 0;
 }
