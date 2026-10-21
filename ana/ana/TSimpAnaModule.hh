@@ -102,6 +102,8 @@ public:
 
   int               fNElectrons;
   int               fNMuons[2];     // [0]: total, [1]: 'trigger', P > 90
+  int               fNCEElectrons;  // N(electrons) with 90 < MomTargetEnd < 110 MeV/c
+  int               fNCEEvents;     // cumulative count of events with fNCEElectrons == 1
   int               fMinNStrawHits;
 
   int               fPDGCode;

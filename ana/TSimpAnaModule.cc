@@ -31,6 +31,8 @@ TSimpAnaModule::TSimpAnaModule(const char* name, const char* title): TStnModule(
   fPDGCode       = 0;
   fMCProcessCode = -1;
   fMinNStrawHits = 20;
+  fNCEElectrons  = 0;
+  fNCEEvents     = 0;
   fStnt          = TStntuple::Instance();
 }
 
@@ -134,6 +136,16 @@ void TSimpAnaModule::BookHistograms() {
       BookSimpHistograms(fHist.fSimp[i],Form("Hist/%s",folder_name));
     }
   }
+//-----------------------------------------------------------------------------
+// sim_CE: exactly one electron (PDG==11) with 90 < MomTargetEnd < 110 MeV/c
+//-----------------------------------------------------------------------------
+  {
+    sprintf(folder_name,"sim_CE");
+    fol = (TFolder*) hist_folder->FindObject(folder_name);
+    if (! fol) fol = hist_folder->AddFolder(folder_name,folder_name);
+    fHist.fSimp[50] = new SimpHist_t;
+    BookSimpHistograms(fHist.fSimp[50],Form("Hist/%s",folder_name));
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -201,6 +213,21 @@ void TSimpAnaModule::FillHistograms() {
       }
       else if (abs(pdg_code) == 211) {
 	FillSimpHistograms(fHist.fSimp[40],simp);
+      }
+    }
+  }
+//-----------------------------------------------------------------------------
+// sim_CE: exactly one electron (PDG==11) with 90 < MomTargetEnd < 110 MeV/c
+//-----------------------------------------------------------------------------
+  if (fNCEElectrons == 1) {
+    for (int i=0; i<fEvtPar.fNSimp; i++) {
+      simp = fSimpBlock->Particle(i);
+      if (simp->PDGCode() == 11) {
+        float p_vd10 = simp->fMomTargetEnd;
+        if (p_vd10 > 90 and p_vd10 < 110) {
+          FillSimpHistograms(fHist.fSimp[50],simp);
+          break;
+        }
       }
     }
   }
@@ -334,9 +361,10 @@ int TSimpAnaModule::Event(int ientry) {
 //-----------------------------------------------------------------------------
 // count particles
 //-----------------------------------------------------------------------------
-  fNMuons[0]  = 0;
-  fNMuons[1]  = 0;
-  fNElectrons = 0;
+  fNMuons[0]    = 0;
+  fNMuons[1]    = 0;
+  fNElectrons   = 0;
+  fNCEElectrons = 0;
 
   for (int i=0; i<fEvtPar.fNSimp; i++) {
     TSimParticle* simp = fSimpBlock->Particle(i);
@@ -352,8 +380,12 @@ int TSimpAnaModule::Event(int ientry) {
       if (simp->NStrawHits() >= fMinNStrawHits) {
 	if (p > 90) fNElectrons += 1;
       }
+      float p_vd10 = simp->fMomTargetEnd;
+      if (p_vd10 > 90 and p_vd10 < 110) fNCEElectrons += 1;
     }
   }
+
+  if (fNCEElectrons == 1) fNCEEvents += 1;
 
   FillHistograms();
 
@@ -373,11 +405,21 @@ void TSimpAnaModule::Debug() {
     }
     if (np >= 2) GetHeaderBlock()->Print(Form("np = %5i",np));
   }
+
+  if (GetDebugBit(6) == 1) {
+    if (fNCEElectrons == 1) {
+      GetHeaderBlock()->Print(Form("NCEEvents(running)=%5i",fNCEEvents));
+    }
+  }
 }
 
 //_____________________________________________________________________________
 int TSimpAnaModule::EndJob() {
   printf("----- end job: ---- %s\n",GetName());
+  if (GetDebugBit(6) == 1) {
+    printf("%s::EndJob: N(events, single CE electron, 90<p_VD10<110 MeV/c): %5i\n",
+           GetName(), fNCEEvents);
+  }
   return 0;
 }
 
