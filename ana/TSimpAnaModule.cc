@@ -7,6 +7,7 @@
 //  5  : NP >= 2 (with >= 20 straw hits)
 //  6  : single CE electron (90 < p_VD10 < 110 MeV/c)
 //  7  : events with >= 2 tracks with mom at VD10 > 80 MeV/c
+//  8  : single positron (PDG==-11) with 85 < p_VD10 < 95 MeV/c
 //
 ///////////////////////////////////////////////////////////////////////////////
 #include "TF1.h"
@@ -35,6 +36,8 @@ TSimpAnaModule::TSimpAnaModule(const char* name, const char* title): TStnModule(
   fMinNStrawHits      = 20;
   fNCEElectrons       = 0;
   fNCEEvents          = 0;
+  fNCEPositrons       = 0;
+  fNCEPosEvents       = 0;
   fNMultiTrkParticles = 0;
   fNMultiTrkEvents    = 0;
   fStnt               = TStntuple::Instance();
@@ -160,6 +163,16 @@ void TSimpAnaModule::BookHistograms() {
     fHist.fSimp[51] = new SimpHist_t;
     BookSimpHistograms(fHist.fSimp[51],Form("Hist/%s",folder_name));
   }
+//-----------------------------------------------------------------------------
+// sim_muplus: exactly one positron (PDG==-11) with 85 < MomTargetEnd < 95 MeV/c
+//-----------------------------------------------------------------------------
+  {
+    sprintf(folder_name,"sim_muplus");
+    fol = (TFolder*) hist_folder->FindObject(folder_name);
+    if (! fol) fol = hist_folder->AddFolder(folder_name,folder_name);
+    fHist.fSimp[52] = new SimpHist_t;
+    BookSimpHistograms(fHist.fSimp[52],Form("Hist/%s",folder_name));
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -240,6 +253,21 @@ void TSimpAnaModule::FillHistograms() {
         float p_vd10 = simp->fMomTargetEnd;
         if (p_vd10 > 90 and p_vd10 < 110) {
           FillSimpHistograms(fHist.fSimp[50],simp);
+          break;
+        }
+      }
+    }
+  }
+//-----------------------------------------------------------------------------
+// sim_muplus: exactly one positron (PDG==-11) with 85 < MomTargetEnd < 95 MeV/c
+//-----------------------------------------------------------------------------
+  if (fNCEPositrons == 1) {
+    for (int i=0; i<fEvtPar.fNSimp; i++) {
+      simp = fSimpBlock->Particle(i);
+      if (simp->PDGCode() == -11) {
+        float p_vd10 = simp->fMomTargetEnd;
+        if (p_vd10 > 85 and p_vd10 < 95) {
+          FillSimpHistograms(fHist.fSimp[52],simp);
           break;
         }
       }
@@ -390,6 +418,7 @@ int TSimpAnaModule::Event(int ientry) {
   fNMuons[1]          = 0;
   fNElectrons         = 0;
   fNCEElectrons       = 0;
+  fNCEPositrons       = 0;
   fNMultiTrkParticles = 0;
 
   for (int i=0; i<fEvtPar.fNSimp; i++) {
@@ -409,10 +438,15 @@ int TSimpAnaModule::Event(int ientry) {
       float p_vd10 = simp->fMomTargetEnd;
       if (p_vd10 > 90 and p_vd10 < 110) fNCEElectrons += 1;
     }
+    else if (pdg_code == -11) {
+      float p_vd10 = simp->fMomTargetEnd;
+      if (p_vd10 > 85 and p_vd10 < 95) fNCEPositrons += 1;
+    }
     if (simp->fMomTargetEnd > 80) fNMultiTrkParticles += 1;
   }
 
   if (fNCEElectrons       == 1) fNCEEvents       += 1;
+  if (fNCEPositrons       == 1) fNCEPosEvents    += 1;
   if (fNMultiTrkParticles >= 2) fNMultiTrkEvents += 1;
 
   FillHistograms();
@@ -446,6 +480,12 @@ void TSimpAnaModule::Debug() {
                                    fNMultiTrkEvents, fNMultiTrkParticles));
     }
   }
+
+  if (GetDebugBit(8) == 1) {
+    if (fNCEPositrons == 1) {
+      GetHeaderBlock()->Print(Form("NCEPosEvents(running)=%5i",fNCEPosEvents));
+    }
+  }
 }
 
 //_____________________________________________________________________________
@@ -458,6 +498,10 @@ int TSimpAnaModule::EndJob() {
   if (GetDebugBit(7) == 1) {
     printf("%s::EndJob: N(events, >= 2 tracks with mom at VD10 > 80 MeV/c): %5i\n",
            GetName(), fNMultiTrkEvents);
+  }
+  if (GetDebugBit(8) == 1) {
+    printf("%s::EndJob: N(events, single positron (PDG==-11), 85<p_VD10<95 MeV/c): %5i\n",
+           GetName(), fNCEPosEvents);
   }
   return 0;
 }

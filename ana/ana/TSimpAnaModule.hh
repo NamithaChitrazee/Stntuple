@@ -104,6 +104,8 @@ public:
   int               fNMuons[2];          // [0]: total, [1]: 'trigger', P > 90
   int               fNCEElectrons;       // N(electrons) with 90 < MomTargetEnd < 110 MeV/c
   int               fNCEEvents;          // cumulative count of events with fNCEElectrons == 1
+  int               fNCEPositrons;       // N(positrons, PDG==-11) with 85 < MomTargetEnd < 95 MeV/c
+  int               fNCEPosEvents;       // cumulative count of events with fNCEPositrons == 1
   int               fNMultiTrkParticles; // N(particles) with MomTargetEnd (VD10) > 80 MeV/c in this event
   int               fNMultiTrkEvents;    // cumulative count of events with fNMultiTrkParticles >= 2
   int               fMinNStrawHits;
